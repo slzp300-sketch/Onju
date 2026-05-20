@@ -15,6 +15,7 @@ export default defineConfig({
         name: '직장생활조',
         short_name: '직장생활조',
         description: '크리스천 직장인을 위한 신앙-업무-공동체 통합 루틴 관리 앱',
+        start_url: '/',
         theme_color: '#6366f1',
         background_color: '#ffffff',
         display: 'standalone',

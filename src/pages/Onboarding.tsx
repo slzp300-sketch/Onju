@@ -150,6 +150,12 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-dvh bg-white flex flex-col">
+      {/* 상단 바 */}
+      <div className="flex items-center justify-end px-4 pt-3 pb-1">
+        <button onClick={finish} className="text-sm text-gray-400 py-1">
+          건너뛰기
+        </button>
+      </div>
       {/* 프로그레스 바 */}
       <div className="h-1 bg-gray-100 w-full">
         <motion.div
