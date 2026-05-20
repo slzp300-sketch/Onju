@@ -33,7 +33,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const { setOnboardingDone } = useAuthStore();
   const { setMonthlyGoals } = useGoalStore();
-  const { addRoutine } = useRoutineStore();
+  const { setRoutines: commitRoutines } = useRoutineStore();
 
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
@@ -81,36 +81,30 @@ export default function Onboarding() {
       };
       setMonthlyGoals([goal]);
     }
-    // 개인 루틴 저장
-    routines.forEach((r, i) => {
-      const routine: DailyRoutine = {
-        id: `pr-ob-${Date.now()}-${i}`,
+    const ts = Date.now();
+    const personalToSave: DailyRoutine[] = routines.map((r, i) => ({
+      id: `pr-ob-${ts}-${i}`,
+      userId: 'user-1',
+      title: r.title,
+      type: 'personal',
+      frequency: r.frequency,
+      isActive: true,
+      order: i,
+      createdAt: today.toISOString(),
+    }));
+    const faithToSave: DailyRoutine[] = faithRoutineTemplates
+      .filter(t => selectedFaithIds.includes(t.id))
+      .map((t, i) => ({
+        id: `fr-ob-${ts}-${i}`,
         userId: 'user-1',
-        title: r.title,
-        type: 'personal',
-        frequency: r.frequency,
+        title: t.title,
+        type: 'faith' as const,
+        frequency: 'daily' as const,
         isActive: true,
         order: i,
         createdAt: today.toISOString(),
-      };
-      addRoutine(routine);
-    });
-    // 신앙 루틴 저장
-    faithRoutineTemplates
-      .filter(t => selectedFaithIds.includes(t.id))
-      .forEach((t, i) => {
-        const routine: DailyRoutine = {
-          id: `fr-ob-${Date.now()}-${i}`,
-          userId: 'user-1',
-          title: t.title,
-          type: 'faith',
-          frequency: 'daily',
-          isActive: true,
-          order: i,
-          createdAt: today.toISOString(),
-        };
-        addRoutine(routine);
-      });
+      }));
+    commitRoutines(personalToSave, faithToSave);
 
     setOnboardingDone();
     navigate('/');

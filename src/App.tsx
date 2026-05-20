@@ -1,6 +1,6 @@
 ﻿import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Home, Target, ListChecks, BarChart2, Users } from 'lucide-react';
+import { Home, Target, ListChecks, BarChart2, Users, UserCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Today from './pages/Today';
 import WeeklyGoals from './pages/WeeklyGoals';
@@ -29,6 +29,7 @@ const navItems = [
   { to: '/routines', icon: ListChecks, label: '루틴' },
   { to: '/stats', icon: BarChart2, label: '통계' },
   { to: '/groups', icon: Users, label: '소모임' },
+  { to: '/profile', icon: UserCircle, label: '마이' },
 ];
 
 function BottomNavInner() {
@@ -62,7 +63,7 @@ function BottomNavInner() {
             <motion.div whileTap={{ scale: 1.25 }} transition={{ duration: 0.12 }}>
               <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
             </motion.div>
-            {active && <span>{label}</span>}
+            <span>{label}</span>
           </NavLink>
         );
       })}

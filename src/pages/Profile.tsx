@@ -11,8 +11,6 @@ export default function Profile() {
   const { user, logout } = useAuthStore();
   const { weeklyGoals } = useGoalStore();
 
-  if (!user) return null;
-
   const thisWeekGoalCount = weeklyGoals.filter(
     g => g.weekNumber === currentWeek() && g.year === currentYear()
   ).length;
@@ -30,8 +28,8 @@ export default function Profile() {
             <User size={22} className="text-indigo-600" />
           </div>
           <div>
-            <p className="text-sm font-bold text-gray-900">{user.name}</p>
-            <p className="text-xs text-gray-400">{user.email}</p>
+            <p className="text-sm font-bold text-gray-900">{user!.name}</p>
+            <p className="text-xs text-gray-400">{user!.email}</p>
           </div>
         </div>
       </Card>
@@ -39,7 +37,7 @@ export default function Profile() {
       {/* 주간 슬롯 현황 */}
       <Card className="mx-4">
         <p className="text-xs font-semibold text-gray-500 mb-2">주간 목표 슬롯</p>
-        <SlotBadge total={user.weeklyGoalSlots} used={thisWeekGoalCount} />
+        <SlotBadge total={user!.weeklyGoalSlots} used={thisWeekGoalCount} />
         <p className="text-xs text-gray-400 mt-2">지난 주 달성률 80% 이상 시 슬롯이 늘어납니다 (최대 5개)</p>
       </Card>
 
