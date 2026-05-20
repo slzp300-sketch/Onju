@@ -73,7 +73,7 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
                   initial={{ opacity: 0, scale: 0.8, y: 8 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.8, y: 8 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  transition={{ type: 'spring', stiffness: 650, damping: 22 }}
                   className="absolute right-0 bottom-10 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 flex gap-2 z-10"
                 >
                   {(['heart', 'fire', 'pray'] as CheerType[]).map(type => (

@@ -88,21 +88,21 @@ export default function Dashboard() {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.05,
+        staggerChildren: 0.04,
+        delayChildren: 0.03,
       },
     },
   } as const;
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
+    hidden: { opacity: 0, y: 8 },
     show: {
       opacity: 1,
       y: 0,
       transition: {
         type: 'spring',
-        stiffness: 260,
-        damping: 24,
+        stiffness: 380,
+        damping: 28,
       },
     },
   } as const;

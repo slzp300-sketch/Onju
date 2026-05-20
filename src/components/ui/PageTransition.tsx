@@ -8,13 +8,13 @@ interface PageTransitionProps {
 export default function PageTransition({ children }: PageTransitionProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -12 }}
+      exit={{ opacity: 0, y: -4 }}
       transition={{
         type: 'spring',
-        stiffness: 280,
-        damping: 26,
+        stiffness: 600,
+        damping: 22,
       }}
       className="w-full min-h-dvh flex flex-col"
     >

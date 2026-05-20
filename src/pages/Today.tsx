@@ -48,21 +48,21 @@ export default function Today() {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.05,
+        staggerChildren: 0.02,
+        delayChildren: 0,
       },
     },
   } as const;
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
+    hidden: { opacity: 0, y: 6 },
     show: {
       opacity: 1,
       y: 0,
       transition: {
         type: 'spring',
-        stiffness: 260,
-        damping: 24,
+        stiffness: 550,
+        damping: 20,
       },
     },
   } as const;

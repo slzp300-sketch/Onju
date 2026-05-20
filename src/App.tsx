@@ -67,10 +67,10 @@ function BottomNavInner() {
               <motion.span
                 layoutId="activeTabPill"
                 className="absolute inset-x-3 top-1.5 bottom-1.5 bg-indigo-50/60 rounded-2xl -z-10"
-                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                transition={{ type: 'spring', stiffness: 650, damping: 28 }}
               />
             )}
-            <motion.div whileTap={{ scale: 1.25 }} transition={{ duration: 0.12 }}>
+            <motion.div whileTap={{ scale: 1.25 }} transition={{ duration: 0.08 }}>
               <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
             </motion.div>
             <span>{label}</span>

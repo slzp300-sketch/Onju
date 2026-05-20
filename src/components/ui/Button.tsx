@@ -35,7 +35,7 @@ export default function Button({
       disabled={disabled}
       whileTap={disabled ? undefined : { scale: 0.96 }}
       whileHover={disabled ? undefined : { scale: 1.015 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+      transition={{ type: 'spring', stiffness: 700, damping: 20 }}
       className={[
         'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors',
         variantClasses[variant],
