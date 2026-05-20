@@ -55,7 +55,7 @@ export default function Stats() {
     const { default: html2canvas } = await import('html2canvas');
     const canvas = await html2canvas(reportRef.current, { scale: 2, backgroundColor: '#ffffff' });
     const link = document.createElement('a');
-    link.download = `직장생활조_${todayStr}.png`;
+    link.download = `온주_${todayStr}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
@@ -157,7 +157,7 @@ export default function Stats() {
       {/* 섹션 5: 월간 리포트 공유 */}
       <div ref={reportRef} className="mx-4">
         <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-3xl p-6 text-white">
-          <p className="text-xs font-semibold opacity-70 mb-1">직장생활조</p>
+          <p className="text-xs font-semibold opacity-70 mb-1">온주</p>
           <h3 className="text-lg font-bold mb-4">{user?.name.slice(-2)}님의 이번 달 기록</h3>
           <div className="grid grid-cols-3 gap-3 mb-4">
             <ReportStat label="개인" value={`${Math.round(monthAvgPersonal)}%`} />

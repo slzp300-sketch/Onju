@@ -34,7 +34,7 @@ export default function Login() {
         <div className="w-14 h-14 rounded-2xl bg-indigo-500 flex items-center justify-center mb-4">
           <span className="text-white text-2xl font-bold">직</span>
         </div>
-        <h1 className="text-xl font-bold text-gray-900">직장생활조</h1>
+        <h1 className="text-xl font-bold text-gray-900">온주</h1>
         <p className="text-sm text-gray-400 mt-1">크리스천 직장인의 루틴 파트너</p>
       </div>
 
