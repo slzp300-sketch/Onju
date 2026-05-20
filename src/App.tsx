@@ -1,7 +1,9 @@
-﻿import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
+﻿import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Home, Target, ListChecks, BarChart2, Users, UserCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useRoutineStore } from './store/routineStore';
 import Today from './pages/Today';
 import WeeklyGoals from './pages/WeeklyGoals';
 import MonthlyGoals from './pages/MonthlyGoals';
@@ -73,6 +75,11 @@ function BottomNavInner() {
 
 function AppRoutes() {
   const { isAuthenticated, onboardingDone } = useAuthStore();
+  const deduplicateFaithRoutines = useRoutineStore(s => s.deduplicateFaithRoutines);
+
+  useEffect(() => {
+    if (isAuthenticated) deduplicateFaithRoutines();
+  }, [isAuthenticated, deduplicateFaithRoutines]);
 
   return (
     <Routes>

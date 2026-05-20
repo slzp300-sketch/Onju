@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createGroup } from '../api/groups';
+import { useGroupStore } from '../store/groupStore';
+import { useAuthStore } from '../store/authStore';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { format, addDays } from 'date-fns';
+import type { SmallGroup } from '../types';
 
 export default function GroupNew() {
   const navigate = useNavigate();
-  const qc = useQueryClient();
+  const { addGroup } = useGroupStore();
+  const { user } = useAuthStore();
   const [form, setForm] = useState({
     title: '',
     goal: '',
@@ -18,23 +20,27 @@ export default function GroupNew() {
     isPublic: true,
   });
 
-  const mutation = useMutation({
-    mutationFn: () =>
-      createGroup({
-        title: form.title,
-        goal: form.goal,
-        maxMembers: form.maxMembers,
-        startDate: new Date().toISOString(),
-        endDate: addDays(new Date(), form.durationDays).toISOString(),
-        isPublic: form.isPublic,
-      }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['groups'] });
-      navigate('/groups');
-    },
-  });
-
   const isValid = form.title.trim() && form.goal.trim();
+
+  const handleCreate = () => {
+    if (!isValid) return;
+    const now = new Date();
+    const group: SmallGroup = {
+      id: `grp-${Date.now()}`,
+      creatorId: user?.id ?? 'user-1',
+      title: form.title.trim(),
+      goal: form.goal.trim(),
+      startDate: now.toISOString(),
+      endDate: addDays(now, form.durationDays).toISOString(),
+      maxMembers: form.maxMembers,
+      currentMemberCount: 1,
+      status: 'recruiting',
+      isPublic: form.isPublic,
+      createdAt: now.toISOString(),
+    };
+    addGroup(group);
+    navigate('/groups');
+  };
 
   return (
     <div className="flex flex-col gap-4 pb-4">
@@ -68,9 +74,7 @@ export default function GroupNew() {
 
           <Field label={`최대 인원: ${form.maxMembers}명`}>
             <input
-              type="range"
-              min={2}
-              max={10}
+              type="range" min={2} max={10}
               value={form.maxMembers}
               onChange={e => setForm(f => ({ ...f, maxMembers: Number(e.target.value) }))}
               className="w-full accent-indigo-600"
@@ -79,10 +83,7 @@ export default function GroupNew() {
 
           <Field label={`기간: ${form.durationDays}일 (${format(addDays(new Date(), form.durationDays), 'M월 d일')} 종료)`}>
             <input
-              type="range"
-              min={7}
-              max={90}
-              step={7}
+              type="range" min={7} max={90} step={7}
               value={form.durationDays}
               onChange={e => setForm(f => ({ ...f, durationDays: Number(e.target.value) }))}
               className="w-full accent-indigo-600"
@@ -102,12 +103,8 @@ export default function GroupNew() {
             </button>
           </div>
 
-          <Button
-            fullWidth
-            onClick={() => mutation.mutate()}
-            disabled={!isValid || mutation.isPending}
-          >
-            {mutation.isPending ? '생성 중...' : '소모임 만들기'}
+          <Button fullWidth onClick={handleCreate} disabled={!isValid}>
+            소모임 만들기
           </Button>
         </div>
       </Card>

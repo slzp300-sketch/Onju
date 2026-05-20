@@ -15,6 +15,7 @@ interface RoutineState {
   deactivateRoutine: (id: string) => void;
   updateRoutine: (id: string, changes: Partial<Pick<DailyRoutine, 'title' | 'frequency'>>) => void;
   setRoutines: (personal: DailyRoutine[], faith: DailyRoutine[]) => void;
+  deduplicateFaithRoutines: () => void;
 }
 
 export const useRoutineStore = create<RoutineState>()(
@@ -107,6 +108,18 @@ export const useRoutineStore = create<RoutineState>()(
 
       setRoutines: (personal, faith) => {
         set({ personalRoutines: personal, faithRoutines: faith });
+      },
+
+      deduplicateFaithRoutines: () => {
+        set((s) => {
+          const seen = new Set<string>();
+          const deduped = s.faithRoutines.filter(r => {
+            if (seen.has(r.title)) return false;
+            seen.add(r.title);
+            return true;
+          });
+          return deduped.length === s.faithRoutines.length ? s : { faithRoutines: deduped };
+        });
       },
     }),
     { name: 'routine-store' }
