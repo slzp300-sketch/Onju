@@ -1,9 +1,10 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Home, Target, ListChecks, BarChart2, Users, UserCircle } from 'lucide-react';
+import { LayoutDashboard, Users, UserCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRoutineStore } from './store/routineStore';
+import Dashboard from './pages/Dashboard';
 import Today from './pages/Today';
 import WeeklyGoals from './pages/WeeklyGoals';
 import MonthlyGoals from './pages/MonthlyGoals';
@@ -25,11 +26,11 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 1000 * 30 } },
 });
 
+// 홈 탭이 활성화되어야 하는 하위 경로들
+const HOME_PATHS = ['/today', '/goals', '/routines', '/stats', '/review'];
+
 const navItems = [
-  { to: '/', icon: Home, label: '오늘' },
-  { to: '/goals/weekly', icon: Target, label: '목표' },
-  { to: '/routines', icon: ListChecks, label: '루틴' },
-  { to: '/stats', icon: BarChart2, label: '통계' },
+  { to: '/', icon: LayoutDashboard, label: '홈' },
   { to: '/groups', icon: Users, label: '소모임' },
   { to: '/profile', icon: UserCircle, label: '마이' },
 ];
@@ -39,8 +40,8 @@ function BottomNavInner() {
   const hideNav =
     location.pathname === '/login' ||
     location.pathname === '/signup' ||
-    location.pathname === '/groups/new' ||
     location.pathname === '/onboarding' ||
+    location.pathname === '/groups/new' ||
     location.pathname === '/review' ||
     location.pathname.startsWith('/review/result') ||
     (location.pathname.startsWith('/groups/') && location.pathname !== '/groups');
@@ -51,13 +52,12 @@ function BottomNavInner() {
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex z-30 max-w-md mx-auto safe-bottom">
       {navItems.map(({ to, icon: Icon, label }) => {
         const active = to === '/'
-          ? location.pathname === '/'
+          ? location.pathname === '/' || HOME_PATHS.some(p => location.pathname.startsWith(p))
           : location.pathname.startsWith(to);
         return (
           <NavLink
             key={to}
             to={to}
-            end={to === '/'}
             className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium transition-colors ${
               active ? 'text-indigo-600' : 'text-gray-400'
             }`}
@@ -93,7 +93,8 @@ function AppRoutes() {
         <Route path="*" element={<Navigate to="/onboarding" replace />} />
       ) : (
         <>
-          <Route path="/" element={<Today />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/today" element={<Today />} />
           <Route path="/goals/monthly" element={<MonthlyGoals />} />
           <Route path="/goals/weekly" element={<WeeklyGoals />} />
           <Route path="/routines" element={<Routines />} />
