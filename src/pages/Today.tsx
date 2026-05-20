@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useQuery } from '@tanstack/react-query';
 import Card from '../components/ui/Card';
@@ -42,76 +43,113 @@ export default function Today() {
     prevCompleteRef.current = allDone;
   }, [allDone]);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.05,
+      },
+    },
+  } as const;
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 260,
+        damping: 24,
+      },
+    },
+  } as const;
+
   return (
-    <div className="flex flex-col gap-4 pb-4">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="flex flex-col gap-4 pb-4"
+    >
       {/* 헤더 */}
-      <div className="px-4 pt-5">
+      <motion.div variants={itemVariants} className="px-4 pt-5">
         <p className="text-xs text-gray-400 font-medium">{formatDisplay(new Date())}</p>
         <h1 className="text-lg font-bold text-gray-900 mt-0.5">
           안녕하세요, {user?.name.slice(-2)}님
         </h1>
-      </div>
+      </motion.div>
 
       {/* 일요일 리뷰 배너 */}
       {isSunday() && (
-        <div className="px-4">
+        <motion.div variants={itemVariants} className="px-4">
           <ReviewBanner
             completed={isReviewCompleted(reviews, currentWeek(), currentYear())}
             weekRangeText={getWeekRangeText()}
             onStart={() => navigate('/review')}
           />
-        </div>
+        </motion.div>
       )}
 
       {/* 스트릭 카운터 */}
-      <div className="px-4">
+      <motion.div variants={itemVariants} className="px-4">
         <StreakCounter
           personalStreak={pStreak}
           faithStreak={fStreak}
           personalBest={pBest}
           faithBest={fBest}
         />
-      </div>
+      </motion.div>
 
       {/* 오늘 달성률 */}
-      <Card className="mx-4">
-        <p className="text-xs font-semibold text-gray-500 mb-3">오늘의 달성률</p>
-        <DailyProgress />
-      </Card>
+      <motion.div variants={itemVariants}>
+        <Card className="mx-4">
+          <p className="text-xs font-semibold text-gray-500 mb-3">오늘의 달성률</p>
+          <DailyProgress />
+        </Card>
+      </motion.div>
 
       {/* 주간 히트맵 */}
-      <Card className="mx-4">
-        <p className="text-xs font-semibold text-gray-500 mb-3">이번 주 현황</p>
-        <HeatMap personalRoutines={personalRoutines} faithRoutines={faithRoutines} logs={logs} />
-        <div className="flex gap-3 mt-3">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-sm bg-indigo-400" />
-            <span className="text-xs text-gray-400">개인</span>
+      <motion.div variants={itemVariants}>
+        <Card className="mx-4">
+          <p className="text-xs font-semibold text-gray-500 mb-3">이번 주 현황</p>
+          <HeatMap personalRoutines={personalRoutines} faithRoutines={faithRoutines} logs={logs} />
+          <div className="flex gap-3 mt-3">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-indigo-400" />
+              <span className="text-xs text-gray-400">개인</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-emerald-400" />
+              <span className="text-xs text-gray-400">신앙</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-sm bg-emerald-400" />
-            <span className="text-xs text-gray-400">신앙</span>
-          </div>
-        </div>
-      </Card>
+        </Card>
+      </motion.div>
 
       {/* 개인 루틴 */}
-      <Card className="mx-4">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-gray-900">개인 루틴</p>
-          <span className="text-xs text-gray-400">{personalRoutines.length}개</span>
-        </div>
-        <RoutineTrackA />
-      </Card>
+      <motion.div variants={itemVariants}>
+        <Card className="mx-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold text-gray-900">개인 루틴</p>
+            <span className="text-xs text-gray-400">{personalRoutines.length}개</span>
+          </div>
+          <RoutineTrackA />
+        </Card>
+      </motion.div>
 
       {/* 신앙 루틴 */}
-      <Card className="mx-4">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-gray-900">신앙 루틴</p>
-          <span className="text-xs text-gray-400">{faithRoutines.length}개</span>
-        </div>
-        <RoutineTrackB />
-      </Card>
-    </div>
+      <motion.div variants={itemVariants}>
+        <Card className="mx-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold text-gray-900">신앙 루틴</p>
+            <span className="text-xs text-gray-400">{faithRoutines.length}개</span>
+          </div>
+          <RoutineTrackB />
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 }

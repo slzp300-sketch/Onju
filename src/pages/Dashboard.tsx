@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { CheckSquare, Target, Calendar, ListChecks, BarChart2, ChevronRight, Flame } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import { useRoutineStore } from '../store/routineStore';
 import { useGoalStore } from '../store/goalStore';
 import { useAuthStore } from '../store/authStore';
@@ -82,10 +83,39 @@ export default function Dashboard() {
     violet: { bg: 'bg-violet-50', text: 'text-violet-500' },
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.05,
+      },
+    },
+  } as const;
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 260,
+        damping: 24,
+      },
+    },
+  } as const;
+
   return (
-    <div className="flex flex-col gap-4 pb-4">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="flex flex-col gap-4 pb-4"
+    >
       {/* 헤더 */}
-      <div className="px-4 pt-5 flex items-start justify-between">
+      <motion.div variants={itemVariants} className="px-4 pt-5 flex items-start justify-between">
         <div>
           <p className="text-xs text-gray-400">{formatDisplay(new Date())}</p>
           <h1 className="text-lg font-bold text-gray-900 mt-0.5">
@@ -98,10 +128,10 @@ export default function Dashboard() {
             <span className="text-xs font-semibold text-orange-500">{streak}일</span>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* 오늘 현황 카드 */}
-      <div className="mx-4 bg-indigo-500 rounded-2xl p-4 text-white">
+      <motion.div variants={itemVariants} className="mx-4 bg-indigo-500 rounded-2xl p-4 text-white">
         <p className="text-xs opacity-70 mb-3">오늘의 달성률</p>
         <div className="flex gap-6">
           <div>
@@ -114,42 +144,47 @@ export default function Dashboard() {
             <p className="text-xs opacity-70 mt-0.5">신앙 루틴</p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* 일요일 리뷰 배너 */}
       {isSunday() && (
-        <div className="px-4">
+        <motion.div variants={itemVariants} className="px-4">
           <ReviewBanner
             completed={isReviewCompleted(reviews, currentWeek(), currentYear())}
             weekRangeText={getWeekRangeText()}
             onStart={() => navigate('/review')}
           />
-        </div>
+        </motion.div>
       )}
 
       {/* 목차 */}
-      <div className="px-4 flex flex-col gap-2">
+      <motion.div variants={itemVariants} className="px-4 flex flex-col gap-2">
         <p className="text-xs font-semibold text-gray-400 px-1 mb-1">관리 메뉴</p>
-        {menuItems.map(item => {
-          const cls = iconClass[item.color];
-          return (
-            <button
-              key={item.to}
-              onClick={() => navigate(item.to)}
-              className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3.5 border border-gray-100 text-left w-full active:bg-gray-50 transition-colors"
-            >
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cls.bg}`}>
-                <item.icon size={18} className={cls.text} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900">{item.label}</p>
-                <p className="text-xs text-gray-400 mt-0.5 truncate">{item.sub}</p>
-              </div>
-              <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
-            </button>
-          );
-        })}
-      </div>
-    </div>
+        <div className="flex flex-col gap-2">
+          {menuItems.map(item => {
+            const cls = iconClass[item.color];
+            return (
+              <motion.button
+                key={item.to}
+                onClick={() => navigate(item.to)}
+                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.01 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3.5 border border-gray-100 text-left w-full active:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cls.bg}`}>
+                  <item.icon size={18} className={cls.text} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900">{item.label}</p>
+                  <p className="text-xs text-gray-400 mt-0.5 truncate">{item.sub}</p>
+                </div>
+                <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+              </motion.button>
+            );
+          })}
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LayoutDashboard, Users, UserCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import PageTransition from './components/ui/PageTransition';
 import { useRoutineStore } from './store/routineStore';
 import Dashboard from './pages/Dashboard';
 import Today from './pages/Today';
@@ -58,10 +59,17 @@ function BottomNavInner() {
           <NavLink
             key={to}
             to={to}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium transition-colors ${
+            className={`relative flex-1 flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium transition-colors z-10 ${
               active ? 'text-indigo-600' : 'text-gray-400'
             }`}
           >
+            {active && (
+              <motion.span
+                layoutId="activeTabPill"
+                className="absolute inset-x-3 top-1.5 bottom-1.5 bg-indigo-50/60 rounded-2xl -z-10"
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
             <motion.div whileTap={{ scale: 1.25 }} transition={{ duration: 0.12 }}>
               <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
             </motion.div>
@@ -76,38 +84,41 @@ function BottomNavInner() {
 function AppRoutes() {
   const { isAuthenticated, onboardingDone } = useAuthStore();
   const deduplicateFaithRoutines = useRoutineStore(s => s.deduplicateFaithRoutines);
+  const location = useLocation();
 
   useEffect(() => {
     if (isAuthenticated) deduplicateFaithRoutines();
   }, [isAuthenticated, deduplicateFaithRoutines]);
 
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/onboarding" element={<Onboarding />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+        <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
+        <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
 
-      {!isAuthenticated ? (
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      ) : !onboardingDone ? (
-        <Route path="*" element={<Navigate to="/onboarding" replace />} />
-      ) : (
-        <>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/today" element={<Today />} />
-          <Route path="/goals/monthly" element={<MonthlyGoals />} />
-          <Route path="/goals/weekly" element={<WeeklyGoals />} />
-          <Route path="/routines" element={<Routines />} />
-          <Route path="/stats" element={<Stats />} />
-          <Route path="/groups" element={<Groups />} />
-          <Route path="/groups/new" element={<GroupNew />} />
-          <Route path="/groups/:id" element={<GroupDetail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/review" element={<WeeklyReviewPage />} />
-          <Route path="/review/result/:week" element={<ReviewResultPage />} />
-        </>
-      )}
-    </Routes>
+        {!isAuthenticated ? (
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        ) : !onboardingDone ? (
+          <Route path="*" element={<Navigate to="/onboarding" replace />} />
+        ) : (
+          <>
+            <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
+            <Route path="/today" element={<PageTransition><Today /></PageTransition>} />
+            <Route path="/goals/monthly" element={<PageTransition><MonthlyGoals /></PageTransition>} />
+            <Route path="/goals/weekly" element={<PageTransition><WeeklyGoals /></PageTransition>} />
+            <Route path="/routines" element={<PageTransition><Routines /></PageTransition>} />
+            <Route path="/stats" element={<PageTransition><Stats /></PageTransition>} />
+            <Route path="/groups" element={<PageTransition><Groups /></PageTransition>} />
+            <Route path="/groups/new" element={<PageTransition><GroupNew /></PageTransition>} />
+            <Route path="/groups/:id" element={<PageTransition><GroupDetail /></PageTransition>} />
+            <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+            <Route path="/review" element={<PageTransition><WeeklyReviewPage /></PageTransition>} />
+            <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />
+          </>
+        )}
+      </Routes>
+    </AnimatePresence>
   );
 }
 

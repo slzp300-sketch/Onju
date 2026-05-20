@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes } from 'react';
+import { motion } from 'framer-motion';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -29,9 +30,12 @@ export default function Button({
   ...props
 }: ButtonProps) {
   return (
-    <button
-      {...props}
+    <motion.button
+      {...props as any}
       disabled={disabled}
+      whileTap={disabled ? undefined : { scale: 0.96 }}
+      whileHover={disabled ? undefined : { scale: 1.015 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
       className={[
         'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors',
         variantClasses[variant],
@@ -42,6 +46,6 @@ export default function Button({
       ].join(' ')}
     >
       {children}
-    </button>
+    </motion.button>
   );
 }
