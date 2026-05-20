@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { MonthlyGoal, WeeklyGoal } from '../types';
-import { mockMonthlyGoals, mockWeeklyGoals } from '../mocks/data/seed';
 
 interface GoalState {
   monthlyGoals: MonthlyGoal[];
@@ -15,8 +14,8 @@ interface GoalState {
 export const useGoalStore = create<GoalState>()(
   persist(
     (set) => ({
-      monthlyGoals: mockMonthlyGoals,
-      weeklyGoals: mockWeeklyGoals,
+      monthlyGoals: [],
+      weeklyGoals: [],
       setMonthlyGoals: (goals) => set({ monthlyGoals: goals }),
       setWeeklyGoals: (goals) => set({ weeklyGoals: goals }),
       addWeeklyGoal: (goal) =>

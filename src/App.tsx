@@ -12,6 +12,8 @@ import GroupNew from './pages/GroupNew';
 import GroupDetail from './pages/GroupDetail';
 import Profile from './pages/Profile';
 import Onboarding from './pages/Onboarding';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import WeeklyReviewPage from './pages/WeeklyReviewPage';
 import ReviewResultPage from './pages/ReviewResultPage';
 import SlotUnlockModal from './components/ui/SlotUnlockModal';
@@ -32,6 +34,8 @@ const navItems = [
 function BottomNavInner() {
   const location = useLocation();
   const hideNav =
+    location.pathname === '/login' ||
+    location.pathname === '/signup' ||
     location.pathname === '/groups/new' ||
     location.pathname === '/onboarding' ||
     location.pathname === '/review' ||
@@ -67,12 +71,17 @@ function BottomNavInner() {
 }
 
 function AppRoutes() {
-  const { onboardingDone } = useAuthStore();
+  const { isAuthenticated, onboardingDone } = useAuthStore();
 
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
       <Route path="/onboarding" element={<Onboarding />} />
-      {!onboardingDone ? (
+
+      {!isAuthenticated ? (
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      ) : !onboardingDone ? (
         <Route path="*" element={<Navigate to="/onboarding" replace />} />
       ) : (
         <>

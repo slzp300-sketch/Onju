@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { DailyRoutine, RoutineLog } from '../types';
 import { format } from 'date-fns';
-import { mockPersonalRoutines, mockFaithRoutines, mockRoutineLogs } from '../mocks/data/seed';
 
 interface RoutineState {
   personalRoutines: DailyRoutine[];
@@ -21,9 +20,9 @@ interface RoutineState {
 export const useRoutineStore = create<RoutineState>()(
   persist(
     (set, get) => ({
-      personalRoutines: mockPersonalRoutines,
-      faithRoutines: mockFaithRoutines,
-      logs: mockRoutineLogs,
+      personalRoutines: [],
+      faithRoutines: [],
+      logs: [],
 
       toggleRoutineLog: (routineId, date) => {
         const today = date ?? format(new Date(), 'yyyy-MM-dd');

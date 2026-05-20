@@ -158,7 +158,7 @@ export default function Stats() {
       <div ref={reportRef} className="mx-4">
         <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-3xl p-6 text-white">
           <p className="text-xs font-semibold opacity-70 mb-1">직장생활조</p>
-          <h3 className="text-lg font-bold mb-4">{user.name.slice(-2)}님의 이번 달 기록</h3>
+          <h3 className="text-lg font-bold mb-4">{user?.name.slice(-2)}님의 이번 달 기록</h3>
           <div className="grid grid-cols-3 gap-3 mb-4">
             <ReportStat label="개인" value={`${Math.round(monthAvgPersonal)}%`} />
             <ReportStat label="신앙" value={`${Math.round(monthAvgFaith)}%`} />

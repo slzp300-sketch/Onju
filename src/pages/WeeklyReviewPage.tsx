@@ -127,7 +127,7 @@ export default function WeeklyReviewPage() {
       // 4. 목표 칸 추가 여부 확인
       const { shouldUnlock, newSlotCount } = checkSlotUnlock(
         thisWeekGoals,
-        user.weeklyGoalSlots
+        user?.weeklyGoalSlots ?? 3
       );
       if (shouldUnlock) {
         useUIStore.getState().setPendingUnlock(newSlotCount);

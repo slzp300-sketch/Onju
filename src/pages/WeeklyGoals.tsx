@@ -21,10 +21,10 @@ export default function WeeklyGoals() {
     g => g.weekNumber === currentWeek() && g.year === currentYear()
   );
 
-  const slots = getAvailableSlots(user, thisWeekGoals.length);
+  const slots = getAvailableSlots(user!, thisWeekGoals.length);
 
   // 지난 주 달성률 계산 (샘플: 이번 주와 동일한 목표들 사용)
-  const { currentRate, shouldUnlock } = checkSlotUnlock(weeklyGoals, user.weeklyGoalSlots);
+  const { currentRate, shouldUnlock } = checkSlotUnlock(weeklyGoals, user?.weeklyGoalSlots ?? 3);
 
   const getMonthlyTitle = (monthlyGoalId?: string) =>
     monthlyGoals.find(g => g.id === monthlyGoalId)?.title;

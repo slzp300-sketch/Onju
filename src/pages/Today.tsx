@@ -48,7 +48,7 @@ export default function Today() {
       <div className="px-4 pt-5">
         <p className="text-xs text-gray-400 font-medium">{formatDisplay(new Date())}</p>
         <h1 className="text-lg font-bold text-gray-900 mt-0.5">
-          안녕하세요, {user.name.slice(-2)}님
+          안녕하세요, {user?.name.slice(-2)}님
         </h1>
       </div>
 

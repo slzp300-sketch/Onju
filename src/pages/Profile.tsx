@@ -1,4 +1,5 @@
-import { User, Bell, ChevronRight } from 'lucide-react';
+import { User, Bell, ChevronRight, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import SlotBadge from '../components/ui/SlotBadge';
 import { useAuthStore } from '../store/authStore';
@@ -6,8 +7,11 @@ import { useGoalStore } from '../store/goalStore';
 import { currentWeek, currentYear } from '../utils/date';
 
 export default function Profile() {
-  const { user } = useAuthStore();
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
   const { weeklyGoals } = useGoalStore();
+
+  if (!user) return null;
 
   const thisWeekGoalCount = weeklyGoals.filter(
     g => g.weekNumber === currentWeek() && g.year === currentYear()
@@ -42,6 +46,14 @@ export default function Profile() {
       {/* 설정 메뉴 */}
       <Card className="mx-4" padding="none">
         <MenuItem icon={<Bell size={16} />} label="알림 설정" />
+        <div className="h-px bg-gray-100 mx-4" />
+        <button
+          onClick={() => { logout(); navigate('/login', { replace: true }); }}
+          className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors"
+        >
+          <LogOut size={16} className="text-red-400" />
+          <span className="text-sm text-red-400 flex-1">로그아웃</span>
+        </button>
       </Card>
     </div>
   );
