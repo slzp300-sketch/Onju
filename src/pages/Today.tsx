@@ -15,6 +15,31 @@ import { useAuthStore } from '../store/authStore';
 import { formatDisplay, today, isSunday, getWeekRangeText, currentWeek, currentYear, isReviewCompleted } from '../utils/date';
 import { getTodayRates, calcStreak } from '../utils/completion';
 import { fetchReviews } from '../api/reviews';
+import type { TimeSlot } from '../types';
+import RoutineItem from '../components/routines/RoutineItem';
+
+const TIME_SLOT_META: { value: TimeSlot; label: string; emoji: string }[] = [
+  { value: 'morning', label: '아침', emoji: '🌅' },
+  { value: 'afternoon', label: '점심', emoji: '☀️' },
+  { value: 'evening', label: '저녁', emoji: '🌙' },
+];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.02, delayChildren: 0 },
+  },
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 6 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 550, damping: 20 },
+  },
+} as const;
 
 export default function Today() {
   const navigate = useNavigate();
@@ -35,7 +60,6 @@ export default function Today() {
   const { current: pStreak, best: pBest } = calcStreak(personalRoutines, logs, todayStr);
   const { current: fStreak, best: fBest } = calcStreak(faithRoutines, logs, todayStr);
 
-  // 전체 완료 시 confetti 한 번만
   useEffect(() => {
     if (allDone && !prevCompleteRef.current) {
       confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#1D9E75', '#378ADD', '#7F77DD'] });
@@ -43,29 +67,9 @@ export default function Today() {
     prevCompleteRef.current = allDone;
   }, [allDone]);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.02,
-        delayChildren: 0,
-      },
-    },
-  } as const;
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 6 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 550,
-        damping: 20,
-      },
-    },
-  } as const;
+  // 시간대가 지정된 루틴이 하나라도 있으면 그룹핑 모드 사용
+  const allRoutines = [...personalRoutines, ...faithRoutines];
+  const hasTimeSlots = allRoutines.some(r => r.timeSlot);
 
   return (
     <motion.div
@@ -129,27 +133,86 @@ export default function Today() {
         </Card>
       </motion.div>
 
-      {/* 개인 루틴 */}
-      <motion.div variants={itemVariants}>
-        <Card className="mx-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-semibold text-gray-900">개인 루틴</p>
-            <span className="text-xs text-gray-400">{personalRoutines.length}개</span>
-          </div>
-          <RoutineTrackA />
-        </Card>
-      </motion.div>
+      {hasTimeSlots ? (
+        // 시간대별 그룹핑 뷰
+        <TimeSlotGroupedRoutines />
+      ) : (
+        // 기본 뷰
+        <>
+          <motion.div variants={itemVariants}>
+            <Card className="mx-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-semibold text-gray-900">개인 루틴</p>
+                <span className="text-xs text-gray-400">{personalRoutines.length}개</span>
+              </div>
+              <RoutineTrackA />
+            </Card>
+          </motion.div>
 
-      {/* 신앙 루틴 */}
-      <motion.div variants={itemVariants}>
-        <Card className="mx-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-semibold text-gray-900">신앙 루틴</p>
-            <span className="text-xs text-gray-400">{faithRoutines.length}개</span>
-          </div>
-          <RoutineTrackB />
-        </Card>
-      </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="mx-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-semibold text-gray-900">신앙 루틴</p>
+                <span className="text-xs text-gray-400">{faithRoutines.length}개</span>
+              </div>
+              <RoutineTrackB />
+            </Card>
+          </motion.div>
+        </>
+      )}
     </motion.div>
   );
+}
+
+function TimeSlotGroupedRoutines() {
+  const { personalRoutines, faithRoutines } = useRoutineStore();
+  const allRoutines = [...personalRoutines, ...faithRoutines];
+
+  const grouped = TIME_SLOT_META.map(slot => ({
+    ...slot,
+    routines: allRoutines.filter(r => r.timeSlot === slot.value),
+  })).filter(g => g.routines.length > 0);
+
+  const unslotted = allRoutines.filter(r => !r.timeSlot);
+
+  return (
+    <>
+      {grouped.map(group => (
+        <motion.div key={group.value} variants={itemVariants}>
+          <Card className="mx-4">
+            <p className="text-xs font-semibold text-gray-500 mb-3">
+              {group.emoji} {group.label}
+            </p>
+            <div className="divide-y divide-gray-50">
+              {group.routines.map(routine => {
+                // RoutineItem을 직접 렌더링하기 위해 dynamic import 대신 inline으로 사용
+                // RoutineTrackA/B는 전체 목록을 렌더링하므로 여기선 개별 컴포넌트 필요
+                return <SlottedRoutineItem key={routine.id} routineId={routine.id} />;
+              })}
+            </div>
+          </Card>
+        </motion.div>
+      ))}
+
+      {unslotted.length > 0 && (
+        <motion.div variants={itemVariants}>
+          <Card className="mx-4">
+            <p className="text-xs font-semibold text-gray-500 mb-3">기타</p>
+            <div className="divide-y divide-gray-50">
+              {unslotted.map(routine => (
+                <SlottedRoutineItem key={routine.id} routineId={routine.id} />
+              ))}
+            </div>
+          </Card>
+        </motion.div>
+      )}
+    </>
+  );
+}
+
+function SlottedRoutineItem({ routineId }: { routineId: string }) {
+  const { personalRoutines, faithRoutines } = useRoutineStore();
+  const routine = [...personalRoutines, ...faithRoutines].find(r => r.id === routineId);
+  if (!routine) return null;
+  return <RoutineItem routine={routine} />;
 }

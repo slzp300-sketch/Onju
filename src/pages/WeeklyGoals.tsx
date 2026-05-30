@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, TrendingUp } from 'lucide-react';
+import { Plus, TrendingUp, ChevronDown } from 'lucide-react';
+import { format } from 'date-fns';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import SlotBadge from '../components/ui/SlotBadge';
@@ -9,31 +10,43 @@ import MonthlyGoalCard from '../components/goals/MonthlyGoalCard';
 import EmptyState from '../components/ui/EmptyState';
 import { useGoalStore } from '../store/goalStore';
 import { useAuthStore } from '../store/authStore';
+import { useSettingsStore } from '../store/settingsStore';
 import { getAvailableSlots, checkSlotUnlock } from '../utils/slots';
-import { currentWeek, currentYear } from '../utils/date';
+import { getWeekRangeFor, formatDateRange } from '../utils/date';
+
+const WEEKDAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
 
 export default function WeeklyGoals() {
   const [showCreate, setShowCreate] = useState(false);
+  const [showWeekSetting, setShowWeekSetting] = useState(false);
   const { weeklyGoals, monthlyGoals } = useGoalStore();
   const { user } = useAuthStore();
+  const { weekStartDay, setWeekStartDay } = useSettingsStore();
 
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const { start, end } = getWeekRangeFor(new Date(), weekStartDay);
+  const weekStart = format(start, 'yyyy-MM-dd');
+  const weekEnd = format(end, 'yyyy-MM-dd');
+
+  // 오늘이 startDate~endDate 범위에 포함된 목표
   const thisWeekGoals = weeklyGoals.filter(
-    g => g.weekNumber === currentWeek() && g.year === currentYear()
+    g => g.startDate <= today && g.endDate >= today
   );
 
   const slots = getAvailableSlots(user!, thisWeekGoals.length);
-
-  // 지난 주 달성률 계산 (샘플: 이번 주와 동일한 목표들 사용)
   const { currentRate, shouldUnlock } = checkSlotUnlock(weeklyGoals, user?.weeklyGoalSlots ?? 3);
 
   const getMonthlyTitle = (monthlyGoalId?: string) =>
     monthlyGoals.find(g => g.id === monthlyGoalId)?.title;
 
+  // 오늘 포함된 월간 목표
+  const activeMonthlyGoals = monthlyGoals.filter(g => g.startDate <= today && g.endDate >= today);
+
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="px-4 pt-5">
         <h1 className="text-lg font-bold text-gray-900">주간 목표</h1>
-        <p className="text-xs text-gray-400 mt-0.5">{currentYear()}년 {currentWeek()}주차</p>
+        <p className="text-xs text-gray-400 mt-0.5">{formatDateRange(weekStart, weekEnd)}</p>
       </div>
 
       {/* 목표 현황 */}
@@ -42,8 +55,6 @@ export default function WeeklyGoals() {
           <p className="text-sm font-semibold text-gray-900">이번 주 목표 현황</p>
           <SlotBadge total={slots.total} used={slots.used} />
         </div>
-
-        {/* 지난 주 달성률 안내 */}
         <div className={`rounded-xl p-3 text-xs ${shouldUnlock ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-500'}`}>
           <div className="flex items-center gap-1.5">
             <TrendingUp size={13} />
@@ -54,20 +65,46 @@ export default function WeeklyGoals() {
             )}
           </div>
         </div>
+
+        {/* 주 시작 요일 설정 */}
+        <button
+          onClick={() => setShowWeekSetting(v => !v)}
+          className="mt-3 flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <span>주 시작: {WEEKDAY_NAMES[weekStartDay]}요일</span>
+          <ChevronDown size={12} className={`transition-transform ${showWeekSetting ? 'rotate-180' : ''}`} />
+        </button>
+        {showWeekSetting && (
+          <div className="mt-2 flex gap-1.5 flex-wrap">
+            {WEEKDAY_NAMES.map((name, i) => (
+              <button
+                key={i}
+                onClick={() => { setWeekStartDay(i); setShowWeekSetting(false); }}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all border ${
+                  weekStartDay === i
+                    ? 'bg-indigo-500 text-white border-transparent'
+                    : 'border-gray-200 text-gray-500'
+                }`}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        )}
       </Card>
 
       {/* 월간 목표 */}
-      {monthlyGoals.length > 0 && (
+      {activeMonthlyGoals.length > 0 && (
         <div className="px-4">
-          <p className="text-xs font-semibold text-gray-500 mb-2">이번 달 목표</p>
-          {monthlyGoals.map(g => <MonthlyGoalCard key={g.id} goal={g} />)}
+          <p className="text-xs font-semibold text-gray-500 mb-2">진행 중인 월간 목표</p>
+          {activeMonthlyGoals.map(g => <MonthlyGoalCard key={g.id} goal={g} />)}
         </div>
       )}
 
       {/* 이번 주 목표 목록 */}
       <div className="px-4">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs font-semibold text-gray-500">이번 주 목표</p>
+          <p className="text-xs font-semibold text-gray-500">이번 기간 목표</p>
           <Button
             variant="ghost"
             size="sm"
@@ -86,8 +123,8 @@ export default function WeeklyGoals() {
 
         {thisWeekGoals.length === 0 ? (
           <EmptyState
-            title="이번 주 목표가 없어요"
-            description="+ 추가 버튼으로 이번 주 목표를 설정해 보세요"
+            title="이번 기간 목표가 없어요"
+            description="+ 추가 버튼으로 기간을 지정해 목표를 세워 보세요"
           />
         ) : (
           <div className="flex flex-col gap-2">

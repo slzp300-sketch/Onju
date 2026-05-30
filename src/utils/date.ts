@@ -4,6 +4,32 @@ import type { WeeklyReview } from '../types';
 
 const WEEK_OPTIONS = { weekStartsOn: 1 } as const;
 
+// weekStartDay: 0=일, 1=월, ... 6=토
+export function getWeekRangeFor(date: Date, weekStartDay: number): { start: Date; end: Date } {
+  const opts = { weekStartsOn: weekStartDay as 0 | 1 | 2 | 3 | 4 | 5 | 6 };
+  return {
+    start: startOfWeek(date, opts),
+    end: endOfWeek(date, opts),
+  };
+}
+
+export function formatDateRange(startDate: string, endDate: string): string {
+  const s = new Date(startDate);
+  const e = new Date(endDate);
+  return `${format(s, 'M/d')} ~ ${format(e, 'M/d')}`;
+}
+
+export function elapsedDays(startDate: string, endDate: string): { elapsed: number; total: number } {
+  const today = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const totalMs = end.getTime() - start.getTime();
+  const elapsedMs = Math.min(today.getTime() - start.getTime(), totalMs);
+  const total = Math.round(totalMs / 86400000) + 1;
+  const elapsed = Math.max(0, Math.round(elapsedMs / 86400000) + 1);
+  return { elapsed: Math.min(elapsed, total), total };
+}
+
 export const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 export const formatDisplay = (date: Date) => format(date, 'M월 d일 (E)', { locale: ko });
 export const today = () => formatDate(new Date());

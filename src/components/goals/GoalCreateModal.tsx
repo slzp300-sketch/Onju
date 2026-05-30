@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { format } from 'date-fns';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import { useGoalStore } from '../../store/goalStore';
-import { currentWeek, currentYear } from '../../utils/date';
+import { useSettingsStore } from '../../store/settingsStore';
+import { currentWeek, currentYear, getWeekRangeFor } from '../../utils/date';
 import type { WeeklyGoal } from '../../types';
 
 interface GoalCreateModalProps {
@@ -11,9 +13,16 @@ interface GoalCreateModalProps {
 }
 
 export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProps) {
+  const { weekStartDay } = useSettingsStore();
+  const { start, end } = getWeekRangeFor(new Date(), weekStartDay);
+  const defaultStart = format(start, 'yyyy-MM-dd');
+  const defaultEnd = format(end, 'yyyy-MM-dd');
+
   const [title, setTitle] = useState('');
-  const { addWeeklyGoal, monthlyGoals } = useGoalStore();
   const [selectedMonthlyId, setSelectedMonthlyId] = useState('');
+  const [startDate, setStartDate] = useState(defaultStart);
+  const [endDate, setEndDate] = useState(defaultEnd);
+  const { addWeeklyGoal, monthlyGoals } = useGoalStore();
 
   const handleSubmit = () => {
     if (!title.trim()) return;
@@ -24,6 +33,8 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
       monthlyGoalId: selectedMonthlyId || undefined,
       weekNumber: currentWeek(),
       year: currentYear(),
+      startDate,
+      endDate,
       status: 'active',
       completionRate: 0,
       linkedRoutineIds: [],
@@ -32,11 +43,13 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
     addWeeklyGoal(newGoal);
     setTitle('');
     setSelectedMonthlyId('');
+    setStartDate(defaultStart);
+    setEndDate(defaultEnd);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="이번 주 목표 추가">
+    <Modal isOpen={isOpen} onClose={onClose} title="목표 추가">
       <div className="flex flex-col gap-4">
         <div>
           <label className="text-xs font-medium text-gray-600 mb-1.5 block">목표 내용</label>
@@ -45,11 +58,32 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
             value={title}
             onChange={e => setTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            placeholder="이번 주 이루고 싶은 것은?"
+            placeholder="이번 기간 이루고 싶은 것은?"
             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             autoFocus
           />
         </div>
+
+        <div>
+          <label className="text-xs font-medium text-gray-600 mb-1.5 block">목표 기간</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+            <span className="text-gray-400 text-sm">~</span>
+            <input
+              type="date"
+              value={endDate}
+              min={startDate}
+              onChange={e => setEndDate(e.target.value)}
+              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
+        </div>
+
         {monthlyGoals.length > 0 && (
           <div>
             <label className="text-xs font-medium text-gray-600 mb-1.5 block">월간 목표 연결 (선택)</label>
@@ -65,6 +99,7 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
             </select>
           </div>
         )}
+
         <Button onClick={handleSubmit} disabled={!title.trim()} fullWidth>
           목표 추가
         </Button>

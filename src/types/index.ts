@@ -18,6 +18,8 @@ export interface MonthlyGoal {
   description?: string;
   month: number;
   year: number;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
   status: GoalStatus;
   createdAt: string;
 }
@@ -29,11 +31,15 @@ export interface WeeklyGoal {
   title: string;
   weekNumber: number;
   year: number;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
   status: GoalStatus;
   completionRate: number; // 0-100
   linkedRoutineIds: string[];
   createdAt: string;
 }
+
+export type TimeSlot = 'morning' | 'afternoon' | 'evening';
 
 export interface DailyRoutine {
   id: string;
@@ -46,6 +52,8 @@ export interface DailyRoutine {
   isActive: boolean;
   order: number;
   createdAt: string;
+  durationMinutes?: number;
+  timeSlot?: TimeSlot;
 }
 
 export interface FaithRoutineTemplate {

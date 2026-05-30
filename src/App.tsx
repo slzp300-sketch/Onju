@@ -1,27 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LayoutDashboard, Users, UserCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PageTransition from './components/ui/PageTransition';
-import { useRoutineStore } from './store/routineStore';
-import Dashboard from './pages/Dashboard';
-import Today from './pages/Today';
-import WeeklyGoals from './pages/WeeklyGoals';
-import MonthlyGoals from './pages/MonthlyGoals';
-import Routines from './pages/Routines';
-import Stats from './pages/Stats';
-import Groups from './pages/Groups';
-import GroupNew from './pages/GroupNew';
-import GroupDetail from './pages/GroupDetail';
-import Profile from './pages/Profile';
-import Onboarding from './pages/Onboarding';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import WeeklyReviewPage from './pages/WeeklyReviewPage';
-import ReviewResultPage from './pages/ReviewResultPage';
-import SlotUnlockModal from './components/ui/SlotUnlockModal';
 import { useAuthStore } from './store/authStore';
+import { useRoutineStore } from './store/routineStore';
+import { useNotificationScheduler } from './hooks/useNotificationScheduler';
+import LoadingSpinner from './components/ui/LoadingSpinner';
+import PageTransition from './components/ui/PageTransition';
+import SlotUnlockModal from './components/ui/SlotUnlockModal';
+
+// Lazy-loaded page components
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Today = lazy(() => import('./pages/Today'));
+const WeeklyGoals = lazy(() => import('./pages/WeeklyGoals'));
+const MonthlyGoals = lazy(() => import('./pages/MonthlyGoals'));
+const Routines = lazy(() => import('./pages/Routines'));
+const Stats = lazy(() => import('./pages/Stats'));
+const Groups = lazy(() => import('./pages/Groups'));
+const GroupNew = lazy(() => import('./pages/GroupNew'));
+const GroupDetail = lazy(() => import('./pages/GroupDetail'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Onboarding = lazy(() => import('./pages/Onboarding'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const WeeklyReviewPage = lazy(() => import('./pages/WeeklyReviewPage'));
+const ReviewResultPage = lazy(() => import('./pages/ReviewResultPage'));
+const NotificationSettings = lazy(() => import('./pages/NotificationSettings'));
+
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 1000 * 30 } },
@@ -44,6 +51,7 @@ function BottomNavInner() {
     location.pathname === '/onboarding' ||
     location.pathname === '/groups/new' ||
     location.pathname === '/review' ||
+    location.pathname === '/notification-settings' ||
     location.pathname.startsWith('/review/result') ||
     (location.pathname.startsWith('/groups/') && location.pathname !== '/groups');
 
@@ -81,9 +89,12 @@ function BottomNavInner() {
   );
 }
 
+
+
 function AppRoutes() {
   const { isAuthenticated, onboardingDone } = useAuthStore();
   const deduplicateFaithRoutines = useRoutineStore(s => s.deduplicateFaithRoutines);
+  useNotificationScheduler();
   const location = useLocation();
 
   useEffect(() => {
@@ -92,32 +103,35 @@ function AppRoutes() {
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
-        <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
-        <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
+      <Suspense fallback={<LoadingSpinner />}> 
+        <Routes location={location} key={location.pathname}>
+          <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+          <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
+          <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
 
-        {!isAuthenticated ? (
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        ) : !onboardingDone ? (
-          <Route path="*" element={<Navigate to="/onboarding" replace />} />
-        ) : (
-          <>
-            <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
-            <Route path="/today" element={<PageTransition><Today /></PageTransition>} />
-            <Route path="/goals/monthly" element={<PageTransition><MonthlyGoals /></PageTransition>} />
-            <Route path="/goals/weekly" element={<PageTransition><WeeklyGoals /></PageTransition>} />
-            <Route path="/routines" element={<PageTransition><Routines /></PageTransition>} />
-            <Route path="/stats" element={<PageTransition><Stats /></PageTransition>} />
-            <Route path="/groups" element={<PageTransition><Groups /></PageTransition>} />
-            <Route path="/groups/new" element={<PageTransition><GroupNew /></PageTransition>} />
-            <Route path="/groups/:id" element={<PageTransition><GroupDetail /></PageTransition>} />
-            <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
-            <Route path="/review" element={<PageTransition><WeeklyReviewPage /></PageTransition>} />
-            <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />
-          </>
-        )}
-      </Routes>
+          {!isAuthenticated ? (
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          ) : !onboardingDone ? (
+            <Route path="*" element={<Navigate to="/onboarding" replace />} />
+          ) : (
+            <>
+              <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
+              <Route path="/today" element={<PageTransition><Today /></PageTransition>} />
+              <Route path="/goals/monthly" element={<PageTransition><MonthlyGoals /></PageTransition>} />
+              <Route path="/goals/weekly" element={<PageTransition><WeeklyGoals /></PageTransition>} />
+              <Route path="/routines" element={<PageTransition><Routines /></PageTransition>} />
+              <Route path="/stats" element={<PageTransition><Stats /></PageTransition>} />
+              <Route path="/groups" element={<PageTransition><Groups /></PageTransition>} />
+              <Route path="/groups/new" element={<PageTransition><GroupNew /></PageTransition>} />
+              <Route path="/groups/:id" element={<PageTransition><GroupDetail /></PageTransition>} />
+              <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+              <Route path="/review" element={<PageTransition><WeeklyReviewPage /></PageTransition>} />
+              <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />
+              <Route path="/notification-settings" element={<PageTransition><NotificationSettings /></PageTransition>} />
+            </>
+          )}
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   );
 }

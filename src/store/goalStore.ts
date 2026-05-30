@@ -7,8 +7,11 @@ interface GoalState {
   weeklyGoals: WeeklyGoal[];
   setMonthlyGoals: (goals: MonthlyGoal[]) => void;
   setWeeklyGoals: (goals: WeeklyGoal[]) => void;
+  addMonthlyGoal: (goal: MonthlyGoal) => void;
   addWeeklyGoal: (goal: WeeklyGoal) => void;
   removeWeeklyGoal: (id: string) => void;
+  removeMonthlyGoal: (id: string) => void;
+  updateWeeklyGoal: (id: string, patch: Partial<WeeklyGoal>) => void;
 }
 
 export const useGoalStore = create<GoalState>()(
@@ -18,10 +21,12 @@ export const useGoalStore = create<GoalState>()(
       weeklyGoals: [],
       setMonthlyGoals: (goals) => set({ monthlyGoals: goals }),
       setWeeklyGoals: (goals) => set({ weeklyGoals: goals }),
-      addWeeklyGoal: (goal) =>
-        set((s) => ({ weeklyGoals: [...s.weeklyGoals, goal] })),
-      removeWeeklyGoal: (id) =>
-        set((s) => ({ weeklyGoals: s.weeklyGoals.filter(g => g.id !== id) })),
+      addMonthlyGoal: (goal) => set((s) => ({ monthlyGoals: [...s.monthlyGoals, goal] })),
+      addWeeklyGoal: (goal) => set((s) => ({ weeklyGoals: [...s.weeklyGoals, goal] })),
+      removeWeeklyGoal: (id) => set((s) => ({ weeklyGoals: s.weeklyGoals.filter(g => g.id !== id) })),
+      removeMonthlyGoal: (id) => set((s) => ({ monthlyGoals: s.monthlyGoals.filter(g => g.id !== id) })),
+      updateWeeklyGoal: (id, patch) =>
+        set((s) => ({ weeklyGoals: s.weeklyGoals.map(g => g.id === id ? { ...g, ...patch } : g) })),
     }),
     { name: 'goal-store' }
   )

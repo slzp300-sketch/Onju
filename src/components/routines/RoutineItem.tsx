@@ -1,8 +1,10 @@
-import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, Play, Clock } from 'lucide-react';
 import type { DailyRoutine } from '../../types';
 import { useRoutineStore } from '../../store/routineStore';
 import { today } from '../../utils/date';
+import FocusMode from './FocusMode';
 
 interface RoutineItemProps {
   routine: DailyRoutine;
@@ -12,38 +14,70 @@ interface RoutineItemProps {
 export default function RoutineItem({ routine, dragHandle }: RoutineItemProps) {
   const { toggleRoutineLog, isCompleted } = useRoutineStore();
   const done = isCompleted(routine.id, today());
+  const [focusOpen, setFocusOpen] = useState(false);
 
   const handleToggle = () => {
     toggleRoutineLog(routine.id, today());
   };
 
   return (
-    <motion.div
-      layout
-      className={[
-        'flex items-center gap-3 py-3 px-1 rounded-xl transition-colors',
-        done ? 'opacity-70' : '',
-      ].join(' ')}
-    >
-      {dragHandle}
-      <motion.button
-        onClick={handleToggle}
-        whileTap={{ scale: 0.85 }}
-        className={[
-          'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all',
-          done
-            ? routine.type === 'faith'
-              ? 'bg-emerald-500 border-emerald-500'
-              : 'bg-indigo-500 border-indigo-500'
-            : 'border-gray-300 bg-white',
-        ].join(' ')}
+    <>
+      <motion.div
+        layout
+        className={['flex items-center gap-3 py-3 px-1 rounded-xl', done ? 'opacity-60' : ''].join(' ')}
       >
-        <AnimatedCheck done={done} />
-      </motion.button>
-      <span className={`text-sm flex-1 ${done ? 'line-through text-gray-400' : 'text-gray-800'}`}>
-        {routine.title}
-      </span>
-    </motion.div>
+        {dragHandle}
+
+        <motion.button
+          onClick={handleToggle}
+          whileTap={{ scale: 0.85 }}
+          className={[
+            'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all',
+            done
+              ? routine.type === 'faith'
+                ? 'bg-emerald-500 border-emerald-500'
+                : 'bg-indigo-500 border-indigo-500'
+              : 'border-gray-300 bg-white',
+          ].join(' ')}
+        >
+          <AnimatedCheck done={done} />
+        </motion.button>
+
+        <div className="flex-1 min-w-0">
+          <span className={`text-sm ${done ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+            {routine.title}
+          </span>
+          {routine.durationMinutes && (
+            <span className="ml-2 inline-flex items-center gap-0.5 text-xs text-gray-400">
+              <Clock size={10} />
+              {routine.durationMinutes}분
+            </span>
+          )}
+        </div>
+
+        {!done && (
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setFocusOpen(true)}
+            className={[
+              'flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors',
+              routine.type === 'faith'
+                ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100',
+            ].join(' ')}
+          >
+            <Play size={11} fill="currentColor" />
+            시작
+          </motion.button>
+        )}
+      </motion.div>
+
+      <AnimatePresence>
+        {focusOpen && (
+          <FocusMode routine={routine} onClose={() => setFocusOpen(false)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

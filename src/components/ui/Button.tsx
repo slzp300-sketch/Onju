@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes } from 'react';
-import { motion } from 'framer-motion';
+import { motion, type HTMLMotionProps } from 'framer-motion';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -31,7 +31,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <motion.button
-      {...props as any}
+      {...(props as HTMLMotionProps<'button'>)}
       disabled={disabled}
       whileTap={disabled ? undefined : { scale: 0.96 }}
       whileHover={disabled ? undefined : { scale: 1.015 }}

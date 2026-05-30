@@ -43,7 +43,7 @@ export default function Profile() {
 
       {/* 설정 메뉴 */}
       <Card className="mx-4" padding="none">
-        <MenuItem icon={<Bell size={16} />} label="알림 설정" />
+        <MenuItem icon={<Bell size={16} />} label="알림 설정" onClick={() => navigate('/notification-settings')} />
         <div className="h-px bg-gray-100 mx-4" />
         <button
           onClick={() => { logout(); navigate('/login', { replace: true }); }}
@@ -57,9 +57,9 @@ export default function Profile() {
   );
 }
 
-function MenuItem({ icon, label }: { icon: React.ReactNode; label: string }) {
+function MenuItem({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick?: () => void }) {
   return (
-    <button className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors">
+    <button onClick={onClick} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors">
       <span className="text-gray-500">{icon}</span>
       <span className="text-sm text-gray-800 flex-1">{label}</span>
       <ChevronRight size={16} className="text-gray-300" />

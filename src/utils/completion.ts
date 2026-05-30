@@ -111,7 +111,7 @@ export function calcStreak(
       best = Math.max(best, running);
       if (i === 0 || current === i) current = running;
     } else {
-      if (i === 0) { running = 0; break; }
+      if (i === 0) { break; }
       best = Math.max(best, running);
       running = 0;
     }

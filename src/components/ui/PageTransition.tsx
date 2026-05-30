@@ -11,11 +11,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
-      transition={{
-        type: 'spring',
-        stiffness: 600,
-        damping: 22,
-      }}
+      transition={{ type: 'tween', duration: 0.12, ease: 'easeOut' }}
       className="w-full min-h-dvh flex flex-col"
     >
       {children}
