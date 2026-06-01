@@ -54,6 +54,7 @@ export interface DailyRoutine {
   order: number;
   createdAt: string;
   durationMinutes?: number;
+  durationSeconds?: number;   // 타이머 초 단위 (durationMinutes보다 우선)
   timeSlot?: TimeSlot;
 }
 
@@ -176,6 +177,7 @@ export interface PersonalRoutine {
   emoji: string;
   when: string;
   habitIds: string[]; // 순서 있는 습관 ID 목록
+  habitDurations?: Record<string, number>; // habitId → 분
   timerEnabled: boolean;
   createdAt: string;
 }

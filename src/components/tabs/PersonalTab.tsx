@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Trash2, Timer, Pencil, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
+import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import FAB from '../ui/FAB';
+import ConfirmModal from '../ui/ConfirmModal';
 import { useHabitStore } from '../../store/habitStore';
 import type { Habit } from '../../types';
 import { format } from 'date-fns';
@@ -88,6 +89,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
   const { habits, personalRoutines, removePersonalRoutine, isHabitCompleted } = useHabitStore();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const routine = personalRoutines.find(r => r.id === routineId);
   if (!routine) return null;
@@ -99,12 +101,13 @@ function RoutineGroup({ routineId }: { routineId: string }) {
   return (
     <div className="mb-0.5">
       {/* 루틴 헤더 */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100">
+      <div onClick={() => navigate(`/personal-routines/edit/${routine.id}`)}
+        className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100 cursor-pointer active:bg-gray-100 transition-colors">
         {/* 접기/펼치기 */}
         <motion.button
           animate={{ rotate: expanded ? 0 : -90 }}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-          onClick={() => setExpanded(v => !v)}
+          onClick={e => { e.stopPropagation(); setExpanded(v => !v); }}
           className="text-gray-400 flex-shrink-0"
         >
           <ChevronDown size={16} />
@@ -127,27 +130,32 @@ function RoutineGroup({ routineId }: { routineId: string }) {
           <Timer size={14} className="text-indigo-400 flex-shrink-0" />
         )}
 
-        {/* ▶ 전체 시작 */}
+        {/* ▶ 전체 시작 (타이머 활성화 시에만 표시) */}
+        {routine.timerEnabled && (
         <motion.button
           whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+          onClick={e => { e.stopPropagation(); navigate(`/routine-timer/${routine.id}`); }}
           className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${allDone ? 'bg-indigo-500 text-white' : 'bg-white border border-gray-200 text-gray-400 hover:border-indigo-300 hover:text-indigo-500'}`}
         >
           <Play size={10} fill="currentColor" />
         </motion.button>
-
-        {/* 수정 */}
-        <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-          onClick={() => navigate(`/personal-routines/edit/${routine.id}`)}
-          className="text-gray-300 hover:text-indigo-400 transition-colors p-0.5">
-          <Pencil size={13} />
-        </motion.button>
+        )}
 
         {/* 삭제 */}
         <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-          onClick={() => removePersonalRoutine(routine.id)}
+          onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
           className="text-gray-200 hover:text-red-400 transition-colors p-0.5">
           <Trash2 size={13} />
         </motion.button>
+
+      <ConfirmModal
+        isOpen={confirmDelete}
+        title={`'${routine?.title}' 루틴을 삭제할까요?`}
+        message="삭제하면 되돌릴 수 없어요."
+        confirmLabel="삭제"
+        onConfirm={() => { removePersonalRoutine(routine.id); setConfirmDelete(false); }}
+        onCancel={() => setConfirmDelete(false)}
+      />
       </div>
 
       {/* 습관 목록 (접기/펼치기) */}
@@ -174,12 +182,14 @@ function RoutineGroup({ routineId }: { routineId: string }) {
 function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: number; inRoutine?: boolean }) {
   const { toggleHabitLog, isHabitCompleted, removeHabit } = useHabitStore();
   const navigate = useNavigate();
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const done = isHabitCompleted(habit.id, todayStr());
 
   return (
     <motion.div
       layout
-      className={`flex items-center gap-3 px-4 py-3 ${done ? 'opacity-70' : ''}`}
+      onClick={() => navigate(`/habits/edit/${habit.id}`)}
+      className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors ${done ? 'opacity-70' : ''}`}
     >
       {/* 번호 */}
       <span className={`text-xs font-bold w-5 text-center flex-shrink-0 ${done ? 'text-gray-300' : 'text-gray-400'}`}>
@@ -201,30 +211,21 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
         )}
       </div>
 
-      {/* 오른쪽: 수정/삭제 + 체크 버튼 */}
+      {/* 오른쪽: 삭제 + 체크 버튼 */}
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        {!done && (
-          <>
-            <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-              onClick={() => navigate(`/habits/edit/${habit.id}`)}
-              className="text-gray-300 hover:text-indigo-400 transition-colors p-1">
-              <Pencil size={13} />
-            </motion.button>
-            {!inRoutine && (
-              <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                onClick={() => removeHabit(habit.id)}
-                className="text-gray-200 hover:text-red-400 transition-colors p-1">
-                <Trash2 size={13} />
-              </motion.button>
-            )}
-          </>
+        {!done && !inRoutine && (
+          <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+            onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
+            className="text-gray-200 hover:text-red-400 transition-colors p-1">
+            <Trash2 size={13} />
+          </motion.button>
         )}
 
         {/* 체크 버튼 */}
         <motion.button
           whileTap={{ scale: 0.82 }}
           transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-          onClick={() => toggleHabitLog(habit.id)}
+          onClick={e => { e.stopPropagation(); toggleHabitLog(habit.id); }}
           className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
             done
               ? 'bg-indigo-500 border-indigo-500'
@@ -247,6 +248,14 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
           </AnimatePresence>
         </motion.button>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete}
+        title={`'${habit.title}' 습관을 삭제할까요?`}
+        message="삭제하면 되돌릴 수 없어요."
+        onConfirm={() => { removeHabit(habit.id); setConfirmDelete(false); }}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </motion.div>
   );
 }

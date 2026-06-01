@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BarChart2, Users, UserCircle, LayoutDashboard, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/authStore';
+import { useThemeStore, applyTheme } from './store/themeStore';
 import { useRoutineStore } from './store/routineStore';
 import { useNotificationScheduler } from './hooks/useNotificationScheduler';
 import LoadingSpinner from './components/ui/LoadingSpinner';
@@ -24,6 +25,8 @@ const HabitNew = lazy(() => import('./pages/HabitNew'));
 const TodoNew = lazy(() => import('./pages/TodoNew'));
 const PersonalRoutineNew = lazy(() => import('./pages/PersonalRoutineNew'));
 const FaithRoutineNew = lazy(() => import('./pages/FaithRoutineNew'));
+const RoutineTimer = lazy(() => import('./pages/RoutineTimer'));
+const StreakDetail = lazy(() => import('./pages/StreakDetail'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Login = lazy(() => import('./pages/Login'));
@@ -74,6 +77,8 @@ function BottomNav() {
     location.pathname === '/groups/new' ||
     location.pathname === '/review' ||
     location.pathname === '/notification-settings' ||
+    location.pathname === '/streak' ||
+    location.pathname.startsWith('/routine-timer/') ||
     location.pathname.startsWith('/todos/') ||
     location.pathname.startsWith('/habits/') ||
     location.pathname.startsWith('/personal-routines/') ||
@@ -173,6 +178,8 @@ function AppRoutes() {
               <Route path="/faith-routines/edit/:id" element={<FaithRoutineNew />} />
               <Route path="/todos/new" element={<TodoNew />} />
               <Route path="/todos/edit/:id" element={<TodoNew />} />
+              <Route path="/routine-timer/:id" element={<RoutineTimer />} />
+              <Route path="/streak" element={<StreakDetail />} />
               <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
               <Route path="/review" element={<PageTransition><WeeklyReviewPage /></PageTransition>} />
               <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />
@@ -186,6 +193,10 @@ function AppRoutes() {
 }
 
 export default function App() {
+  const { theme } = useThemeStore();
+  // 앱 마운트 시 저장된 테마 즉시 적용
+  applyTheme(theme);
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>

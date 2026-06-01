@@ -13,7 +13,7 @@ interface RoutineState {
   addRoutine: (routine: DailyRoutine) => void;
   removeRoutine: (id: string) => void;
   deactivateRoutine: (id: string) => void;
-  updateRoutine: (id: string, changes: Partial<Pick<DailyRoutine, 'title' | 'frequency' | 'emoji' | 'timeSlot'>>) => void;
+  updateRoutine: (id: string, changes: Partial<Pick<DailyRoutine, 'title' | 'frequency' | 'emoji' | 'timeSlot' | 'durationSeconds'>>) => void;
   setRoutines: (personal: DailyRoutine[], faith: DailyRoutine[]) => void;
   deduplicateFaithRoutines: () => void;
 }

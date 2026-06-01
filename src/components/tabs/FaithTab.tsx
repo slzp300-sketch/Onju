@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Trash2, Pencil, BookOpen, Play } from 'lucide-react';
+import { Trash2, BookOpen, Play, Timer } from 'lucide-react';
+import ConfirmModal from '../ui/ConfirmModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import FAB from '../ui/FAB';
@@ -71,7 +72,6 @@ export default function FaithTab() {
                   key={r.id}
                   routine={r}
                   index={idx + 1}
-                  onEdit={() => navigate(`/faith-routines/edit/${r.id}`)}
                   onRemove={() => removeRoutine(r.id)}
                 />
               ))}
@@ -101,7 +101,6 @@ export default function FaithTab() {
                 key={r.id}
                 routine={r}
                 index={idx + 1}
-                onEdit={() => navigate(`/faith-routines/edit/${r.id}`)}
                 onRemove={() => removeRoutine(r.id)}
               />
             ))}
@@ -115,21 +114,23 @@ export default function FaithTab() {
 }
 
 /* ── 신앙 루틴 행 ── */
-function FaithRoutineRow({ routine, index, onEdit, onRemove }: {
+function FaithRoutineRow({ routine, index, onRemove }: {
   routine: DailyRoutine;
   index: number;
-  onEdit: () => void;
   onRemove: () => void;
 }) {
   const { toggleRoutineLog, isCompleted } = useRoutineStore();
+  const navigate = useNavigate();
   const [focusOpen, setFocusOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const done = isCompleted(routine.id);
 
   return (
     <>
       <motion.div
         layout
-        className={`flex items-center gap-3 px-4 py-3 ${done ? 'opacity-70' : ''}`}
+        onClick={() => navigate(`/faith-routines/edit/${routine.id}`)}
+        className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors ${done ? 'opacity-70' : ''}`}
       >
         {/* 번호 */}
         <span className={`text-xs font-bold w-5 text-center flex-shrink-0 ${done ? 'text-gray-300' : 'text-gray-400'}`}>
@@ -146,8 +147,13 @@ function FaithRoutineRow({ routine, index, onEdit, onRemove }: {
           <p className={`text-sm font-semibold truncate ${done ? 'line-through text-gray-400' : 'text-gray-800'}`}>
             {routine.title}
           </p>
-          {routine.durationMinutes && (
-            <p className="text-[11px] text-gray-400 mt-0.5">{routine.durationMinutes}분</p>
+          {routine.durationSeconds && !done && (
+            <p className="text-[11px] text-emerald-500 font-medium mt-0.5 flex items-center gap-0.5">
+              <Timer size={10} />
+              {routine.durationSeconds >= 60
+                ? `${Math.floor(routine.durationSeconds / 60)}분 ${routine.durationSeconds % 60 > 0 ? `${routine.durationSeconds % 60}초` : ''}`.trim()
+                : `${routine.durationSeconds}초`}
+            </p>
           )}
         </div>
 
@@ -157,17 +163,13 @@ function FaithRoutineRow({ routine, index, onEdit, onRemove }: {
             <>
               <motion.button
                 whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-                onClick={() => setFocusOpen(true)}
+                onClick={e => { e.stopPropagation(); setFocusOpen(true); }}
                 className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center"
               >
                 <Play size={11} fill="currentColor" />
               </motion.button>
               <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                onClick={onEdit} className="text-gray-300 hover:text-indigo-400 transition-colors p-1">
-                <Pencil size={13} />
-              </motion.button>
-              <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                onClick={onRemove} className="text-gray-200 hover:text-red-400 transition-colors p-1">
+                onClick={e => { e.stopPropagation(); setConfirmDelete(true); }} className="text-gray-200 hover:text-red-400 transition-colors p-1">
                 <Trash2 size={13} />
               </motion.button>
             </>
@@ -177,7 +179,7 @@ function FaithRoutineRow({ routine, index, onEdit, onRemove }: {
           <motion.button
             whileTap={{ scale: 0.82 }}
             transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-            onClick={() => toggleRoutineLog(routine.id)}
+            onClick={e => { e.stopPropagation(); toggleRoutineLog(routine.id); }}
             className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
               done
                 ? 'bg-emerald-500 border-emerald-500'
@@ -205,6 +207,14 @@ function FaithRoutineRow({ routine, index, onEdit, onRemove }: {
       <AnimatePresence>
         {focusOpen && <FocusMode routine={routine} onClose={() => setFocusOpen(false)} />}
       </AnimatePresence>
+
+      <ConfirmModal
+        isOpen={confirmDelete}
+        title={`'${routine.title}' 루틴을 삭제할까요?`}
+        message="삭제하면 되돌릴 수 없어요."
+        onConfirm={() => { onRemove(); setConfirmDelete(false); }}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </>
   );
 }

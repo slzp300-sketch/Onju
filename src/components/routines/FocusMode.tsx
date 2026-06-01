@@ -19,7 +19,8 @@ function fmt(s: number) {
 export default function FocusMode({ routine, onClose }: FocusModeProps) {
   const { toggleRoutineLog, isCompleted } = useRoutineStore();
   const done = isCompleted(routine.id, today());
-  const totalSeconds = (routine.durationMinutes ?? 0) * 60;
+  // durationSeconds 우선, 없으면 durationMinutes 변환
+  const totalSeconds = routine.durationSeconds ?? (routine.durationMinutes ?? 0) * 60;
   const [elapsed, setElapsed] = useState(0);
   const [finished, setFinished] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

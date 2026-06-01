@@ -40,3 +40,252 @@ body {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* ══════════════════════════════════════════
+   테마 CSS 변수
+══════════════════════════════════════════ */
+
+/* 라이트 (기본) */
+:root, [data-theme="light"] {
+  --t-bg: #f7f8fa;
+  --t-card: #ffffff;
+  --t-card2: #f1f3f5;
+  --t-border: #eeeff2;
+  --t-border2: #e2e4e9;
+  --t-text1: #1a1d23;
+  --t-text2: #3d424f;
+  --t-text3: #6e7585;
+  --t-text4: #9ea5b4;
+  --t-text5: #cdd1da;
+  --t-accent: #6366f1;
+  --t-accent-bg: #f0f0fe;
+  --t-accent-text: #5254cc;
+  --t-accent-border: #c8c9f7;
+  --t-nav-bg: rgba(255,255,255,0.96);
+  --t-divide: #f1f3f5;
+}
+
+/* 다크 — 부드러운 다크, 너무 검지 않게 */
+[data-theme="dark"] {
+  --t-bg: #1c1e26;
+  --t-card: #252830;
+  --t-card2: #2e3240;
+  --t-border: #2e3240;
+  --t-border2: #3a3f52;
+  --t-text1: #e8eaf0;
+  --t-text2: #c4c8d6;
+  --t-text3: #8b90a4;
+  --t-text4: #5e6278;
+  --t-text5: #44485c;
+  --t-accent: #7c7ff5;
+  --t-accent-bg: #22243a;
+  --t-accent-text: #9b9ef7;
+  --t-accent-border: #3a3d6a;
+  --t-nav-bg: rgba(28,30,38,0.97);
+  --t-divide: #252830;
+}
+
+/* 로즈 — 선명한 로즈핑크 */
+[data-theme="rose"] {
+  --t-bg: #fdf0f2;
+  --t-card: #ffffff;
+  --t-card2: #fce4e8;
+  --t-border: #f9d6dc;
+  --t-border2: #f2b8c2;
+  --t-text1: #2d1a1e;
+  --t-text2: #4f2d34;
+  --t-text3: #8a5460;
+  --t-text4: #b8858e;
+  --t-text5: #dcbbc0;
+  --t-accent: #d4546a;
+  --t-accent-bg: #fde8ec;
+  --t-accent-text: #b83a52;
+  --t-accent-border: #f0a0b0;
+  --t-nav-bg: rgba(255,255,255,0.97);
+  --t-divide: #fce4e8;
+}
+
+/* 포레스트 — 채도 낮춘 세이지/올리브그린 */
+[data-theme="forest"] {
+  --t-bg: #f2f5f0;
+  --t-card: #fafcf9;
+  --t-card2: #e6ede2;
+  --t-border: #dde6d8;
+  --t-border2: #ccd8c6;
+  --t-text1: #1e2a1a;
+  --t-text2: #364530;
+  --t-text3: #617558;
+  --t-text4: #8fa386;
+  --t-text5: #bfccba;
+  --t-accent: #5e8f6a;
+  --t-accent-bg: #e4ede0;
+  --t-accent-text: #4a7356;
+  --t-accent-border: #9dbf97;
+  --t-nav-bg: rgba(250,252,249,0.97);
+  --t-divide: #e6ede2;
+}
+
+/* ══════════════════════════════════════════
+   테마 오버라이드 — 공통 (라이트 제외)
+══════════════════════════════════════════ */
+[data-theme="dark"],
+[data-theme="rose"],
+[data-theme="forest"] {
+
+  /* 페이지/배경 */
+  body { background-color: var(--t-bg) !important; }
+  .bg-gray-50 { background-color: var(--t-bg) !important; }
+  .bg-white { background-color: var(--t-card) !important; }
+  .bg-gray-100 { background-color: var(--t-card2) !important; }
+
+  /* 텍스트 */
+  .text-gray-900 { color: var(--t-text1) !important; }
+  .text-gray-800 { color: var(--t-text2) !important; }
+  .text-gray-700, .text-gray-600 { color: var(--t-text3) !important; }
+  .text-gray-500, .text-gray-400 { color: var(--t-text4) !important; }
+  .text-gray-300, .text-gray-200 { color: var(--t-text5) !important; }
+
+  /* 보더 */
+  .border-gray-100 { border-color: var(--t-border) !important; }
+  .border-gray-200, .border-gray-50 { border-color: var(--t-border2) !important; }
+  .divide-gray-50 > * + *, .divide-gray-100 > * + * { border-color: var(--t-divide) !important; }
+  .border-t, .border-b { border-color: var(--t-border) !important; }
+  .border-y { border-top-color: var(--t-border) !important; border-bottom-color: var(--t-border) !important; }
+
+  /* 네비게이션 */
+  nav.fixed {
+    background-color: var(--t-nav-bg) !important;
+    border-top-color: var(--t-border) !important;
+  }
+
+  /* 입력 */
+  input:not([type="range"]), textarea {
+    background-color: var(--t-card) !important;
+    color: var(--t-text1) !important;
+    border-color: var(--t-border2) !important;
+  }
+  input::placeholder, textarea::placeholder { color: var(--t-text5) !important; }
+
+  /* 인디고 계열 → 테마 액센트로 */
+  .bg-indigo-500, .bg-indigo-600 { background-color: var(--t-accent) !important; }
+  .bg-indigo-50 { background-color: var(--t-accent-bg) !important; }
+  .bg-indigo-100 { background-color: var(--t-accent-bg) !important; }
+  .text-indigo-600, .text-indigo-500, .text-indigo-700 { color: var(--t-accent-text) !important; }
+  .text-indigo-400 { color: var(--t-accent) !important; }
+  .border-indigo-100, .border-indigo-200, .border-indigo-300 { border-color: var(--t-accent-border) !important; }
+  .ring-indigo-400, .ring-indigo-300 { --tw-ring-color: var(--t-accent) !important; }
+  .shadow-indigo-200 { --tw-shadow-color: transparent !important; }
+
+  /* 에메랄드 계열 → 테마에 따라 조정 */
+  .bg-emerald-50 { background-color: var(--t-accent-bg) !important; }
+
+  /* 바이올렛(통계) → 액센트 색으로 */
+  .bg-violet-50 { background-color: var(--t-accent-bg) !important; }
+  .text-violet-500, .text-violet-600 { color: var(--t-accent-text) !important; }
+
+  /* 주간 달성 바 */
+  .bg-indigo-400, .bg-indigo-300 { background-color: var(--t-accent) !important; opacity: 0.85; }
+}
+
+/* ══════════════════════════════════════════
+   다크 전용
+══════════════════════════════════════════ */
+[data-theme="dark"] {
+  .bg-gray-800 { background-color: #151720 !important; }
+  .bg-gray-900, .bg-gray-950 { background-color: #0d0f17 !important; }
+  .text-white { color: #e8eaf0 !important; }
+  .bg-white\/10 { background-color: rgba(255,255,255,0.08) !important; }
+  .bg-white\/20 { background-color: rgba(255,255,255,0.12) !important; }
+
+  /* 에메랄드 → 다크에서도 부드럽게 */
+  .bg-emerald-50, .bg-emerald-100 { background-color: #1a2e26 !important; }
+  .text-emerald-500, .text-emerald-600, .text-emerald-400 { color: #6ee7b7 !important; }
+  .bg-emerald-500, .bg-emerald-400 { background-color: #2d7a5e !important; }
+  .border-emerald-200, .border-emerald-300 { border-color: #2d4a3e !important; }
+
+  /* 오렌지(스트릭) */
+  .bg-orange-50 { background-color: #2a1e10 !important; }
+  .text-orange-500, .text-orange-400 { color: #fb923c !important; }
+
+  /* 앰버(경고) */
+  .bg-amber-50 { background-color: #271f0a !important; }
+  .text-amber-700, .text-amber-600 { color: #fbbf24 !important; }
+  .border-amber-100 { border-color: #3a2d10 !important; }
+
+  /* 빨강(삭제/에러) */
+  .text-red-400 { color: #f87171 !important; }
+
+  /* 그라디언트 카드(월간리포트) */
+  .from-indigo-600 { --tw-gradient-from: #3730a3 !important; }
+  .to-indigo-800 { --tw-gradient-to: #1e1b4b !important; }
+
+  /* 입력 포커스 */
+  .focus\:ring-2:focus { --tw-ring-color: var(--t-accent) !important; }
+
+  /* 달력/히트맵 */
+  .bg-gray-950 { background-color: #0d0f17 !important; }
+  .bg-gray-700 { background-color: #2e3240 !important; }
+}
+
+/* ══════════════════════════════════════════
+   로즈 전용
+══════════════════════════════════════════ */
+[data-theme="rose"] {
+  /* 에메랄드 → 로즈에서 분홍/모브로 */
+  .bg-emerald-50, .bg-emerald-100 { background-color: #fce8ec !important; }
+  .text-emerald-500, .text-emerald-600 { color: #b83a52 !important; }
+  .bg-emerald-500, .bg-emerald-400 { background-color: #d4546a !important; }
+  .border-emerald-200, .border-emerald-300 { border-color: #f0a0b0 !important; }
+
+  /* 오렌지(스트릭) */
+  .bg-orange-50 { background-color: #fff0f2 !important; }
+  .text-orange-500 { color: #d4546a !important; }
+
+  /* 앰버(경고) */
+  .bg-amber-50 { background-color: #fef6f0 !important; }
+  .text-amber-700 { color: #9a4a30 !important; }
+  .border-amber-100 { border-color: #f9d4c0 !important; }
+
+  /* 빨강 */
+  .text-red-400 { color: #c0434a !important; }
+
+  /* 그라디언트 */
+  .from-indigo-600 { --tw-gradient-from: #c0546a !important; }
+  .to-indigo-800 { --tw-gradient-to: #8a2840 !important; }
+
+  /* FAB */
+  .bg-indigo-500 { background-color: #d4546a !important; }
+
+  /* 그린 바(주간 달성) */
+  .bg-emerald-400.rounded-full { background-color: #d4546a !important; }
+}
+
+/* ══════════════════════════════════════════
+   포레스트 전용
+══════════════════════════════════════════ */
+[data-theme="forest"] {
+  /* 에메랄드 → 포레스트에서 같은 계열 살짝 다르게 */
+  .bg-emerald-50, .bg-emerald-100 { background-color: #e2ede0 !important; }
+  .text-emerald-500, .text-emerald-600 { color: #3d7a50 !important; }
+  .bg-emerald-500, .bg-emerald-400 { background-color: #5e8f6a !important; }
+  .border-emerald-200, .border-emerald-300 { border-color: #9dbf97 !important; }
+
+  /* 오렌지(스트릭) */
+  .bg-orange-50 { background-color: #f5f0e8 !important; }
+  .text-orange-500 { color: #8a6a30 !important; }
+
+  /* 앰버(경고) */
+  .bg-amber-50 { background-color: #f7f3e8 !important; }
+  .text-amber-700 { color: #7a5e20 !important; }
+  .border-amber-100 { border-color: #e0d4a8 !important; }
+
+  /* 빨강 */
+  .text-red-400 { color: #a05050 !important; }
+
+  /* 그라디언트 */
+  .from-indigo-600 { --tw-gradient-from: #3a7a50 !important; }
+  .to-indigo-800 { --tw-gradient-to: #1e4a30 !important; }
+
+  /* FAB */
+  .bg-indigo-500 { background-color: #5e8f6a !important; }
+}

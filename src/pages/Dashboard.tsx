@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Target, CalendarDays, Trash2, ListTodo, Pencil } from 'lucide-react';
+import { Target, CalendarDays, Trash2, ListTodo } from 'lucide-react';
 import FAB from '../components/ui/FAB';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,7 @@ import { format, startOfWeek, addDays } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import confetti from 'canvas-confetti';
 import { useRoutineStore } from '../store/routineStore';
+import { useHabitStore } from '../store/habitStore';
 import { useTodoStore } from '../store/todoStore';
 import { useGoalStore } from '../store/goalStore';
 import { useAuthStore } from '../store/authStore';
@@ -36,13 +37,18 @@ function getWeekDays(): Date[] {
   return Array.from({ length: 7 }, (_, i) => addDays(start, i));
 }
 
-/* ── 특정 날짜의 루틴 달성률 계산 ── */
-function getDayRate(routines: import('../types').DailyRoutine[], logs: import('../types').RoutineLog[], dateStr: string): number {
-  if (routines.length === 0) return 0;
-  const dayLogs = logs.filter(l => l.date === dateStr && l.completed);
-  const completedIds = new Set(dayLogs.map(l => l.routineId));
-  const done = routines.filter(r => completedIds.has(r.id)).length;
-  return Math.round((done / routines.length) * 100);
+/* ── 신앙 루틴 일별 달성률 ── */
+function getFaithRate(routines: import('../types').DailyRoutine[], logs: import('../types').RoutineLog[], dateStr: string): number {
+  if (routines.length === 0) return -1; // 루틴 없음
+  const done = new Set(logs.filter(l => l.date === dateStr && l.completed).map(l => l.routineId));
+  return Math.round((routines.filter(r => done.has(r.id)).length / routines.length) * 100);
+}
+
+/* ── 개인 루틴(습관) 일별 달성률 ── */
+function getHabitRate(habits: import('../types').Habit[], habitLogs: { habitId: string; date: string; completed: boolean }[], dateStr: string): number {
+  if (habits.length === 0) return -1; // 습관 없음
+  const done = habitLogs.filter(l => l.date === dateStr && l.completed).length;
+  return Math.round((done / habits.length) * 100);
 }
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } } as const;
@@ -52,6 +58,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { faithRoutines, logs, isCompleted } = useRoutineStore();
+  const { habits, habitLogs } = useHabitStore();
   const { todos, toggleTodo, removeTodo } = useTodoStore();
   const { weeklyGoals, monthlyGoals } = useGoalStore();
   const todayStr = today();
@@ -76,17 +83,20 @@ export default function Dashboard() {
   const thisWeekGoals = weeklyGoals.filter(g => g.weekNumber === currentWeek() && g.year === currentYear());
   const todayTodos = todos.filter(t => t.date === todayStr);
   const doneTodos = todayTodos.filter(t => t.completed).length;
-  const doneFaith = faithRoutines.filter(r => isCompleted(r.id)).length;
   const weekDays = getWeekDays();
 
-  // 한주 달성률 (신앙 루틴 기준)
+  // 한주 달성률 — 개인(습관) + 신앙 각각
   const weekRates = weekDays.map(d => {
     const ds = format(d, 'yyyy-MM-dd');
-    return { date: ds, rate: getDayRate(faithRoutines, logs, ds) };
+    return {
+      date: ds,
+      personal: getHabitRate(habits, habitLogs, ds),
+      faith: getFaithRate(faithRoutines, logs, ds),
+    };
   });
   const badges: Record<TabType, string | undefined> = {
     personal: undefined,
-    faith: faithRoutines.length > 0 ? `${doneFaith}/${faithRoutines.length}` : undefined,
+    faith: undefined,
     todo: todayTodos.length > 0 ? `${doneTodos}/${todayTodos.length}` : undefined,
   };
 
@@ -99,25 +109,24 @@ export default function Dashboard() {
           <p className="text-xs text-gray-400 font-medium">{format(new Date(), 'yyyy년 M월', { locale: ko })}</p>
           <h1 className="text-lg font-bold text-gray-900 mt-0.5">안녕하세요, {user?.name}님 👋</h1>
         </div>
-        {streak > 0 && (
-          <div className="flex items-center gap-1 bg-orange-50 px-2.5 py-1.5 rounded-xl mt-1">
-            <Flame size={13} className="text-orange-400" />
-            <span className="text-xs font-bold text-orange-500">{streak}일</span>
-          </div>
-        )}
       </motion.div>
 
-      {/* ── 이번달 / 이번주 목표 (한 행) ── */}
-      <motion.div variants={itemV} className="px-4 mb-4 flex gap-3">
+      {/* ── 이번달 / 이번주 목표 + 스트릭 ── */}
+      <motion.div variants={itemV} className="px-4 mb-4 flex gap-2">
         {/* 이번달 목표 */}
-        <button onClick={() => navigate('/goals/monthly')}
-          className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-3 text-left hover:border-indigo-200 transition-colors">
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          whileHover={{ scale: 1.01 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          onClick={() => navigate('/goals/monthly')}
+          className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-3 text-left shadow-sm active:shadow-none active:bg-indigo-50/50 active:border-indigo-200 transition-colors"
+        >
           <div className="flex items-center gap-1 mb-2">
-            <CalendarDays size={12} className="text-gray-400" />
-            <span className="text-[11px] font-semibold text-gray-400">이번달 목표</span>
+            <CalendarDays size={11} className="text-indigo-400" />
+            <span className="text-[11px] font-bold text-indigo-400">이번달</span>
           </div>
           {thisMonthGoals.length === 0 ? (
-            <p className="text-xs text-gray-300 font-medium">목표를 세워보세요</p>
+            <p className="text-xs text-gray-300 font-medium leading-tight">목표를<br />세워보세요</p>
           ) : (
             <div className="flex flex-col gap-1">
               {thisMonthGoals.slice(0, 2).map(g => (
@@ -131,17 +140,22 @@ export default function Dashboard() {
               )}
             </div>
           )}
-        </button>
+        </motion.button>
 
         {/* 이번주 목표 */}
-        <button onClick={() => navigate('/goals/weekly')}
-          className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-3 text-left hover:border-indigo-200 transition-colors">
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          whileHover={{ scale: 1.01 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          onClick={() => navigate('/goals/weekly')}
+          className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-3 text-left shadow-sm active:shadow-none active:bg-indigo-50/50 active:border-indigo-200 transition-colors"
+        >
           <div className="flex items-center gap-1 mb-2">
-            <Target size={12} className="text-gray-400" />
-            <span className="text-[11px] font-semibold text-gray-400">이번주 목표</span>
+            <Target size={11} className="text-indigo-400" />
+            <span className="text-[11px] font-bold text-indigo-400">이번주</span>
           </div>
           {thisWeekGoals.length === 0 ? (
-            <p className="text-xs text-gray-300 font-medium">목표를 추가해보세요</p>
+            <p className="text-xs text-gray-300 font-medium leading-tight">목표를<br />추가해보세요</p>
           ) : (
             <div className="flex flex-col gap-1">
               {thisWeekGoals.slice(0, 2).map(g => (
@@ -163,7 +177,31 @@ export default function Dashboard() {
               )}
             </div>
           )}
-        </button>
+        </motion.button>
+
+        {/* 연속 달성 버튼 (스트릭 0일이어도 항상 표시) */}
+        <motion.button
+          whileTap={{ scale: 0.93 }}
+          whileHover={{ scale: 1.03 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          onClick={() => navigate('/streak')}
+          className="bg-white border border-gray-100 rounded-2xl px-3 py-3 text-center shadow-sm active:shadow-none active:bg-orange-50/60 active:border-orange-200 transition-colors"
+          style={{ minWidth: 72 }}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <motion.span
+              animate={streak > 0 ? { scale: [1, 1.15, 1] } : {}}
+              transition={{ repeat: Infinity, repeatDelay: 3, duration: 0.4 }}
+              className="text-2xl leading-none"
+            >
+              🔥
+            </motion.span>
+            <span className={`text-sm font-bold ${streak > 0 ? 'text-orange-500' : 'text-gray-300'}`}>
+              {streak}일
+            </span>
+            <span className="text-[10px] text-gray-400 font-medium">연속</span>
+          </div>
+        </motion.button>
       </motion.div>
 
       {/* ── 일요일 리뷰 배너 ── */}
@@ -177,71 +215,66 @@ export default function Dashboard() {
       <motion.div variants={itemV} className="bg-white border border-gray-100 rounded-t-3xl mx-3 overflow-hidden">
 
       {/* 주간 날짜 스트립 */}
-      <div className="px-2 pt-3 pb-2">
-        <div className="bg-white rounded-2xl border border-gray-100 px-2 py-3">
-          <div className="flex justify-between">
-            {weekDays.map((d, i) => {
-              const ds = format(d, 'yyyy-MM-dd');
-              const isToday = ds === todayStr;
-              const isSelected = ds === selectedDay;
-              const rate = weekRates[i].rate;
-              const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
+      <div className="px-3 pt-3 pb-2">
+        {/* 범례 */}
+        <div className="flex items-center gap-3 mb-2 px-1">
+          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-indigo-400" /><span className="text-[10px] text-gray-400 font-medium">개인</span></div>
+          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-400" /><span className="text-[10px] text-gray-400 font-medium">신앙</span></div>
+        </div>
+        <div className="flex justify-between gap-0.5">
+          {weekDays.map((d, i) => {
+            const ds = format(d, 'yyyy-MM-dd');
+            const isToday = ds === todayStr;
+            const isSelected = ds === selectedDay;
+            const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
+            const pRate = weekRates[i].personal; // -1: 없음, 0~100
+            const fRate = weekRates[i].faith;
 
-              return (
-                <button
-                  key={ds}
-                  onClick={() => setSelectedDay(ds)}
-                  className="flex flex-col items-center gap-1.5 flex-1"
-                >
-                  {/* 요일 */}
-                  <span className={`text-[11px] font-semibold ${isToday ? 'text-indigo-500' : 'text-gray-400'}`}>
-                    {DAY_LABELS[i]}
-                  </span>
+            return (
+              <button key={ds} onClick={() => setSelectedDay(ds)}
+                className="flex flex-col items-center gap-1 flex-1">
+                {/* 요일 */}
+                <span className={`text-[10px] font-semibold ${isToday ? 'text-indigo-500' : 'text-gray-400'}`}>
+                  {DAY_LABELS[i]}
+                </span>
 
-                  {/* 날짜 + 달성률 링 */}
-                  <div className="relative w-9 h-9 flex items-center justify-center">
-                    {/* 달성률 링 */}
-                    {!isFuture && rate > 0 && (
-                      <svg className="absolute inset-0 w-9 h-9 -rotate-90" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="15" fill="none" stroke="#e5e7eb" strokeWidth="2.5" />
-                        <circle
-                          cx="18" cy="18" r="15" fill="none"
-                          stroke={isToday ? '#6366f1' : '#a5b4fc'}
-                          strokeWidth="2.5"
-                          strokeDasharray={`${2 * Math.PI * 15}`}
-                          strokeDashoffset={`${2 * Math.PI * 15 * (1 - rate / 100)}`}
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    )}
-                    {!isFuture && rate === 0 && (
-                      <svg className="absolute inset-0 w-9 h-9" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="15" fill="none" stroke="#f3f4f6" strokeWidth="2.5" />
-                      </svg>
-                    )}
+                {/* 날짜 숫자 */}
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${
+                  isSelected && isToday ? 'bg-indigo-500 text-white'
+                  : isSelected ? 'bg-gray-800 text-white'
+                  : isToday ? 'text-indigo-600'
+                  : isFuture ? 'text-gray-300'
+                  : 'text-gray-600'
+                }`}>
+                  {format(d, 'd')}
+                </div>
 
-                    {/* 날짜 숫자 */}
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold z-10 ${
-                      isSelected && isToday ? 'bg-indigo-500 text-white'
-                      : isSelected ? 'bg-gray-800 text-white'
-                      : isToday ? 'text-indigo-600'
-                      : isFuture ? 'text-gray-300'
-                      : 'text-gray-600'
-                    }`}>
-                      {format(d, 'd')}
-                    </div>
-                  </div>
+                {/* 개인 루틴 바 */}
+                <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                  {!isFuture && pRate >= 0 && (
+                    <motion.div
+                      className="h-full bg-indigo-400 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pRate}%` }}
+                      transition={{ duration: 0.5, delay: i * 0.04 }}
+                    />
+                  )}
+                </div>
 
-                  {/* 달성률 텍스트 */}
-                  <span className={`text-[10px] font-bold ${
-                    isFuture ? 'text-transparent' : rate === 100 ? 'text-indigo-500' : rate > 0 ? 'text-gray-400' : 'text-gray-300'
-                  }`}>
-                    {isFuture ? '-' : rate > 0 ? `${rate}%` : '·'}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                {/* 신앙 루틴 바 */}
+                <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                  {!isFuture && fRate >= 0 && (
+                    <motion.div
+                      className="h-full bg-emerald-400 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${fRate}%` }}
+                      transition={{ duration: 0.5, delay: i * 0.04 + 0.1 }}
+                    />
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -298,7 +331,8 @@ export default function Dashboard() {
                   {/* 미완료 */}
                   {todayTodos.filter(t => !t.completed).map((todo, idx) => (
                     <motion.div key={todo.id} layout
-                      className="flex items-center gap-3 px-4 py-3">
+                      onClick={() => navigate(`/todos/edit/${todo.id}`)}
+                      className="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors">
                       <span className="text-xs font-bold w-5 text-center text-gray-400 flex-shrink-0">{idx + 1}</span>
                       {/* 아이콘 */}
                       <div className="w-9 h-9 rounded-2xl bg-gray-100 flex items-center justify-center text-lg flex-shrink-0">
@@ -307,16 +341,12 @@ export default function Dashboard() {
                       <span className="flex-1 text-sm font-semibold text-gray-800">{todo.title}</span>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
                         <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                          onClick={() => navigate(`/todos/edit/${todo.id}`)} className="text-gray-300 hover:text-indigo-400 transition-colors p-1">
-                          <Pencil size={13} />
-                        </motion.button>
-                        <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                          onClick={() => removeTodo(todo.id)} className="text-gray-200 hover:text-red-400 transition-colors p-1">
+                          onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-gray-200 hover:text-red-400 transition-colors p-1">
                           <Trash2 size={13} />
                         </motion.button>
                         {/* 체크 버튼 */}
                         <motion.button whileTap={{ scale: 0.82 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-                          onClick={() => toggleTodo(todo.id)}
+                          onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
                           className="w-7 h-7 rounded-full border-2 border-gray-300 hover:border-indigo-400 flex items-center justify-center transition-colors">
                         </motion.button>
                       </div>
@@ -330,7 +360,8 @@ export default function Dashboard() {
                       </div>
                       {todayTodos.filter(t => t.completed).map((todo, idx) => (
                         <motion.div key={todo.id} layout
-                          className="flex items-center gap-3 px-4 py-3 opacity-70">
+                          onClick={() => navigate(`/todos/edit/${todo.id}`)}
+                          className="flex items-center gap-3 px-4 py-3 opacity-70 cursor-pointer active:bg-gray-50 transition-colors">
                           <span className="text-xs font-bold w-5 text-center text-gray-300 flex-shrink-0">
                             {todayTodos.filter(t => !t.completed).length + idx + 1}
                           </span>
@@ -340,12 +371,12 @@ export default function Dashboard() {
                           <span className="flex-1 text-sm font-semibold line-through text-gray-400">{todo.title}</span>
                           <div className="flex items-center gap-1.5 flex-shrink-0">
                             <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                              onClick={() => removeTodo(todo.id)} className="text-gray-200 hover:text-red-400 transition-colors p-1">
+                              onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-gray-200 hover:text-red-400 transition-colors p-1">
                               <Trash2 size={13} />
                             </motion.button>
                             {/* 체크됨 버튼 */}
                             <motion.button whileTap={{ scale: 0.82 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-                              onClick={() => toggleTodo(todo.id)}
+                              onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
                               className="w-7 h-7 rounded-full bg-indigo-500 border-2 border-indigo-500 flex items-center justify-center">
                               <AnimatePresence mode="wait" initial={false}>
                                 <motion.svg key="chk" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
