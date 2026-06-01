@@ -1,5 +1,5 @@
 import type { User, MonthlyGoal, WeeklyGoal, DailyRoutine, RoutineLog } from '../../types';
-import { getISOWeek, getYear, format, subDays } from 'date-fns';
+import { getISOWeek, getYear, format, subDays, startOfWeek, endOfWeek } from 'date-fns';
 
 const today = new Date();
 const currentWeek = getISOWeek(today);
@@ -21,10 +21,15 @@ export const mockMonthlyGoals: MonthlyGoal[] = [
     description: '매일 한 가지 긍정적인 행동으로 동료들에게 선한 영향력 흘려보내기',
     month: today.getMonth() + 1,
     year: today.getFullYear(),
+    startDate: format(today, 'yyyy-MM-01'),
+    endDate: format(new Date(today.getFullYear(), today.getMonth() + 1, 0), 'yyyy-MM-dd'),
     status: 'active',
     createdAt: new Date().toISOString(),
   },
 ];
+
+const weekStart = format(startOfWeek(today, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+const weekEnd = format(endOfWeek(today, { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
 export const mockWeeklyGoals: WeeklyGoal[] = [
   {
@@ -34,6 +39,8 @@ export const mockWeeklyGoals: WeeklyGoal[] = [
     title: '매일 아침 경건의 시간 갖기',
     weekNumber: currentWeek,
     year: currentYear,
+    startDate: weekStart,
+    endDate: weekEnd,
     status: 'active',
     completionRate: 71,
     linkedRoutineIds: ['pr-1', 'fr-1'],
@@ -45,6 +52,8 @@ export const mockWeeklyGoals: WeeklyGoal[] = [
     title: '동료에게 따뜻한 말 한마디',
     weekNumber: currentWeek,
     year: currentYear,
+    startDate: weekStart,
+    endDate: weekEnd,
     status: 'active',
     completionRate: 85,
     linkedRoutineIds: ['pr-2'],
@@ -56,6 +65,8 @@ export const mockWeeklyGoals: WeeklyGoal[] = [
     title: '점심 시간 짧은 묵상',
     weekNumber: currentWeek,
     year: currentYear,
+    startDate: weekStart,
+    endDate: weekEnd,
     status: 'active',
     completionRate: 57,
     linkedRoutineIds: ['fr-2'],

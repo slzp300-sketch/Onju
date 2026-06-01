@@ -19,13 +19,16 @@ export const goalHandlers = [
 
   http.post('/api/goals/monthly', async ({ request }) => {
     const body = await request.json() as Partial<MonthlyGoal>;
+    const now = new Date();
     const newGoal: MonthlyGoal = {
       id: `mg-${Date.now()}`,
       userId: 'user-1',
       title: body.title ?? '',
       description: body.description,
-      month: body.month ?? new Date().getMonth() + 1,
-      year: body.year ?? new Date().getFullYear(),
+      month: body.month ?? now.getMonth() + 1,
+      year: body.year ?? now.getFullYear(),
+      startDate: body.startDate ?? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`,
+      endDate: body.endDate ?? new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0],
       status: 'active',
       createdAt: new Date().toISOString(),
     };
@@ -53,6 +56,8 @@ export const goalHandlers = [
       title: body.title ?? '',
       weekNumber: body.weekNumber ?? 1,
       year: body.year ?? new Date().getFullYear(),
+      startDate: body.startDate ?? new Date().toISOString().split('T')[0],
+      endDate: body.endDate ?? new Date().toISOString().split('T')[0],
       status: 'active',
       completionRate: 0,
       linkedRoutineIds: body.linkedRoutineIds ?? [],
