@@ -45,6 +45,7 @@ export interface DailyRoutine {
   id: string;
   userId: string;
   title: string;
+  emoji?: string;
   type: RoutineType;
   weeklyGoalId?: string;
   monthlyGoalId?: string;
@@ -183,6 +184,7 @@ export interface Todo {
   id: string;
   userId: string;
   title: string;
+  emoji?: string;
   date: string; // YYYY-MM-DD
   completed: boolean;
   completedAt?: string;

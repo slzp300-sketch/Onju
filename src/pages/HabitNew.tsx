@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import EmojiPickerButton from '../components/ui/EmojiPickerButton';
+
+const tap = { whileTap: { scale: 0.94 }, transition: { type: 'spring' as const, stiffness: 600, damping: 20 } };
+const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 import { useHabitStore } from '../store/habitStore';
 import type { HabitFrequency } from '../types';
 import { WEEKDAY_LABELS } from '../types';
@@ -13,7 +17,6 @@ const FREQ_OPTIONS: { value: HabitFrequency; label: string; desc: string }[] = [
   { value: 'custom', label: '직접 선택', desc: '요일 선택' },
 ];
 
-const POPULAR_EMOJIS = ['🏃', '💪', '📖', '✍️', '🎯', '🧘', '🚶', '💻', '🎵', '🌿', '☕', '🥗', '💤', '🧠', '❤️', '🌞', '🙏', '✝️', '📿', '🕊️', '🎨', '🏋️', '🚴', '🧹', '🌱', '📝', '🍎', '💧', '🎸', '📸'];
 
 export default function HabitNew() {
   const navigate = useNavigate();
@@ -27,7 +30,6 @@ export default function HabitNew() {
   const [freq, setFreq] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [customDays, setCustomDays] = useState<number[]>(existing?.customDays ?? []);
   const [when, setWhen] = useState(existing?.when ?? '');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const freqLabel = FREQ_OPTIONS.find(f => f.value === freq)?.label ?? '매일';
   const whenPlaceholder = '예) 8:00 / 출근길';
@@ -51,9 +53,9 @@ export default function HabitNew() {
     <div className="min-h-dvh bg-gray-50 flex flex-col">
       {/* 헤더 */}
       <div className="flex items-center px-4 pt-5 pb-3 bg-white border-b border-gray-100">
-        <button onClick={() => navigate(-1)} className="p-1 -ml-1 text-gray-500">
+        <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-gray-500">
           <ChevronLeft size={24} />
-        </button>
+        </motion.button>
         <h1 className="flex-1 text-center text-base font-bold text-gray-900">
           {isEdit ? '습관 수정하기' : '습관 추가하기'}
         </h1>
@@ -68,31 +70,7 @@ export default function HabitNew() {
           <div className="flex gap-2">
             {/* 이모지 버튼 */}
             <div className="relative">
-              <button
-                onClick={() => setShowEmojiPicker(v => !v)}
-                className="w-14 h-14 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-3xl shadow-sm"
-              >
-                {emoji}
-              </button>
-              <AnimatePresence>
-                {showEmojiPicker && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -4, scale: 0.95 }}
-                    className="absolute top-16 left-0 z-20 bg-white border border-gray-100 rounded-2xl shadow-xl p-3 w-64"
-                  >
-                    <div className="grid grid-cols-8 gap-1.5">
-                      {POPULAR_EMOJIS.map(e => (
-                        <button key={e} onClick={() => { setEmoji(e); setShowEmojiPicker(false); }}
-                          className={`w-7 h-7 flex items-center justify-center rounded-lg text-xl hover:bg-gray-100 transition-colors ${emoji === e ? 'bg-indigo-50 ring-2 ring-indigo-300' : ''}`}>
-                          {e}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
             </div>
 
             {/* 이름 입력 */}
@@ -124,10 +102,10 @@ export default function HabitNew() {
               {/* 주기 선택 */}
               <div className="flex gap-2 mt-3 flex-wrap">
                 {FREQ_OPTIONS.map(f => (
-                  <button key={f.value} onClick={() => setFreq(f.value)}
+                  <motion.button key={f.value} {...tap} onClick={() => setFreq(f.value)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${freq === f.value ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-500 bg-gray-50'}`}>
                     {f.label}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
               {/* 요일 직접 선택 */}
@@ -136,10 +114,10 @@ export default function HabitNew() {
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                     <div className="flex gap-1.5 mt-3">
                       {WEEKDAY_LABELS.map((label, idx) => (
-                        <button key={idx} onClick={() => setCustomDays(d => d.includes(idx) ? d.filter(x => x !== idx) : [...d, idx])}
+                        <motion.button key={idx} {...tap} onClick={() => setCustomDays(d => d.includes(idx) ? d.filter(x => x !== idx) : [...d, idx])}
                           className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${customDays.includes(idx) ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-500 bg-gray-50'}`}>
                           {label}
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
                   </motion.div>
@@ -169,13 +147,15 @@ export default function HabitNew() {
       {/* 하단 시작하기 버튼 */}
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 pb-safe bg-white border-t border-gray-100"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-        <button
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: 'spring', stiffness: 600, damping: 20 }}
           onClick={handleSubmit}
           disabled={!title.trim() || (freq === 'custom' && customDays.length === 0)}
           className="w-full py-4 mt-3 rounded-2xl bg-indigo-500 text-white font-bold text-base disabled:opacity-40 hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-200"
         >
           {isEdit ? '수정 완료' : '시작하기'}
-        </button>
+        </motion.button>
       </div>
     </div>
   );

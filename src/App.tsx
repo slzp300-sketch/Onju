@@ -172,6 +172,7 @@ function AppRoutes() {
               <Route path="/faith-routines/new" element={<FaithRoutineNew />} />
               <Route path="/faith-routines/edit/:id" element={<FaithRoutineNew />} />
               <Route path="/todos/new" element={<TodoNew />} />
+              <Route path="/todos/edit/:id" element={<TodoNew />} />
               <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
               <Route path="/review" element={<PageTransition><WeeklyReviewPage /></PageTransition>} />
               <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />

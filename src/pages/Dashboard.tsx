@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Target, CalendarDays, Trash2, ListTodo } from 'lucide-react';
+import { Flame, Target, CalendarDays, Trash2, ListTodo, Pencil } from 'lucide-react';
 import FAB from '../components/ui/FAB';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -289,48 +289,75 @@ export default function Dashboard() {
 
               {todayTodos.length === 0 ? (
                 <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-                  <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-4xl mb-5">
-                    ✅
-                  </div>
+                  <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-4xl mb-5">✅</div>
                   <p className="text-base font-bold text-gray-700 mb-1">오늘 할 일을 적어보세요</p>
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    하나씩 체크할 때마다<br />성취감이 쌓여가요
-                  </p>
+                  <p className="text-sm text-gray-400 leading-relaxed">하나씩 체크할 때마다<br />성취감이 쌓여가요</p>
                 </div>
               ) : (
-                <div className="bg-white">
-                  <div className="divide-y divide-gray-50">
-                    {todayTodos.filter(t => !t.completed).map((todo, idx) => (
-                      <div key={todo.id} className="flex items-center gap-3 px-4 py-3">
-                        <span className="text-xs font-bold w-5 text-center text-gray-400 flex-shrink-0">{idx + 1}</span>
-                        <button onClick={() => toggleTodo(todo.id)} className="w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0 hover:border-indigo-400 transition-colors" />
-                        <span className="flex-1 text-sm font-medium text-gray-800">{todo.title}</span>
-                        <button onClick={() => removeTodo(todo.id)} className="text-gray-200 hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
+                <div className="bg-white divide-y divide-gray-50">
+                  {/* 미완료 */}
+                  {todayTodos.filter(t => !t.completed).map((todo, idx) => (
+                    <motion.div key={todo.id} layout
+                      className="flex items-center gap-3 px-4 py-3">
+                      <span className="text-xs font-bold w-5 text-center text-gray-400 flex-shrink-0">{idx + 1}</span>
+                      {/* 아이콘 */}
+                      <div className="w-9 h-9 rounded-2xl bg-gray-100 flex items-center justify-center text-lg flex-shrink-0">
+                        {todo.emoji ?? '📝'}
                       </div>
-                    ))}
-                  </div>
+                      <span className="flex-1 text-sm font-semibold text-gray-800">{todo.title}</span>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+                          onClick={() => navigate(`/todos/edit/${todo.id}`)} className="text-gray-300 hover:text-indigo-400 transition-colors p-1">
+                          <Pencil size={13} />
+                        </motion.button>
+                        <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+                          onClick={() => removeTodo(todo.id)} className="text-gray-200 hover:text-red-400 transition-colors p-1">
+                          <Trash2 size={13} />
+                        </motion.button>
+                        {/* 체크 버튼 */}
+                        <motion.button whileTap={{ scale: 0.82 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+                          onClick={() => toggleTodo(todo.id)}
+                          className="w-7 h-7 rounded-full border-2 border-gray-300 hover:border-indigo-400 flex items-center justify-center transition-colors">
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  ))}
+                  {/* 완료 */}
                   {todayTodos.filter(t => t.completed).length > 0 && (
                     <>
-                      <div className="px-4 py-2 bg-gray-50 border-y border-gray-100">
+                      <div className="px-4 py-2 bg-gray-50">
                         <span className="text-xs font-bold text-gray-400">완료 {doneTodos}개</span>
                       </div>
-                      <div className="divide-y divide-gray-50">
-                        {todayTodos.filter(t => t.completed).map((todo, idx) => (
-                          <div key={todo.id} className="flex items-center gap-3 px-4 py-3">
-                            <span className="text-xs font-bold w-5 text-center text-gray-300 flex-shrink-0">
-                              {todayTodos.filter(t => !t.completed).length + idx + 1}
-                            </span>
-                            <button onClick={() => toggleTodo(todo.id)}
-                              className="w-5 h-5 rounded-full border-2 border-indigo-400 bg-indigo-400 flex items-center justify-center flex-shrink-0">
-                              <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-                                <path d="M1 3.5L3 5.5L8 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                            </button>
-                            <span className="flex-1 text-sm font-medium line-through text-gray-400">{todo.title}</span>
-                            <button onClick={() => removeTodo(todo.id)} className="text-gray-200 hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
+                      {todayTodos.filter(t => t.completed).map((todo, idx) => (
+                        <motion.div key={todo.id} layout
+                          className="flex items-center gap-3 px-4 py-3 opacity-70">
+                          <span className="text-xs font-bold w-5 text-center text-gray-300 flex-shrink-0">
+                            {todayTodos.filter(t => !t.completed).length + idx + 1}
+                          </span>
+                          <div className="w-9 h-9 rounded-2xl bg-indigo-50 flex items-center justify-center text-lg flex-shrink-0">
+                            {todo.emoji ?? '📝'}
                           </div>
-                        ))}
-                      </div>
+                          <span className="flex-1 text-sm font-semibold line-through text-gray-400">{todo.title}</span>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+                              onClick={() => removeTodo(todo.id)} className="text-gray-200 hover:text-red-400 transition-colors p-1">
+                              <Trash2 size={13} />
+                            </motion.button>
+                            {/* 체크됨 버튼 */}
+                            <motion.button whileTap={{ scale: 0.82 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+                              onClick={() => toggleTodo(todo.id)}
+                              className="w-7 h-7 rounded-full bg-indigo-500 border-2 border-indigo-500 flex items-center justify-center">
+                              <AnimatePresence mode="wait" initial={false}>
+                                <motion.svg key="chk" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                                  exit={{ scale: 0, opacity: 0 }} transition={{ type: 'spring', stiffness: 600, damping: 25 }}
+                                  width="11" height="9" viewBox="0 0 11 9" fill="none">
+                                  <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </motion.svg>
+                              </AnimatePresence>
+                            </motion.button>
+                          </div>
+                        </motion.div>
+                      ))}
                     </>
                   )}
                 </div>

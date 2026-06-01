@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import { Trash2, Timer, Pencil, CheckSquare, LayoutList } from 'lucide-react';
+import { Trash2, Timer, Pencil, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import FAB from '../ui/FAB';
 import { useHabitStore } from '../../store/habitStore';
 import type { Habit } from '../../types';
-import { WEEKDAY_LABELS } from '../../types';
+import { format } from 'date-fns';
 
-type SubTab = 'habit' | 'routine';
+const todayStr = () => format(new Date(), 'yyyy-MM-dd');
 
 /* ════════════════════════════════════════
-   개인 탭 (최상위)
+   개인 탭 최상위
 ════════════════════════════════════════ */
 export default function PersonalTab() {
-  const [sub, setSub] = useState<SubTab>('habit');
   const { habits, personalRoutines } = useHabitStore();
   const navigate = useNavigate();
 
@@ -34,136 +33,232 @@ export default function PersonalTab() {
     },
   ];
 
-  return (
-    <div className="flex flex-col">
-      {/* 서브탭 */}
-      <div className="flex gap-2 px-4 py-3">
-        {([
-          { key: 'habit' as SubTab, label: '습관', count: habits.length },
-          { key: 'routine' as SubTab, label: '루틴', count: personalRoutines.length },
-        ]).map(s => (
-          <button key={s.key} onClick={() => setSub(s.key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all ${sub === s.key ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'}`}>
-            {s.label}
-            {s.count > 0 && (
-              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${sub === s.key ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-500'}`}>{s.count}</span>
-            )}
-          </button>
-        ))}
-      </div>
+  // 루틴에 포함된 습관 ID 집합
+  const habitIdsInRoutines = new Set(personalRoutines.flatMap(r => r.habitIds));
+  // 루틴에 속하지 않는 단독 습관
+  const standaloneHabits = habits.filter(h => !habitIdsInRoutines.has(h.id));
 
-      <AnimatePresence mode="wait">
-        {sub === 'habit'
-          ? <motion.div key="h" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.15 }}><HabitSubTab /></motion.div>
-          : <motion.div key="r" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} transition={{ duration: 0.15 }}><RoutineSubTab /></motion.div>
-        }
-      </AnimatePresence>
+  if (habits.length === 0) {
+    return (
+      <div className="relative">
+        <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-4xl mb-5">😊</div>
+          <p className="text-base font-bold text-gray-700 mb-1">첫 번째 습관을 시작해 보세요</p>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            작은 습관 하나가 직장 생활을<br />조금 더 단단하게 만들어 줄 거예요
+          </p>
+        </div>
+        <FAB options={fabOptions} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative flex flex-col pb-24">
+      {/* 루틴 그룹 */}
+      {personalRoutines.map(r => (
+        <RoutineGroup key={r.id} routineId={r.id} />
+      ))}
+
+      {/* 단독 습관 */}
+      {standaloneHabits.length > 0 && (
+        <div>
+          {personalRoutines.length > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+              <span className="text-sm">📋</span>
+              <span className="flex-1 text-xs font-bold text-gray-700">개별 습관</span>
+              <CompletedBadge habits={standaloneHabits} />
+            </div>
+          )}
+          <div className="bg-white divide-y divide-gray-50">
+            {standaloneHabits.map((h, idx) => (
+              <HabitRow key={h.id} habit={h} index={idx + 1} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <FAB options={fabOptions} />
     </div>
   );
 }
 
-/* ── 습관 서브탭 ── */
-function HabitSubTab() {
-  const { habits, removeHabit } = useHabitStore();
+/* ── 루틴 그룹 (접기/펼치기 + 진행률) ── */
+function RoutineGroup({ routineId }: { routineId: string }) {
+  const { habits, personalRoutines, removePersonalRoutine, isHabitCompleted } = useHabitStore();
   const navigate = useNavigate();
+  const [expanded, setExpanded] = useState(true);
 
-  const freqLabel = (h: Habit) => {
-    if (h.frequency === 'daily') return '매일';
-    if (h.frequency === 'weekdays') return '평일';
-    if (h.frequency === 'weekends') return '주말';
-    return (h.customDays ?? []).map(d => WEEKDAY_LABELS[d]).join('·');
-  };
+  const routine = personalRoutines.find(r => r.id === routineId);
+  if (!routine) return null;
 
-  if (habits.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-        <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-4xl mb-5">
-          😊
-        </div>
-        <p className="text-base font-bold text-gray-700 mb-1">첫 번째 습관을 시작해 보세요</p>
-        <p className="text-sm text-gray-400 leading-relaxed">
-          작은 습관 하나가 직장 생활을<br />조금 더 단단하게 만들어 줄 거예요
-        </p>
-      </div>
-    );
-  }
+  const routineHabits = routine.habitIds.map(id => habits.find(h => h.id === id)).filter(Boolean) as Habit[];
+  const completedCount = routineHabits.filter(h => isHabitCompleted(h.id, todayStr())).length;
+  const allDone = completedCount === routineHabits.length && routineHabits.length > 0;
 
   return (
-    <div className="flex flex-col gap-2 px-4 pb-4 pt-2">
-      {habits.map(h => (
-        <div key={h.id} className="flex items-center gap-3 bg-white border border-gray-100 rounded-2xl px-4 py-3.5">
-          <span className="text-2xl flex-shrink-0">{h.emoji}</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900">{h.title}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">{freqLabel(h)}</span>
-              {h.when && <span className="text-[11px] text-gray-400 truncate">· {h.when}</span>}
-            </div>
-          </div>
-          <button onClick={() => navigate(`/habits/edit/${h.id}`)} className="text-gray-300 hover:text-indigo-500 transition-colors p-1"><Pencil size={14} /></button>
-          <button onClick={() => removeHabit(h.id)} className="text-gray-200 hover:text-red-400 transition-colors p-1"><Trash2 size={14} /></button>
-        </div>
-      ))}
+    <div className="mb-0.5">
+      {/* 루틴 헤더 */}
+      <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100">
+        {/* 접기/펼치기 */}
+        <motion.button
+          animate={{ rotate: expanded ? 0 : -90 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+          onClick={() => setExpanded(v => !v)}
+          className="text-gray-400 flex-shrink-0"
+        >
+          <ChevronDown size={16} />
+        </motion.button>
+
+        <span className="text-lg">{routine.emoji}</span>
+        <span className="flex-1 text-sm font-bold text-gray-800">{routine.title}</span>
+
+        {routine.when && (
+          <span className="text-[11px] text-gray-400 mr-1">{routine.when}</span>
+        )}
+
+        {/* 진행률 뱃지 */}
+        <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${allDone ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'}`}>
+          {completedCount}/{routineHabits.length}
+        </span>
+
+        {/* 타이머 아이콘 */}
+        {routine.timerEnabled && (
+          <Timer size={14} className="text-indigo-400 flex-shrink-0" />
+        )}
+
+        {/* ▶ 전체 시작 */}
+        <motion.button
+          whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${allDone ? 'bg-indigo-500 text-white' : 'bg-white border border-gray-200 text-gray-400 hover:border-indigo-300 hover:text-indigo-500'}`}
+        >
+          <Play size={10} fill="currentColor" />
+        </motion.button>
+
+        {/* 수정 */}
+        <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+          onClick={() => navigate(`/personal-routines/edit/${routine.id}`)}
+          className="text-gray-300 hover:text-indigo-400 transition-colors p-0.5">
+          <Pencil size={13} />
+        </motion.button>
+
+        {/* 삭제 */}
+        <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+          onClick={() => removePersonalRoutine(routine.id)}
+          className="text-gray-200 hover:text-red-400 transition-colors p-0.5">
+          <Trash2 size={13} />
+        </motion.button>
+      </div>
+
+      {/* 습관 목록 (접기/펼치기) */}
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+            className="overflow-hidden bg-white divide-y divide-gray-50"
+          >
+            {routineHabits.map((h, idx) => (
+              <HabitRow key={h.id} habit={h} index={idx + 1} inRoutine />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-/* ── 루틴 서브탭 ── */
-function RoutineSubTab() {
-  const { habits, personalRoutines, removePersonalRoutine } = useHabitStore();
+/* ── 개별 습관 행 ── */
+function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: number; inRoutine?: boolean }) {
+  const { toggleHabitLog, isHabitCompleted, removeHabit } = useHabitStore();
   const navigate = useNavigate();
-
-  if (personalRoutines.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-        <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-4xl mb-5">
-          🗂️
-        </div>
-        <p className="text-base font-bold text-gray-700 mb-1">나만의 루틴을 만들어 보세요</p>
-        <p className="text-sm text-gray-400 leading-relaxed">
-          습관들을 묶어 루틴으로 만들면<br />하루를 더 체계적으로 보낼 수 있어요
-        </p>
-        {habits.length < 2 && (
-          <div className="mt-4 px-4 py-2.5 bg-amber-50 border border-amber-100 rounded-2xl">
-            <p className="text-xs text-amber-700 font-medium">💡 먼저 습관을 2개 이상 추가해 주세요</p>
-          </div>
-        )}
-      </div>
-    );
-  }
+  const done = isHabitCompleted(habit.id, todayStr());
 
   return (
-    <div className="flex flex-col gap-3 px-4 pb-4 pt-2">
-      {personalRoutines.map(r => {
-        const rHabits = r.habitIds.map(id => habits.find(h => h.id === id)).filter(Boolean) as Habit[];
-        return (
-          <div key={r.id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-50">
-              <span className="text-2xl">{r.emoji}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-gray-900">{r.title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  {r.when && <span className="text-[11px] text-gray-400">{r.when}</span>}
-                  {r.timerEnabled && <span className="flex items-center gap-0.5 text-[11px] font-medium text-indigo-500"><Timer size={10} /> 타이머</span>}
-                </div>
-              </div>
-              <button onClick={() => navigate(`/personal-routines/edit/${r.id}`)} className="text-gray-300 hover:text-indigo-500 transition-colors p-1"><Pencil size={14} /></button>
-              <button onClick={() => removePersonalRoutine(r.id)} className="text-gray-200 hover:text-red-400 transition-colors p-1"><Trash2 size={14} /></button>
-            </div>
-            <div className="px-4 py-2">
-              {rHabits.map((h, idx) => (
-                <div key={h.id} className="flex items-center gap-2 py-1.5">
-                  <span className="text-xs font-bold text-gray-300 w-4">{idx + 1}</span>
-                  <span className="text-base">{h.emoji}</span>
-                  <span className="text-sm text-gray-700 font-medium">{h.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+    <motion.div
+      layout
+      className={`flex items-center gap-3 px-4 py-3 ${done ? 'opacity-70' : ''}`}
+    >
+      {/* 번호 */}
+      <span className={`text-xs font-bold w-5 text-center flex-shrink-0 ${done ? 'text-gray-300' : 'text-gray-400'}`}>
+        {index}
+      </span>
+
+      {/* 이모지 (장식용) */}
+      <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${done ? 'bg-indigo-50' : 'bg-gray-100'}`}>
+        {habit.emoji}
+      </div>
+
+      {/* 텍스트 */}
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm font-semibold truncate ${done ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+          {habit.title}
+        </p>
+        {habit.when && (
+          <p className="text-[11px] text-gray-400 mt-0.5 truncate">{habit.when}</p>
+        )}
+      </div>
+
+      {/* 오른쪽: 수정/삭제 + 체크 버튼 */}
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        {!done && (
+          <>
+            <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+              onClick={() => navigate(`/habits/edit/${habit.id}`)}
+              className="text-gray-300 hover:text-indigo-400 transition-colors p-1">
+              <Pencil size={13} />
+            </motion.button>
+            {!inRoutine && (
+              <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+                onClick={() => removeHabit(habit.id)}
+                className="text-gray-200 hover:text-red-400 transition-colors p-1">
+                <Trash2 size={13} />
+              </motion.button>
+            )}
+          </>
+        )}
+
+        {/* 체크 버튼 */}
+        <motion.button
+          whileTap={{ scale: 0.82 }}
+          transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+          onClick={() => toggleHabitLog(habit.id)}
+          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
+            done
+              ? 'bg-indigo-500 border-indigo-500'
+              : 'border-gray-300 hover:border-indigo-400'
+          }`}
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            {done && (
+              <motion.svg
+                key="check"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 600, damping: 25 }}
+                width="11" height="9" viewBox="0 0 11 9" fill="none"
+              >
+                <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </motion.svg>
+            )}
+          </AnimatePresence>
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── 완료 뱃지 헬퍼 ── */
+function CompletedBadge({ habits }: { habits: Habit[] }) {
+  const { isHabitCompleted } = useHabitStore();
+  const done = habits.filter(h => isHabitCompleted(h.id, todayStr())).length;
+  const allDone = done === habits.length;
+  return (
+    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'}`}>
+      {done}/{habits.length}
+    </span>
   );
 }

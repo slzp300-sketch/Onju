@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ChevronLeft, Timer, Check } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useHabitStore } from '../store/habitStore';
+import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 
-const POPULAR_EMOJIS = ['🎯', '🌅', '🌙', '☀️', '💪', '🧘', '📖', '🙏', '✝️', '🏃', '🎵', '🌿', '💻', '✍️', '❤️', '🌟'];
+const tap = { whileTap: { scale: 0.94 }, transition: { type: 'spring' as const, stiffness: 600, damping: 20 } };
+const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 
 export default function PersonalRoutineNew() {
   const navigate = useNavigate();
@@ -19,7 +21,6 @@ export default function PersonalRoutineNew() {
   const [when, setWhen] = useState(existing?.when ?? '');
   const [selectedIds, setSelectedIds] = useState<string[]>(existing?.habitIds ?? []);
   const [timerEnabled, setTimerEnabled] = useState(existing?.timerEnabled ?? false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const toggle = (id: string) =>
     setSelectedIds(ids => ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]);
@@ -39,9 +40,9 @@ export default function PersonalRoutineNew() {
     <div className="min-h-dvh bg-gray-50 flex flex-col">
       {/* 헤더 */}
       <div className="flex items-center px-4 pt-5 pb-3 bg-white border-b border-gray-100">
-        <button onClick={() => navigate(-1)} className="p-1 -ml-1 text-gray-500">
+        <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-gray-500">
           <ChevronLeft size={24} />
-        </button>
+        </motion.button>
         <h1 className="flex-1 text-center text-base font-bold text-gray-900">
           {isEdit ? '루틴 수정하기' : '루틴 추가하기'}
         </h1>
@@ -55,25 +56,7 @@ export default function PersonalRoutineNew() {
           <p className="text-xs font-bold text-gray-500 mb-2">루틴 이름</p>
           <div className="flex gap-2">
             <div className="relative">
-              <button onClick={() => setShowEmojiPicker(v => !v)}
-                className="w-14 h-14 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-3xl shadow-sm">
-                {emoji}
-              </button>
-              <AnimatePresence>
-                {showEmojiPicker && (
-                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-                    className="absolute top-16 left-0 z-20 bg-white border border-gray-100 rounded-2xl shadow-xl p-3 w-60">
-                    <div className="grid grid-cols-8 gap-1.5">
-                      {POPULAR_EMOJIS.map(e => (
-                        <button key={e} onClick={() => { setEmoji(e); setShowEmojiPicker(false); }}
-                          className={`w-7 h-7 flex items-center justify-center rounded-lg text-xl hover:bg-gray-100 ${emoji === e ? 'bg-indigo-50 ring-2 ring-indigo-300' : ''}`}>
-                          {e}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
             </div>
             <input type="text" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="루틴 이름을 입력하세요" autoFocus
@@ -131,7 +114,7 @@ export default function PersonalRoutineNew() {
                 const sel = selectedIds.includes(h.id);
                 const order = selectedIds.indexOf(h.id) + 1;
                 return (
-                  <button key={h.id} onClick={() => toggle(h.id)}
+                  <motion.button key={h.id} {...tap} onClick={() => toggle(h.id)}
                     className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl border transition-all text-left ${sel ? 'border-indigo-300 bg-indigo-50' : 'border-gray-100 bg-white'}`}>
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold transition-all ${sel ? 'bg-indigo-500 text-white' : 'border-2 border-gray-200 text-transparent'}`}>
                       {sel ? order : <Check size={14} className="text-transparent" />}
@@ -141,7 +124,7 @@ export default function PersonalRoutineNew() {
                       <p className="text-sm font-semibold text-gray-800">{h.title}</p>
                       {h.when && <p className="text-xs text-gray-400 truncate">{h.when}</p>}
                     </div>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -153,11 +136,12 @@ export default function PersonalRoutineNew() {
       {/* 하단 버튼 */}
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-white border-t border-gray-100"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-        <button onClick={handleSubmit}
+        <motion.button whileTap={{ scale: 0.97 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+          onClick={handleSubmit}
           disabled={!title.trim() || selectedIds.length < 2}
           className="w-full py-4 mt-3 rounded-2xl bg-indigo-500 text-white font-bold text-base disabled:opacity-40 hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-200">
           {isEdit ? '수정 완료' : '시작하기'}
-        </button>
+        </motion.button>
       </div>
     </div>
   );
