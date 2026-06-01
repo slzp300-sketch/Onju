@@ -151,6 +151,44 @@ export interface BibleVerse {
   reflection?: string;
 }
 
+// 습관 반복 주기
+export type HabitFrequency = 'daily' | 'weekdays' | 'weekends' | 'custom';
+export const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
+
+// 습관 (개별 단위)
+export interface Habit {
+  id: string;
+  userId: string;
+  title: string;
+  emoji: string;
+  frequency: HabitFrequency;
+  customDays?: number[]; // 0=일 ~ 6=토, frequency==='custom'일 때
+  when: string; // 사용자 입력 텍스트 ("아침 기상 후", "출근 전" 등)
+  createdAt: string;
+}
+
+// 개인 루틴 (습관 2개 이상의 묶음)
+export interface PersonalRoutine {
+  id: string;
+  userId: string;
+  title: string;
+  emoji: string;
+  when: string;
+  habitIds: string[]; // 순서 있는 습관 ID 목록
+  timerEnabled: boolean;
+  createdAt: string;
+}
+
+export interface Todo {
+  id: string;
+  userId: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  completed: boolean;
+  completedAt?: string;
+  createdAt: string;
+}
+
 // 루틴 조정 내역
 export interface RoutineChange {
   routineId: string;

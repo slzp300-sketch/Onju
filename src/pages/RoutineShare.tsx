@@ -1,0 +1,182 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Share2, Heart, Bookmark } from 'lucide-react';
+import { useHabitStore } from '../store/habitStore';
+
+// 더미 공유 루틴 데이터
+const SHARED_ROUTINES = [
+  {
+    id: 'sr-1',
+    userName: '김믿음',
+    userEmoji: '😊',
+    routineEmoji: '🌅',
+    routineName: '아침 모닝루틴',
+    when: '기상 직후 30분',
+    habits: ['스트레칭 5분', '성경 묵상', '감사 일기'],
+    likes: 24,
+  },
+  {
+    id: 'sr-2',
+    userName: '이소망',
+    userEmoji: '🙂',
+    routineEmoji: '💪',
+    routineName: '퇴근 후 리셋',
+    when: '퇴근 후',
+    habits: ['30분 산책', '기도', '독서 20분'],
+    likes: 18,
+  },
+  {
+    id: 'sr-3',
+    userName: '박사랑',
+    userEmoji: '😄',
+    routineEmoji: '🌙',
+    routineName: '저녁 마무리 루틴',
+    when: '취침 1시간 전',
+    habits: ['하루 되돌아보기', '내일 계획 작성', '저녁 기도'],
+    likes: 31,
+  },
+  {
+    id: 'sr-4',
+    userName: '최인내',
+    userEmoji: '😌',
+    routineEmoji: '📖',
+    routineName: '말씀 묵상 루틴',
+    when: '점심 시간',
+    habits: ['오늘의 말씀 읽기', '묵상 메모', '적용 다짐'],
+    likes: 42,
+  },
+];
+
+type TabType = 'discover' | 'my';
+
+export default function RoutineShare() {
+  const [activeTab, setActiveTab] = useState<TabType>('discover');
+  const { personalRoutines } = useHabitStore();
+
+  return (
+    <div className="flex flex-col min-h-full">
+      {/* 헤더 */}
+      <div className="px-4 pt-5 pb-3">
+        <h1 className="text-lg font-bold text-gray-900">루틴 공유</h1>
+        <p className="text-xs text-gray-400 mt-0.5">다른 사람의 루틴을 발견하고 나의 루틴을 공유해요</p>
+      </div>
+
+      {/* 탭 */}
+      <div className="flex border-b border-gray-100 px-4">
+        {([
+          { key: 'discover' as TabType, label: '둘러보기' },
+          { key: 'my' as TabType, label: '내 루틴 공유' },
+        ]).map(tab => (
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+            className={`relative pb-2.5 mr-6 text-sm font-bold transition-colors ${activeTab === tab.key ? 'text-gray-900' : 'text-gray-400'}`}>
+            {tab.label}
+            {activeTab === tab.key && (
+              <motion.div layoutId="shareTabLine" className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* 콘텐츠 */}
+      {activeTab === 'discover' ? (
+        <div className="flex flex-col gap-3 px-4 py-4 pb-24">
+          {SHARED_ROUTINES.map(r => (
+            <SharedRoutineCard key={r.id} data={r} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3 px-4 py-4 pb-24">
+          <p className="text-xs text-gray-400 leading-relaxed">
+            내 루틴을 공유하면 다른 사람들에게 영감을 줄 수 있어요.
+          </p>
+          {personalRoutines.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-14 text-center">
+              <span className="text-4xl mb-3">🗂️</span>
+              <p className="text-sm font-semibold text-gray-600">아직 만든 루틴이 없어요</p>
+              <p className="text-xs text-gray-400 mt-1">홈에서 루틴을 먼저 만들어 보세요</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {personalRoutines.map(r => (
+                <div key={r.id} className="bg-white border border-gray-100 rounded-2xl px-4 py-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{r.emoji}</span>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{r.title}</p>
+                        {r.when && <p className="text-xs text-gray-400">{r.when}</p>}
+                      </div>
+                    </div>
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500 text-white text-xs font-semibold rounded-xl hover:bg-indigo-600 transition-colors">
+                      <Share2 size={12} /> 공유
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-400">{r.habitIds.length}개 습관</span>
+                    {r.timerEnabled && <span className="text-xs text-indigo-400 font-medium">· 타이머</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  return (
+    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+      {/* 카드 헤더 */}
+      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-50">
+        <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-lg flex-shrink-0">
+          {data.userEmoji}
+        </div>
+        <div className="flex-1">
+          <p className="text-xs font-semibold text-gray-800">{data.userName}</p>
+        </div>
+        <button onClick={() => setSaved(v => !v)}
+          className={`transition-colors ${saved ? 'text-indigo-500' : 'text-gray-300 hover:text-gray-400'}`}>
+          <Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />
+        </button>
+      </div>
+
+      {/* 루틴 정보 */}
+      <div className="px-4 pt-3 pb-2">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xl">{data.routineEmoji}</span>
+          <div>
+            <p className="text-sm font-bold text-gray-900">{data.routineName}</p>
+            <p className="text-xs text-gray-400">{data.when}</p>
+          </div>
+        </div>
+
+        {/* 습관 목록 */}
+        <div className="flex flex-col gap-1 ml-1 mb-3">
+          {data.habits.map((h, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-300 w-3">{idx + 1}</span>
+              <span className="text-xs text-gray-600">{h}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* 좋아요 */}
+        <div className="flex items-center justify-between border-t border-gray-50 pt-2.5">
+          <button onClick={() => setLiked(v => !v)}
+            className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${liked ? 'text-red-400' : 'text-gray-400 hover:text-red-300'}`}>
+            <Heart size={14} fill={liked ? 'currentColor' : 'none'} />
+            {data.likes + (liked ? 1 : 0)}
+          </button>
+          <button className="text-xs text-indigo-500 font-semibold hover:text-indigo-700 transition-colors">
+            나도 따라하기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

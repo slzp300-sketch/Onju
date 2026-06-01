@@ -7,17 +7,19 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
+  onOpenComplete?: () => void;
 }
 
-export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
+export default function Modal({ isOpen, onClose, title, children, onOpenComplete }: ModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      onOpenComplete?.();
     } else {
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <AnimatePresence>
