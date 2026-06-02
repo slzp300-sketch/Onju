@@ -31,22 +31,19 @@ const TABS: { key: TabType; label: string }[] = [
 
 const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 
-/* ── 이번 주 월~일 날짜 배열 ── */
 function getWeekDays(): Date[] {
   const start = startOfWeek(new Date(), { weekStartsOn: 1 });
   return Array.from({ length: 7 }, (_, i) => addDays(start, i));
 }
 
-/* ── 신앙 루틴 일별 달성률 ── */
 function getFaithRate(routines: import('../types').DailyRoutine[], logs: import('../types').RoutineLog[], dateStr: string): number {
-  if (routines.length === 0) return -1; // 루틴 없음
+  if (routines.length === 0) return -1;
   const done = new Set(logs.filter(l => l.date === dateStr && l.completed).map(l => l.routineId));
   return Math.round((routines.filter(r => done.has(r.id)).length / routines.length) * 100);
 }
 
-/* ── 개인 루틴(습관) 일별 달성률 ── */
 function getHabitRate(habits: import('../types').Habit[], habitLogs: { habitId: string; date: string; completed: boolean }[], dateStr: string): number {
-  if (habits.length === 0) return -1; // 습관 없음
+  if (habits.length === 0) return -1;
   const done = habitLogs.filter(l => l.date === dateStr && l.completed).length;
   return Math.round((done / habits.length) * 100);
 }
@@ -73,7 +70,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (allDone && !prevCompleteRef.current) {
-      confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#1D9E75', '#378ADD', '#7F77DD'] });
+      confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#00BF40', '#0066FF', '#7C7FF5'] });
     }
     prevCompleteRef.current = allDone;
   }, [allDone]);
@@ -85,7 +82,6 @@ export default function Dashboard() {
   const doneTodos = todayTodos.filter(t => t.completed).length;
   const weekDays = getWeekDays();
 
-  // 한주 달성률 — 개인(습관) + 신앙 각각
   const weekRates = weekDays.map(d => {
     const ds = format(d, 'yyyy-MM-dd');
     return {
@@ -94,6 +90,7 @@ export default function Dashboard() {
       faith: getFaithRate(faithRoutines, logs, ds),
     };
   });
+
   const badges: Record<TabType, string | undefined> = {
     personal: undefined,
     faith: undefined,
@@ -103,40 +100,39 @@ export default function Dashboard() {
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="flex flex-col pb-8">
 
-      {/* ── 헤더 ── */}
+      {/* 헤더 */}
       <motion.div variants={itemV} className="px-4 pt-5 pb-3 flex items-start justify-between">
         <div>
-          <p className="text-xs text-gray-400 font-medium">{format(new Date(), 'yyyy년 M월', { locale: ko })}</p>
-          <h1 className="text-lg font-bold text-gray-900 mt-0.5">안녕하세요, {user?.name}님 👋</h1>
+          <p className="text-caption1 text-label-alt font-medium">{format(new Date(), 'yyyy년 M월', { locale: ko })}</p>
+          <h1 className="text-heading2 font-bold text-label-strong font-brand mt-0.5">안녕하세요, {user?.name}님</h1>
         </div>
       </motion.div>
 
-      {/* ── 이번달 / 이번주 목표 + 스트릭 ── */}
+      {/* 목표 + 스트릭 카드 행 */}
       <motion.div variants={itemV} className="px-4 mb-4 flex gap-2">
         {/* 이번달 목표 */}
         <motion.button
-          whileTap={{ scale: 0.96 }}
-          whileHover={{ scale: 1.01 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.12 }}
           onClick={() => navigate('/goals/monthly')}
-          className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-3 text-left shadow-sm active:shadow-none active:bg-indigo-50/50 active:border-indigo-200 transition-colors"
+          className="flex-1 bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
         >
           <div className="flex items-center gap-1 mb-2">
-            <CalendarDays size={11} className="text-indigo-400" />
-            <span className="text-[11px] font-bold text-indigo-400">이번달</span>
+            <CalendarDays size={11} className="text-primary" />
+            <span className="text-caption2 font-bold text-primary">이번달</span>
           </div>
           {thisMonthGoals.length === 0 ? (
-            <p className="text-xs text-gray-300 font-medium leading-tight">목표를<br />세워보세요</p>
+            <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를<br />세워보세요</p>
           ) : (
             <div className="flex flex-col gap-1">
               {thisMonthGoals.slice(0, 2).map(g => (
                 <div key={g.id} className="flex items-center gap-1.5">
-                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${g.status === 'completed' ? 'bg-indigo-400' : 'bg-gray-300'}`} />
-                  <p className={`text-xs font-medium truncate ${g.status === 'completed' ? 'line-through text-gray-400' : 'text-gray-700'}`}>{g.title}</p>
+                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${g.status === 'completed' ? 'bg-primary' : 'bg-line'}`} />
+                  <p className={`text-caption1 font-medium truncate ${g.status === 'completed' ? 'line-through text-label-assistive' : 'text-label'}`}>{g.title}</p>
                 </div>
               ))}
               {thisMonthGoals.length > 2 && (
-                <p className="text-[11px] text-gray-400">+{thisMonthGoals.length - 2}개 더</p>
+                <p className="text-caption2 text-label-assistive">+{thisMonthGoals.length - 2}개 더</p>
               )}
             </div>
           )}
@@ -144,48 +140,46 @@ export default function Dashboard() {
 
         {/* 이번주 목표 */}
         <motion.button
-          whileTap={{ scale: 0.96 }}
-          whileHover={{ scale: 1.01 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.12 }}
           onClick={() => navigate('/goals/weekly')}
-          className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-3 text-left shadow-sm active:shadow-none active:bg-indigo-50/50 active:border-indigo-200 transition-colors"
+          className="flex-1 bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
         >
           <div className="flex items-center gap-1 mb-2">
-            <Target size={11} className="text-indigo-400" />
-            <span className="text-[11px] font-bold text-indigo-400">이번주</span>
+            <Target size={11} className="text-primary" />
+            <span className="text-caption2 font-bold text-primary">이번주</span>
           </div>
           {thisWeekGoals.length === 0 ? (
-            <p className="text-xs text-gray-300 font-medium leading-tight">목표를<br />추가해보세요</p>
+            <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를<br />추가해보세요</p>
           ) : (
             <div className="flex flex-col gap-1">
               {thisWeekGoals.slice(0, 2).map(g => (
                 <div key={g.id} className="flex items-center gap-1.5">
                   <div className="relative w-4 h-4 flex-shrink-0">
                     <svg className="w-4 h-4 -rotate-90" viewBox="0 0 16 16">
-                      <circle cx="8" cy="8" r="6" fill="none" stroke="#e5e7eb" strokeWidth="2" />
-                      <circle cx="8" cy="8" r="6" fill="none" stroke="#6366f1" strokeWidth="2"
+                      <circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-fill-strong)" strokeWidth="2" />
+                      <circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-primary)" strokeWidth="2"
                         strokeDasharray={`${2 * Math.PI * 6}`}
                         strokeDashoffset={`${2 * Math.PI * 6 * (1 - g.completionRate / 100)}`}
                         strokeLinecap="round" />
                     </svg>
                   </div>
-                  <p className="text-xs font-medium text-gray-700 truncate">{g.title}</p>
+                  <p className="text-caption1 font-medium text-label truncate">{g.title}</p>
                 </div>
               ))}
               {thisWeekGoals.length > 2 && (
-                <p className="text-[11px] text-gray-400">+{thisWeekGoals.length - 2}개 더</p>
+                <p className="text-caption2 text-label-assistive">+{thisWeekGoals.length - 2}개 더</p>
               )}
             </div>
           )}
         </motion.button>
 
-        {/* 연속 달성 버튼 (스트릭 0일이어도 항상 표시) */}
+        {/* 스트릭 */}
         <motion.button
           whileTap={{ scale: 0.93 }}
-          whileHover={{ scale: 1.03 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          transition={{ duration: 0.12 }}
           onClick={() => navigate('/streak')}
-          className="bg-white border border-gray-100 rounded-2xl px-3 py-3 text-center shadow-sm active:shadow-none active:bg-orange-50/60 active:border-orange-200 transition-colors"
+          className="bg-surface border border-line rounded-xl px-3 py-3 text-center shadow-emphasize hover:bg-fill transition-colors"
           style={{ minWidth: 72 }}
         >
           <div className="flex flex-col items-center gap-1">
@@ -196,210 +190,202 @@ export default function Dashboard() {
             >
               🔥
             </motion.span>
-            <span className={`text-sm font-bold ${streak > 0 ? 'text-orange-500' : 'text-gray-300'}`}>
+            <span className={`text-label1 font-bold ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
               {streak}일
             </span>
-            <span className="text-[10px] text-gray-400 font-medium">연속</span>
+            <span className="text-caption2 text-label-assistive font-medium">연속</span>
           </div>
         </motion.button>
       </motion.div>
 
-      {/* ── 일요일 리뷰 배너 ── */}
+      {/* 일요일 리뷰 배너 */}
       {isSunday() && (
         <motion.div variants={itemV} className="px-4 mb-4">
           <ReviewBanner completed={isReviewCompleted(reviews, currentWeek(), currentYear())} weekRangeText={getWeekRangeText()} onStart={() => navigate('/review')} />
         </motion.div>
       )}
 
-      {/* ── 주간 스트립 + 루틴 탭 그룹 ── */}
-      <motion.div variants={itemV} className="bg-white border border-gray-100 rounded-t-3xl mx-3 overflow-hidden">
+      {/* 주간 스트립 + 탭 */}
+      <motion.div variants={itemV} className="bg-surface border border-line rounded-t-3xl mx-3 overflow-hidden shadow-emphasize">
 
-      {/* 주간 날짜 스트립 */}
-      <div className="px-3 pt-3 pb-2">
-        {/* 범례 */}
-        <div className="flex items-center gap-3 mb-2 px-1">
-          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-indigo-400" /><span className="text-[10px] text-gray-400 font-medium">개인</span></div>
-          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-400" /><span className="text-[10px] text-gray-400 font-medium">신앙</span></div>
+        {/* 주간 날짜 스트립 */}
+        <div className="px-3 pt-3 pb-2">
+          <div className="flex items-center gap-3 mb-2 px-1">
+            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-primary" /><span className="text-caption2 text-label-assistive font-medium">개인</span></div>
+            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-positive" /><span className="text-caption2 text-label-assistive font-medium">신앙</span></div>
+          </div>
+          <div className="flex justify-between gap-0.5">
+            {weekDays.map((d, i) => {
+              const ds = format(d, 'yyyy-MM-dd');
+              const isToday = ds === todayStr;
+              const isSelected = ds === selectedDay;
+              const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
+              const pRate = weekRates[i].personal;
+              const fRate = weekRates[i].faith;
+
+              return (
+                <button key={ds} onClick={() => setSelectedDay(ds)}
+                  className="flex flex-col items-center gap-1 flex-1">
+                  <span className={`text-caption2 font-semibold ${isToday ? 'text-primary' : 'text-label-assistive'}`}>
+                    {DAY_LABELS[i]}
+                  </span>
+
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-label1 font-bold ${
+                    isSelected && isToday ? 'bg-primary text-white'
+                    : isSelected ? 'bg-label-strong text-white'
+                    : isToday ? 'text-primary'
+                    : isFuture ? 'text-label-assistive'
+                    : 'text-label'
+                  }`}>
+                    {format(d, 'd')}
+                  </div>
+
+                  <div className="w-full h-1 bg-fill rounded-full overflow-hidden">
+                    {!isFuture && pRate >= 0 && (
+                      <motion.div
+                        className="h-full bg-primary rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${pRate}%` }}
+                        transition={{ duration: 0.5, delay: i * 0.04 }}
+                      />
+                    )}
+                  </div>
+
+                  <div className="w-full h-1 bg-fill rounded-full overflow-hidden">
+                    {!isFuture && fRate >= 0 && (
+                      <motion.div
+                        className="h-full bg-positive rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${fRate}%` }}
+                        transition={{ duration: 0.5, delay: i * 0.04 + 0.1 }}
+                      />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex justify-between gap-0.5">
-          {weekDays.map((d, i) => {
-            const ds = format(d, 'yyyy-MM-dd');
-            const isToday = ds === todayStr;
-            const isSelected = ds === selectedDay;
-            const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
-            const pRate = weekRates[i].personal; // -1: 없음, 0~100
-            const fRate = weekRates[i].faith;
 
-            return (
-              <button key={ds} onClick={() => setSelectedDay(ds)}
-                className="flex flex-col items-center gap-1 flex-1">
-                {/* 요일 */}
-                <span className={`text-[10px] font-semibold ${isToday ? 'text-indigo-500' : 'text-gray-400'}`}>
-                  {DAY_LABELS[i]}
-                </span>
-
-                {/* 날짜 숫자 */}
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${
-                  isSelected && isToday ? 'bg-indigo-500 text-white'
-                  : isSelected ? 'bg-gray-800 text-white'
-                  : isToday ? 'text-indigo-600'
-                  : isFuture ? 'text-gray-300'
-                  : 'text-gray-600'
-                }`}>
-                  {format(d, 'd')}
-                </div>
-
-                {/* 개인 루틴 바 */}
-                <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-                  {!isFuture && pRate >= 0 && (
-                    <motion.div
-                      className="h-full bg-indigo-400 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pRate}%` }}
-                      transition={{ duration: 0.5, delay: i * 0.04 }}
-                    />
-                  )}
-                </div>
-
-                {/* 신앙 루틴 바 */}
-                <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-                  {!isFuture && fRate >= 0 && (
-                    <motion.div
-                      className="h-full bg-emerald-400 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${fRate}%` }}
-                      transition={{ duration: 0.5, delay: i * 0.04 + 0.1 }}
-                    />
-                  )}
-                </div>
+        {/* 루틴 3탭 */}
+        <div className="border-t border-line-soft">
+          <div className="flex border-b border-line-soft bg-surface">
+            {TABS.map(tab => (
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                className={`relative flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 text-caption1 font-bold transition-colors ${activeTab === tab.key ? 'text-label-strong' : 'text-label-assistive'}`}>
+                <span>{tab.label}</span>
+                {badges[tab.key] && (
+                  <span className={`text-caption2 font-bold px-1.5 py-0.5 rounded ${activeTab === tab.key ? 'bg-primary-soft text-primary' : 'bg-fill text-label-assistive'}`}>
+                    {badges[tab.key]}
+                  </span>
+                )}
+                {activeTab === tab.key && (
+                  <motion.div layoutId="tab3Line" className="absolute bottom-0 left-3 right-3 h-0.5 bg-label-strong rounded-full" />
+                )}
               </button>
-            );
-          })}
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            {activeTab === 'personal' && (
+              <motion.div key="p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
+                <PersonalTab />
+              </motion.div>
+            )}
+            {activeTab === 'faith' && (
+              <motion.div key="f" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
+                <FaithTab />
+              </motion.div>
+            )}
+            {activeTab === 'todo' && (
+              <motion.div key="t" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
+                <FAB options={[{
+                  icon: <ListTodo size={20} />,
+                  label: '투두 추가',
+                  sub: '오늘의 할 일',
+                  color: 'bg-primary',
+                  onClick: () => navigate('/todos/new'),
+                }]} />
+
+                {todayTodos.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+                    <div className="w-20 h-20 rounded-full bg-primary-soft flex items-center justify-center mb-5">
+                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                      </svg>
+                    </div>
+                    <p className="text-body2 font-bold text-label mb-1">오늘 할 일을 적어보세요</p>
+                    <p className="text-caption1 text-label-alt leading-relaxed">하나씩 체크할 때마다<br />성취감이 쌓여가요</p>
+                  </div>
+                ) : (
+                  <div className="bg-surface divide-y divide-line-soft">
+                    {todayTodos.filter(t => !t.completed).map((todo, idx) => (
+                      <motion.div key={todo.id} layout
+                        onClick={() => navigate(`/todos/edit/${todo.id}`)}
+                        className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-fill transition-colors">
+                        <span className="text-caption2 font-bold w-5 text-center text-label-assistive flex-shrink-0">{idx + 1}</span>
+                        <div className="w-9 h-9 rounded-xl bg-fill flex items-center justify-center text-lg flex-shrink-0">
+                          {todo.emoji ?? '📝'}
+                        </div>
+                        <span className="flex-1 text-body2 font-semibold text-label">{todo.title}</span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
+                            onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
+                            <Trash2 size={13} />
+                          </motion.button>
+                          <motion.button whileTap={{ scale: 0.82 }} transition={{ duration: 0.08 }}
+                            onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
+                            className="w-7 h-7 rounded-full border-2 border-line hover:border-primary flex items-center justify-center transition-colors">
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    ))}
+
+                    {todayTodos.filter(t => t.completed).length > 0 && (
+                      <>
+                        <div className="px-4 py-2 bg-surface-alt">
+                          <span className="text-caption2 font-bold text-label-assistive">완료 {doneTodos}개</span>
+                        </div>
+                        {todayTodos.filter(t => t.completed).map((todo, idx) => (
+                          <motion.div key={todo.id} layout
+                            onClick={() => navigate(`/todos/edit/${todo.id}`)}
+                            className="flex items-center gap-3 px-4 py-3 opacity-60 cursor-pointer hover:bg-fill transition-colors">
+                            <span className="text-caption2 font-bold w-5 text-center text-label-assistive flex-shrink-0">
+                              {todayTodos.filter(t => !t.completed).length + idx + 1}
+                            </span>
+                            <div className="w-9 h-9 rounded-xl bg-primary-soft flex items-center justify-center text-lg flex-shrink-0">
+                              {todo.emoji ?? '📝'}
+                            </div>
+                            <span className="flex-1 text-body2 font-semibold line-through text-label-assistive">{todo.title}</span>
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                              <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
+                                onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
+                                <Trash2 size={13} />
+                              </motion.button>
+                              <motion.button whileTap={{ scale: 0.82 }} transition={{ duration: 0.08 }}
+                                onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
+                                className="w-7 h-7 rounded-full bg-primary border-2 border-primary flex items-center justify-center">
+                                <AnimatePresence mode="wait" initial={false}>
+                                  <motion.svg key="chk" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.15 }}
+                                    width="11" height="9" viewBox="0 0 11 9" fill="none">
+                                    <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                  </motion.svg>
+                                </AnimatePresence>
+                              </motion.button>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
-
-      {/* 루틴 3탭 */}
-      <div className="border-t border-gray-100">
-        {/* 탭 바 */}
-        <div className="flex border-b border-gray-100 bg-white">
-          {TABS.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`relative flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 text-xs font-bold transition-colors ${activeTab === tab.key ? 'text-gray-900' : 'text-gray-400'}`}>
-              <span>{tab.label}</span>
-              {badges[tab.key] && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${activeTab === tab.key ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-400'}`}>
-                  {badges[tab.key]}
-                </span>
-              )}
-              {activeTab === tab.key && (
-                <motion.div layoutId="tab3Line" className="absolute bottom-0 left-3 right-3 h-0.5 bg-gray-900 rounded-full" />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* 탭 콘텐츠 */}
-        <AnimatePresence mode="wait">
-          {activeTab === 'personal' && (
-            <motion.div key="p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-              <PersonalTab />
-            </motion.div>
-          )}
-          {activeTab === 'faith' && (
-            <motion.div key="f" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-              <FaithTab />
-            </motion.div>
-          )}
-          {activeTab === 'todo' && (
-            <motion.div key="t" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-              <FAB options={[{
-                icon: <ListTodo size={20} />,
-                label: '투두 추가',
-                sub: '오늘의 할 일',
-                color: 'bg-indigo-500',
-                onClick: () => navigate('/todos/new'),
-              }]} />
-
-              {todayTodos.length === 0 ? (
-                <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-                  <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-4xl mb-5">✅</div>
-                  <p className="text-base font-bold text-gray-700 mb-1">오늘 할 일을 적어보세요</p>
-                  <p className="text-sm text-gray-400 leading-relaxed">하나씩 체크할 때마다<br />성취감이 쌓여가요</p>
-                </div>
-              ) : (
-                <div className="bg-white divide-y divide-gray-50">
-                  {/* 미완료 */}
-                  {todayTodos.filter(t => !t.completed).map((todo, idx) => (
-                    <motion.div key={todo.id} layout
-                      onClick={() => navigate(`/todos/edit/${todo.id}`)}
-                      className="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors">
-                      <span className="text-xs font-bold w-5 text-center text-gray-400 flex-shrink-0">{idx + 1}</span>
-                      {/* 아이콘 */}
-                      <div className="w-9 h-9 rounded-2xl bg-gray-100 flex items-center justify-center text-lg flex-shrink-0">
-                        {todo.emoji ?? '📝'}
-                      </div>
-                      <span className="flex-1 text-sm font-semibold text-gray-800">{todo.title}</span>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                          onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-gray-200 hover:text-red-400 transition-colors p-1">
-                          <Trash2 size={13} />
-                        </motion.button>
-                        {/* 체크 버튼 */}
-                        <motion.button whileTap={{ scale: 0.82 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-                          onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
-                          className="w-7 h-7 rounded-full border-2 border-gray-300 hover:border-indigo-400 flex items-center justify-center transition-colors">
-                        </motion.button>
-                      </div>
-                    </motion.div>
-                  ))}
-                  {/* 완료 */}
-                  {todayTodos.filter(t => t.completed).length > 0 && (
-                    <>
-                      <div className="px-4 py-2 bg-gray-50">
-                        <span className="text-xs font-bold text-gray-400">완료 {doneTodos}개</span>
-                      </div>
-                      {todayTodos.filter(t => t.completed).map((todo, idx) => (
-                        <motion.div key={todo.id} layout
-                          onClick={() => navigate(`/todos/edit/${todo.id}`)}
-                          className="flex items-center gap-3 px-4 py-3 opacity-70 cursor-pointer active:bg-gray-50 transition-colors">
-                          <span className="text-xs font-bold w-5 text-center text-gray-300 flex-shrink-0">
-                            {todayTodos.filter(t => !t.completed).length + idx + 1}
-                          </span>
-                          <div className="w-9 h-9 rounded-2xl bg-indigo-50 flex items-center justify-center text-lg flex-shrink-0">
-                            {todo.emoji ?? '📝'}
-                          </div>
-                          <span className="flex-1 text-sm font-semibold line-through text-gray-400">{todo.title}</span>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                              onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-gray-200 hover:text-red-400 transition-colors p-1">
-                              <Trash2 size={13} />
-                            </motion.button>
-                            {/* 체크됨 버튼 */}
-                            <motion.button whileTap={{ scale: 0.82 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-                              onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
-                              className="w-7 h-7 rounded-full bg-indigo-500 border-2 border-indigo-500 flex items-center justify-center">
-                              <AnimatePresence mode="wait" initial={false}>
-                                <motion.svg key="chk" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                                  exit={{ scale: 0, opacity: 0 }} transition={{ type: 'spring', stiffness: 600, damping: 25 }}
-                                  width="11" height="9" viewBox="0 0 11 9" fill="none">
-                                  <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </motion.svg>
-                              </AnimatePresence>
-                            </motion.button>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </>
-                  )}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
 
       </motion.div>
     </motion.div>
   );
 }
-
