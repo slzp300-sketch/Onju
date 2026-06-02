@@ -31,6 +31,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
+const KakaoCallback = lazy(() => import('./pages/KakaoCallback'));
 const WeeklyReviewPage = lazy(() => import('./pages/WeeklyReviewPage'));
 const ReviewResultPage = lazy(() => import('./pages/ReviewResultPage'));
 const NotificationSettings = lazy(() => import('./pages/NotificationSettings'));
@@ -73,6 +74,7 @@ function BottomNav() {
   const hideNav =
     location.pathname === '/login' ||
     location.pathname === '/signup' ||
+    location.pathname === '/auth/kakao/callback' ||
     location.pathname === '/onboarding' ||
     location.pathname === '/groups/new' ||
     location.pathname === '/review' ||
@@ -151,6 +153,7 @@ function AppRoutes() {
         <Routes location={location} key={location.pathname}>
           <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
           <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
+          <Route path="/auth/kakao/callback" element={<PageTransition><KakaoCallback /></PageTransition>} />
           <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
 
           {!isAuthenticated ? (
