@@ -38,7 +38,6 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // 카카오 SDK 로드
   useEffect(() => {
     if (window.Kakao) return;
     const script = document.createElement('script');
@@ -109,22 +108,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col px-6">
+    <div className="min-h-dvh bg-surface flex flex-col px-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center pt-20 pb-10">
-        <div className="w-14 h-14 rounded-2xl bg-indigo-500 flex items-center justify-center mb-4">
-          <span className="text-white text-2xl font-bold">직</span>
+        <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mb-4 shadow-strong">
+          <span className="text-white text-2xl font-bold font-brand">직</span>
         </div>
-        <h1 className="text-xl font-bold text-gray-900">온주</h1>
-        <p className="text-sm text-gray-400 mt-1">크리스천 직장인의 루틴 파트너</p>
+        <h1 className="text-heading2 font-bold text-label-strong font-brand">온주</h1>
+        <p className="text-label2 text-label-alt mt-1">크리스천 직장인의 루틴 파트너</p>
       </div>
 
-      {/* 소셜 로그인 버튼들 */}
+      {/* 소셜 로그인 */}
       <div className="flex flex-col gap-3">
-        {/* 구글 */}
         <button
           onClick={() => handleGoogle()}
-          className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-2xl py-3.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          className="w-full flex items-center justify-center gap-3 border border-line rounded-lg h-12 text-body2 font-medium text-label bg-surface hover:bg-fill transition-colors"
         >
           <svg width="18" height="18" viewBox="0 0 48 48">
             <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
@@ -135,10 +133,9 @@ export default function Login() {
           구글로 계속하기
         </button>
 
-        {/* 카카오 */}
         <button
           onClick={handleKakao}
-          className="w-full flex items-center justify-center gap-3 rounded-2xl py-3.5 text-sm font-medium text-[#3C1E1E] bg-[#FEE500] hover:bg-[#F5DC00] active:bg-[#EDD000] transition-colors"
+          className="w-full flex items-center justify-center gap-3 rounded-lg h-12 text-body2 font-medium text-[#3C1E1E] bg-[#FEE500] hover:bg-[#F5DC00] transition-colors"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E">
             <path d="M12 3C6.48 3 2 6.69 2 11.25c0 2.91 1.82 5.47 4.58 6.97L5.5 21l4.27-2.27c.73.1 1.48.15 2.23.15 5.52 0 10-3.69 10-8.25S17.52 3 12 3z"/>
@@ -146,18 +143,16 @@ export default function Login() {
           카카오로 계속하기
         </button>
 
-        {/* 구분선 */}
         <div className="flex items-center gap-3 my-1">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">또는</span>
-          <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex-1 h-px bg-line-soft" />
+          <span className="text-caption1 text-label-assistive">또는</span>
+          <div className="flex-1 h-px bg-line-soft" />
         </div>
 
-        {/* 이메일 로그인 토글 */}
         {!showEmail ? (
           <button
             onClick={() => setShowEmail(true)}
-            className="w-full border border-gray-200 rounded-2xl py-3.5 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+            className="w-full border border-line rounded-lg h-12 text-body2 font-medium text-label-alt hover:bg-fill transition-colors"
           >
             이메일로 로그인
           </button>
@@ -170,7 +165,7 @@ export default function Login() {
               placeholder="이메일"
               autoComplete="email"
               autoFocus
-              className="w-full border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="input-base"
             />
             <input
               type="password"
@@ -178,24 +173,24 @@ export default function Login() {
               onChange={e => setPassword(e.target.value)}
               placeholder="비밀번호"
               autoComplete="current-password"
-              className="w-full border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="input-base"
             />
             <button
               type="submit"
               disabled={loading || !email.trim() || !password}
-              className="w-full bg-indigo-500 text-white rounded-2xl py-3.5 text-sm font-semibold disabled:opacity-40"
+              className="w-full bg-primary text-white rounded-lg h-12 text-body2 font-bold disabled:opacity-30 hover:bg-primary-strong transition-colors"
             >
               로그인
             </button>
           </form>
         )}
 
-        {error && <p className="text-xs text-red-500 px-1 text-center">{error}</p>}
+        {error && <p className="text-caption1 text-negative px-1 text-center">{error}</p>}
       </div>
 
-      <p className="text-sm text-gray-400 text-center mt-6">
+      <p className="text-body2 text-label-alt text-center mt-6">
         계정이 없으신가요?{' '}
-        <Link to="/signup" className="text-indigo-500 font-medium">
+        <Link to="/signup" className="text-primary font-medium">
           회원가입
         </Link>
       </p>

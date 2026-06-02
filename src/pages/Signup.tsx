@@ -39,17 +39,16 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col px-6">
+    <div className="min-h-dvh bg-surface flex flex-col px-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center pt-16 pb-8">
-        <div className="w-14 h-14 rounded-2xl bg-indigo-500 flex items-center justify-center mb-4">
-          <span className="text-white text-2xl font-bold">직</span>
+        <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mb-4 shadow-strong">
+          <span className="text-white text-2xl font-bold font-brand">직</span>
         </div>
-        <h1 className="text-xl font-bold text-gray-900">회원가입</h1>
-        <p className="text-sm text-gray-400 mt-1">함께 루틴을 만들어가요</p>
+        <h1 className="text-heading2 font-bold text-label-strong font-brand">회원가입</h1>
+        <p className="text-label2 text-label-alt mt-1">함께 루틴을 만들어가요</p>
       </div>
 
-      {/* 폼 */}
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           type="text"
@@ -57,7 +56,7 @@ export default function Signup() {
           onChange={e => setName(e.target.value)}
           placeholder="이름"
           autoComplete="name"
-          className="w-full border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="input-base"
         />
         <input
           type="email"
@@ -65,7 +64,7 @@ export default function Signup() {
           onChange={e => setEmail(e.target.value)}
           placeholder="이메일"
           autoComplete="email"
-          className="w-full border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="input-base"
         />
         <input
           type="password"
@@ -73,7 +72,7 @@ export default function Signup() {
           onChange={e => setPassword(e.target.value)}
           placeholder="비밀번호 (6자 이상)"
           autoComplete="new-password"
-          className="w-full border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="input-base"
         />
         <input
           type="password"
@@ -81,23 +80,23 @@ export default function Signup() {
           onChange={e => setPasswordConfirm(e.target.value)}
           placeholder="비밀번호 확인"
           autoComplete="new-password"
-          className="w-full border border-gray-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="input-base"
         />
 
-        {error && <p className="text-xs text-red-500 px-1">{error}</p>}
+        {error && <p className="text-caption1 text-negative px-1">{error}</p>}
 
         <button
           type="submit"
           disabled={loading || !name.trim() || !email.trim() || !password || !passwordConfirm}
-          className="w-full bg-indigo-500 text-white rounded-2xl py-3.5 text-sm font-semibold disabled:opacity-40 mt-1"
+          className="w-full bg-primary text-white rounded-lg h-12 text-body2 font-bold disabled:opacity-30 hover:bg-primary-strong transition-colors mt-1"
         >
           가입하기
         </button>
       </form>
 
-      <p className="text-sm text-gray-400 text-center mt-6">
+      <p className="text-body2 text-label-alt text-center mt-6">
         이미 계정이 있으신가요?{' '}
-        <Link to="/login" className="text-indigo-500 font-medium">
+        <Link to="/login" className="text-primary font-medium">
           로그인
         </Link>
       </p>
