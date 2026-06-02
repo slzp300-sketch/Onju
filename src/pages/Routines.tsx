@@ -14,14 +14,14 @@ export default function Routines() {
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 pt-5 pb-0">
-        <div className="flex border-b border-gray-100">
+        <div className="flex border-b border-line-soft">
           {(['personal', 'faith', 'todo'] as TabType[]).map((key, i) => {
             const label = ['개인', '신앙', '투두'][i];
             return (
               <button key={key} onClick={() => setActiveTab(key)}
-                className={`flex-1 pb-2.5 text-sm font-bold transition-colors relative ${activeTab === key ? 'text-gray-900' : 'text-gray-400'}`}>
+                className={`flex-1 pb-2.5 text-label1 font-bold transition-colors relative ${activeTab === key ? 'text-label-strong' : 'text-label-assistive'}`}>
                 {label}
-                {activeTab === key && <motion.div layoutId="tabLine" className="absolute bottom-0 left-4 right-4 h-0.5 bg-gray-900 rounded-full" />}
+                {activeTab === key && <motion.div layoutId="tabLine" className="absolute bottom-0 left-4 right-4 h-0.5 bg-label-strong rounded-full" />}
               </button>
             );
           })}
@@ -67,15 +67,15 @@ function TodoTab() {
 
   return (
     <div className="flex flex-col">
-      <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-line-soft flex items-center justify-between">
         <div>
-          <p className="text-xs font-bold text-gray-900">오늘의 할 일</p>
-          <p className="text-xs text-gray-400 mt-0.5">
-            {pending.length > 0 ? `${pending.length}개 남음` : done.length > 0 ? '모두 완료! 🎉' : '할 일을 추가해 보세요'}
+          <p className="text-label1 font-bold text-label-strong">오늘의 할 일</p>
+          <p className="text-caption1 text-label-alt mt-0.5">
+            {pending.length > 0 ? `${pending.length}개 남음` : done.length > 0 ? '모두 완료했어요!' : '할 일을 추가해 보세요'}
           </p>
         </div>
         {todayTodos.length > 0 && (
-          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${done.length === todayTodos.length ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'}`}>
+          <span className={`text-caption2 font-bold px-2 py-0.5 rounded ${done.length === todayTodos.length ? 'bg-primary-soft text-primary' : 'bg-fill text-label-alt'}`}>
             {done.length}/{todayTodos.length}
           </span>
         )}
@@ -83,13 +83,13 @@ function TodoTab() {
 
       <AnimatePresence>
         {showInput && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-b border-gray-100">
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-b border-line-soft">
             <div className="flex items-center gap-2 px-4 py-3">
               <input autoFocus type="text" value={input} onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleAdd(); if (e.key === 'Escape') setShowInput(false); }}
-                placeholder="할 일 입력..." className="flex-1 text-sm outline-none placeholder-gray-300" />
-              <button onClick={() => setShowInput(false)} className="text-gray-300 hover:text-gray-500"><X size={15} /></button>
-              <button onClick={handleAdd} disabled={!input.trim()} className="text-xs font-bold text-indigo-500 disabled:text-gray-300 ml-1">추가</button>
+                placeholder="할 일 입력..." className="flex-1 text-body2 outline-none placeholder-label-assistive text-label" />
+              <button onClick={() => setShowInput(false)} className="text-label-assistive hover:text-label-alt"><X size={15} /></button>
+              <button onClick={handleAdd} disabled={!input.trim()} className="text-label2 font-bold text-primary disabled:text-label-assistive ml-1">추가</button>
             </div>
           </motion.div>
         )}
@@ -98,45 +98,45 @@ function TodoTab() {
       {todayTodos.length === 0 && !showInput ? (
         <div className="px-4 py-6">
           <button onClick={() => setShowInput(true)}
-            className="w-full flex items-center justify-center gap-1.5 py-4 border-2 border-dashed border-gray-200 rounded-2xl hover:border-indigo-300 transition-colors">
-            <Plus size={14} className="text-gray-400" />
-            <span className="text-sm text-gray-400">오늘의 할 일을 추가해 보세요</span>
+            className="w-full flex items-center justify-center gap-1.5 py-4 border-2 border-dashed border-line rounded-xl hover:border-primary transition-colors">
+            <Plus size={14} className="text-label-assistive" />
+            <span className="text-body2 text-label-alt">오늘의 할 일을 추가해 보세요</span>
           </button>
         </div>
       ) : (
-        <div className="bg-white">
-          <div className="divide-y divide-gray-50">
+        <div className="bg-surface">
+          <div className="divide-y divide-line-soft">
             {pending.map((todo, idx) => (
               <div key={todo.id} className="flex items-center gap-3 px-4 py-3">
-                <span className="text-xs font-bold w-5 text-center text-gray-400 flex-shrink-0">{idx + 1}</span>
-                <button onClick={() => toggleTodo(todo.id)} className="w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0 hover:border-indigo-400 transition-colors" />
-                <span className="flex-1 text-sm font-medium text-gray-800">{todo.title}</span>
-                <button onClick={() => removeTodo(todo.id)} className="text-gray-200 hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
+                <span className="text-caption2 font-bold w-5 text-center text-label-assistive flex-shrink-0">{idx + 1}</span>
+                <button onClick={() => toggleTodo(todo.id)} className="w-5 h-5 rounded-full border-2 border-line flex-shrink-0 hover:border-primary transition-colors" />
+                <span className="flex-1 text-body2 font-medium text-label">{todo.title}</span>
+                <button onClick={() => removeTodo(todo.id)} className="text-label-assistive hover:text-negative transition-colors"><Trash2 size={14} /></button>
               </div>
             ))}
           </div>
           {done.length > 0 && (
             <>
-              <div className="px-4 py-2 bg-gray-50 border-y border-gray-100">
-                <span className="text-xs font-bold text-gray-400">완료 {done.length}개</span>
+              <div className="px-4 py-2 bg-surface-alt border-y border-line-soft">
+                <span className="text-caption2 font-bold text-label-assistive">완료 {done.length}개</span>
               </div>
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-line-soft">
                 {done.map((todo, idx) => (
                   <div key={todo.id} className="flex items-center gap-3 px-4 py-3">
-                    <span className="text-xs font-bold w-5 text-center text-gray-300 flex-shrink-0">{pending.length + idx + 1}</span>
-                    <button onClick={() => toggleTodo(todo.id)} className="w-5 h-5 rounded-full border-2 border-indigo-400 bg-indigo-400 flex items-center justify-center flex-shrink-0">
+                    <span className="text-caption2 font-bold w-5 text-center text-label-assistive flex-shrink-0">{pending.length + idx + 1}</span>
+                    <button onClick={() => toggleTodo(todo.id)} className="w-5 h-5 rounded-full border-2 border-primary bg-primary flex items-center justify-center flex-shrink-0">
                       <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3 5.5L8 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </button>
-                    <span className="flex-1 text-sm font-medium line-through text-gray-400">{todo.title}</span>
-                    <button onClick={() => removeTodo(todo.id)} className="text-gray-200 hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
+                    <span className="flex-1 text-body2 font-medium line-through text-label-assistive">{todo.title}</span>
+                    <button onClick={() => removeTodo(todo.id)} className="text-label-assistive hover:text-negative transition-colors"><Trash2 size={14} /></button>
                   </div>
                 ))}
               </div>
             </>
           )}
-          <div className="px-4 py-3 border-t border-gray-50">
+          <div className="px-4 py-3 border-t border-line-soft">
             <button onClick={() => setShowInput(true)}
-              className="w-full flex items-center justify-center gap-1 py-2.5 rounded-xl border border-dashed border-gray-200 text-gray-400 text-xs font-semibold hover:border-indigo-300 hover:text-indigo-500 transition-colors">
+              className="w-full flex items-center justify-center gap-1 py-2.5 rounded-lg border border-dashed border-line text-label-assistive text-caption1 font-semibold hover:border-primary hover:text-primary transition-colors">
               <Plus size={13} /> 할 일 추가
             </button>
           </div>
