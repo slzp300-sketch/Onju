@@ -111,24 +111,8 @@ export default function StreakDetail() {
           <div className="bg-surface rounded-xl shadow-emphasize px-4 py-4">
             <p className="text-label1 font-bold text-label-strong mb-4">이번 주 달성 현황</p>
 
-            {/* 요일 */}
-            <div className="flex justify-between mb-2">
-              {weekDays.map((d, i) => {
-                const ds = format(d, 'yyyy-MM-dd');
-                const isToday = ds === todayStr;
-                return (
-                  <span
-                    key={i}
-                    className={`text-caption2 font-semibold text-center flex-1 ${isToday ? 'text-primary' : 'text-label-assistive'}`}
-                  >
-                    {ALL_DAY_LABELS[getDay(d)]}
-                  </span>
-                );
-              })}
-            </div>
-
-            {/* 날짜 원 */}
-            <div className="flex justify-between">
+            {/* 요일 + 날짜 타일 */}
+            <div className="flex gap-1.5">
               {weekDays.map((d, i) => {
                 const ds = format(d, 'yyyy-MM-dd');
                 const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
@@ -136,32 +120,38 @@ export default function StreakDetail() {
                 const completed = !isFuture && isDayCompleted(faithRoutines, logs, habits, habitLogs, ds);
 
                 return (
-                  <div key={ds} className="flex-1 flex items-center justify-center">
+                  <div key={ds} className="flex-1 flex flex-col items-center gap-1.5">
+                    {/* 요일 */}
+                    <span className={`text-caption2 font-bold ${isToday ? 'text-primary' : 'text-label-assistive'}`}>
+                      {ALL_DAY_LABELS[getDay(d)]}
+                    </span>
+
+                    {/* 타일 */}
                     <motion.div
-                      initial={{ scale: 0.7 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.1 + i * 0.04, type: 'spring', stiffness: 400, damping: 26 }}
-                      className={`w-9 h-9 rounded-full flex items-center justify-center ${
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.05 + i * 0.04, type: 'spring', stiffness: 420, damping: 26 }}
+                      className={`w-full rounded-2xl flex flex-col items-center justify-center gap-1 py-3 ${
                         completed
                           ? 'bg-positive shadow-sm'
                           : isToday
-                          ? 'border-2 border-primary bg-primary-soft'
+                          ? 'bg-primary-soft border-2 border-primary'
                           : isFuture
                           ? 'bg-fill'
                           : 'bg-fill-strong'
                       }`}
                     >
-                      {completed ? (
-                        <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
-                          <path d="M1 5L4.5 8.5L12 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      ) : (
-                        <span className={`text-caption1 font-bold ${
-                          isToday ? 'text-primary' : isFuture ? 'text-label-assistive' : 'text-label-alt'
-                        }`}>
-                          {format(d, 'd')}
-                        </span>
-                      )}
+                      <span className={`text-label1 font-bold leading-none ${
+                        completed ? 'text-white'
+                        : isToday ? 'text-primary'
+                        : isFuture ? 'text-label-assistive'
+                        : 'text-label-alt'
+                      }`}>
+                        {format(d, 'd')}
+                      </span>
+                      <span className="text-[14px] leading-none">
+                        {completed ? '✓' : isToday ? '·' : isFuture ? '' : '✕'}
+                      </span>
                     </motion.div>
                   </div>
                 );
