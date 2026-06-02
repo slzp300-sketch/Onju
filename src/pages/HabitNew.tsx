@@ -43,16 +43,30 @@ export default function HabitNew() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showTypePicker, setShowTypePicker] = useState(false);
 
-  const handleToggleNotif = async () => {
-    if (!notifEnabled) {
-      // 알림 켤 때 권한 요청
-      if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
-        const perm = await Notification.requestPermission();
-        setPermission(perm);
-        if (perm !== 'granted') return;
-      }
+  const handleToggleNotif = () => {
+    if (notifEnabled) {
+      setNotifEnabled(false);
+      return;
     }
-    setNotifEnabled(v => !v);
+    // 켤 때: 권한 상태 확인
+    if (typeof Notification === 'undefined') {
+      setNotifEnabled(true);
+      return;
+    }
+    if (Notification.permission === 'granted') {
+      setNotifEnabled(true);
+      return;
+    }
+    if (Notification.permission === 'denied') {
+      // 차단됨 — 브라우저 설정에서 허용 필요
+      alert('알림 권한이 차단되어 있어요. 브라우저 설정에서 알림을 허용해주세요.');
+      return;
+    }
+    // default: 권한 요청 (비동기지만 별도 처리)
+    void Notification.requestPermission().then(perm => {
+      setPermission(perm);
+      if (perm === 'granted') setNotifEnabled(true);
+    });
   };
 
   const freqLabel = FREQ_OPTIONS.find(f => f.value === freq)?.label ?? '매일';
@@ -119,17 +133,16 @@ export default function HabitNew() {
                   <span className="text-xl">🔔</span>
                   <span className="text-body2 font-semibold text-label-strong">알림</span>
                 </div>
-                <motion.button
-                  {...tapSm}
+                <button
                   onClick={handleToggleNotif}
                   className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${notifEnabled ? 'bg-positive' : 'bg-fill-strong'}`}
                 >
                   <motion.div
                     animate={{ x: notifEnabled ? 20 : 2 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm"
+                    className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm pointer-events-none"
                   />
-                </motion.button>
+                </button>
               </div>
 
               {/* 시간 칩 목록 + 타입 (enabled 시) */}
