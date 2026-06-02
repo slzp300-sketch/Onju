@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Shield, X, Flame } from 'lucide-react';
@@ -9,6 +9,7 @@ import { useStreakStore } from '../store/streakStore';
 import { calcStreak } from '../utils/completion';
 import { today, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
+import StampOverlay from '../components/ui/StampOverlay';
 import type { DailyRoutine, RoutineLog, Habit } from '../types';
 
 
@@ -39,11 +40,22 @@ export default function StreakDetail() {
   const { habits, habitLogs } = useHabitStore();
   const { shields, syncShields } = useStreakStore();
   const [showShieldInfo, setShowShieldInfo] = useState(false);
+  const [showStreakStamp, setShowStreakStamp] = useState(false);
+  const prevStreak = useRef(0);
 
   const todayStr = today();
   const { current: streak, best } = calcStreak(faithRoutines, logs, todayStr);
 
   useEffect(() => { syncShields(streak); }, [streak, syncShields]);
+
+  // 스트릭 5일 단위 달성 시 스탬프
+  useEffect(() => {
+    if (streak > 0 && streak % 5 === 0 && streak !== prevStreak.current) {
+      setShowStreakStamp(true);
+    }
+    prevStreak.current = streak;
+   
+  }, [streak]);
 
   const { weekStartDay } = useSettingsStore();
   const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
@@ -274,6 +286,16 @@ export default function StreakDetail() {
           </>
         )}
       </AnimatePresence>
+
+      {/* 스트릭 5일 단위 달성 스탬프 */}
+      <StampOverlay
+        show={showStreakStamp}
+        label={`${streak}일`}
+        sublabel="연속 달성!"
+        color="#ef4444"
+        rotation={10}
+        onComplete={() => setShowStreakStamp(false)}
+      />
     </>
   );
 }

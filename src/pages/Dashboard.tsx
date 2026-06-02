@@ -15,6 +15,7 @@ import { useAuthStore } from '../store/authStore';
 import { calcStreak } from '../utils/completion';
 import { today, isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
+import StampOverlay from '../components/ui/StampOverlay';
 import ReviewBanner from '../components/review/ReviewBanner';
 import { fetchReviews } from '../api/reviews';
 import PersonalTab from '../components/tabs/PersonalTab';
@@ -58,6 +59,8 @@ export default function Dashboard() {
   const prevCompleteRef = useRef(false);
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   const [selectedDay, setSelectedDay] = useState<string>(todayStr);
+  const [showPerfectStamp, setShowPerfectStamp] = useState(false);
+  const prevTodayRates = useRef<{ personal: number; faith: number } | null>(null);
 
   const { data: reviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
 
@@ -70,6 +73,7 @@ export default function Dashboard() {
     }
     prevCompleteRef.current = allDone;
   }, [allDone]);
+
 
   const now = new Date();
   const thisMonthGoals = monthlyGoals.filter(g => g.month === now.getMonth() + 1 && g.year === now.getFullYear());
@@ -93,7 +97,22 @@ export default function Dashboard() {
     todo: todayTodos.length > 0 ? `${doneTodos}/${todayTodos.length}` : undefined,
   };
 
+  // 오늘 날짜 개인+신앙 둘 다 100% 달성 시 스탬프
+  const todayIdx = weekDays.findIndex(d => format(d, 'yyyy-MM-dd') === todayStr);
+  const todayRates = todayIdx >= 0 ? weekRates[todayIdx] : null;
+   
+  useEffect(() => {
+    if (!todayRates) return;
+    const prev = prevTodayRates.current;
+    const nowPerfect = todayRates.personal === 100 && todayRates.faith === 100;
+    const wasPerfect = prev ? prev.personal === 100 && prev.faith === 100 : false;
+    if (nowPerfect && !wasPerfect) setShowPerfectStamp(true);
+    prevTodayRates.current = { personal: todayRates.personal, faith: todayRates.faith };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [todayRates?.personal, todayRates?.faith]);
+
   return (
+    <>
     <motion.div
       variants={container} initial="hidden" animate="show"
       className="flex flex-col overflow-hidden"
@@ -411,5 +430,16 @@ export default function Dashboard() {
 
       </motion.div>
     </motion.div>
+
+    {/* 오늘 100% 달성 스탬프 */}
+    <StampOverlay
+      show={showPerfectStamp}
+      label="완벽"
+      sublabel="오늘 100% 달성"
+      color="#0066ff"
+      rotation={-8}
+      onComplete={() => setShowPerfectStamp(false)}
+    />
+    </>
   );
 }

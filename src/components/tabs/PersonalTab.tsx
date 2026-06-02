@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
 import StampButton from '../ui/StampButton';
+import RowStamp from '../ui/RowStamp';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import FAB from '../ui/FAB';
@@ -187,16 +188,27 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [focusOpen, setFocusOpen] = useState(false);
+  const [rowStamp, setRowStamp] = useState<'done' | 'rest' | null>(null);
   const done = isHabitCompleted(habit.id, todayStr());
   const skipped = isHabitSkipped(habit.id, todayStr());
+
+  const fireStamp = (type: 'done' | 'rest') => {
+    setRowStamp(type);
+    setTimeout(() => setRowStamp(null), 900);
+  };
 
   return (
     <>
       <motion.div
         layout
         onClick={() => navigate(`/habits/edit/${habit.id}`)}
-        className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
+        className={`relative flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
       >
+        {/* 미니 스탬프 */}
+        <AnimatePresence>
+          {rowStamp && <RowStamp type={rowStamp} color={rowStamp === 'done' ? '#0066ff' : '#f59e0b'} />}
+        </AnimatePresence>
+
         {/* 번호 */}
         <span className={`text-caption2 font-bold w-5 text-center flex-shrink-0 ${(done || skipped) ? 'text-label-assistive' : 'text-label-alt'}`}>
           {index}
@@ -256,7 +268,11 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
               inkColor="text-white"
               dryColor="text-amber-500"
               rotation={9}
-              onClick={e => { e.stopPropagation(); skipHabitLog(habit.id); }}
+              onClick={e => {
+                e.stopPropagation();
+                if (!skipped) fireStamp('rest');
+                skipHabitLog(habit.id);
+              }}
             />
           )}
 
@@ -269,7 +285,11 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
               inkColor="text-white"
               dryColor="text-primary"
               rotation={-10}
-              onClick={e => { e.stopPropagation(); toggleHabitLog(habit.id); }}
+              onClick={e => {
+                e.stopPropagation();
+                if (!done) fireStamp('done');
+                toggleHabitLog(habit.id);
+              }}
             />
           )}
         </div>

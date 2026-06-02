@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Trash2, BookOpen, Play, Timer } from 'lucide-react';
 import StampButton from '../ui/StampButton';
+import RowStamp from '../ui/RowStamp';
 import ConfirmModal from '../ui/ConfirmModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -124,16 +125,27 @@ function FaithRoutineRow({ routine, index, onRemove }: {
   const navigate = useNavigate();
   const [focusOpen, setFocusOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [rowStamp, setRowStamp] = useState<'done' | 'rest' | null>(null);
   const done = isCompleted(routine.id);
   const skipped = isSkipped(routine.id);
+
+  const fireStamp = (type: 'done' | 'rest') => {
+    setRowStamp(type);
+    setTimeout(() => setRowStamp(null), 900);
+  };
 
   return (
     <>
       <motion.div
         layout
         onClick={() => navigate(`/faith-routines/edit/${routine.id}`)}
-        className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
+        className={`relative flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
       >
+        {/* 미니 스탬프 */}
+        <AnimatePresence>
+          {rowStamp && <RowStamp type={rowStamp} color={rowStamp === 'done' ? '#10b981' : '#f59e0b'} />}
+        </AnimatePresence>
+
         {/* 번호 */}
         <span className={`text-caption2 font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
           {index}
@@ -195,7 +207,11 @@ function FaithRoutineRow({ routine, index, onRemove }: {
               inkColor="text-white"
               dryColor="text-amber-500"
               rotation={9}
-              onClick={e => { e.stopPropagation(); skipRoutineLog(routine.id); }}
+              onClick={e => {
+                e.stopPropagation();
+                if (!skipped) fireStamp('rest');
+                skipRoutineLog(routine.id);
+              }}
             />
           )}
 
@@ -208,7 +224,11 @@ function FaithRoutineRow({ routine, index, onRemove }: {
               inkColor="text-white"
               dryColor="text-emerald-600"
               rotation={-10}
-              onClick={e => { e.stopPropagation(); toggleRoutineLog(routine.id); }}
+              onClick={e => {
+                e.stopPropagation();
+                if (!done) fireStamp('done');
+                toggleRoutineLog(routine.id);
+              }}
             />
           )}
         </div>
