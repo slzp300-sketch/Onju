@@ -59,7 +59,7 @@ export default function StreakDetail() {
       <div className="flex items-center justify-between px-5 pt-10 pb-4">
         <motion.button whileTap={{ scale: 0.88 }} onClick={() => navigate(-1)}
           className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center">
-          <ChevronLeft size={20} className="text-gray-300" />
+          <ChevronLeft size={20} className="text-label-assistive" />
         </motion.button>
         <div />
       </div>
@@ -88,7 +88,7 @@ export default function StreakDetail() {
             <span className="text-green-400">{streak}일</span> 연속 달성!
           </h1>
           {best > streak && (
-            <p className="text-gray-500 text-sm mt-1">최고 기록 {best}일</p>
+            <p className="text-label-alt text-sm mt-1">최고 기록 {best}일</p>
           )}
         </motion.div>
 
@@ -97,7 +97,7 @@ export default function StreakDetail() {
           className="w-full bg-gray-900 rounded-3xl p-5">
           <div className="flex justify-between mb-3">
             {DAY_LABELS.map((label, i) => (
-              <span key={i} className={`text-xs font-semibold text-center flex-1 ${i === 0 ? 'text-green-400' : 'text-gray-500'}`}>
+              <span key={i} className={`text-xs font-semibold text-center flex-1 ${i === 0 ? 'text-green-400' : 'text-label-alt'}`}>
                 {label}
               </span>
             ))}
@@ -127,7 +127,7 @@ export default function StreakDetail() {
                         <path d="M1 5.5L5 9.5L13 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     ) : (
-                      <span className={`text-xs font-bold ${isToday ? 'text-white' : 'text-gray-600'}`}>
+                      <span className={`text-xs font-bold ${isToday ? 'text-white' : 'text-label'}`}>
                         {format(d, 'd')}
                       </span>
                     )}
@@ -138,7 +138,7 @@ export default function StreakDetail() {
           </div>
 
           {/* 안내 메시지 */}
-          <p className="text-gray-500 text-xs text-center mt-4 leading-relaxed">
+          <p className="text-label-alt text-xs text-center mt-4 leading-relaxed">
             {streak > 0
               ? `오늘을 포함해 ${streak}일 연속 달성 중이에요`
               : '오늘 루틴을 완료하면 연속 달성이 시작돼요'}
@@ -157,7 +157,7 @@ export default function StreakDetail() {
             </div>
             <div className="flex-1 text-left">
               <p className="text-white text-sm font-semibold">내가 가진 방패: {shields}개</p>
-              <p className="text-gray-500 text-xs mt-0.5">
+              <p className="text-label-alt text-xs mt-0.5">
                 {daysToShield > 0
                   ? `${daysToShield}일 더 달성하면 방패 1개`
                   : '방패를 획득했어요!'}
@@ -166,7 +166,7 @@ export default function StreakDetail() {
             <div className="flex gap-1.5">
               {Array.from({ length: 2 }).map((_, i) => (
                 <div key={i} className={`w-7 h-7 rounded-full flex items-center justify-center ${i < shields ? 'bg-blue-500' : 'bg-gray-700'}`}>
-                  <Shield size={14} className={i < shields ? 'text-white' : 'text-gray-600'} />
+                  <Shield size={14} className={i < shields ? 'text-white' : 'text-label'} />
                 </div>
               ))}
             </div>
@@ -177,8 +177,8 @@ export default function StreakDetail() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
           className="w-full bg-gray-900 rounded-2xl px-5 py-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-400 text-xs font-medium">다음 방패까지</span>
-            <span className="text-gray-400 text-xs">{streak % 5}/5일</span>
+            <span className="text-label-alt text-xs font-medium">다음 방패까지</span>
+            <span className="text-label-alt text-xs">{streak % 5}/5일</span>
           </div>
           <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
             <motion.div
@@ -188,7 +188,7 @@ export default function StreakDetail() {
               transition={{ duration: 0.8, delay: 0.5 }}
             />
           </div>
-          <p className="text-gray-600 text-xs mt-2 text-center">
+          <p className="text-label text-xs mt-2 text-center">
             5일 연속 달성마다 방패 1개 획득 · 최대 2개 보유
           </p>
         </motion.div>
@@ -215,7 +215,7 @@ export default function StreakDetail() {
                   </div>
                   <h2 className="text-white text-lg font-bold">연속 기록 보호 방패</h2>
                 </div>
-                <button onClick={() => setShowShieldInfo(false)} className="text-gray-500">
+                <button onClick={() => setShowShieldInfo(false)} className="text-label-alt">
                   <X size={20} />
                 </button>
               </div>
@@ -227,7 +227,7 @@ export default function StreakDetail() {
                 ].map((text, i) => (
                   <div key={i} className="flex items-start gap-2.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
-                    <p className="text-gray-300 text-sm leading-relaxed">{text}</p>
+                    <p className="text-label-assistive text-sm leading-relaxed">{text}</p>
                   </div>
                 ))}
               </div>

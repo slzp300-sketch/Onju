@@ -34,10 +34,10 @@ export default function GroupDetail() {
     <div className="flex flex-col gap-4 pb-4">
       {/* 헤더 */}
       <div className="px-4 pt-4 flex items-center gap-2">
-        <button onClick={() => navigate(-1)} className="text-gray-500 p-1">
+        <button onClick={() => navigate(-1)} className="text-label-alt p-1 hover:text-label transition-colors">
           <ChevronLeft size={22} />
         </button>
-        <h1 className="text-base font-bold text-gray-900 flex-1 truncate">{group.title}</h1>
+        <h1 className="text-headline1 font-bold text-label-strong flex-1 truncate">{group.title}</h1>
       </div>
 
       {/* 그룹 정보 */}
@@ -48,8 +48,8 @@ export default function GroupDetail() {
             color={group.status === 'recruiting' ? 'green' : group.status === 'active' ? 'indigo' : 'gray'}
           />
         </div>
-        <p className="text-sm text-gray-600 leading-relaxed mb-3">{group.goal}</p>
-        <div className="flex gap-4 text-xs text-gray-400">
+        <p className="text-body2 text-label leading-relaxed mb-3">{group.goal}</p>
+        <div className="flex gap-4 text-caption1 text-label-alt">
           <span className="flex items-center gap-1">
             <Users size={12} />
             {group.currentMemberCount}/{group.maxMembers}명
@@ -71,12 +71,12 @@ export default function GroupDetail() {
       )}
       {isFull && !isMember && !isCreator && (
         <div className="px-4">
-          <p className="text-center text-sm text-gray-400 bg-gray-50 rounded-xl py-3">정원이 마감되었습니다</p>
+          <p className="text-center text-body2 text-label-alt bg-fill rounded-xl py-3">정원이 마감되었습니다.</p>
         </div>
       )}
       {(isMember || isCreator) && (
         <div className="px-4">
-          <p className="text-center text-sm text-indigo-500 bg-indigo-50 rounded-xl py-3 font-medium">
+          <p className="text-center text-body2 text-primary bg-primary-soft rounded-xl py-3 font-medium">
             {isCreator ? '내가 만든 소모임이에요' : '참여 중인 소모임이에요'}
           </p>
         </div>

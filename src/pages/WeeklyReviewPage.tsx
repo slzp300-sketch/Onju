@@ -212,19 +212,19 @@ export default function WeeklyReviewPage() {
       <div className="flex items-center px-4 pt-4 pb-2 gap-3">
         <button
           onClick={goBack}
-          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500"
+          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-fill text-label-alt"
         >
           <ChevronLeft size={20} />
         </button>
-        <span className="text-xs font-semibold text-indigo-500 ml-auto">
+        <span className="text-xs font-semibold text-primary ml-auto">
           {step + 1} / 4
         </span>
       </div>
 
       {/* 프로그레스 바 */}
-      <div className="h-1 bg-gray-100 w-full">
+      <div className="h-1 bg-fill w-full">
         <motion.div
-          className="h-full bg-indigo-500"
+          className="h-full bg-primary"
           animate={{ width: `${((step + 1) / 4) * 100}%` }}
           transition={{ duration: 0.3 }}
         />
@@ -249,7 +249,7 @@ export default function WeeklyReviewPage() {
       </div>
 
       {/* 하단 버튼 */}
-      <div className="px-6 pb-8 pt-4 flex gap-3 border-t border-gray-100 bg-white">
+      <div className="px-6 pb-8 pt-4 flex gap-3 border-t border-line-soft bg-white">
         {step > 0 && (
           <Button variant="ghost" onClick={goBack}>
             뒤로
@@ -298,14 +298,14 @@ function ReviewSummaryStep({
 }) {
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">
-      <p className="text-xs text-gray-400 mb-1">{weekRangeText}</p>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">이번 주 요약</h2>
+      <p className="text-xs text-label-alt mb-1">{weekRangeText}</p>
+      <h2 className="text-2xl font-bold text-label-strong mb-6">이번 주 요약</h2>
 
       {/* 달성률 카드 */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="bg-indigo-50 rounded-2xl p-4 flex flex-col items-center">
-          <p className="text-xs font-medium text-indigo-400 mb-1">개인 루틴</p>
-          <p className="text-4xl font-bold text-indigo-600">{personalRate}%</p>
+        <div className="bg-primary-soft rounded-2xl p-4 flex flex-col items-center">
+          <p className="text-xs font-medium text-primary mb-1">개인 루틴</p>
+          <p className="text-4xl font-bold text-primary">{personalRate}%</p>
         </div>
         <div className="bg-emerald-50 rounded-2xl p-4 flex flex-col items-center">
           <p className="text-xs font-medium text-emerald-400 mb-1">신앙 루틴</p>
@@ -315,22 +315,22 @@ function ReviewSummaryStep({
 
       {/* 주간 목표 */}
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-sm font-semibold text-gray-700">주간 목표</p>
-        <p className="text-xs text-gray-400">
+        <p className="text-sm font-semibold text-label">주간 목표</p>
+        <p className="text-xs text-label-alt">
           {goalAchievedCount} / {goalTotalCount} 달성
         </p>
       </div>
 
       {goalTotalCount === 0 ? (
-        <p className="text-sm text-gray-400 py-4 text-center">이번 주 목표가 없어요.</p>
+        <p className="text-sm text-label-alt py-4 text-center">이번 주 목표가 없어요.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {weeklyGoals.map((goal) => {
             const low = goal.completionRate < 80;
             return (
-              <div key={goal.id} className="bg-gray-50 rounded-xl p-3">
+              <div key={goal.id} className="bg-surface-alt rounded-xl p-3">
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-sm text-gray-800 font-medium flex-1 mr-2 line-clamp-1">
+                  <p className="text-sm text-label-strong font-medium flex-1 mr-2 line-clamp-1">
                     {goal.title}
                   </p>
                   <p
@@ -382,10 +382,10 @@ function ReviewFeedbackStep({
 }) {
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">자기 피드백</h2>
+      <h2 className="text-2xl font-bold text-label-strong mb-6">자기 피드백</h2>
 
       {/* 기분 선택 */}
-      <p className="text-sm font-semibold text-gray-700 mb-3">이번 주 어땠나요?</p>
+      <p className="text-sm font-semibold text-label mb-3">이번 주 어땠나요?</p>
       <div className="grid grid-cols-3 gap-2 mb-6">
         {MOODS.map((m) => (
           <button
@@ -393,12 +393,12 @@ function ReviewFeedbackStep({
             onClick={() => onMoodChange(m.value)}
             className={`flex flex-col items-center gap-1.5 py-3 rounded-2xl border-2 transition-all ${
               mood === m.value
-                ? 'border-indigo-400 bg-indigo-50'
-                : 'border-gray-100 bg-white'
+                ? 'border-primary bg-primary-soft'
+                : 'border-line-soft bg-white'
             }`}
           >
             <span className="text-2xl">{m.emoji}</span>
-            <span className="text-xs font-medium text-gray-700">{m.label}</span>
+            <span className="text-xs font-medium text-label">{m.label}</span>
           </button>
         ))}
       </div>
@@ -406,11 +406,11 @@ function ReviewFeedbackStep({
       {/* 목표별 별점 */}
       {weeklyGoals.length > 0 && (
         <>
-          <p className="text-sm font-semibold text-gray-700 mb-3">목표별 만족도</p>
+          <p className="text-sm font-semibold text-label mb-3">목표별 만족도</p>
           <div className="flex flex-col gap-3 mb-6">
             {weeklyGoals.map((goal) => (
-              <div key={goal.id} className="bg-gray-50 rounded-xl px-3 py-3">
-                <p className="text-sm text-gray-700 mb-2 line-clamp-1">{goal.title}</p>
+              <div key={goal.id} className="bg-surface-alt rounded-xl px-3 py-3">
+                <p className="text-sm text-label mb-2 line-clamp-1">{goal.title}</p>
                 <StarRating
                   value={goalRatings[goal.id] ?? 0}
                   onChange={(r) => onRatingChange(goal.id, r)}
@@ -422,13 +422,13 @@ function ReviewFeedbackStep({
       )}
 
       {/* 한 줄 소감 */}
-      <p className="text-sm font-semibold text-gray-700 mb-2">한 줄 소감</p>
+      <p className="text-sm font-semibold text-label mb-2">한 줄 소감</p>
       <textarea
         value={comment}
         onChange={(e) => onCommentChange(e.target.value)}
         placeholder="이번 주 한 줄 소감을 남겨보세요..."
         rows={3}
-        className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300"
+        className="w-full border border-line rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300"
       />
     </div>
   );
@@ -451,7 +451,7 @@ function StarRating({
         >
           <Star
             size={22}
-            className={n <= value ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}
+            className={n <= value ? 'text-yellow-400 fill-yellow-400' : 'text-label-assistive'}
           />
         </button>
       ))}
@@ -526,8 +526,8 @@ function ReviewImproveStep({
 
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">루틴 개선</h2>
-      <p className="text-sm text-gray-400 mb-5">다음 주 루틴을 조정해 보세요.</p>
+      <h2 className="text-2xl font-bold text-label-strong mb-2">루틴 개선</h2>
+      <p className="text-sm text-label-alt mb-5">다음 주 루틴을 조정해 보세요.</p>
 
       <div className="flex flex-col gap-3 mb-4">
         {routines.map((routine) => {
@@ -541,24 +541,24 @@ function ReviewImproveStep({
               className={`rounded-2xl border p-3 transition-all ${
                 action === 'delete'
                   ? 'border-red-200 bg-red-50'
-                  : 'border-gray-100 bg-gray-50'
+                  : 'border-line-soft bg-surface-alt'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
                 <p
                   className={`text-sm font-medium ${
-                    action === 'delete' ? 'text-red-400 line-through' : 'text-gray-800'
+                    action === 'delete' ? 'text-red-400 line-through' : 'text-label-strong'
                   }`}
                 >
                   {routine.title}
                 </p>
-                <span className="text-xs text-gray-400 ml-2 shrink-0">
+                <span className="text-xs text-label-alt ml-2 shrink-0">
                   {routine.type === 'personal' ? '개인' : '신앙'}
                 </span>
               </div>
 
               {rec && (
-                <p className="text-xs text-indigo-500 mb-2">{rec.message}</p>
+                <p className="text-xs text-primary mb-2">{rec.message}</p>
               )}
 
               {/* 액션 버튼 */}
@@ -568,7 +568,7 @@ function ReviewImproveStep({
                   onClick={() => setAction(routine.id, 'keep')}
                   label="유지"
                   icon={<Check size={13} />}
-                  activeColor="bg-indigo-100 text-indigo-700"
+                  activeColor="bg-primary-soft text-primary"
                 />
                 <ActionButton
                   active={action === 'edit'}
@@ -595,7 +595,7 @@ function ReviewImproveStep({
                     onChange={(e) =>
                       updateEditData(routine.id, { title: e.target.value })
                     }
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    className="w-full border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
                   />
                   <div className="flex gap-1.5">
                     {(['daily', 'weekdays', 'weekends'] as Frequency[]).map((f) => {
@@ -608,8 +608,8 @@ function ReviewImproveStep({
                           onClick={() => updateEditData(routine.id, { frequency: f })}
                           className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                             currentFreq === f
-                              ? 'bg-indigo-100 text-indigo-700'
-                              : 'bg-white border border-gray-200 text-gray-500'
+                              ? 'bg-primary-soft text-primary'
+                              : 'bg-white border border-line text-label-alt'
                           }`}
                         >
                           {FREQ_LABELS[f]}
@@ -626,7 +626,7 @@ function ReviewImproveStep({
 
       {/* 새 루틴 추가 */}
       {showAddForm ? (
-        <div className="border border-indigo-200 bg-indigo-50 rounded-2xl p-3 flex flex-col gap-2">
+        <div className="border border-primary-soft bg-primary-soft rounded-2xl p-3 flex flex-col gap-2">
           <div className="flex gap-2">
             <input
               type="text"
@@ -634,12 +634,12 @@ function ReviewImproveStep({
               onChange={(e) => setNewTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addNewRoutine()}
               placeholder="새 루틴 이름"
-              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"
+              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"
               autoFocus
             />
             <button
               onClick={() => setShowAddForm(false)}
-              className="text-gray-400 px-1"
+              className="text-label-alt px-1"
             >
               <X size={18} />
             </button>
@@ -651,8 +651,8 @@ function ReviewImproveStep({
                 onClick={() => setNewFreq(f)}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   newFreq === f
-                    ? 'bg-indigo-100 text-indigo-700'
-                    : 'bg-white border border-gray-200 text-gray-500'
+                    ? 'bg-primary-soft text-primary'
+                    : 'bg-white border border-line text-label-alt'
                 }`}
               >
                 {FREQ_LABELS[f]}
@@ -666,7 +666,7 @@ function ReviewImproveStep({
       ) : (
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 py-2 px-1"
+          className="flex items-center gap-1.5 text-sm font-medium text-primary py-2 px-1"
         >
           <Plus size={16} />
           새 루틴 추가
@@ -679,18 +679,18 @@ function ReviewImproveStep({
         .map((c) => (
           <div
             key={c.routineId}
-            className="flex items-center gap-2 bg-indigo-50 rounded-xl px-3 py-2.5 mt-2"
+            className="flex items-center gap-2 bg-primary-soft rounded-xl px-3 py-2.5 mt-2"
           >
-            <Plus size={13} className="text-indigo-400 shrink-0" />
-            <span className="flex-1 text-sm text-gray-800">{c.newRoutine!.title}</span>
-            <span className="text-xs text-indigo-400">
+            <Plus size={13} className="text-primary shrink-0" />
+            <span className="flex-1 text-sm text-label-strong">{c.newRoutine!.title}</span>
+            <span className="text-xs text-primary">
               {FREQ_LABELS[c.newRoutine!.frequency as Frequency]}
             </span>
             <button
               onClick={() =>
                 onChangesUpdate(changes.filter((x) => x.routineId !== c.routineId))
               }
-              className="text-gray-400 ml-1"
+              className="text-label-alt ml-1"
             >
               <X size={14} />
             </button>
@@ -717,7 +717,7 @@ function ActionButton({
     <button
       onClick={onClick}
       className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-        active ? activeColor : 'bg-white border border-gray-200 text-gray-500'
+        active ? activeColor : 'bg-white border border-line text-label-alt'
       }`}
     >
       {icon}
@@ -742,20 +742,20 @@ function ReviewIntentionStep({
 }) {
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">다음 주 의도</h2>
-      <p className="text-sm text-gray-400 mb-5">한 가지 집중할 것을 정해보세요.</p>
+      <h2 className="text-2xl font-bold text-label-strong mb-2">다음 주 의도</h2>
+      <p className="text-sm text-label-alt mb-5">한 가지 집중할 것을 정해보세요.</p>
 
       <textarea
         value={intention}
         onChange={(e) => onIntentionChange(e.target.value)}
         placeholder="다음 주에 집중할 한 가지는..."
         rows={4}
-        className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 mb-6"
+        className="w-full border border-line rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 mb-6"
       />
 
       {/* 소모임 나눔 */}
-      <p className="text-sm font-semibold text-gray-700 mb-3">소모임 나눔</p>
-      <p className="text-xs text-gray-400 mb-3">
+      <p className="text-sm font-semibold text-label mb-3">소모임 나눔</p>
+      <p className="text-xs text-label-alt mb-3">
         선택한 소모임에 이번 주 소감과 다음 주 의도를 공유해요.
       </p>
       <div className="flex flex-col gap-2">
@@ -764,16 +764,16 @@ function ReviewIntentionStep({
           return (
             <div
               key={group.id}
-              className="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3"
+              className="flex items-center gap-3 bg-surface-alt rounded-2xl px-4 py-3"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">{group.title}</p>
+                <p className="text-sm font-medium text-label-strong truncate">{group.title}</p>
               </div>
               {/* 토글 스위치 */}
               <button
                 onClick={() => onToggleGroup(group.id)}
                 className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
-                  on ? 'bg-indigo-500' : 'bg-gray-200'
+                  on ? 'bg-primary' : 'bg-gray-200'
                 }`}
               >
                 <motion.div

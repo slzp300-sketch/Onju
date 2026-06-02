@@ -45,10 +45,10 @@ export default function GroupNew() {
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="px-4 pt-4 flex items-center gap-2">
-        <button onClick={() => navigate(-1)} className="text-gray-500 p-1">
+        <button onClick={() => navigate(-1)} className="text-label-alt p-1 hover:text-label transition-colors">
           <ChevronLeft size={22} />
         </button>
-        <h1 className="text-base font-bold text-gray-900">소모임 만들기</h1>
+        <h1 className="text-headline1 font-bold text-label-strong">소모임 만들기</h1>
       </div>
 
       <Card className="mx-4">
@@ -77,7 +77,7 @@ export default function GroupNew() {
               type="range" min={2} max={10}
               value={form.maxMembers}
               onChange={e => setForm(f => ({ ...f, maxMembers: Number(e.target.value) }))}
-              className="w-full accent-indigo-600"
+              className="w-full accent-primary"
             />
           </Field>
 
@@ -86,18 +86,18 @@ export default function GroupNew() {
               type="range" min={7} max={90} step={7}
               value={form.durationDays}
               onChange={e => setForm(f => ({ ...f, durationDays: Number(e.target.value) }))}
-              className="w-full accent-indigo-600"
+              className="w-full accent-primary"
             />
           </Field>
 
           <div className="flex items-center justify-between py-1">
             <div>
-              <p className="text-sm font-medium text-gray-800">공개 소모임</p>
-              <p className="text-xs text-gray-400">누구든 검색해서 참여할 수 있어요</p>
+              <p className="text-body2 font-medium text-label-strong">공개 소모임</p>
+              <p className="text-caption1 text-label-alt">누구든 검색해서 참여할 수 있어요</p>
             </div>
             <button
               onClick={() => setForm(f => ({ ...f, isPublic: !f.isPublic }))}
-              className={`w-11 h-6 rounded-full transition-colors ${form.isPublic ? 'bg-indigo-500' : 'bg-gray-300'}`}
+              className={`w-11 h-6 rounded-full transition-colors ${form.isPublic ? 'bg-primary' : 'bg-fill-strong'}`}
             >
               <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform mx-0.5 ${form.isPublic ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
@@ -115,7 +115,7 @@ export default function GroupNew() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs font-medium text-gray-600 mb-1.5 block">{label}</label>
+      <label className="text-caption1 font-medium text-label-alt mb-1.5 block">{label}</label>
       {children}
     </div>
   );
