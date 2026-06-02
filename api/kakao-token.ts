@@ -7,9 +7,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!code || !redirectUri) return res.status(400).json({ error: 'Missing params' });
 
   const restKey = process.env.KAKAO_REST_API_KEY;
+  const clientSecret = process.env.KAKAO_CLIENT_SECRET;
   if (!restKey) return res.status(500).json({ error: 'KAKAO_REST_API_KEY not set' });
-  // 키 앞 4자리만 노출 (디버그용)
-  console.log('KAKAO_REST_API_KEY prefix:', restKey.slice(0, 4));
 
   // 1. 인가 코드 → 액세스 토큰
   const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
@@ -20,13 +19,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       client_id: restKey,
       redirect_uri: redirectUri,
       code,
+      ...(clientSecret ? { client_secret: clientSecret } : {}),
     }),
   });
 
   const tokenData = await tokenRes.json() as { access_token?: string; error?: string };
   if (!tokenData.access_token) {
-    console.log('Token exchange failed:', JSON.stringify(tokenData));
-    return res.status(400).json({ error: 'Failed to get token', detail: tokenData, keyPrefix: restKey.slice(0, 4) });
+    return res.status(400).json({ error: 'Failed to get token', detail: tokenData });
   }
 
   // 2. 액세스 토큰 → 사용자 정보
