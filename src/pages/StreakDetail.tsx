@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Shield, X, Flame } from 'lucide-react';
-import { format, startOfWeek, addDays } from 'date-fns';
+import { format, getDay } from 'date-fns';
 import { useRoutineStore } from '../store/routineStore';
 import { useHabitStore } from '../store/habitStore';
 import { useStreakStore } from '../store/streakStore';
 import { calcStreak } from '../utils/completion';
-import { today } from '../utils/date';
+import { today, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
+import { useSettingsStore } from '../store/settingsStore';
 import type { DailyRoutine, RoutineLog, Habit } from '../types';
 
-const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 
 function isDayCompleted(
   faithRoutines: DailyRoutine[],
@@ -45,8 +45,8 @@ export default function StreakDetail() {
 
   useEffect(() => { syncShields(streak); }, [streak, syncShields]);
 
-  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  const { weekStartDay } = useSettingsStore();
+  const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
 
   const nextShieldAt = Math.ceil((streak + 1) / 5) * 5;
   const daysToShield = nextShieldAt - streak;
@@ -113,15 +113,15 @@ export default function StreakDetail() {
 
             {/* 요일 */}
             <div className="flex justify-between mb-2">
-              {DAY_LABELS.map((label, i) => {
-                const ds = format(weekDays[i], 'yyyy-MM-dd');
+              {weekDays.map((d, i) => {
+                const ds = format(d, 'yyyy-MM-dd');
                 const isToday = ds === todayStr;
                 return (
                   <span
                     key={i}
                     className={`text-caption2 font-semibold text-center flex-1 ${isToday ? 'text-primary' : 'text-label-assistive'}`}
                   >
-                    {label}
+                    {ALL_DAY_LABELS[getDay(d)]}
                   </span>
                 );
               })}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Download, ChevronRight, Flame, CheckCircle2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { format, startOfWeek, addDays, startOfMonth, endOfMonth } from 'date-fns';
+import { format, getDay, startOfMonth, endOfMonth } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import Card from '../components/ui/Card';
 import MonthlyCalendar from '../components/ui/MonthlyCalendar';
@@ -12,18 +12,13 @@ import { useHabitStore } from '../store/habitStore';
 import { useTodoStore } from '../store/todoStore';
 import { useAuthStore } from '../store/authStore';
 import { calcStreak, getRoutineStats } from '../utils/completion';
-import { today } from '../utils/date';
+import { today, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
+import { useSettingsStore } from '../store/settingsStore';
 import { fetchReviews } from '../api/reviews';
 
 type TabType = 'daily' | 'weekly' | 'monthly';
 
-const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 const MOOD_EMOJI: Record<string, string> = { hard: '😓', normal: '😊', easy: '😌' };
-
-function getWeekDays(): Date[] {
-  const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-  return Array.from({ length: 7 }, (_, i) => addDays(start, i));
-}
 
 export default function Stats() {
   const [activeTab, setActiveTab] = useState<TabType>('daily');
@@ -178,7 +173,8 @@ function WeeklyTab() {
   const { todos } = useTodoStore();
   const { data: reviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
 
-  const weekDays = getWeekDays();
+  const { weekStartDay } = useSettingsStore();
+  const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
 
   const getRates = (type: 'faith' | 'habit' | 'todo') => {
     return weekDays.map(d => {
@@ -291,7 +287,7 @@ function WeeklyBarChart({ label, rates, emptyText }: {
                   />
                 </div>
                 <span className={`text-caption2 font-semibold ${isToday ? 'text-primary' : 'text-label-assistive'}`}>
-                  {DAY_LABELS[i]}
+                  {ALL_DAY_LABELS[getDay(new Date(d.ds + 'T12:00:00'))]}
                 </span>
               </div>
             );
@@ -307,6 +303,7 @@ function MonthlyTab() {
   const { habits, habitLogs } = useHabitStore();
   const { todos } = useTodoStore();
   const { user } = useAuthStore();
+  const { weekStartDay } = useSettingsStore();
   const reportRef = useRef<HTMLDivElement>(null);
   const todayStr = today();
   const now = new Date();
@@ -361,7 +358,7 @@ function MonthlyTab() {
 
       <Card>
         <p className="text-caption1 font-bold text-label mb-3">🙏 신앙 루틴 월간 히트맵</p>
-        <MonthlyCalendar personalRoutines={personalRoutines} faithRoutines={faithRoutines} logs={logs} month={now} />
+        <MonthlyCalendar personalRoutines={personalRoutines} faithRoutines={faithRoutines} logs={logs} month={now} weekStartDay={weekStartDay as 0 | 1} />
       </Card>
 
       {faithStats.length > 0 && (

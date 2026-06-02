@@ -9,7 +9,7 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      weekStartDay: 0, // 기본값: 일요일
+      weekStartDay: 1, // 기본값: 월요일
       setWeekStartDay: (day) => set({ weekStartDay: day }),
     }),
     { name: 'settings-store' }

@@ -1,8 +1,22 @@
-import { format, getISOWeek, getYear, getDay, startOfWeek, endOfWeek, subWeeks, addWeeks } from 'date-fns';
+import { format, getISOWeek, getYear, getDay, startOfWeek, endOfWeek, subWeeks, addWeeks, addDays } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { WeeklyReview } from '../types';
 
 const WEEK_OPTIONS = { weekStartsOn: 1 } as const;
+
+// 요일 레이블 (0=일 ~ 6=토)
+export const ALL_DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
+
+// weekStartDay 기반 date-fns 옵션
+export function weekOpts(weekStartDay: 0 | 1 = 1) {
+  return { weekStartsOn: weekStartDay as 0 | 1 | 2 | 3 | 4 | 5 | 6 };
+}
+
+// 특정 주의 7일 반환 (weekStartDay 기준)
+export function getWeekDays(date: Date = new Date(), weekStartDay: 0 | 1 = 1): Date[] {
+  const start = startOfWeek(date, weekOpts(weekStartDay));
+  return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+}
 
 // weekStartDay: 0=일, 1=월, ... 6=토
 export function getWeekRangeFor(date: Date, weekStartDay: number): { start: Date; end: Date } {
@@ -64,8 +78,10 @@ export const getNextWeekApplyTime = (): string =>
   format(getNextWeekMonday(), "yyyy-MM-dd'T'00:00:00");
 
 // "5월 19일(월) ~ 5월 25일(일)" 형태
-export const getWeekRangeText = (date: Date = new Date()): string => {
-  const { start, end } = getCurrentWeekRange(date);
+export const getWeekRangeText = (date: Date = new Date(), weekStartDay: 0 | 1 = 1): string => {
+  const opts = weekOpts(weekStartDay);
+  const start = startOfWeek(date, opts);
+  const end = endOfWeek(date, opts);
   return `${format(start, 'M월 d일(EEE)', { locale: ko })} ~ ${format(end, 'M월 d일(EEE)', { locale: ko })}`;
 };
 

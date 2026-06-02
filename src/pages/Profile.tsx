@@ -1,4 +1,4 @@
-import { User, Bell, ChevronRight, LogOut, Palette } from 'lucide-react';
+import { User, Bell, ChevronRight, LogOut, Palette, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
@@ -6,6 +6,7 @@ import SlotBadge from '../components/ui/SlotBadge';
 import { useAuthStore } from '../store/authStore';
 import { useGoalStore } from '../store/goalStore';
 import { useThemeStore, THEMES, type ThemeId } from '../store/themeStore';
+import { useSettingsStore } from '../store/settingsStore';
 import { currentWeek, currentYear } from '../utils/date';
 
 export default function Profile() {
@@ -13,6 +14,7 @@ export default function Profile() {
   const { user, logout } = useAuthStore();
   const { weeklyGoals } = useGoalStore();
   const { theme, setTheme } = useThemeStore();
+  const { weekStartDay, setWeekStartDay } = useSettingsStore();
 
   const thisWeekGoalCount = weeklyGoals.filter(
     g => g.weekNumber === currentWeek() && g.year === currentYear()
@@ -43,6 +45,31 @@ export default function Profile() {
       </Card>
 
       <Card className="mx-4" padding="none">
+        {/* 주 시작 요일 */}
+        <div className="flex items-center justify-between px-4 py-3.5">
+          <div className="flex items-center gap-3">
+            <CalendarDays size={16} className="text-label-alt" />
+            <span className="text-body2 font-semibold text-label-strong">주 시작 요일</span>
+          </div>
+          <div className="flex bg-fill rounded-xl p-0.5">
+            {([{ label: '월', value: 1 }, { label: '일', value: 0 }] as const).map(opt => (
+              <motion.button
+                key={opt.value}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.1 }}
+                onClick={() => setWeekStartDay(opt.value)}
+                className={`px-4 py-1.5 rounded-lg text-body2 font-bold transition-all ${
+                  weekStartDay === opt.value
+                    ? 'bg-surface shadow-sm text-label-strong'
+                    : 'text-label-assistive'
+                }`}
+              >
+                {opt.label}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+        <div className="h-px bg-line-soft mx-4" />
         <MenuItem icon={<Bell size={16} />} label="알림 설정" onClick={() => navigate('/notification-settings')} />
         <div className="h-px bg-line-soft mx-4" />
         <button

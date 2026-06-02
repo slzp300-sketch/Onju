@@ -6,10 +6,11 @@ interface MonthlyCalendarProps {
   personalRoutines: DailyRoutine[];
   faithRoutines: DailyRoutine[];
   logs: RoutineLog[];
-  month?: Date; // defaults to current month
+  month?: Date;
+  weekStartDay?: 0 | 1; // 0=일, 1=월 (default: 1)
 }
 
-const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+const ALL_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 const TODAY_STR = format(new Date(), 'yyyy-MM-dd');
 
 function rateToAlpha(rate: number): number {
@@ -22,13 +23,17 @@ export default function MonthlyCalendar({
   faithRoutines,
   logs,
   month = new Date(),
+  weekStartDay = 1,
 }: MonthlyCalendarProps) {
   const start = startOfMonth(month);
   const end = endOfMonth(month);
   const days = eachDayOfInterval({ start, end });
 
-  // 1일이 무슨 요일인지 (0=일 ~ 6=토)
-  const startWeekday = getDay(start);
+  // 시작 요일 기준으로 헤더 레이블 순서 조정
+  const weekLabels = Array.from({ length: 7 }, (_, i) => ALL_LABELS[(weekStartDay + i) % 7]);
+
+  // 1일 앞의 빈 셀 수: (getDay(start) - weekStartDay + 7) % 7
+  const startWeekday = (getDay(start) - weekStartDay + 7) % 7;
 
   // 날짜별 달성률 계산
   const dayData = days.map(day => {
@@ -51,16 +56,20 @@ export default function MonthlyCalendar({
     <div>
       {/* 요일 헤더 */}
       <div className="grid grid-cols-7 mb-1">
-        {WEEKDAY_LABELS.map((label, i) => (
-          <div
-            key={label}
-            className={`text-center text-caption1 font-medium py-1 ${
-              i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-label-alt'
-            }`}
-          >
-            {label}
-          </div>
-        ))}
+        {weekLabels.map((label, i) => {
+          const isSun = label === '일';
+          const isSat = label === '토';
+          return (
+            <div
+              key={i}
+              className={`text-center text-caption1 font-medium py-1 ${
+                isSun ? 'text-red-400' : isSat ? 'text-blue-400' : 'text-label-alt'
+              }`}
+            >
+              {label}
+            </div>
+          );
+        })}
       </div>
 
       {/* 날짜 그리드 */}

@@ -4,7 +4,7 @@ import { Target, CalendarDays, Trash2, ListTodo } from 'lucide-react';
 import FAB from '../components/ui/FAB';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { format, startOfWeek, addDays } from 'date-fns';
+import { format, getDay } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import confetti from 'canvas-confetti';
 import { useRoutineStore } from '../store/routineStore';
@@ -13,7 +13,8 @@ import { useTodoStore } from '../store/todoStore';
 import { useGoalStore } from '../store/goalStore';
 import { useAuthStore } from '../store/authStore';
 import { calcStreak } from '../utils/completion';
-import { today, isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText } from '../utils/date';
+import { today, isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
+import { useSettingsStore } from '../store/settingsStore';
 import ReviewBanner from '../components/review/ReviewBanner';
 import { fetchReviews } from '../api/reviews';
 import PersonalTab from '../components/tabs/PersonalTab';
@@ -29,12 +30,6 @@ const TABS: { key: TabType; label: string }[] = [
   { key: 'todo', label: '투두' },
 ];
 
-const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
-
-function getWeekDays(): Date[] {
-  const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-  return Array.from({ length: 7 }, (_, i) => addDays(start, i));
-}
 
 function getFaithRate(routines: import('../types').DailyRoutine[], logs: import('../types').RoutineLog[], dateStr: string): number {
   if (routines.length === 0) return -1;
@@ -54,6 +49,7 @@ const itemV = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transiti
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { weekStartDay } = useSettingsStore();
   const { faithRoutines, logs, isCompleted } = useRoutineStore();
   const { habits, habitLogs } = useHabitStore();
   const { todos, toggleTodo, removeTodo } = useTodoStore();
@@ -80,7 +76,7 @@ export default function Dashboard() {
   const thisWeekGoals = weeklyGoals.filter(g => g.weekNumber === currentWeek() && g.year === currentYear());
   const todayTodos = todos.filter(t => t.date === todayStr);
   const doneTodos = todayTodos.filter(t => t.completed).length;
-  const weekDays = getWeekDays();
+  const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
 
   const weekRates = weekDays.map(d => {
     const ds = format(d, 'yyyy-MM-dd');
@@ -205,7 +201,7 @@ export default function Dashboard() {
       {/* 일요일 리뷰 배너 */}
       {isSunday() && (
         <motion.div variants={itemV} className="flex-shrink-0 px-4 mb-4">
-          <ReviewBanner completed={isReviewCompleted(reviews, currentWeek(), currentYear())} weekRangeText={getWeekRangeText()} onStart={() => navigate('/review')} />
+          <ReviewBanner completed={isReviewCompleted(reviews, currentWeek(), currentYear())} weekRangeText={getWeekRangeText(new Date(), weekStartDay as 0 | 1)} onStart={() => navigate('/review')} />
         </motion.div>
       )}
 
@@ -231,7 +227,7 @@ export default function Dashboard() {
                 <button key={ds} onClick={() => setSelectedDay(ds)}
                   className="flex flex-col items-center gap-1 flex-1">
                   <span className={`text-caption2 font-semibold ${isToday ? 'text-primary' : 'text-label-assistive'}`}>
-                    {DAY_LABELS[i]}
+                    {ALL_DAY_LABELS[getDay(d)]}
                   </span>
 
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center text-label1 font-bold ${
