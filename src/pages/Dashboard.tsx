@@ -101,7 +101,7 @@ export default function Dashboard() {
     <motion.div
       variants={container} initial="hidden" animate="show"
       className="flex flex-col overflow-hidden"
-      style={{ height: 'calc(100dvh - 5rem - env(safe-area-inset-bottom, 0px))' }}
+      style={{ height: '100dvh' }}
     >
 
       {/* 헤더 */}
@@ -290,7 +290,7 @@ export default function Dashboard() {
             ))}
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}>
           <AnimatePresence mode="wait">
             {activeTab === 'personal' && (
               <motion.div key="p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>

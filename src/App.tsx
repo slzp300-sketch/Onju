@@ -115,17 +115,17 @@ function BottomNav() {
               )}
               <NavLink
                 to={item.to}
-                className={`relative flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition-colors ${active ? 'text-primary' : 'text-label-assistive'}`}
+                className={`relative flex-1 flex flex-col items-center gap-1 py-3.5 text-[12px] font-medium transition-colors ${active ? 'text-primary' : 'text-label-assistive'}`}
               >
                 {active && (
                   <motion.span
                     layoutId="activeTabPill"
-                    className="absolute inset-x-2 top-1.5 bottom-1.5 bg-primary-soft rounded-2xl -z-10"
+                    className="absolute inset-x-2 top-2 bottom-2 bg-primary-soft rounded-2xl -z-10"
                     transition={{ type: 'spring', stiffness: 650, damping: 28 }}
                   />
                 )}
                 <motion.div whileTap={{ scale: 1.2 }} transition={{ duration: 0.08 }}>
-                  <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
+                  <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
                 </motion.div>
                 <span className={active ? 'font-semibold' : ''}>{item.label}</span>
               </NavLink>
@@ -202,7 +202,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <div className="max-w-md mx-auto min-h-dvh bg-surface-alt relative" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
+        <div className="max-w-md mx-auto min-h-dvh bg-surface-alt relative" style={{ paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}>
           <AppRoutes />
           <BottomNav />
           <SlotUnlockModal />
