@@ -22,7 +22,7 @@ export default function PersonalTab() {
       icon: <CheckSquare size={20} />,
       label: '습관 추가',
       sub: '1개의 반복 할 일',
-      color: 'bg-indigo-600',
+      color: 'bg-primary',
       onClick: () => navigate('/habits/new'),
     },
     {
@@ -43,9 +43,9 @@ export default function PersonalTab() {
     return (
       <div className="relative">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-          <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-4xl mb-5">😊</div>
-          <p className="text-base font-bold text-gray-700 mb-1">첫 번째 습관을 시작해 보세요</p>
-          <p className="text-sm text-gray-400 leading-relaxed">
+          <div className="w-20 h-20 rounded-full bg-primary-soft flex items-center justify-center text-4xl mb-5">😊</div>
+          <p className="text-base font-bold text-label mb-1">첫 번째 습관을 시작해 보세요</p>
+          <p className="text-sm text-label-alt leading-relaxed">
             작은 습관 하나가 직장 생활을<br />조금 더 단단하게 만들어 줄 거예요
           </p>
         </div>
@@ -65,13 +65,13 @@ export default function PersonalTab() {
       {standaloneHabits.length > 0 && (
         <div>
           {personalRoutines.length > 0 && (
-            <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
               <span className="text-sm">📋</span>
-              <span className="flex-1 text-xs font-bold text-gray-700">개별 습관</span>
+              <span className="flex-1 text-xs font-bold text-label">개별 습관</span>
               <CompletedBadge habits={standaloneHabits} />
             </div>
           )}
-          <div className="bg-white divide-y divide-gray-50">
+          <div className="bg-white divide-y divide-y divide-line-soft">
             {standaloneHabits.map((h, idx) => (
               <HabitRow key={h.id} habit={h} index={idx + 1} />
             ))}
@@ -102,32 +102,32 @@ function RoutineGroup({ routineId }: { routineId: string }) {
     <div className="mb-0.5">
       {/* 루틴 헤더 */}
       <div onClick={() => navigate(`/personal-routines/edit/${routine.id}`)}
-        className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100 cursor-pointer active:bg-gray-100 transition-colors">
+        className="flex items-center gap-2 px-4 py-3 bg-surface-alt border-b border-line-soft cursor-pointer active:bg-fill transition-colors">
         {/* 접기/펼치기 */}
         <motion.button
           animate={{ rotate: expanded ? 0 : -90 }}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
           onClick={e => { e.stopPropagation(); setExpanded(v => !v); }}
-          className="text-gray-400 flex-shrink-0"
+          className="text-label-alt flex-shrink-0"
         >
           <ChevronDown size={16} />
         </motion.button>
 
         <span className="text-lg">{routine.emoji}</span>
-        <span className="flex-1 text-sm font-bold text-gray-800">{routine.title}</span>
+        <span className="flex-1 text-sm font-bold text-label-strong">{routine.title}</span>
 
         {routine.when && (
-          <span className="text-[11px] text-gray-400 mr-1">{routine.when}</span>
+          <span className="text-[11px] text-label-alt mr-1">{routine.when}</span>
         )}
 
         {/* 진행률 뱃지 */}
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${allDone ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'}`}>
+        <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>
           {completedCount}/{routineHabits.length}
         </span>
 
         {/* 타이머 아이콘 */}
         {routine.timerEnabled && (
-          <Timer size={14} className="text-indigo-400 flex-shrink-0" />
+          <Timer size={14} className="text-primary flex-shrink-0" />
         )}
 
         {/* ▶ 전체 시작 (타이머 활성화 시에만 표시) */}
@@ -135,7 +135,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
         <motion.button
           whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
           onClick={e => { e.stopPropagation(); navigate(`/routine-timer/${routine.id}`); }}
-          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${allDone ? 'bg-indigo-500 text-white' : 'bg-white border border-gray-200 text-gray-400 hover:border-indigo-300 hover:text-indigo-500'}`}
+          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${allDone ? 'bg-primary text-white' : 'bg-white border border-line text-label-alt hover:border-primary-soft hover:text-primary'}`}
         >
           <Play size={10} fill="currentColor" />
         </motion.button>
@@ -166,7 +166,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-            className="overflow-hidden bg-white divide-y divide-gray-50"
+            className="overflow-hidden bg-white divide-y divide-y divide-line-soft"
           >
             {routineHabits.map((h, idx) => (
               <HabitRow key={h.id} habit={h} index={idx + 1} inRoutine />
@@ -189,25 +189,25 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
     <motion.div
       layout
       onClick={() => navigate(`/habits/edit/${habit.id}`)}
-      className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors ${done ? 'opacity-70' : ''}`}
+      className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${done ? 'opacity-70' : ''}`}
     >
       {/* 번호 */}
-      <span className={`text-xs font-bold w-5 text-center flex-shrink-0 ${done ? 'text-gray-300' : 'text-gray-400'}`}>
+      <span className={`text-xs font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
         {index}
       </span>
 
       {/* 이모지 (장식용) */}
-      <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${done ? 'bg-indigo-50' : 'bg-gray-100'}`}>
+      <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${done ? 'bg-primary-soft' : 'bg-fill'}`}>
         {habit.emoji}
       </div>
 
       {/* 텍스트 */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-semibold truncate ${done ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+        <p className={`text-sm font-semibold truncate ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
           {habit.title}
         </p>
         {habit.when && (
-          <p className="text-[11px] text-gray-400 mt-0.5 truncate">{habit.when}</p>
+          <p className="text-[11px] text-label-alt mt-0.5 truncate">{habit.when}</p>
         )}
       </div>
 
@@ -228,8 +228,8 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
           onClick={e => { e.stopPropagation(); toggleHabitLog(habit.id); }}
           className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
             done
-              ? 'bg-indigo-500 border-indigo-500'
-              : 'border-gray-300 hover:border-indigo-400'
+              ? 'bg-primary border-indigo-500'
+              : 'border-line hover:border-primary'
           }`}
         >
           <AnimatePresence mode="wait" initial={false}>
@@ -266,7 +266,7 @@ function CompletedBadge({ habits }: { habits: Habit[] }) {
   const done = habits.filter(h => isHabitCompleted(h.id, todayStr())).length;
   const allDone = done === habits.length;
   return (
-    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'}`}>
+    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>
       {done}/{habits.length}
     </span>
   );

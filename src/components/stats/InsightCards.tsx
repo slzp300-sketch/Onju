@@ -5,7 +5,7 @@ import { generateInsights, type Insight } from '../../utils/insights';
 import { today } from '../../utils/date';
 
 const COLOR_MAP = {
-  indigo: { bg: 'bg-indigo-50', border: 'border-indigo-100', title: 'text-indigo-900', body: 'text-indigo-700', btn: 'bg-indigo-500' },
+  indigo: { bg: 'bg-primary-soft', border: 'border-primary-soft', title: 'text-indigo-900', body: 'text-primary', btn: 'bg-primary' },
   emerald: { bg: 'bg-emerald-50', border: 'border-emerald-100', title: 'text-emerald-900', body: 'text-emerald-700', btn: 'bg-emerald-500' },
   orange: { bg: 'bg-orange-50', border: 'border-orange-100', title: 'text-orange-900', body: 'text-orange-700', btn: 'bg-orange-500' },
   red: { bg: 'bg-red-50', border: 'border-red-100', title: 'text-red-900', body: 'text-red-700', btn: 'bg-red-500' },
@@ -20,7 +20,7 @@ export default function InsightCards() {
 
   return (
     <div className="px-4 flex flex-col gap-2">
-      <p className="text-xs font-semibold text-gray-500">패턴 분석</p>
+      <p className="text-xs font-semibold text-label-alt">패턴 분석</p>
       {insights.map((ins, i) => (
         <InsightCard key={ins.id} insight={ins} index={i} onAction={ins.actionPath ? () => navigate(ins.actionPath!) : undefined} />
       ))}

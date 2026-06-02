@@ -7,11 +7,11 @@ export default function MonthlyGoalCard({ goal }: { goal: MonthlyGoal }) {
     : `${goal.year}년 ${goal.month}월`;
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 border border-indigo-100">
-      <p className="text-xs font-medium text-indigo-500 mb-1">{range}</p>
-      <p className="text-sm font-semibold text-gray-900 mb-1">{goal.title}</p>
+    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 border border-primary-soft">
+      <p className="text-xs font-medium text-primary mb-1">{range}</p>
+      <p className="text-sm font-semibold text-label-strong mb-1">{goal.title}</p>
       {goal.description && (
-        <p className="text-xs text-gray-500 leading-relaxed">{goal.description}</p>
+        <p className="text-xs text-label-alt leading-relaxed">{goal.description}</p>
       )}
     </div>
   );

@@ -43,7 +43,7 @@ function DragValue({ values, selected, onChange }: DragValueProps) {
 
   return (
     <div
-      className="flex items-center justify-center bg-indigo-50 border border-indigo-200 rounded-lg cursor-ns-resize overflow-hidden select-none"
+      className="flex items-center justify-center bg-primary-soft border border-primary-soft rounded-lg cursor-ns-resize overflow-hidden select-none"
       style={{ width: 44, height: 32, touchAction: 'none' }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -84,7 +84,7 @@ export default function DurationPicker({ seconds, onChange }: DurationPickerProp
   return (
     <div className="flex items-center gap-2 justify-center py-1">
       <DragValue values={MINUTES} selected={mins} onChange={m => onChange(m * 60 + secs)} />
-      <span className="text-sm font-bold text-gray-300">:</span>
+      <span className="text-sm font-bold text-label-assistive">:</span>
       <DragValue values={SECONDS} selected={secs} onChange={s => onChange(mins * 60 + s)} />
     </div>
   );

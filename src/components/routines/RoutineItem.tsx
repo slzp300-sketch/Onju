@@ -36,19 +36,19 @@ export default function RoutineItem({ routine, dragHandle }: RoutineItemProps) {
             done
               ? routine.type === 'faith'
                 ? 'bg-emerald-500 border-emerald-500'
-                : 'bg-indigo-500 border-indigo-500'
-              : 'border-gray-300 bg-white',
+                : 'bg-primary border-indigo-500'
+              : 'border-line bg-white',
           ].join(' ')}
         >
           <AnimatedCheck done={done} />
         </motion.button>
 
         <div className="flex-1 min-w-0">
-          <span className={`text-sm ${done ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+          <span className={`text-sm ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
             {routine.title}
           </span>
           {routine.durationMinutes && (
-            <span className="ml-2 inline-flex items-center gap-0.5 text-xs text-gray-400">
+            <span className="ml-2 inline-flex items-center gap-0.5 text-xs text-label-alt">
               <Clock size={10} />
               {routine.durationMinutes}분
             </span>
@@ -63,7 +63,7 @@ export default function RoutineItem({ routine, dragHandle }: RoutineItemProps) {
               'flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors',
               routine.type === 'faith'
                 ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100',
+                : 'bg-primary-soft text-primary hover:bg-primary-soft',
             ].join(' ')}
           >
             <Play size={11} fill="currentColor" />

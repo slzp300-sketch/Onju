@@ -27,10 +27,10 @@ export default function StreakCounter({
     <>
       <button
         onClick={() => setShowDetail(true)}
-        className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3 border border-gray-100 shadow-sm w-full"
+        className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3 border border-line-soft shadow-sm w-full"
       >
         <StreakPill icon="🔥" value={personalStreak} label="개인" color="text-orange-500" />
-        <div className="w-px h-6 bg-gray-100" />
+        <div className="w-px h-6 bg-fill" />
         <StreakPill icon="✝" value={faithStreak} label="신앙" color="text-emerald-500" />
       </button>
 
@@ -52,9 +52,9 @@ export default function StreakCounter({
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-5">
-                <h3 className="font-bold text-gray-900">연속 달성 현황</h3>
+                <h3 className="font-bold text-label-strong">연속 달성 현황</h3>
                 <button onClick={() => setShowDetail(false)}>
-                  <X size={20} className="text-gray-400" />
+                  <X size={20} className="text-label-alt" />
                 </button>
               </div>
 
@@ -75,7 +75,7 @@ export default function StreakCounter({
                 />
               </div>
 
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-xs text-label-alt text-center">
                 달성률 50% 이상이면 그날 연속 달성으로 인정돼요
               </p>
             </motion.div>
@@ -97,7 +97,7 @@ function StreakPill({ icon, value, label, color }: {
       <span className="text-lg">{icon}</span>
       <div>
         <p className={`text-base font-bold ${color}`}>{value}일</p>
-        <p className="text-xs text-gray-400">{label}</p>
+        <p className="text-xs text-label-alt">{label}</p>
       </div>
     </div>
   );
@@ -119,9 +119,9 @@ function DetailCard({ icon, label, streak, best, color }: {
   return (
     <div className={`rounded-2xl border p-4 ${colorMap[color]}`}>
       <div className="text-2xl mb-2">{icon}</div>
-      <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-gray-900">{streak}<span className="text-sm font-medium text-gray-400 ml-1">일</span></p>
-      <p className="text-xs text-gray-400 mt-1">최고 {best}일</p>
+      <p className="text-xs font-medium text-label-alt mb-1">{label}</p>
+      <p className="text-2xl font-bold text-label-strong">{streak}<span className="text-sm font-medium text-label-alt ml-1">일</span></p>
+      <p className="text-xs text-label-alt mt-1">최고 {best}일</p>
       {next && (
         <p className="text-xs mt-2 font-medium">
           다음 기록 목표까지 {next - streak}일

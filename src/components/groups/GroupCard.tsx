@@ -19,14 +19,14 @@ export default function GroupCard({ group }: { group: SmallGroup }) {
   return (
     <button
       onClick={() => navigate(`/groups/${group.id}`)}
-      className="w-full bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-left hover:border-indigo-200 transition-colors"
+      className="w-full bg-white rounded-2xl p-4 border border-line-soft shadow-sm text-left hover:border-primary-soft transition-colors"
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="text-sm font-semibold text-gray-900 flex-1">{group.title}</h3>
+        <h3 className="text-sm font-semibold text-label-strong flex-1">{group.title}</h3>
         <Badge label={label} color={color} />
       </div>
-      <p className="text-xs text-gray-500 leading-relaxed mb-3 line-clamp-2">{group.goal}</p>
-      <div className="flex items-center gap-3 text-xs text-gray-400">
+      <p className="text-xs text-label-alt leading-relaxed mb-3 line-clamp-2">{group.goal}</p>
+      <div className="flex items-center gap-3 text-xs text-label-alt">
         <span className="flex items-center gap-1">
           <Users size={12} />
           <span className={isFull ? 'text-red-400' : ''}>

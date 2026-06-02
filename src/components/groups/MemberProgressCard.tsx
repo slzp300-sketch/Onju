@@ -37,29 +37,29 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
   return (
     <>
       <div
-        className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm relative overflow-hidden"
+        className="bg-white rounded-2xl p-4 border border-line-soft shadow-sm relative overflow-hidden"
         onClick={() => setShowDetail(true)}
       >
         {/* 상단: 아바타 + 이름 + 응원 */}
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-primary-soft flex items-center justify-center text-primary font-semibold text-sm flex-shrink-0">
             {initial}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">{member.userName}</p>
+            <p className="text-sm font-semibold text-label-strong truncate">{member.userName}</p>
             <div className="flex items-center gap-1 text-orange-500">
               <Flame size={12} />
               <span className="text-xs font-medium">{member.streak}일 연속</span>
             </div>
           </div>
-          <span className="text-xs font-semibold text-gray-700">{member.weeklyRate}%</span>
+          <span className="text-xs font-semibold text-label">{member.weeklyRate}%</span>
 
           {/* 응원 버튼 */}
           <div className="relative" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => canCheer && setShowCheerPop(p => !p)}
               className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                canCheer ? 'bg-pink-50 text-pink-400 hover:bg-pink-100' : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                canCheer ? 'bg-pink-50 text-pink-400 hover:bg-pink-100' : 'bg-fill text-label-assistive cursor-not-allowed'
               }`}
               disabled={!canCheer}
             >
@@ -74,16 +74,16 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.8, y: 8 }}
                   transition={{ type: 'spring', stiffness: 650, damping: 22 }}
-                  className="absolute right-0 bottom-10 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 flex gap-2 z-10"
+                  className="absolute right-0 bottom-10 bg-white rounded-2xl shadow-xl border border-line-soft p-2 flex gap-2 z-10"
                 >
                   {(['heart', 'fire', 'pray'] as CheerType[]).map(type => (
                     <button
                       key={type}
                       onClick={() => handleCheer(type)}
-                      className="flex flex-col items-center gap-0.5 p-2 rounded-xl hover:bg-gray-50 transition-colors"
+                      className="flex flex-col items-center gap-0.5 p-2 rounded-xl hover:bg-surface-alt transition-colors"
                     >
                       <span className="text-xl">{CHEER_ICONS[type]}</span>
-                      <span className="text-xs text-gray-400">{CHEER_LABELS[type]}</span>
+                      <span className="text-xs text-label-alt">{CHEER_LABELS[type]}</span>
                     </button>
                   ))}
                 </motion.div>
@@ -135,13 +135,13 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-primary font-semibold text-sm">
                     {initial}
                   </div>
-                  <p className="font-semibold text-gray-900">{member.userName}</p>
+                  <p className="font-semibold text-label-strong">{member.userName}</p>
                 </div>
                 <button onClick={() => setShowDetail(false)}>
-                  <X size={20} className="text-gray-400" />
+                  <X size={20} className="text-label-alt" />
                 </button>
               </div>
 
@@ -167,10 +167,10 @@ function MiniBar({ label, rate, color }: { label: string; rate: number; color: s
   return (
     <div>
       <div className="flex justify-between mb-1">
-        <span className="text-xs text-gray-400">{label}</span>
-        <span className="text-xs font-medium text-gray-700">{rate}%</span>
+        <span className="text-xs text-label-alt">{label}</span>
+        <span className="text-xs font-medium text-label">{rate}%</span>
       </div>
-      <div className="bg-gray-100 rounded-full h-1.5 overflow-hidden">
+      <div className="bg-fill rounded-full h-1.5 overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${rate}%`, backgroundColor: color }}
@@ -182,13 +182,13 @@ function MiniBar({ label, rate, color }: { label: string; rate: number; color: s
 
 function StatPill({ label, value, color }: { label: string; value: string; color?: 'indigo' | 'emerald' }) {
   const colorMap = {
-    indigo: 'text-indigo-600',
+    indigo: 'text-primary',
     emerald: 'text-emerald-600',
   };
   return (
-    <div className="bg-gray-50 rounded-2xl p-3 text-center">
-      <p className="text-xs text-gray-400 mb-1">{label}</p>
-      <p className={`text-lg font-bold ${color ? colorMap[color] : 'text-gray-900'}`}>{value}</p>
+    <div className="bg-surface-alt rounded-2xl p-3 text-center">
+      <p className="text-xs text-label-alt mb-1">{label}</p>
+      <p className={`text-lg font-bold ${color ? colorMap[color] : 'text-label-strong'}`}>{value}</p>
     </div>
   );
 }

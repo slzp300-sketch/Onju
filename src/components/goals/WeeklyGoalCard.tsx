@@ -15,25 +15,25 @@ export default function WeeklyGoalCard({ goal, monthlyTitle }: WeeklyGoalCardPro
   const isPast = goal.endDate < new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+    <div className="bg-white rounded-2xl p-4 border border-line-soft shadow-sm">
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900">{goal.title}</p>
+          <p className="text-sm font-semibold text-label-strong">{goal.title}</p>
           {monthlyTitle && (
-            <p className="text-xs text-indigo-500 mt-0.5">{monthlyTitle}</p>
+            <p className="text-xs text-primary mt-0.5">{monthlyTitle}</p>
           )}
-          <p className="text-xs text-gray-400 mt-1">{formatDateRange(goal.startDate, goal.endDate)}</p>
+          <p className="text-xs text-label-alt mt-1">{formatDateRange(goal.startDate, goal.endDate)}</p>
         </div>
         <button
           onClick={() => removeWeeklyGoal(goal.id)}
-          className="text-gray-300 hover:text-red-400 transition-colors p-1 flex-shrink-0"
+          className="text-label-assistive hover:text-red-400 transition-colors p-1 flex-shrink-0"
         >
           <Trash2 size={15} />
         </button>
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+        <div className="flex-1 bg-fill rounded-full h-1.5 overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{
@@ -42,7 +42,7 @@ export default function WeeklyGoalCard({ goal, monthlyTitle }: WeeklyGoalCardPro
             }}
           />
         </div>
-        <span className="text-xs text-gray-400 w-12 text-right flex-shrink-0">
+        <span className="text-xs text-label-alt w-12 text-right flex-shrink-0">
           {elapsed}/{total}일
         </span>
       </div>

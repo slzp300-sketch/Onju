@@ -24,7 +24,7 @@ export default function HeatMap({ personalRoutines, faithRoutines, logs, days = 
 
         return (
           <div key={dateStr} className="flex flex-col items-center gap-1 flex-1">
-            <span className={`text-xs ${isToday ? 'text-indigo-600 font-semibold' : 'text-gray-400'}`}>
+            <span className={`text-xs ${isToday ? 'text-primary font-semibold' : 'text-label-alt'}`}>
               {format(date, 'E', { locale: ko })}
             </span>
             <div className="flex flex-col gap-0.5 w-full">
@@ -39,7 +39,7 @@ export default function HeatMap({ personalRoutines, faithRoutines, logs, days = 
                 title={`신앙 ${faith}%`}
               />
             </div>
-            {isToday && <div className="w-1 h-1 rounded-full bg-indigo-500" />}
+            {isToday && <div className="w-1 h-1 rounded-full bg-primary" />}
           </div>
         );
       })}

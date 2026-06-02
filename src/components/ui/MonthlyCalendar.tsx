@@ -55,7 +55,7 @@ export default function MonthlyCalendar({
           <div
             key={label}
             className={`text-center text-xs font-medium py-1 ${
-              i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-gray-400'
+              i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-label-alt'
             }`}
           >
             {label}
@@ -78,12 +78,12 @@ export default function MonthlyCalendar({
             }`}
           >
             <div className={`text-center text-xs py-0.5 ${
-              isToday ? 'font-bold text-indigo-600' : isFuture ? 'text-gray-300' : 'text-gray-500'
+              isToday ? 'font-bold text-primary' : isFuture ? 'text-label-assistive' : 'text-label-alt'
             }`}>
               {format(day, 'd')}
             </div>
             {isFuture || !hasRoutines ? (
-              <div className="h-4 bg-gray-50" />
+              <div className="h-4 bg-surface-alt" />
             ) : (
               <div className="flex flex-col">
                 <div
@@ -117,25 +117,25 @@ export default function MonthlyCalendar({
       {/* 범례 */}
       <div className="flex gap-3 mt-3">
         <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-sm bg-indigo-400" />
-          <span className="text-xs text-gray-400">개인</span>
+          <div className="w-2.5 h-2.5 rounded-sm bg-primary" />
+          <span className="text-xs text-label-alt">개인</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-sm bg-emerald-400" />
-          <span className="text-xs text-gray-400">신앙</span>
+          <span className="text-xs text-label-alt">신앙</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-sm bg-gray-100" />
-          <span className="text-xs text-gray-400">미완료</span>
+          <div className="w-2.5 h-2.5 rounded-sm bg-fill" />
+          <span className="text-xs text-label-alt">미완료</span>
         </div>
       </div>
 
       {/* 요약 */}
       {hasRoutines && pastDays.length > 0 && (
-        <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
-          <SummaryBadge label="완벽한 날" count={perfect} color="text-indigo-600" bg="bg-indigo-50" />
+        <div className="flex gap-2 mt-3 pt-3 border-t border-line-soft">
+          <SummaryBadge label="완벽한 날" count={perfect} color="text-primary" bg="bg-primary-soft" />
           <SummaryBadge label="부분 달성" count={partial} color="text-orange-500" bg="bg-orange-50" />
-          <SummaryBadge label="미체크" count={missed} color="text-gray-400" bg="bg-gray-50" />
+          <SummaryBadge label="미체크" count={missed} color="text-label-alt" bg="bg-surface-alt" />
         </div>
       )}
     </div>
@@ -146,7 +146,7 @@ function SummaryBadge({ label, count, color, bg }: { label: string; count: numbe
   return (
     <div className={`flex-1 rounded-xl px-2 py-1.5 text-center ${bg}`}>
       <p className={`text-base font-bold ${color}`}>{count}</p>
-      <p className="text-xs text-gray-400 mt-0.5">{label}</p>
+      <p className="text-xs text-label-alt mt-0.5">{label}</p>
     </div>
   );
 }

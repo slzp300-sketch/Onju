@@ -15,15 +15,15 @@ export default function ReviewBanner({ completed, weekRangeText, onStart }: Revi
       onClick={onStart}
       className={`w-full text-left rounded-2xl p-4 flex items-center gap-3 transition-colors ${
         completed
-          ? 'bg-gray-50 border border-gray-100'
+          ? 'bg-surface-alt border border-line-soft'
           : 'border-l-4 border-[#7F77DD] bg-[#EEEDFE]'
       }`}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-400 mb-0.5">{weekRangeText}</p>
+        <p className="text-xs text-label-alt mb-0.5">{weekRangeText}</p>
         {completed ? (
-          <p className="text-sm font-semibold text-gray-500 flex items-center gap-1.5">
-            <CheckCircle2 size={15} className="text-indigo-400" />
+          <p className="text-sm font-semibold text-label-alt flex items-center gap-1.5">
+            <CheckCircle2 size={15} className="text-primary" />
             이번 주 리뷰 완료
           </p>
         ) : (
@@ -33,7 +33,7 @@ export default function ReviewBanner({ completed, weekRangeText, onStart }: Revi
           </>
         )}
       </div>
-      <ChevronRight size={18} className={completed ? 'text-gray-300' : 'text-[#7F77DD]'} />
+      <ChevronRight size={18} className={completed ? 'text-label-assistive' : 'text-[#7F77DD]'} />
     </motion.button>
   );
 }

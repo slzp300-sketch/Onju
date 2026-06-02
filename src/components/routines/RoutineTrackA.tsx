@@ -18,7 +18,7 @@ function SortableRoutineItem({ routine }: { routine: DailyRoutine }) {
       <RoutineItem
         routine={routine}
         dragHandle={
-          <button {...attributes} {...listeners} className="text-gray-300 touch-none cursor-grab">
+          <button {...attributes} {...listeners} className="text-label-assistive touch-none cursor-grab">
             <GripVertical size={16} />
           </button>
         }
@@ -44,7 +44,7 @@ export default function RoutineTrackA() {
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={personalRoutines.map(r => r.id)} strategy={verticalListSortingStrategy}>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-y divide-line-soft">
           {personalRoutines.map(routine => (
             <SortableRoutineItem key={routine.id} routine={routine} />
           ))}

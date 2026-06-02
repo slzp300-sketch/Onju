@@ -60,12 +60,12 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
     >
       <button
         onClick={onClose}
-        className="absolute top-6 right-6 text-gray-600 hover:text-gray-400 transition-colors"
+        className="absolute top-6 right-6 text-label hover:text-label-alt transition-colors"
       >
         <X size={24} />
       </button>
 
-      <p className="text-gray-500 text-xs tracking-widest uppercase mb-2">
+      <p className="text-label-alt text-xs tracking-widest uppercase mb-2">
         {routine.type === 'faith' ? '신앙 루틴' : '개인 루틴'}
       </p>
       <h2 className="text-white text-2xl font-bold mb-14 text-center px-10 leading-tight">
@@ -92,7 +92,7 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
           <span className="text-white text-4xl font-mono font-bold tabular-nums">
             {totalSeconds > 0 ? fmt(remaining) : fmt(elapsed)}
           </span>
-          <span className="text-gray-600 text-xs">
+          <span className="text-label text-xs">
             {totalSeconds > 0 ? (finished ? '완료!' : '남은 시간') : '경과 시간'}
           </span>
         </div>
@@ -110,7 +110,7 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
 
       <button
         onClick={onClose}
-        className="mt-5 text-gray-700 text-sm hover:text-gray-500 transition-colors"
+        className="mt-5 text-label text-sm hover:text-label-alt transition-colors"
       >
         나중에 할게요
       </button>

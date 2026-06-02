@@ -38,7 +38,7 @@ export default function EmojiPickerButton({ emoji, onChange, size = 'md' }: Emoj
         whileTap={{ scale: 0.88 }}
         transition={{ type: 'spring', stiffness: 700, damping: 22 }}
         onClick={() => setOpen(v => !v)}
-        className={`${btnSize} rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-sm hover:bg-gray-50 transition-colors`}
+        className={`${btnSize} rounded-2xl bg-white border border-line flex items-center justify-center shadow-sm hover:bg-surface-alt transition-colors`}
       >
         {emoji}
       </motion.button>

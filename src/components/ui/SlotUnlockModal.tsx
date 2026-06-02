@@ -38,8 +38,8 @@ export default function SlotUnlockModal() {
             onClick={e => e.stopPropagation()}
           >
             <div className="text-4xl mb-3">🎉</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">목표 칸이 늘어났어요!</h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <h2 className="text-xl font-bold text-label-strong mb-1">목표 칸이 늘어났어요!</h2>
+            <p className="text-sm text-label-alt mb-6">
               지난 주 달성률이 80%를 넘었어요.<br />이제 주간 목표를 하나 더 세울 수 있어요!
             </p>
 
@@ -53,8 +53,8 @@ export default function SlotUnlockModal() {
                   transition={{ delay: i * 0.1, type: 'spring', stiffness: 500, damping: 25 }}
                   className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm ${
                     i < newSlotCount
-                      ? 'bg-indigo-500 text-white'
-                      : 'bg-gray-100 text-gray-300'
+                      ? 'bg-primary text-white'
+                      : 'bg-fill text-label-assistive'
                   }`}
                 >
                   {i < newSlotCount ? '✓' : ''}
@@ -62,13 +62,13 @@ export default function SlotUnlockModal() {
               ))}
             </div>
 
-            <p className="text-xs text-indigo-600 font-semibold mb-4">
+            <p className="text-xs text-primary font-semibold mb-4">
               이제 주간 목표를 {newSlotCount}개까지 설정할 수 있어요
             </p>
 
             <button
               onClick={clearPendingUnlock}
-              className="w-full bg-indigo-500 text-white font-semibold py-3 rounded-2xl text-sm"
+              className="w-full bg-primary text-white font-semibold py-3 rounded-2xl text-sm"
             >
               확인
             </button>

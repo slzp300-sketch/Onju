@@ -67,8 +67,8 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-gray-900">말씀 기록</h3>
-              <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
+              <h3 className="font-bold text-label-strong">말씀 기록</h3>
+              <button onClick={onClose}><X size={20} className="text-label-alt" /></button>
             </div>
 
             {/* 성경 선택 */}
@@ -77,13 +77,13 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
                 <select
                   value={book}
                   onChange={e => setBook(e.target.value)}
-                  className="w-full appearance-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 pr-8"
+                  className="w-full appearance-none border border-line rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 pr-8"
                 >
                   {BIBLE_BOOKS.map(b => (
                     <option key={b} value={b}>{b}</option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-2.5 top-3 text-gray-400 pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-2.5 top-3 text-label-alt pointer-events-none" />
               </div>
               <div className="flex items-center gap-1">
                 <input
@@ -91,21 +91,21 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
                   value={chapter}
                   onChange={e => setChapter(Number(e.target.value))}
                   min={1}
-                  className="w-14 border border-gray-200 rounded-xl px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="w-14 border border-line rounded-xl px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-300"
                 />
-                <span className="text-xs text-gray-400">장</span>
+                <span className="text-xs text-label-alt">장</span>
                 <input
                   type="number"
                   value={verse}
                   onChange={e => setVerse(Number(e.target.value))}
                   min={1}
-                  className="w-14 border border-gray-200 rounded-xl px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="w-14 border border-line rounded-xl px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-300"
                 />
-                <span className="text-xs text-gray-400">절</span>
+                <span className="text-xs text-label-alt">절</span>
               </div>
             </div>
 
-            <p className="text-xs font-semibold text-gray-500 mb-2">
+            <p className="text-xs font-semibold text-label-alt mb-2">
               {book} {chapter}:{verse}
             </p>
 
@@ -114,7 +114,7 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
               onChange={e => setReflection(e.target.value)}
               placeholder="오늘 말씀을 통해 받은 은혜를 한 줄로 적어보세요..."
               rows={3}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 mb-4"
+              className="w-full border border-line rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 mb-4"
             />
 
             <Button fullWidth onClick={handleSave}>저장</Button>
