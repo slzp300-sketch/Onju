@@ -117,31 +117,33 @@ export function useNotificationScheduler() {
       markSent('review');
     }
 
-    // 습관별 개별 알림
+    // 습관별 개별 알림 (시간마다 별도 스케줄)
     habits.forEach(habit => {
       const n = habit.notification;
       if (!n?.enabled || n.type !== 'push') return;
 
-      const { h, m } = parseTime(n.time);
-      const key = `habit-${habit.id}`;
-      const nowH = now.getHours();
-      const nowM = now.getMinutes();
-      const passed = nowH > h || (nowH === h && nowM >= m);
+      n.times.forEach((timeStr, tIdx) => {
+        const { h, m } = parseTime(timeStr);
+        const key = `habit-${habit.id}-${tIdx}`;
+        const nowH = now.getHours();
+        const nowM = now.getMinutes();
+        const passed = nowH > h || (nowH === h && nowM >= m);
 
-      if (passed && !alreadySentToday(key)) {
-        sendNotification(`${habit.emoji} ${habit.title}`, '습관을 실천할 시간이에요!');
-        markSent(key);
-      } else if (!passed) {
-        const delay = msUntil(h, m);
-        if (delay > 0) {
-          timers.current.push(setTimeout(() => {
-            if (!alreadySentToday(key)) {
-              sendNotification(`${habit.emoji} ${habit.title}`, '습관을 실천할 시간이에요!');
-              markSent(key);
-            }
-          }, delay));
+        if (passed && !alreadySentToday(key)) {
+          sendNotification(`${habit.emoji} ${habit.title}`, '습관을 실천할 시간이에요!');
+          markSent(key);
+        } else if (!passed) {
+          const delay = msUntil(h, m);
+          if (delay > 0) {
+            timers.current.push(setTimeout(() => {
+              if (!alreadySentToday(key)) {
+                sendNotification(`${habit.emoji} ${habit.title}`, '습관을 실천할 시간이에요!');
+                markSent(key);
+              }
+            }, delay));
+          }
         }
-      }
+      });
     });
 
     return () => timers.current.forEach(clearTimeout);

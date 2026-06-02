@@ -160,7 +160,7 @@ export const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] 
 export interface HabitNotification {
   enabled: boolean;
   type: 'push' | 'sound';
-  time: string; // "HH:mm" 24시간
+  times: string[]; // ["HH:mm", ...] 복수 알림 시간
 }
 
 // 습관 (개별 단위)

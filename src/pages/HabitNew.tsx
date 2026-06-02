@@ -38,7 +38,8 @@ export default function HabitNew() {
   // 알림
   const [notifEnabled, setNotifEnabled] = useState(existing?.notification?.enabled ?? false);
   const [notifType, setNotifType] = useState<'push' | 'sound'>(existing?.notification?.type ?? 'push');
-  const [notifTime, setNotifTime] = useState(existing?.notification?.time ?? '09:00');
+  const [notifTimes, setNotifTimes] = useState<string[]>(existing?.notification?.times ?? ['09:00']);
+  const [editingIdx, setEditingIdx] = useState<number>(0);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showTypePicker, setShowTypePicker] = useState(false);
 
@@ -64,7 +65,7 @@ export default function HabitNew() {
       ...(freq === 'custom' ? { customDays } : {}),
       when: when.trim(),
       notification: notifEnabled
-        ? { enabled: true, type: notifType, time: notifTime }
+        ? { enabled: true, type: notifType, times: notifTimes }
         : undefined,
     };
     if (isEdit && existing) {
@@ -131,7 +132,7 @@ export default function HabitNew() {
                 </motion.button>
               </div>
 
-              {/* 시간 + 타입 (enabled 시) */}
+              {/* 시간 칩 목록 + 타입 (enabled 시) */}
               <AnimatePresence>
                 {notifEnabled && (
                   <motion.div
@@ -142,20 +143,34 @@ export default function HabitNew() {
                     className="overflow-hidden"
                   >
                     <div className="flex items-center justify-between mt-3">
-                      {/* 시간 칩 */}
-                      <div className="flex items-center gap-2">
+                      {/* 시간 칩들 + 추가 버튼 */}
+                      <div className="flex flex-wrap items-center gap-2 flex-1 mr-2">
+                        {notifTimes.map((t, idx) => {
+                          const { ampmIdx, hourIdx, minuteIdx } = to12h(t);
+                          const label = `${ampmIdx === 0 ? '오전' : '오후'} ${hourIdx + 1}:${String(minuteIdx).padStart(2, '0')}`;
+                          return (
+                            <motion.button
+                              key={idx}
+                              {...tapSm}
+                              onClick={() => { setEditingIdx(idx); setShowTimePicker(true); }}
+                              className="px-3 py-1.5 rounded-xl bg-fill border border-line text-body2 font-semibold text-label-strong"
+                            >
+                              {label}
+                            </motion.button>
+                          );
+                        })}
+                        {/* + 추가 버튼 */}
                         <motion.button
                           {...tapSm}
-                          onClick={() => setShowTimePicker(true)}
-                          className="px-3 py-1.5 rounded-xl bg-fill border border-line text-body2 font-semibold text-label-strong"
+                          onClick={() => {
+                            const newIdx = notifTimes.length;
+                            setNotifTimes(prev => [...prev, '09:00']);
+                            setEditingIdx(newIdx);
+                            setShowTimePicker(true);
+                          }}
+                          className="w-8 h-8 rounded-xl border border-dashed border-line flex items-center justify-center text-label-assistive text-lg"
                         >
-                          {(() => {
-                            const { ampmIdx, hourIdx, minuteIdx } = to12h(notifTime);
-                            const ampm = ampmIdx === 0 ? '오전' : '오후';
-                            const h = String(hourIdx + 1);
-                            const m = String(minuteIdx).padStart(2, '0');
-                            return `${ampm} ${h}:${m}`;
-                          })()}
+                          +
                         </motion.button>
                       </div>
 
@@ -163,7 +178,7 @@ export default function HabitNew() {
                       <motion.button
                         {...tapSm}
                         onClick={() => setShowTypePicker(true)}
-                        className="flex items-center gap-1 text-body2 text-label-alt"
+                        className="flex items-center gap-1 text-body2 text-label-alt shrink-0"
                       >
                         <span>{notifType === 'push' ? '푸시' : '알림음'}</span>
                         <ChevronRight size={16} className="text-label-assistive" />
@@ -234,9 +249,15 @@ export default function HabitNew() {
       {/* 알림 시트 */}
       <AlarmTimeSheet
         isOpen={showTimePicker}
-        time={notifTime}
-        onChange={setNotifTime}
-        onDelete={() => setNotifEnabled(false)}
+        time={notifTimes[editingIdx] ?? '09:00'}
+        onChange={(t) =>
+          setNotifTimes(prev => prev.map((old, i) => i === editingIdx ? t : old))
+        }
+        onDelete={() => {
+          const next = notifTimes.filter((_, i) => i !== editingIdx);
+          setNotifTimes(next.length > 0 ? next : ['09:00']);
+          if (next.length === 0) setNotifEnabled(false);
+        }}
         onClose={() => setShowTimePicker(false)}
       />
       <AlarmTypeSheet
