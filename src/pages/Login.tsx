@@ -3,11 +3,22 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../store/authStore';
 
+interface KakaoUserResponse {
+  id: number;
+  kakao_account?: {
+    profile?: { nickname?: string };
+    email?: string;
+  };
+}
+
 interface KakaoStatic {
   isInitialized: () => boolean;
   init: (key: string) => void;
   Auth: {
-    authorize: (options: { redirectUri: string }) => void;
+    login: (options: { success: () => void; fail: () => void }) => void;
+  };
+  API: {
+    request: (options: { url: string; success: (res: KakaoUserResponse) => void; fail: () => void }) => void;
   };
 }
 
@@ -75,8 +86,24 @@ export default function Login() {
       setError('카카오 SDK가 아직 로드되지 않았어요. 잠시 후 다시 시도해주세요.');
       return;
     }
-    window.Kakao.Auth.authorize({
-      redirectUri: `${window.location.origin}/auth/kakao/callback`,
+    window.Kakao.Auth.login({
+      success: () => {
+        window.Kakao.API.request({
+          url: '/v2/user/me',
+          success: (res: KakaoUserResponse) => {
+            const profile = res.kakao_account?.profile;
+            const email = res.kakao_account?.email;
+            socialLogin('kakao', {
+              id: String(res.id),
+              name: profile?.nickname ?? '카카오 사용자',
+              email,
+            });
+            navigate('/', { replace: true });
+          },
+          fail: () => setError('카카오 사용자 정보를 불러오지 못했어요.'),
+        });
+      },
+      fail: () => setError('카카오 로그인에 실패했어요.'),
     });
   };
 
