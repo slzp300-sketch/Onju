@@ -9,6 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const restKey = process.env.KAKAO_REST_API_KEY;
   const clientSecret = process.env.KAKAO_CLIENT_SECRET;
   if (!restKey) return res.status(500).json({ error: 'KAKAO_REST_API_KEY not set' });
+  if (!clientSecret) return res.status(500).json({ error: 'KAKAO_CLIENT_SECRET not set' });
 
   // 1. 인가 코드 → 액세스 토큰
   const tokenRes = await fetch('https://kauth.kakao.com/oauth/token', {
@@ -19,7 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       client_id: restKey,
       redirect_uri: redirectUri,
       code,
-      ...(clientSecret ? { client_secret: clientSecret } : {}),
+      client_secret: clientSecret,
     }),
   });
 
