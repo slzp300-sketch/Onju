@@ -23,34 +23,34 @@ export default function NotificationSettings() {
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="px-4 pt-5 flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="text-gray-500 hover:text-gray-700">
+        <button onClick={() => navigate(-1)} className="text-label-alt hover:text-label transition-colors">
           <ChevronLeft size={22} />
         </button>
-        <h1 className="text-lg font-bold text-gray-900">알림 설정</h1>
+        <h1 className="text-heading2 font-bold text-label-strong font-brand">알림 설정</h1>
       </div>
 
       {/* 권한 상태 */}
       {!canNotify && (
         <Card className="mx-4">
           <div className="flex items-start gap-3">
-            <div className={`mt-0.5 ${denied ? 'text-red-400' : 'text-indigo-500'}`}>
+            <div className={`mt-0.5 ${denied ? 'text-negative' : 'text-primary'}`}>
               {denied ? <BellOff size={20} /> : <Bell size={20} />}
             </div>
             <div className="flex-1">
               {denied ? (
                 <>
-                  <p className="text-sm font-semibold text-gray-900">알림이 차단되어 있어요</p>
-                  <p className="text-xs text-gray-400 mt-1">브라우저 설정에서 이 사이트의 알림을 허용해 주세요.</p>
+                  <p className="text-body2 font-semibold text-label-strong">알림이 차단되어 있어요</p>
+                  <p className="text-caption1 text-label-alt mt-1">브라우저 설정에서 이 사이트의 알림을 허용해 주세요.</p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm font-semibold text-gray-900">알림 권한이 필요해요</p>
-                  <p className="text-xs text-gray-400 mt-1">루틴 리마인드와 주간 리뷰 알림을 받으려면 허용해 주세요.</p>
+                  <p className="text-body2 font-semibold text-label-strong">알림 권한이 필요해요</p>
+                  <p className="text-caption1 text-label-alt mt-1">루틴 리마인드와 주간 리뷰 알림을 받으려면 허용해 주세요.</p>
                   <motion.button
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={requestPermission}
                     disabled={requesting}
-                    className="mt-3 px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-xl disabled:opacity-60"
+                    className="mt-3 px-4 h-9 bg-primary text-white text-label2 font-medium rounded-lg disabled:opacity-30 hover:bg-primary-strong transition-colors"
                   >
                     {requesting ? '요청 중…' : '알림 허용하기'}
                   </motion.button>
@@ -65,8 +65,8 @@ export default function NotificationSettings() {
       <Card className="mx-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-gray-900">🌅 아침 알림</p>
-            <p className="text-xs text-gray-400 mt-0.5">오늘의 루틴을 시작하도록 알려줘요</p>
+            <p className="text-body2 font-semibold text-label-strong">🌅 아침 알림</p>
+            <p className="text-caption1 text-label-alt mt-0.5">오늘의 루틴을 시작하도록 알려줘요</p>
           </div>
           <Toggle
             enabled={canNotify && store.morningEnabled}
@@ -76,12 +76,12 @@ export default function NotificationSettings() {
         </div>
         {store.morningEnabled && canNotify && (
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-xs text-gray-500">알림 시간</span>
+            <span className="text-caption1 text-label-alt">알림 시간</span>
             <input
               type="time"
               value={store.morningTime}
               onChange={e => store.update({ morningTime: e.target.value })}
-              className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="text-body2 border border-line rounded-lg px-2 py-1 focus:outline-none focus:border-primary bg-surface text-label"
             />
           </div>
         )}
@@ -91,8 +91,8 @@ export default function NotificationSettings() {
       <Card className="mx-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-gray-900">🌙 저녁 리마인드</p>
-            <p className="text-xs text-gray-400 mt-0.5">미완료 루틴이 있을 때 알려줘요</p>
+            <p className="text-body2 font-semibold text-label-strong">🌙 저녁 리마인드</p>
+            <p className="text-caption1 text-label-alt mt-0.5">미완료 루틴이 있을 때 알려줘요</p>
           </div>
           <Toggle
             enabled={canNotify && store.eveningEnabled}
@@ -102,12 +102,12 @@ export default function NotificationSettings() {
         </div>
         {store.eveningEnabled && canNotify && (
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-xs text-gray-500">알림 시간</span>
+            <span className="text-caption1 text-label-alt">알림 시간</span>
             <input
               type="time"
               value={store.eveningTime}
               onChange={e => store.update({ eveningTime: e.target.value })}
-              className="text-sm border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="text-body2 border border-line rounded-lg px-2 py-1 focus:outline-none focus:border-primary bg-surface text-label"
             />
           </div>
         )}
@@ -117,8 +117,8 @@ export default function NotificationSettings() {
       <Card className="mx-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-gray-900">📋 주간 리뷰 알림</p>
-            <p className="text-xs text-gray-400 mt-0.5">일요일에 주간 리뷰를 상기시켜줘요</p>
+            <p className="text-body2 font-semibold text-label-strong">📋 주간 리뷰 알림</p>
+            <p className="text-caption1 text-label-alt mt-0.5">일요일에 주간 리뷰를 상기시켜줘요</p>
           </div>
           <Toggle
             enabled={canNotify && store.reviewEnabled}
@@ -129,7 +129,7 @@ export default function NotificationSettings() {
       </Card>
 
       {canNotify && (
-        <p className="text-center text-xs text-gray-300 px-4">
+        <p className="text-center text-caption1 text-label-assistive px-4">
           알림은 앱이 열려 있는 동안 예약됩니다
         </p>
       )}
@@ -143,7 +143,7 @@ function Toggle({ enabled, disabled, onChange }: { enabled: boolean; disabled: b
       onClick={() => !disabled && onChange(!enabled)}
       disabled={disabled}
       className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${
-        enabled ? 'bg-indigo-500' : 'bg-gray-200'
+        enabled ? 'bg-primary' : 'bg-fill-strong'
       } ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
     >
       <motion.span

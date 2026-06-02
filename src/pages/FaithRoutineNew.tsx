@@ -87,35 +87,35 @@ export default function FaithRoutineNew() {
     : '신앙 루틴 추가';
 
   return (
-    <div className="min-h-dvh bg-gray-50 flex flex-col">
+    <div className="min-h-dvh bg-surface-alt flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center px-4 pt-5 pb-3 bg-white border-b border-gray-100">
-        <motion.button {...tapSm} onClick={handleBack} className="p-1 -ml-1 text-gray-500">
+      <div className="flex items-center px-4 pt-5 pb-3 bg-surface border-b border-line-soft">
+        <motion.button {...tapSm} onClick={handleBack} className="p-1 -ml-1 text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
-        <h1 className="flex-1 text-center text-base font-bold text-gray-900">{pageTitle}</h1>
+        <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">{pageTitle}</h1>
         <div className="w-8" />
       </div>
 
       {/* ── 선택 화면 ── */}
       {mode === 'choose' && !isEdit && (
         <div className="flex-1 px-4 py-8 flex flex-col gap-4">
-          <p className="text-xs text-gray-400 text-center mb-2">추가 방법을 선택해 주세요</p>
+          <p className="text-caption1 text-label-alt text-center mb-2">추가 방법을 선택해 주세요</p>
           <motion.button {...tap} onClick={() => setMode('template')}
-            className="bg-white border border-gray-100 rounded-2xl px-5 py-5 text-left shadow-sm hover:border-emerald-200 transition-colors">
+            className="bg-surface border border-line rounded-xl px-5 py-5 text-left shadow-emphasize hover:bg-fill transition-colors">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl">📿</span>
-              <p className="text-base font-bold text-gray-900">템플릿 선택</p>
+              <p className="text-body1 font-bold text-label-strong">템플릿 선택</p>
             </div>
-            <p className="text-sm text-gray-500">추천 신앙 루틴 중에서 골라보세요</p>
+            <p className="text-body2 text-label-alt">추천 신앙 루틴 중에서 골라보세요</p>
           </motion.button>
           <motion.button {...tap} onClick={() => setMode('custom')}
-            className="bg-white border border-gray-100 rounded-2xl px-5 py-5 text-left shadow-sm hover:border-emerald-200 transition-colors">
+            className="bg-surface border border-line rounded-xl px-5 py-5 text-left shadow-emphasize hover:bg-fill transition-colors">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl">✏️</span>
-              <p className="text-base font-bold text-gray-900">직접 입력</p>
+              <p className="text-body1 font-bold text-label-strong">직접 입력</p>
             </div>
-            <p className="text-sm text-gray-500">나만의 신앙 루틴을 직접 만들어요</p>
+            <p className="text-body2 text-label-alt">나만의 신앙 루틴을 직접 만들어요</p>
           </motion.button>
         </div>
       )}
@@ -123,23 +123,23 @@ export default function FaithRoutineNew() {
       {/* ── 템플릿 목록 ── */}
       {mode === 'template' && (
         <div className="flex-1 px-4 py-5 flex flex-col gap-3 pb-8">
-          <p className="text-xs text-gray-400">탭해서 세부 설정 후 추가하세요</p>
+          <p className="text-caption1 text-label-alt">탭해서 세부 설정 후 추가하세요</p>
           {faithRoutineTemplates.map(t => {
             const already = !!faithRoutines.find(r => r.title === t.title);
             return (
               <motion.button key={t.id} {...tap} onClick={() => selectTemplate(t)} disabled={already}
-                className={`bg-white border rounded-2xl px-4 py-4 text-left shadow-sm transition-all ${already ? 'border-gray-100 opacity-40 cursor-not-allowed' : 'border-gray-100 hover:border-emerald-300 hover:bg-emerald-50/40'}`}>
+                className={`bg-surface border rounded-xl px-4 py-4 text-left shadow-emphasize transition-all ${already ? 'border-line opacity-40 cursor-not-allowed' : 'border-line hover:border-primary hover:bg-primary-soft/40'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{TEMPLATE_EMOJI[t.title] ?? '🙏'}</span>
                     <div>
-                      <p className="text-sm font-bold text-gray-900">{t.title}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{t.description}</p>
+                      <p className="text-body2 font-bold text-label-strong">{t.title}</p>
+                      <p className="text-caption1 text-label-alt mt-0.5">{t.description}</p>
                     </div>
                   </div>
                   {already
-                    ? <span className="text-xs text-emerald-500 font-medium flex-shrink-0">추가됨</span>
-                    : <Check size={18} className="text-gray-300 flex-shrink-0" />
+                    ? <span className="text-caption1 text-positive font-medium flex-shrink-0">추가됨</span>
+                    : <Check size={18} className="text-label-assistive flex-shrink-0" />
                   }
                 </div>
               </motion.button>
@@ -154,24 +154,24 @@ export default function FaithRoutineNew() {
           <div className="flex-1 px-4 py-5 flex flex-col gap-5 pb-28">
             {/* 이름 */}
             <div>
-              <p className="text-xs font-bold text-gray-500 mb-2">루틴 이름</p>
+              <p className="text-caption1 font-bold text-label-alt mb-2">루틴 이름</p>
               <div className="flex gap-2">
                 <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
                 <input type="text" value={title} onChange={e => setTitle(e.target.value)}
                   placeholder="신앙 루틴 이름"
-                  className="flex-1 h-14 bg-white border border-gray-200 rounded-2xl px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-sm" />
+                  className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,102,255,0.15)] shadow-emphasize transition-all" />
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
               {/* 시간대 */}
-              <div className="px-4 py-4 border-b border-gray-50">
-                <p className="text-xs font-bold text-gray-500 mb-3">시간대 (선택)</p>
+              <div className="px-4 py-4 border-b border-line-soft">
+                <p className="text-caption1 font-bold text-label-alt mb-3">시간대 (선택)</p>
                 <div className="flex gap-2">
                   {TIME_SLOTS.map(ts => (
                     <motion.button key={ts.value} {...tap}
                       onClick={() => setTimeSlot(timeSlot === ts.value ? null : ts.value)}
-                      className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-all ${timeSlot === ts.value ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-gray-200 text-gray-500'}`}>
+                      className={`flex-1 py-2.5 rounded-lg text-body2 font-medium border transition-all ${timeSlot === ts.value ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt'}`}>
                       {ts.emoji} {ts.label}
                     </motion.button>
                   ))}
@@ -181,14 +181,14 @@ export default function FaithRoutineNew() {
               {/* 타이머 토글 */}
               <div className="px-4 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Timer size={18} className="text-emerald-500" />
+                  <Timer size={18} className="text-primary" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">타이머</p>
-                    <p className="text-xs text-gray-400">이 루틴 실행 시 카운트다운</p>
+                    <p className="text-body2 font-semibold text-label-strong">타이머</p>
+                    <p className="text-caption1 text-label-alt">이 루틴 실행 시 카운트다운</p>
                   </div>
                 </div>
                 <button onClick={() => setTimerEnabled(v => !v)}
-                  className={`w-11 h-6 rounded-full transition-colors relative ${timerEnabled ? 'bg-emerald-500' : 'bg-gray-300'}`}>
+                  className={`w-11 h-6 rounded-full transition-colors relative ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}>
                   <motion.div animate={{ x: timerEnabled ? 20 : 2 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     className="absolute top-1 w-4 h-4 rounded-full bg-white shadow" />
@@ -200,7 +200,7 @@ export default function FaithRoutineNew() {
                 {timerEnabled && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-                    className="overflow-hidden border-t border-gray-50">
+                    className="overflow-hidden border-t border-line-soft">
                     <div className="px-4 pb-4 pt-2">
                       <DurationPicker seconds={durationSeconds} onChange={setDurationSeconds} />
                     </div>
@@ -210,11 +210,11 @@ export default function FaithRoutineNew() {
             </div>
           </div>
 
-          <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-white border-t border-gray-100"
+          <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
             style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-            <motion.button whileTap={{ scale: 0.97 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+            <motion.button whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
               onClick={handleSave} disabled={!title.trim()}
-              className="w-full py-4 mt-3 rounded-2xl bg-emerald-500 text-white font-bold text-base disabled:opacity-40 hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-200">
+              className="w-full h-12 mt-3 rounded-lg bg-primary text-white font-bold text-body1 disabled:opacity-30 hover:bg-primary-strong transition-colors">
               {isEdit ? '수정 완료' : '시작하기'}
             </motion.button>
           </div>
