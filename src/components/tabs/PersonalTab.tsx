@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown, Moon } from 'lucide-react';
+import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
+import StampButton from '../ui/StampButton';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import FAB from '../ui/FAB';
@@ -246,43 +247,31 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
             </motion.button>
           )}
 
-          {/* 쉬어가기 버튼 */}
+          {/* 쉬어가기 스탬프 */}
           {!done && (
-            <motion.button
-              whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+            <StampButton
+              label="쉼"
+              active={skipped}
+              activeColor="bg-amber-400 border-amber-400"
+              inkColor="text-white"
+              dryColor="text-amber-500"
+              rotation={9}
               onClick={e => { e.stopPropagation(); skipHabitLog(habit.id); }}
-              className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
-                skipped
-                  ? 'bg-amber-400 border-amber-400'
-                  : 'border-line hover:border-amber-300'
-              }`}
-            >
-              <Moon size={11} className={skipped ? 'text-white' : 'text-label-assistive'} />
-            </motion.button>
+            />
           )}
 
-          {/* 완료 체크 버튼 */}
-          <motion.button
-            whileTap={{ scale: 0.82 }}
-            transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-            onClick={e => { e.stopPropagation(); toggleHabitLog(habit.id); }}
-            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
-              done ? 'bg-primary border-primary'
-              : 'border-line hover:border-primary'
-            }`}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {done && (
-                <motion.svg key="check"
-                  initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 600, damping: 25 }}
-                  width="11" height="9" viewBox="0 0 11 9" fill="none">
-                  <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </motion.svg>
-              )}
-            </AnimatePresence>
-          </motion.button>
+          {/* 완료 스탬프 */}
+          {!skipped && (
+            <StampButton
+              label="완료"
+              active={done}
+              activeColor="bg-primary border-primary"
+              inkColor="text-white"
+              dryColor="text-primary"
+              rotation={-10}
+              onClick={e => { e.stopPropagation(); toggleHabitLog(habit.id); }}
+            />
+          )}
         </div>
 
         <ConfirmModal
