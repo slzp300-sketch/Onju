@@ -3,20 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../store/authStore';
 
-interface KakaoUserResponse {
-  id: number;
-  kakao_account?: {
-    profile?: { nickname?: string };
-    email?: string;
-  };
-}
-
 interface KakaoStatic {
   isInitialized: () => boolean;
   init: (key: string) => void;
   Auth: {
-    login: (options: { success: () => void; fail: () => void }) => void;
-    getAccessToken: () => string | null;
+    authorize: (options: { redirectUri: string }) => void;
   };
 }
 
@@ -84,25 +75,8 @@ export default function Login() {
       setError('카카오 SDK가 아직 로드되지 않았어요. 잠시 후 다시 시도해주세요.');
       return;
     }
-    window.Kakao.Auth.login({
-      success: async () => {
-        try {
-          const accessToken = window.Kakao.Auth.getAccessToken();
-          const res = await fetch('https://kapi.kakao.com/v2/user/me', {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
-          const data = await res.json() as KakaoUserResponse;
-          socialLogin('kakao', {
-            id: String(data.id),
-            name: data.kakao_account?.profile?.nickname ?? '카카오 사용자',
-            email: data.kakao_account?.email,
-          });
-          navigate('/', { replace: true });
-        } catch {
-          setError('카카오 사용자 정보를 불러오지 못했어요.');
-        }
-      },
-      fail: () => setError('카카오 로그인에 실패했어요.'),
+    window.Kakao.Auth.authorize({
+      redirectUri: `${window.location.origin}/auth/kakao/callback`,
     });
   };
 
