@@ -1,4 +1,85 @@
+@import url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css");
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 @import "tailwindcss";
+
+/* ══════════════════════════════════════════
+   Wanted Design System — @theme tokens
+══════════════════════════════════════════ */
+@theme {
+  /* primary */
+  --color-primary: #0066ff;
+  --color-primary-strong: #005eeb;
+  --color-primary-heavy: #0054d1;
+  --color-primary-soft: #eaf2fe;
+
+  /* cool neutral ramp */
+  --color-cool-99: #f7f7f8;
+  --color-cool-98: #f4f4f5;
+  --color-cool-97: #eaebec;
+  --color-cool-95: #dbdcdf;
+  --color-cool-90: #c2c4c8;
+  --color-cool-70: #989ba2;
+  --color-cool-60: #878a93;
+  --color-cool-50: #70737c;
+  --color-cool-30: #46474c;
+  --color-cool-25: #37383c;
+  --color-cool-22: #2e2f33;
+  --color-cool-17: #212225;
+  --color-cool-12: #171719;
+
+  /* text tokens */
+  --color-label: rgba(23,23,25,0.95);
+  --color-label-strong: #171719;
+  --color-label-alt: rgba(55,56,60,0.61);
+  --color-label-assistive: rgba(55,56,60,0.28);
+
+  /* surfaces / lines / fills */
+  --color-surface: #ffffff;
+  --color-surface-alt: #f7f7f8;
+  --color-line: rgba(112,115,124,0.22);
+  --color-line-soft: rgba(112,115,124,0.12);
+  --color-fill: rgba(112,115,124,0.08);
+  --color-fill-strong: rgba(112,115,124,0.16);
+
+  /* status */
+  --color-positive: #00bf40;
+  --color-cautionary: #ff9200;
+  --color-negative: #ff4242;
+
+  /* fonts */
+  --font-brand: "Wanted Sans", "Wanted Sans Variable", "Pretendard", system-ui, sans-serif;
+  --font-ui: "Pretendard", "Pretendard JP", "Wanted Sans", system-ui, sans-serif;
+
+  /* border-radius */
+  --radius: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+
+  /* shadows */
+  --shadow-emphasize: 0px 4px 6px -1px rgba(23,23,23,0.06), 0px 2px 4px -2px rgba(23,23,23,0.06);
+  --shadow-strong: 0px 10px 15px -3px rgba(23,23,23,0.07), 0px 4px 6px -2px rgba(0,0,0,0.07);
+  --shadow-heavy: 0px 16px 24px -6px rgba(23,23,23,0.08), 0px 6px 10px -4px rgba(23,23,23,0.08);
+  --shadow-overlay: 0px 24px 38px -10px rgba(23,23,23,0.12), 0px 10px 15px -5px rgba(23,23,23,0.1);
+
+  /* type scale */
+  --text-display1: 56px;
+  --text-display2: 40px;
+  --text-title1: 36px;
+  --text-title2: 28px;
+  --text-title3: 24px;
+  --text-heading1: 22px;
+  --text-heading2: 20px;
+  --text-headline1: 17px;
+  --text-body1: 16px;
+  --text-body2: 15px;
+  --text-label1: 14px;
+  --text-label2: 13px;
+  --text-caption1: 12px;
+  --text-caption2: 11px;
+}
 
 * {
   box-sizing: border-box;
@@ -7,10 +88,11 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+  font-family: var(--font-ui);
+  color: var(--color-label);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f9fafb;
+  background-color: var(--color-surface-alt);
   overscroll-behavior: none;
 }
 
@@ -19,21 +101,32 @@ body {
   min-height: 100dvh;
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .input-base {
   width: 100%;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  height: 48px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 0 14px;
+  font-size: var(--text-body2);
+  font-family: var(--font-ui);
+  color: var(--color-label);
   outline: none;
-  background: white;
+  background: var(--color-surface);
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.input-base::placeholder {
+  color: var(--color-label-assistive);
 }
 
 .input-base:focus {
-  ring: 2px;
-  border-color: #818cf8;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
 }
 
 /* iOS safe area — 하단 네비게이션이 홈 바 위에 표시되도록 */
@@ -43,152 +136,143 @@ body {
 
 /* ══════════════════════════════════════════
    테마 CSS 변수
+   --t-* : 레거시 surface/text 토큰 (마이그레이션 중 유지)
+   --color-primary : Wanted primary → 테마별 오버라이드
 ══════════════════════════════════════════ */
 
-/* 라이트 (기본) */
+/* 라이트 (기본) — Wanted 토큰 그대로 */
 :root, [data-theme="light"] {
-  --t-bg: #f7f8fa;
+  --t-bg: #f7f7f8;
   --t-card: #ffffff;
-  --t-card2: #f1f3f5;
-  --t-border: #eeeff2;
-  --t-border2: #e2e4e9;
-  --t-text1: #1a1d23;
-  --t-text2: #3d424f;
-  --t-text3: #6e7585;
-  --t-text4: #9ea5b4;
-  --t-text5: #cdd1da;
-  --t-accent: #6366f1;
-  --t-accent-bg: #f0f0fe;
-  --t-accent-text: #5254cc;
-  --t-accent-border: #c8c9f7;
+  --t-card2: #f4f4f5;
+  --t-border: rgba(112,115,124,0.22);
+  --t-border2: rgba(112,115,124,0.16);
+  --t-text1: #171719;
+  --t-text2: rgba(23,23,25,0.95);
+  --t-text3: rgba(55,56,60,0.61);
+  --t-text4: rgba(55,56,60,0.28);
+  --t-text5: rgba(55,56,60,0.16);
   --t-nav-bg: rgba(255,255,255,0.96);
-  --t-divide: #f1f3f5;
+  --t-divide: rgba(112,115,124,0.12);
 }
 
-/* 다크 — 부드러운 다크, 너무 검지 않게 */
+/* 다크 — 부드러운 다크 */
 [data-theme="dark"] {
   --t-bg: #1c1e26;
   --t-card: #252830;
   --t-card2: #2e3240;
-  --t-border: #2e3240;
-  --t-border2: #3a3f52;
+  --t-border: rgba(196,200,214,0.18);
+  --t-border2: rgba(196,200,214,0.28);
   --t-text1: #e8eaf0;
-  --t-text2: #c4c8d6;
-  --t-text3: #8b90a4;
-  --t-text4: #5e6278;
-  --t-text5: #44485c;
-  --t-accent: #7c7ff5;
-  --t-accent-bg: #22243a;
-  --t-accent-text: #9b9ef7;
-  --t-accent-border: #3a3d6a;
+  --t-text2: rgba(228,234,240,0.95);
+  --t-text3: rgba(196,200,214,0.65);
+  --t-text4: rgba(139,144,164,0.55);
+  --t-text5: rgba(94,98,120,0.6);
   --t-nav-bg: rgba(28,30,38,0.97);
-  --t-divide: #252830;
+  --t-divide: rgba(196,200,214,0.1);
+
+  /* Wanted 토큰 오버라이드 — 다크에서 violet/indigo 계열 */
+  --color-primary: #7c7ff5;
+  --color-primary-strong: #6b6ef0;
+  --color-primary-heavy: #5a5de0;
+  --color-primary-soft: #22243a;
+  --color-surface: #252830;
+  --color-surface-alt: #1c1e26;
+  --color-label-strong: #e8eaf0;
+  --color-label: rgba(228,234,240,0.95);
+  --color-label-alt: rgba(196,200,214,0.65);
+  --color-label-assistive: rgba(139,144,164,0.45);
+  --color-line: rgba(196,200,214,0.18);
+  --color-line-soft: rgba(196,200,214,0.1);
+  --color-fill: rgba(196,200,214,0.08);
+  --color-fill-strong: rgba(196,200,214,0.14);
 }
 
-/* 로즈 — 선명한 로즈핑크 */
+/* 로즈 — 로즈핑크 액센트 */
 [data-theme="rose"] {
   --t-bg: #fdf0f2;
   --t-card: #ffffff;
   --t-card2: #fce4e8;
-  --t-border: #f9d6dc;
-  --t-border2: #f2b8c2;
+  --t-border: rgba(212,84,106,0.18);
+  --t-border2: rgba(212,84,106,0.28);
   --t-text1: #2d1a1e;
-  --t-text2: #4f2d34;
-  --t-text3: #8a5460;
-  --t-text4: #b8858e;
-  --t-text5: #dcbbc0;
-  --t-accent: #d4546a;
-  --t-accent-bg: #fde8ec;
-  --t-accent-text: #b83a52;
-  --t-accent-border: #f0a0b0;
+  --t-text2: rgba(45,26,30,0.95);
+  --t-text3: rgba(138,84,96,0.7);
+  --t-text4: rgba(184,133,142,0.65);
+  --t-text5: rgba(220,187,192,0.6);
   --t-nav-bg: rgba(255,255,255,0.97);
-  --t-divide: #fce4e8;
+  --t-divide: rgba(252,228,232,0.8);
+
+  /* Wanted 토큰 오버라이드 — 로즈 */
+  --color-primary: #d4546a;
+  --color-primary-strong: #b83a52;
+  --color-primary-heavy: #9a2840;
+  --color-primary-soft: #fde8ec;
+  --color-surface-alt: #fdf0f2;
 }
 
-/* 포레스트 — 채도 낮춘 세이지/올리브그린 */
+/* 포레스트 — 세이지/올리브그린 액센트 */
 [data-theme="forest"] {
   --t-bg: #f2f5f0;
   --t-card: #fafcf9;
   --t-card2: #e6ede2;
-  --t-border: #dde6d8;
-  --t-border2: #ccd8c6;
+  --t-border: rgba(94,143,106,0.2);
+  --t-border2: rgba(94,143,106,0.3);
   --t-text1: #1e2a1a;
-  --t-text2: #364530;
-  --t-text3: #617558;
-  --t-text4: #8fa386;
-  --t-text5: #bfccba;
-  --t-accent: #5e8f6a;
-  --t-accent-bg: #e4ede0;
-  --t-accent-text: #4a7356;
-  --t-accent-border: #9dbf97;
+  --t-text2: rgba(30,42,26,0.95);
+  --t-text3: rgba(97,117,88,0.7);
+  --t-text4: rgba(143,163,134,0.65);
+  --t-text5: rgba(191,204,186,0.6);
   --t-nav-bg: rgba(250,252,249,0.97);
-  --t-divide: #e6ede2;
+  --t-divide: rgba(230,237,226,0.8);
+
+  /* Wanted 토큰 오버라이드 — 포레스트 */
+  --color-primary: #5e8f6a;
+  --color-primary-strong: #4a7356;
+  --color-primary-heavy: #3a5e44;
+  --color-primary-soft: #e4ede0;
+  --color-surface-alt: #f2f5f0;
 }
 
 /* ══════════════════════════════════════════
-   테마 오버라이드 — 공통 (라이트 제외)
+   공통 테마 오버라이드 (라이트 제외)
+   레거시 Tailwind 색상 클래스 → 테마 토큰
 ══════════════════════════════════════════ */
 [data-theme="dark"],
 [data-theme="rose"],
 [data-theme="forest"] {
-
-  /* 페이지/배경 */
   body { background-color: var(--t-bg) !important; }
+
   .bg-gray-50 { background-color: var(--t-bg) !important; }
   .bg-white { background-color: var(--t-card) !important; }
   .bg-gray-100 { background-color: var(--t-card2) !important; }
 
-  /* 텍스트 */
   .text-gray-900 { color: var(--t-text1) !important; }
   .text-gray-800 { color: var(--t-text2) !important; }
   .text-gray-700, .text-gray-600 { color: var(--t-text3) !important; }
   .text-gray-500, .text-gray-400 { color: var(--t-text4) !important; }
   .text-gray-300, .text-gray-200 { color: var(--t-text5) !important; }
 
-  /* 보더 */
   .border-gray-100 { border-color: var(--t-border) !important; }
   .border-gray-200, .border-gray-50 { border-color: var(--t-border2) !important; }
   .divide-gray-50 > * + *, .divide-gray-100 > * + * { border-color: var(--t-divide) !important; }
   .border-t, .border-b { border-color: var(--t-border) !important; }
-  .border-y { border-top-color: var(--t-border) !important; border-bottom-color: var(--t-border) !important; }
 
-  /* 네비게이션 */
   nav.fixed {
     background-color: var(--t-nav-bg) !important;
     border-top-color: var(--t-border) !important;
   }
 
-  /* 입력 */
   input:not([type="range"]), textarea {
     background-color: var(--t-card) !important;
     color: var(--t-text1) !important;
     border-color: var(--t-border2) !important;
   }
-  input::placeholder, textarea::placeholder { color: var(--t-text5) !important; }
-
-  /* 인디고 계열 → 테마 액센트로 */
-  .bg-indigo-500, .bg-indigo-600 { background-color: var(--t-accent) !important; }
-  .bg-indigo-50 { background-color: var(--t-accent-bg) !important; }
-  .bg-indigo-100 { background-color: var(--t-accent-bg) !important; }
-  .text-indigo-600, .text-indigo-500, .text-indigo-700 { color: var(--t-accent-text) !important; }
-  .text-indigo-400 { color: var(--t-accent) !important; }
-  .border-indigo-100, .border-indigo-200, .border-indigo-300 { border-color: var(--t-accent-border) !important; }
-  .ring-indigo-400, .ring-indigo-300 { --tw-ring-color: var(--t-accent) !important; }
-  .shadow-indigo-200 { --tw-shadow-color: transparent !important; }
-
-  /* 에메랄드 계열 → 테마에 따라 조정 */
-  .bg-emerald-50 { background-color: var(--t-accent-bg) !important; }
-
-  /* 바이올렛(통계) → 액센트 색으로 */
-  .bg-violet-50 { background-color: var(--t-accent-bg) !important; }
-  .text-violet-500, .text-violet-600 { color: var(--t-accent-text) !important; }
-
-  /* 주간 달성 바 */
-  .bg-indigo-400, .bg-indigo-300 { background-color: var(--t-accent) !important; opacity: 0.85; }
+  input::placeholder, textarea::placeholder { color: var(--t-text4) !important; }
 }
 
 /* ══════════════════════════════════════════
-   다크 전용
+   다크 전용 보조 오버라이드
 ══════════════════════════════════════════ */
 [data-theme="dark"] {
   .bg-gray-800 { background-color: #151720 !important; }
@@ -197,95 +281,51 @@ body {
   .bg-white\/10 { background-color: rgba(255,255,255,0.08) !important; }
   .bg-white\/20 { background-color: rgba(255,255,255,0.12) !important; }
 
-  /* 에메랄드 → 다크에서도 부드럽게 */
   .bg-emerald-50, .bg-emerald-100 { background-color: #1a2e26 !important; }
   .text-emerald-500, .text-emerald-600, .text-emerald-400 { color: #6ee7b7 !important; }
   .bg-emerald-500, .bg-emerald-400 { background-color: #2d7a5e !important; }
   .border-emerald-200, .border-emerald-300 { border-color: #2d4a3e !important; }
 
-  /* 오렌지(스트릭) */
   .bg-orange-50 { background-color: #2a1e10 !important; }
   .text-orange-500, .text-orange-400 { color: #fb923c !important; }
 
-  /* 앰버(경고) */
   .bg-amber-50 { background-color: #271f0a !important; }
   .text-amber-700, .text-amber-600 { color: #fbbf24 !important; }
   .border-amber-100 { border-color: #3a2d10 !important; }
 
-  /* 빨강(삭제/에러) */
   .text-red-400 { color: #f87171 !important; }
-
-  /* 그라디언트 카드(월간리포트) */
-  .from-indigo-600 { --tw-gradient-from: #3730a3 !important; }
-  .to-indigo-800 { --tw-gradient-to: #1e1b4b !important; }
-
-  /* 입력 포커스 */
-  .focus\:ring-2:focus { --tw-ring-color: var(--t-accent) !important; }
-
-  /* 달력/히트맵 */
   .bg-gray-950 { background-color: #0d0f17 !important; }
   .bg-gray-700 { background-color: #2e3240 !important; }
 }
 
 /* ══════════════════════════════════════════
-   로즈 전용
+   로즈 전용 보조 오버라이드
 ══════════════════════════════════════════ */
 [data-theme="rose"] {
-  /* 에메랄드 → 로즈에서 분홍/모브로 */
   .bg-emerald-50, .bg-emerald-100 { background-color: #fce8ec !important; }
   .text-emerald-500, .text-emerald-600 { color: #b83a52 !important; }
   .bg-emerald-500, .bg-emerald-400 { background-color: #d4546a !important; }
   .border-emerald-200, .border-emerald-300 { border-color: #f0a0b0 !important; }
-
-  /* 오렌지(스트릭) */
   .bg-orange-50 { background-color: #fff0f2 !important; }
   .text-orange-500 { color: #d4546a !important; }
-
-  /* 앰버(경고) */
   .bg-amber-50 { background-color: #fef6f0 !important; }
   .text-amber-700 { color: #9a4a30 !important; }
   .border-amber-100 { border-color: #f9d4c0 !important; }
-
-  /* 빨강 */
   .text-red-400 { color: #c0434a !important; }
-
-  /* 그라디언트 */
-  .from-indigo-600 { --tw-gradient-from: #c0546a !important; }
-  .to-indigo-800 { --tw-gradient-to: #8a2840 !important; }
-
-  /* FAB */
-  .bg-indigo-500 { background-color: #d4546a !important; }
-
-  /* 그린 바(주간 달성) */
-  .bg-emerald-400.rounded-full { background-color: #d4546a !important; }
 }
 
 /* ══════════════════════════════════════════
-   포레스트 전용
+   포레스트 전용 보조 오버라이드
 ══════════════════════════════════════════ */
 [data-theme="forest"] {
-  /* 에메랄드 → 포레스트에서 같은 계열 살짝 다르게 */
   .bg-emerald-50, .bg-emerald-100 { background-color: #e2ede0 !important; }
   .text-emerald-500, .text-emerald-600 { color: #3d7a50 !important; }
   .bg-emerald-500, .bg-emerald-400 { background-color: #5e8f6a !important; }
   .border-emerald-200, .border-emerald-300 { border-color: #9dbf97 !important; }
-
-  /* 오렌지(스트릭) */
   .bg-orange-50 { background-color: #f5f0e8 !important; }
   .text-orange-500 { color: #8a6a30 !important; }
-
-  /* 앰버(경고) */
   .bg-amber-50 { background-color: #f7f3e8 !important; }
   .text-amber-700 { color: #7a5e20 !important; }
   .border-amber-100 { border-color: #e0d4a8 !important; }
-
-  /* 빨강 */
   .text-red-400 { color: #a05050 !important; }
-
-  /* 그라디언트 */
-  .from-indigo-600 { --tw-gradient-from: #3a7a50 !important; }
-  .to-indigo-800 { --tw-gradient-to: #1e4a30 !important; }
-
-  /* FAB */
-  .bg-indigo-500 { background-color: #5e8f6a !important; }
 }
