@@ -55,7 +55,8 @@ export default function PersonalRoutineNew() {
   const toggle = (hId: string) => {
     setSelectedIds(ids => ids.includes(hId) ? ids.filter(x => x !== hId) : [...ids, hId]);
     if (!habitDurations[hId]) {
-      setHabitDurations(prev => ({ ...prev, [hId]: 60 }));
+      const habit = habits.find(h => h.id === hId);
+      setHabitDurations(prev => ({ ...prev, [hId]: habit?.durationSeconds ?? 60 }));
     }
   };
 
@@ -183,17 +184,30 @@ export default function PersonalRoutineNew() {
                 </SortableContext>
               </DndContext>
 
-              {habits.filter(h => !selectedIds.includes(h.id)).map(h => (
-                <motion.button key={h.id} {...tap} onClick={() => toggle(h.id)}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:bg-fill transition-colors">
-                  <div className="w-7 h-7 rounded-full border-2 border-line flex-shrink-0" />
-                  <span className="text-2xl">{h.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-body2 font-semibold text-label">{h.title}</p>
-                    {h.when && <p className="text-caption1 text-label-alt truncate">{h.when}</p>}
-                  </div>
-                </motion.button>
-              ))}
+              {habits.filter(h => !selectedIds.includes(h.id)).map(h => {
+                const secs = h.durationSeconds;
+                const durLabel = secs
+                  ? secs >= 60
+                    ? `${Math.floor(secs / 60)}분${secs % 60 > 0 ? ` ${secs % 60}초` : ''}`
+                    : `${secs}초`
+                  : null;
+                return (
+                  <motion.button key={h.id} {...tap} onClick={() => toggle(h.id)}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:bg-fill transition-colors">
+                    <div className="w-7 h-7 rounded-full border-2 border-line flex-shrink-0" />
+                    <span className="text-2xl">{h.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-body2 font-semibold text-label">{h.title}</p>
+                      {h.when && <p className="text-caption1 text-label-alt truncate">{h.when}</p>}
+                    </div>
+                    {durLabel && (
+                      <span className="text-caption2 font-semibold text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0">
+                        ⏱ {durLabel}
+                      </span>
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
           )}
         </div>

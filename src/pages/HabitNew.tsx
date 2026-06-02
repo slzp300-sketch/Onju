@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 import { AlarmTimeSheet, AlarmTypeSheet } from '../components/ui/HabitAlarmSheet';
 import { to12h } from '../utils/alarmTime';
+import DurationPicker from '../components/ui/DurationPicker';
+import { Timer } from 'lucide-react';
 import { useNotificationStore } from '../store/notificationStore';
 
 const tap = { whileTap: { scale: 0.98 }, transition: { duration: 0.12 } };
@@ -34,6 +36,10 @@ export default function HabitNew() {
   const [freq, setFreq] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [customDays, setCustomDays] = useState<number[]>(existing?.customDays ?? []);
   const [when, setWhen] = useState(existing?.when ?? '');
+
+  // 타이머
+  const [timerEnabled, setTimerEnabled] = useState(!!(existing?.durationSeconds));
+  const [durationSecs, setDurationSecs] = useState(existing?.durationSeconds ?? 300);
 
   // 알림
   const [notifEnabled, setNotifEnabled] = useState(existing?.notification?.enabled ?? false);
@@ -78,6 +84,7 @@ export default function HabitNew() {
       title: title.trim(), emoji, frequency: freq,
       ...(freq === 'custom' ? { customDays } : {}),
       when: when.trim(),
+      durationSeconds: timerEnabled ? durationSecs : undefined,
       notification: notifEnabled
         ? { enabled: true, type: notifType, times: notifTimes }
         : undefined,
@@ -197,6 +204,44 @@ export default function HabitNew() {
                         <ChevronRight size={16} className="text-label-assistive" />
                       </motion.button>
                     </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* 타이머 */}
+          <div className="border-b border-line-soft">
+            <div className="px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Timer size={20} className="text-primary" />
+                  <div>
+                    <p className="text-body2 font-semibold text-label-strong">타이머</p>
+                    <p className="text-caption1 text-label-alt">루틴 생성 시 자동으로 적용돼요</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setTimerEnabled(v => !v)}
+                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}
+                >
+                  <motion.div
+                    animate={{ x: timerEnabled ? 20 : 2 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none"
+                  />
+                </button>
+              </div>
+              <AnimatePresence>
+                {timerEnabled && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden mt-3"
+                  >
+                    <DurationPicker seconds={durationSecs} onChange={setDurationSecs} />
                   </motion.div>
                 )}
               </AnimatePresence>

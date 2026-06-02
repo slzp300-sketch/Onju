@@ -172,6 +172,7 @@ export interface Habit {
   frequency: HabitFrequency;
   customDays?: number[]; // 0=일 ~ 6=토, frequency==='custom'일 때
   when: string; // 사용자 입력 텍스트 ("아침 기상 후", "출근 전" 등)
+  durationSeconds?: number; // 타이머 시간 (초)
   notification?: HabitNotification;
   createdAt: string;
 }
