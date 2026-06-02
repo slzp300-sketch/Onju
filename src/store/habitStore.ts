@@ -7,6 +7,7 @@ interface HabitLog {
   habitId: string;
   date: string; // YYYY-MM-DD
   completed: boolean;
+  skipped?: boolean; // 쉬어가기 (completed와 상호배타)
 }
 
 interface HabitState {
@@ -23,7 +24,9 @@ interface HabitState {
   updatePersonalRoutine: (id: string, patch: Partial<PersonalRoutine>) => void;
 
   toggleHabitLog: (habitId: string, date?: string) => void;
+  skipHabitLog: (habitId: string, date?: string) => void;
   isHabitCompleted: (habitId: string, date?: string) => boolean;
+  isHabitSkipped: (habitId: string, date?: string) => boolean;
 }
 
 export const useHabitStore = create<HabitState>()(
@@ -54,9 +57,28 @@ export const useHabitStore = create<HabitState>()(
         const { habitLogs } = get();
         const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
         if (existing) {
-          set({ habitLogs: habitLogs.map(l => l.habitId === habitId && l.date === d ? { ...l, completed: !l.completed } : l) });
+          set({ habitLogs: habitLogs.map(l =>
+            l.habitId === habitId && l.date === d
+              ? { ...l, completed: !l.completed, skipped: false }
+              : l
+          )});
         } else {
-          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: true }] });
+          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: true, skipped: false }] });
+        }
+      },
+
+      skipHabitLog: (habitId, date) => {
+        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const { habitLogs } = get();
+        const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
+        if (existing) {
+          set({ habitLogs: habitLogs.map(l =>
+            l.habitId === habitId && l.date === d
+              ? { ...l, skipped: !l.skipped, completed: false }
+              : l
+          )});
+        } else {
+          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: false, skipped: true }] });
         }
       },
 
@@ -64,6 +86,12 @@ export const useHabitStore = create<HabitState>()(
         const d = date ?? format(new Date(), 'yyyy-MM-dd');
         const log = get().habitLogs.find(l => l.habitId === habitId && l.date === d);
         return log?.completed ?? false;
+      },
+
+      isHabitSkipped: (habitId, date) => {
+        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const log = get().habitLogs.find(l => l.habitId === habitId && l.date === d);
+        return log?.skipped ?? false;
       },
     }),
     { name: 'habit-store' }

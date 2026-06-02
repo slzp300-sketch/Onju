@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trash2, BookOpen, Play, Timer } from 'lucide-react';
+import { Trash2, BookOpen, Play, Timer, Moon } from 'lucide-react';
 import ConfirmModal from '../ui/ConfirmModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -119,18 +119,19 @@ function FaithRoutineRow({ routine, index, onRemove }: {
   index: number;
   onRemove: () => void;
 }) {
-  const { toggleRoutineLog, isCompleted } = useRoutineStore();
+  const { toggleRoutineLog, skipRoutineLog, isCompleted, isSkipped } = useRoutineStore();
   const navigate = useNavigate();
   const [focusOpen, setFocusOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const done = isCompleted(routine.id);
+  const skipped = isSkipped(routine.id);
 
   return (
     <>
       <motion.div
         layout
         onClick={() => navigate(`/faith-routines/edit/${routine.id}`)}
-        className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${done ? 'opacity-70' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
       >
         {/* 번호 */}
         <span className={`text-caption2 font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
@@ -138,16 +139,25 @@ function FaithRoutineRow({ routine, index, onRemove }: {
         </span>
 
         {/* 이모지 아이콘 (장식) */}
-        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${done ? 'bg-emerald-50' : 'bg-fill'}`}>
+        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${
+          done ? 'bg-emerald-50' : skipped ? 'bg-amber-50' : 'bg-fill'
+        }`}>
           {routine.emoji ?? (done ? '🙏' : '✝️')}
         </div>
 
         {/* 텍스트 */}
         <div className="flex-1 min-w-0">
-          <p className={`text-label1 font-semibold truncate ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
+          <p className={`text-label1 font-semibold truncate ${
+            done ? 'line-through text-label-alt'
+            : skipped ? 'line-through text-label-assistive'
+            : 'text-label-strong'
+          }`}>
             {routine.title}
           </p>
-          {routine.durationSeconds && !done && (
+          {skipped && (
+            <p className="text-[11px] text-amber-400 font-medium mt-0.5">오늘 쉬어가요 ☁️</p>
+          )}
+          {routine.durationSeconds && !done && !skipped && (
             <p className="text-[11px] text-emerald-500 font-medium mt-0.5 flex items-center gap-0.5">
               <Timer size={10} />
               {routine.durationSeconds >= 60
@@ -159,7 +169,7 @@ function FaithRoutineRow({ routine, index, onRemove }: {
 
         {/* 오른쪽: 포커스 시작 + 수정/삭제 + 체크 */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          {!done && (
+          {!done && !skipped && (
             <>
               <motion.button
                 whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
@@ -173,6 +183,19 @@ function FaithRoutineRow({ routine, index, onRemove }: {
                 <Trash2 size={13} />
               </motion.button>
             </>
+          )}
+
+          {/* 쉬어가기 버튼 */}
+          {!done && (
+            <motion.button
+              whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+              onClick={e => { e.stopPropagation(); skipRoutineLog(routine.id); }}
+              className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
+                skipped ? 'bg-amber-400 border-amber-400' : 'border-line hover:border-amber-300'
+              }`}
+            >
+              <Moon size={11} className={skipped ? 'text-white' : 'text-label-assistive'} />
+            </motion.button>
           )}
 
           {/* 체크 버튼 */}

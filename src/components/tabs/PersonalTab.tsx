@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
+import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import FAB from '../ui/FAB';
 import ConfirmModal from '../ui/ConfirmModal';
+import HabitFocusMode from '../routines/HabitFocusMode';
 import { useHabitStore } from '../../store/habitStore';
 import type { Habit } from '../../types';
 import { format } from 'date-fns';
@@ -86,16 +87,17 @@ export default function PersonalTab() {
 
 /* ── 루틴 그룹 (접기/펼치기 + 진행률) ── */
 function RoutineGroup({ routineId }: { routineId: string }) {
-  const { habits, personalRoutines, removePersonalRoutine, isHabitCompleted } = useHabitStore();
+  const { habits, personalRoutines, removePersonalRoutine, isHabitCompleted, isHabitSkipped } = useHabitStore();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const routine = personalRoutines.find(r => r.id === routineId);
   if (!routine) return null;
-
   const routineHabits = routine.habitIds.map(id => habits.find(h => h.id === id)).filter(Boolean) as Habit[];
-  const completedCount = routineHabits.filter(h => isHabitCompleted(h.id, todayStr())).length;
+  const completedCount = routineHabits.filter(h =>
+    isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr())
+  ).length;
   const allDone = completedCount === routineHabits.length && routineHabits.length > 0;
 
   return (
@@ -180,90 +182,129 @@ function RoutineGroup({ routineId }: { routineId: string }) {
 
 /* ── 개별 습관 행 ── */
 function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: number; inRoutine?: boolean }) {
-  const { toggleHabitLog, isHabitCompleted, removeHabit } = useHabitStore();
+  const { toggleHabitLog, skipHabitLog, isHabitCompleted, isHabitSkipped, removeHabit } = useHabitStore();
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [focusOpen, setFocusOpen] = useState(false);
   const done = isHabitCompleted(habit.id, todayStr());
+  const skipped = isHabitSkipped(habit.id, todayStr());
 
   return (
-    <motion.div
-      layout
-      onClick={() => navigate(`/habits/edit/${habit.id}`)}
-      className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${done ? 'opacity-70' : ''}`}
-    >
-      {/* 번호 */}
-      <span className={`text-caption2 font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
-        {index}
-      </span>
+    <>
+      <motion.div
+        layout
+        onClick={() => navigate(`/habits/edit/${habit.id}`)}
+        className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
+      >
+        {/* 번호 */}
+        <span className={`text-caption2 font-bold w-5 text-center flex-shrink-0 ${(done || skipped) ? 'text-label-assistive' : 'text-label-alt'}`}>
+          {index}
+        </span>
 
-      {/* 이모지 (장식용) */}
-      <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${done ? 'bg-primary-soft' : 'bg-fill'}`}>
-        {habit.emoji}
-      </div>
+        {/* 이모지 */}
+        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${
+          done ? 'bg-primary-soft' : skipped ? 'bg-amber-50' : 'bg-fill'
+        }`}>
+          {habit.emoji}
+        </div>
 
-      {/* 텍스트 */}
-      <div className="flex-1 min-w-0">
-        <p className={`text-label1 font-semibold truncate ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
-          {habit.title}
-        </p>
-        {habit.when && (
-          <p className="text-[11px] text-label-alt mt-0.5 truncate">{habit.when}</p>
-        )}
-      </div>
+        {/* 텍스트 */}
+        <div className="flex-1 min-w-0">
+          <p className={`text-label1 font-semibold truncate ${
+            done ? 'line-through text-label-alt'
+            : skipped ? 'line-through text-label-assistive'
+            : 'text-label-strong'
+          }`}>
+            {habit.title}
+          </p>
+          {skipped && (
+            <p className="text-[11px] text-amber-400 font-medium mt-0.5">오늘 쉬어가요 ☁️</p>
+          )}
+          {!skipped && habit.when && (
+            <p className="text-[11px] text-label-alt mt-0.5 truncate">{habit.when}</p>
+          )}
+        </div>
 
-      {/* 오른쪽: 삭제 + 체크 버튼 */}
-      <div className="flex items-center gap-1.5 flex-shrink-0">
-        {!done && !inRoutine && (
-          <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-            onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
-            className="text-gray-200 hover:text-red-400 transition-colors p-1">
-            <Trash2 size={13} />
-          </motion.button>
-        )}
+        {/* 오른쪽 버튼들 */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {!done && !skipped && !inRoutine && (
+            <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+              onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
+              className="text-gray-200 hover:text-red-400 transition-colors p-1">
+              <Trash2 size={13} />
+            </motion.button>
+          )}
 
-        {/* 체크 버튼 */}
-        <motion.button
-          whileTap={{ scale: 0.82 }}
-          transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-          onClick={e => { e.stopPropagation(); toggleHabitLog(habit.id); }}
-          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
-            done
-              ? 'bg-primary border-primary'
+          {/* 타이머 버튼 (durationSeconds 있을 때만) */}
+          {!done && !skipped && habit.durationSeconds && (
+            <motion.button
+              whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+              onClick={e => { e.stopPropagation(); setFocusOpen(true); }}
+              className="w-7 h-7 rounded-full bg-primary-soft text-primary flex items-center justify-center"
+            >
+              <Play size={10} fill="currentColor" />
+            </motion.button>
+          )}
+
+          {/* 쉬어가기 버튼 */}
+          {!done && (
+            <motion.button
+              whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+              onClick={e => { e.stopPropagation(); skipHabitLog(habit.id); }}
+              className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
+                skipped
+                  ? 'bg-amber-400 border-amber-400'
+                  : 'border-line hover:border-amber-300'
+              }`}
+            >
+              <Moon size={11} className={skipped ? 'text-white' : 'text-label-assistive'} />
+            </motion.button>
+          )}
+
+          {/* 완료 체크 버튼 */}
+          <motion.button
+            whileTap={{ scale: 0.82 }}
+            transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+            onClick={e => { e.stopPropagation(); toggleHabitLog(habit.id); }}
+            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
+              done ? 'bg-primary border-primary'
               : 'border-line hover:border-primary'
-          }`}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {done && (
-              <motion.svg
-                key="check"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 600, damping: 25 }}
-                width="11" height="9" viewBox="0 0 11 9" fill="none"
-              >
-                <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </motion.svg>
-            )}
-          </AnimatePresence>
-        </motion.button>
-      </div>
+            }`}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {done && (
+                <motion.svg key="check"
+                  initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 600, damping: 25 }}
+                  width="11" height="9" viewBox="0 0 11 9" fill="none">
+                  <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </motion.svg>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
 
-      <ConfirmModal
-        isOpen={confirmDelete}
-        title={`'${habit.title}' 습관을 삭제할까요?`}
-        message="삭제하면 되돌릴 수 없어요."
-        onConfirm={() => { removeHabit(habit.id); setConfirmDelete(false); }}
-        onCancel={() => setConfirmDelete(false)}
-      />
-    </motion.div>
+        <ConfirmModal
+          isOpen={confirmDelete}
+          title={`'${habit.title}' 습관을 삭제할까요?`}
+          message="삭제하면 되돌릴 수 없어요."
+          onConfirm={() => { removeHabit(habit.id); setConfirmDelete(false); }}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      </motion.div>
+
+      <AnimatePresence>
+        {focusOpen && <HabitFocusMode habit={habit} onClose={() => setFocusOpen(false)} />}
+      </AnimatePresence>
+    </>
   );
 }
 
 /* ── 완료 뱃지 헬퍼 ── */
 function CompletedBadge({ habits }: { habits: Habit[] }) {
-  const { isHabitCompleted } = useHabitStore();
-  const done = habits.filter(h => isHabitCompleted(h.id, todayStr())).length;
+  const { isHabitCompleted, isHabitSkipped } = useHabitStore();
+  const done = habits.filter(h => isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr())).length;
   const allDone = done === habits.length;
   return (
     <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>

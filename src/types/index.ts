@@ -73,6 +73,7 @@ export interface RoutineLog {
   userId: string;
   date: string; // YYYY-MM-DD
   completed: boolean;
+  skipped?: boolean; // 쉬어가기 (completed와 상호배타)
   memo?: string;
   completedAt?: string;
 }

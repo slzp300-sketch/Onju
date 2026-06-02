@@ -8,8 +8,10 @@ interface RoutineState {
   faithRoutines: DailyRoutine[];
   logs: RoutineLog[];
   toggleRoutineLog: (routineId: string, date?: string) => void;
+  skipRoutineLog: (routineId: string, date?: string) => void;
   reorderRoutines: (type: 'personal' | 'faith', oldIndex: number, newIndex: number) => void;
   isCompleted: (routineId: string, date?: string) => boolean;
+  isSkipped: (routineId: string, date?: string) => boolean;
   addRoutine: (routine: DailyRoutine) => void;
   removeRoutine: (id: string) => void;
   deactivateRoutine: (id: string) => void;
@@ -65,12 +67,36 @@ export const useRoutineStore = create<RoutineState>()(
         set({ [key]: routines.map((r, i) => ({ ...r, order: i })) });
       },
 
+      skipRoutineLog: (routineId, date) => {
+        const today = date ?? format(new Date(), 'yyyy-MM-dd');
+        const { logs } = get();
+        const existing = logs.find(l => l.routineId === routineId && l.date === today);
+        if (existing) {
+          set({ logs: logs.map(l =>
+            l.routineId === routineId && l.date === today
+              ? { ...l, skipped: !l.skipped, completed: false, completedAt: undefined }
+              : l
+          )});
+        } else {
+          set({ logs: [...logs, {
+            id: `log-${Date.now()}`, routineId, userId: 'user-1',
+            date: today, completed: false, skipped: true,
+          }]});
+        }
+      },
+
       isCompleted: (routineId, date) => {
         const today = date ?? format(new Date(), 'yyyy-MM-dd');
         const log = get().logs.find(
           (l) => l.routineId === routineId && l.date === today
         );
         return log?.completed ?? false;
+      },
+
+      isSkipped: (routineId, date) => {
+        const today = date ?? format(new Date(), 'yyyy-MM-dd');
+        const log = get().logs.find(l => l.routineId === routineId && l.date === today);
+        return log?.skipped ?? false;
       },
 
       addRoutine: (routine) => {
