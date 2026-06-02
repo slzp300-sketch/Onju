@@ -59,7 +59,7 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
             onChange={e => setTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             placeholder="이번 기간 이루고 싶은 것은?"
-            className="w-full border border-line rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full border border-line rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             autoFocus
           />
         </div>
@@ -71,7 +71,7 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
               type="date"
               value={startDate}
               onChange={e => setStartDate(e.target.value)}
-              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <span className="text-label-alt text-sm">~</span>
             <input
@@ -79,7 +79,7 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
               value={endDate}
               min={startDate}
               onChange={e => setEndDate(e.target.value)}
-              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
             <select
               value={selectedMonthlyId}
               onChange={e => setSelectedMonthlyId(e.target.value)}
-              className="w-full border border-line rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+              className="w-full border border-line rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-surface"
             >
               <option value="">연결 안 함</option>
               {monthlyGoals.map(g => (

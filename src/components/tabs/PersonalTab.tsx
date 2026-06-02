@@ -71,7 +71,7 @@ export default function PersonalTab() {
               <CompletedBadge habits={standaloneHabits} />
             </div>
           )}
-          <div className="bg-white divide-y divide-y divide-line-soft">
+          <div className="bg-surface divide-y divide-y divide-line-soft">
             {standaloneHabits.map((h, idx) => (
               <HabitRow key={h.id} habit={h} index={idx + 1} />
             ))}
@@ -135,7 +135,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
         <motion.button
           whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
           onClick={e => { e.stopPropagation(); navigate(`/routine-timer/${routine.id}`); }}
-          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${allDone ? 'bg-primary text-white' : 'bg-white border border-line text-label-alt hover:border-primary-soft hover:text-primary'}`}
+          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${allDone ? 'bg-primary text-white' : 'bg-surface border border-line text-label-alt hover:border-primary-soft hover:text-primary'}`}
         >
           <Play size={10} fill="currentColor" />
         </motion.button>
@@ -166,7 +166,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-            className="overflow-hidden bg-white divide-y divide-y divide-line-soft"
+            className="overflow-hidden bg-surface divide-y divide-y divide-line-soft"
           >
             {routineHabits.map((h, idx) => (
               <HabitRow key={h.id} habit={h} index={idx + 1} inRoutine />
@@ -228,7 +228,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
           onClick={e => { e.stopPropagation(); toggleHabitLog(habit.id); }}
           className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${
             done
-              ? 'bg-primary border-indigo-500'
+              ? 'bg-primary border-primary'
               : 'border-line hover:border-primary'
           }`}
         >

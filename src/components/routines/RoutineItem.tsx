@@ -36,8 +36,8 @@ export default function RoutineItem({ routine, dragHandle }: RoutineItemProps) {
             done
               ? routine.type === 'faith'
                 ? 'bg-emerald-500 border-emerald-500'
-                : 'bg-primary border-indigo-500'
-              : 'border-line bg-white',
+                : 'bg-primary border-primary'
+              : 'border-line bg-surface',
           ].join(' ')}
         >
           <AnimatedCheck done={done} />

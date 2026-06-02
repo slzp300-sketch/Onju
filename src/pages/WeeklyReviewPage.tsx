@@ -207,7 +207,7 @@ export default function WeeklyReviewPage() {
   const canProceed = isLastStep ? intention.trim().length > 0 : true;
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col">
+    <div className="min-h-dvh bg-surface flex flex-col">
       {/* 헤더 */}
       <div className="flex items-center px-4 pt-4 pb-2 gap-3">
         <button
@@ -249,7 +249,7 @@ export default function WeeklyReviewPage() {
       </div>
 
       {/* 하단 버튼 */}
-      <div className="px-6 pb-8 pt-4 flex gap-3 border-t border-line-soft bg-white">
+      <div className="px-6 pb-8 pt-4 flex gap-3 border-t border-line-soft bg-surface">
         {step > 0 && (
           <Button variant="ghost" onClick={goBack}>
             뒤로
@@ -394,7 +394,7 @@ function ReviewFeedbackStep({
             className={`flex flex-col items-center gap-1.5 py-3 rounded-2xl border-2 transition-all ${
               mood === m.value
                 ? 'border-primary bg-primary-soft'
-                : 'border-line-soft bg-white'
+                : 'border-line-soft bg-surface'
             }`}
           >
             <span className="text-2xl">{m.emoji}</span>
@@ -428,7 +428,7 @@ function ReviewFeedbackStep({
         onChange={(e) => onCommentChange(e.target.value)}
         placeholder="이번 주 한 줄 소감을 남겨보세요..."
         rows={3}
-        className="w-full border border-line rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300"
+        className="w-full border border-line rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
       />
     </div>
   );
@@ -595,7 +595,7 @@ function ReviewImproveStep({
                     onChange={(e) =>
                       updateEditData(routine.id, { title: e.target.value })
                     }
-                    className="w-full border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    className="w-full border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <div className="flex gap-1.5">
                     {(['daily', 'weekdays', 'weekends'] as Frequency[]).map((f) => {
@@ -609,7 +609,7 @@ function ReviewImproveStep({
                           className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                             currentFreq === f
                               ? 'bg-primary-soft text-primary'
-                              : 'bg-white border border-line text-label-alt'
+                              : 'bg-surface border border-line text-label-alt'
                           }`}
                         >
                           {FREQ_LABELS[f]}
@@ -634,7 +634,7 @@ function ReviewImproveStep({
               onChange={(e) => setNewTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addNewRoutine()}
               placeholder="새 루틴 이름"
-              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"
+              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-surface"
               autoFocus
             />
             <button
@@ -652,7 +652,7 @@ function ReviewImproveStep({
                 className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   newFreq === f
                     ? 'bg-primary-soft text-primary'
-                    : 'bg-white border border-line text-label-alt'
+                    : 'bg-surface border border-line text-label-alt'
                 }`}
               >
                 {FREQ_LABELS[f]}
@@ -717,7 +717,7 @@ function ActionButton({
     <button
       onClick={onClick}
       className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-        active ? activeColor : 'bg-white border border-line text-label-alt'
+        active ? activeColor : 'bg-surface border border-line text-label-alt'
       }`}
     >
       {icon}
@@ -750,7 +750,7 @@ function ReviewIntentionStep({
         onChange={(e) => onIntentionChange(e.target.value)}
         placeholder="다음 주에 집중할 한 가지는..."
         rows={4}
-        className="w-full border border-line rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 mb-6"
+        className="w-full border border-line rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary mb-6"
       />
 
       {/* 소모임 나눔 */}
@@ -777,7 +777,7 @@ function ReviewIntentionStep({
                 }`}
               >
                 <motion.div
-                  className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow"
+                  className="absolute top-0.5 w-5 h-5 bg-surface rounded-full shadow"
                   animate={{ left: on ? '1.375rem' : '0.125rem' }}
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />

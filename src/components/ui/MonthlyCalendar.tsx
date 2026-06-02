@@ -74,7 +74,7 @@ export default function MonthlyCalendar({
           <div
             key={dateStr}
             className={`flex flex-col rounded-lg overflow-hidden ${
-              isToday ? 'ring-2 ring-indigo-400 ring-offset-1' : ''
+              isToday ? 'ring-2 ring-primary ring-offset-1' : ''
             }`}
           >
             <div className={`text-center text-xs py-0.5 ${

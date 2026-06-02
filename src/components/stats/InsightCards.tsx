@@ -5,7 +5,7 @@ import { generateInsights, type Insight } from '../../utils/insights';
 import { today } from '../../utils/date';
 
 const COLOR_MAP = {
-  indigo: { bg: 'bg-primary-soft', border: 'border-primary-soft', title: 'text-indigo-900', body: 'text-primary', btn: 'bg-primary' },
+  indigo: { bg: 'bg-primary-soft', border: 'border-primary-soft', title: 'text-primary-heavy', body: 'text-primary', btn: 'bg-primary' },
   emerald: { bg: 'bg-emerald-50', border: 'border-emerald-100', title: 'text-emerald-900', body: 'text-emerald-700', btn: 'bg-emerald-500' },
   orange: { bg: 'bg-orange-50', border: 'border-orange-100', title: 'text-orange-900', body: 'text-orange-700', btn: 'bg-orange-500' },
   red: { bg: 'bg-red-50', border: 'border-red-100', title: 'text-red-900', body: 'text-red-700', btn: 'bg-red-500' },
