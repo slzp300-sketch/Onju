@@ -3,6 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
+import { AlarmTimeSheet, AlarmTypeSheet } from '../components/ui/HabitAlarmSheet';
+import { to12h } from '../utils/alarmTime';
+import { useNotificationStore } from '../store/notificationStore';
 
 const tap = { whileTap: { scale: 0.98 }, transition: { duration: 0.12 } };
 const tapSm = { whileTap: { scale: 0.92 }, transition: { duration: 0.1 } };
@@ -24,11 +27,32 @@ export default function HabitNew() {
   const existing = id ? habits.find(h => h.id === id) : null;
   const isEdit = !!existing;
 
+  const { setPermission } = useNotificationStore();
+
   const [title, setTitle] = useState(existing?.title ?? '');
   const [emoji, setEmoji] = useState(existing?.emoji ?? '🏃');
   const [freq, setFreq] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [customDays, setCustomDays] = useState<number[]>(existing?.customDays ?? []);
   const [when, setWhen] = useState(existing?.when ?? '');
+
+  // 알림
+  const [notifEnabled, setNotifEnabled] = useState(existing?.notification?.enabled ?? false);
+  const [notifType, setNotifType] = useState<'push' | 'sound'>(existing?.notification?.type ?? 'push');
+  const [notifTime, setNotifTime] = useState(existing?.notification?.time ?? '09:00');
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showTypePicker, setShowTypePicker] = useState(false);
+
+  const handleToggleNotif = async () => {
+    if (!notifEnabled) {
+      // 알림 켤 때 권한 요청
+      if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+        const perm = await Notification.requestPermission();
+        setPermission(perm);
+        if (perm !== 'granted') return;
+      }
+    }
+    setNotifEnabled(v => !v);
+  };
 
   const freqLabel = FREQ_OPTIONS.find(f => f.value === freq)?.label ?? '매일';
   const whenPlaceholder = '예) 8:00 / 출근길';
@@ -39,6 +63,9 @@ export default function HabitNew() {
       title: title.trim(), emoji, frequency: freq,
       ...(freq === 'custom' ? { customDays } : {}),
       when: when.trim(),
+      notification: notifEnabled
+        ? { enabled: true, type: notifType, time: notifTime }
+        : undefined,
     };
     if (isEdit && existing) {
       updateHabit(existing.id, data);
@@ -81,6 +108,72 @@ export default function HabitNew() {
 
         {/* 설정 */}
         <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+
+          {/* 알림 */}
+          <div className="border-b border-line-soft">
+            <div className="px-4 py-4">
+              {/* 토글 행 */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">🔔</span>
+                  <span className="text-body2 font-semibold text-label-strong">알림</span>
+                </div>
+                <motion.button
+                  {...tapSm}
+                  onClick={handleToggleNotif}
+                  className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${notifEnabled ? 'bg-positive' : 'bg-fill-strong'}`}
+                >
+                  <motion.div
+                    animate={{ x: notifEnabled ? 20 : 2 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm"
+                  />
+                </motion.button>
+              </div>
+
+              {/* 시간 + 타입 (enabled 시) */}
+              <AnimatePresence>
+                {notifEnabled && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex items-center justify-between mt-3">
+                      {/* 시간 칩 */}
+                      <div className="flex items-center gap-2">
+                        <motion.button
+                          {...tapSm}
+                          onClick={() => setShowTimePicker(true)}
+                          className="px-3 py-1.5 rounded-xl bg-fill border border-line text-body2 font-semibold text-label-strong"
+                        >
+                          {(() => {
+                            const { ampmIdx, hourIdx, minuteIdx } = to12h(notifTime);
+                            const ampm = ampmIdx === 0 ? '오전' : '오후';
+                            const h = String(hourIdx + 1);
+                            const m = String(minuteIdx).padStart(2, '0');
+                            return `${ampm} ${h}:${m}`;
+                          })()}
+                        </motion.button>
+                      </div>
+
+                      {/* 타입 */}
+                      <motion.button
+                        {...tapSm}
+                        onClick={() => setShowTypePicker(true)}
+                        className="flex items-center gap-1 text-body2 text-label-alt"
+                      >
+                        <span>{notifType === 'push' ? '푸시' : '알림음'}</span>
+                        <ChevronRight size={16} className="text-label-assistive" />
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
 
           {/* 반복 주기 */}
           <div className="border-b border-line-soft">
@@ -137,6 +230,21 @@ export default function HabitNew() {
         </div>
 
       </div>
+
+      {/* 알림 시트 */}
+      <AlarmTimeSheet
+        isOpen={showTimePicker}
+        time={notifTime}
+        onChange={setNotifTime}
+        onDelete={() => setNotifEnabled(false)}
+        onClose={() => setShowTimePicker(false)}
+      />
+      <AlarmTypeSheet
+        isOpen={showTypePicker}
+        type={notifType}
+        onChange={setNotifType}
+        onClose={() => setShowTypePicker(false)}
+      />
 
       {/* 하단 버튼 */}
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"

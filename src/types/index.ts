@@ -157,6 +157,12 @@ export interface BibleVerse {
 export type HabitFrequency = 'daily' | 'weekdays' | 'weekends' | 'custom';
 export const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
+export interface HabitNotification {
+  enabled: boolean;
+  type: 'push' | 'sound';
+  time: string; // "HH:mm" 24시간
+}
+
 // 습관 (개별 단위)
 export interface Habit {
   id: string;
@@ -166,6 +172,7 @@ export interface Habit {
   frequency: HabitFrequency;
   customDays?: number[]; // 0=일 ~ 6=토, frequency==='custom'일 때
   when: string; // 사용자 입력 텍스트 ("아침 기상 후", "출근 전" 등)
+  notification?: HabitNotification;
   createdAt: string;
 }
 

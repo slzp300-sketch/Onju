@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { useRoutineStore } from '../store/routineStore';
 import { useNotificationStore } from '../store/notificationStore';
+import { useHabitStore } from '../store/habitStore';
 import { isSunday } from '../utils/date';
 
 const STORAGE_KEY = 'onju_last_notif';
@@ -41,6 +42,7 @@ function msUntil(h: number, m: number): number {
 
 export function useNotificationScheduler() {
   const { personalRoutines, faithRoutines, logs } = useRoutineStore();
+  const habits = useHabitStore(s => s.habits);
   const settings = useNotificationStore();
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -115,7 +117,34 @@ export function useNotificationScheduler() {
       markSent('review');
     }
 
+    // 습관별 개별 알림
+    habits.forEach(habit => {
+      const n = habit.notification;
+      if (!n?.enabled || n.type !== 'push') return;
+
+      const { h, m } = parseTime(n.time);
+      const key = `habit-${habit.id}`;
+      const nowH = now.getHours();
+      const nowM = now.getMinutes();
+      const passed = nowH > h || (nowH === h && nowM >= m);
+
+      if (passed && !alreadySentToday(key)) {
+        sendNotification(`${habit.emoji} ${habit.title}`, '습관을 실천할 시간이에요!');
+        markSent(key);
+      } else if (!passed) {
+        const delay = msUntil(h, m);
+        if (delay > 0) {
+          timers.current.push(setTimeout(() => {
+            if (!alreadySentToday(key)) {
+              sendNotification(`${habit.emoji} ${habit.title}`, '습관을 실천할 시간이에요!');
+              markSent(key);
+            }
+          }, delay));
+        }
+      }
+    });
+
     return () => timers.current.forEach(clearTimeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.permission, settings.morningEnabled, settings.morningTime, settings.eveningEnabled, settings.eveningTime, settings.reviewEnabled, personalRoutines.length, faithRoutines.length]);
+  }, [settings.permission, settings.morningEnabled, settings.morningTime, settings.eveningEnabled, settings.eveningTime, settings.reviewEnabled, personalRoutines.length, faithRoutines.length, habits]);
 }
