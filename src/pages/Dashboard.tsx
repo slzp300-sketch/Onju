@@ -98,10 +98,14 @@ export default function Dashboard() {
   };
 
   return (
-    <motion.div variants={container} initial="hidden" animate="show" className="flex flex-col pb-8">
+    <motion.div
+      variants={container} initial="hidden" animate="show"
+      className="flex flex-col overflow-hidden"
+      style={{ height: 'calc(100dvh - 5rem - env(safe-area-inset-bottom, 0px))' }}
+    >
 
       {/* 헤더 */}
-      <motion.div variants={itemV} className="px-4 pt-5 pb-3 flex items-start justify-between">
+      <motion.div variants={itemV} className="flex-shrink-0 px-4 pt-5 pb-3 flex items-start justify-between">
         <div>
           <p className="text-caption1 text-label-alt font-medium">{format(new Date(), 'yyyy년 M월', { locale: ko })}</p>
           <h1 className="text-heading2 font-bold text-label-strong font-brand mt-0.5">안녕하세요, {user?.name}님</h1>
@@ -109,7 +113,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* 목표 + 스트릭 카드 행 */}
-      <motion.div variants={itemV} className="px-4 mb-4 flex gap-2">
+      <motion.div variants={itemV} className="flex-shrink-0 px-4 mb-4 flex gap-2">
         {/* 이번달 목표 */}
         <motion.button
           whileTap={{ scale: 0.98 }}
@@ -200,16 +204,16 @@ export default function Dashboard() {
 
       {/* 일요일 리뷰 배너 */}
       {isSunday() && (
-        <motion.div variants={itemV} className="px-4 mb-4">
+        <motion.div variants={itemV} className="flex-shrink-0 px-4 mb-4">
           <ReviewBanner completed={isReviewCompleted(reviews, currentWeek(), currentYear())} weekRangeText={getWeekRangeText()} onStart={() => navigate('/review')} />
         </motion.div>
       )}
 
       {/* 주간 스트립 + 탭 */}
-      <motion.div variants={itemV} className="bg-surface border border-line rounded-t-3xl mx-3 overflow-hidden shadow-emphasize">
+      <motion.div variants={itemV} className="flex-1 flex flex-col bg-surface border border-line rounded-t-3xl mx-3 overflow-hidden shadow-emphasize min-h-0">
 
         {/* 주간 날짜 스트립 */}
-        <div className="px-3 pt-3 pb-2">
+        <div className="flex-shrink-0 px-3 pt-3 pb-2">
           <div className="flex items-center gap-3 mb-2 px-1">
             <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-primary" /><span className="text-caption2 text-label-assistive font-medium">개인</span></div>
             <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-positive" /><span className="text-caption2 text-label-assistive font-medium">신앙</span></div>
@@ -268,8 +272,8 @@ export default function Dashboard() {
         </div>
 
         {/* 루틴 3탭 */}
-        <div className="border-t border-line-soft">
-          <div className="flex border-b border-line-soft bg-surface">
+        <div className="flex-1 flex flex-col border-t border-line-soft min-h-0">
+          <div className="flex-shrink-0 flex border-b border-line-soft bg-surface">
             {TABS.map(tab => (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                 className={`relative flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 text-caption1 font-bold transition-colors ${activeTab === tab.key ? 'text-label-strong' : 'text-label-assistive'}`}>
@@ -286,6 +290,7 @@ export default function Dashboard() {
             ))}
           </div>
 
+          <div className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
             {activeTab === 'personal' && (
               <motion.div key="p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
@@ -383,6 +388,7 @@ export default function Dashboard() {
               </motion.div>
             )}
           </AnimatePresence>
+          </div>
         </div>
 
       </motion.div>
