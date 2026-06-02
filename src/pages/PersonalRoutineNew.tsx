@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronLeft, Timer, GripVertical } from 'lucide-react';
-import DurationPicker from '../components/ui/DurationPicker';
+import DurationPickerSheet from '../components/ui/DurationPickerSheet';
+import { fmtDuration } from '../utils/duration';
 import { useHabitStore } from '../store/habitStore';
 import type { Habit } from '../types';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
@@ -165,16 +166,12 @@ export default function PersonalRoutineNew() {
                     const h = habits.find(x => x.id === hId);
                     if (!h) return null;
                     const secs = habitDurations[hId] ?? 60;
-                    const m = Math.floor(secs / 60);
-                    const s = secs % 60;
-                    const display = m > 0 ? `${m}분 ${s > 0 ? `${s}초` : ''}`.trim() : `${s}초`;
                     return (
                       <SortableHabitCard
                         key={hId}
                         habit={h}
                         order={order + 1}
                         secs={secs}
-                        display={display}
                         timerEnabled={timerEnabled}
                         onToggle={() => toggle(hId)}
                         onDurationChange={val => setDuration(hId, val)}
@@ -233,16 +230,16 @@ interface SortableHabitCardProps {
   habit: Habit;
   order: number;
   secs: number;
-  display: string;
   timerEnabled: boolean;
   onToggle: () => void;
   onDurationChange: (val: number) => void;
 }
 
 function SortableHabitCard({
-  habit, order, secs, display, timerEnabled, onToggle, onDurationChange,
+  habit, order, secs, timerEnabled, onToggle, onDurationChange,
 }: SortableHabitCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: habit.id });
+  const [showSheet, setShowSheet] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -252,44 +249,42 @@ function SortableHabitCard({
   };
 
   return (
-    <div ref={setNodeRef} style={style}
-      className="rounded-xl border border-primary/30 bg-primary-soft/40 overflow-hidden shadow-emphasize">
-      <div className="flex items-center gap-3 px-4 py-3.5">
-        <button onClick={onToggle}
-          className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-label1 font-bold">
-          {order}
-        </button>
-        <span className="text-2xl">{habit.emoji}</span>
-        <div className="flex-1 min-w-0">
-          <p className="text-body2 font-semibold text-label-strong">{habit.title}</p>
-          {habit.when && <p className="text-caption1 text-label-alt truncate">{habit.when}</p>}
+    <>
+      <div ref={setNodeRef} style={style}
+        className="rounded-xl border border-primary/30 bg-primary-soft/40 overflow-hidden shadow-emphasize">
+        <div className="flex items-center gap-3 px-4 py-3.5">
+          <button onClick={onToggle}
+            className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-label1 font-bold">
+            {order}
+          </button>
+          <span className="text-2xl">{habit.emoji}</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-body2 font-semibold text-label-strong">{habit.title}</p>
+            {habit.when && <p className="text-caption1 text-label-alt truncate">{habit.when}</p>}
+          </div>
+          {timerEnabled && (
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              onClick={() => setShowSheet(true)}
+              className="text-caption2 font-semibold text-primary bg-surface px-2.5 py-1 rounded-lg border border-primary/30 flex-shrink-0"
+            >
+              {fmtDuration(secs)}
+            </motion.button>
+          )}
+          <button {...listeners} {...attributes}
+            className="text-label-assistive hover:text-label-alt touch-none p-1 cursor-grab active:cursor-grabbing">
+            <GripVertical size={18} />
+          </button>
         </div>
-        {timerEnabled && (
-          <span className="text-caption2 font-semibold text-primary bg-surface px-2 py-0.5 rounded border border-primary/20">
-            {display}
-          </span>
-        )}
-        <button {...listeners} {...attributes}
-          className="text-label-assistive hover:text-label-alt touch-none p-1 cursor-grab active:cursor-grabbing">
-          <GripVertical size={18} />
-        </button>
       </div>
 
-      <AnimatePresence initial={false}>
-        {timerEnabled && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-            className="overflow-hidden border-t border-primary/20"
-          >
-            <div className="px-4 pb-3 pt-1">
-              <DurationPicker seconds={secs} onChange={onDurationChange} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      <DurationPickerSheet
+        isOpen={showSheet}
+        seconds={secs}
+        onConfirm={onDurationChange}
+        onClose={() => setShowSheet(false)}
+        title={`⏱️ ${habit.emoji} ${habit.title}`}
+      />
+    </>
   );
 }

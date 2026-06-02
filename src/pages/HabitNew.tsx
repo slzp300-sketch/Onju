@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 import { AlarmTimeSheet, AlarmTypeSheet } from '../components/ui/HabitAlarmSheet';
 import { to12h } from '../utils/alarmTime';
-import DurationPicker from '../components/ui/DurationPicker';
+import DurationPickerSheet from '../components/ui/DurationPickerSheet';
+import { fmtDuration } from '../utils/duration';
 import { Timer } from 'lucide-react';
 import { useNotificationStore } from '../store/notificationStore';
 
@@ -40,6 +41,7 @@ export default function HabitNew() {
   // 타이머
   const [timerEnabled, setTimerEnabled] = useState(!!(existing?.durationSeconds));
   const [durationSecs, setDurationSecs] = useState(existing?.durationSeconds ?? 300);
+  const [showDurationSheet, setShowDurationSheet] = useState(false);
 
   // 알림
   const [notifEnabled, setNotifEnabled] = useState(existing?.notification?.enabled ?? false);
@@ -241,7 +243,14 @@ export default function HabitNew() {
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden mt-3"
                   >
-                    <DurationPicker seconds={durationSecs} onChange={setDurationSecs} />
+                    <motion.button
+                      {...tapSm}
+                      onClick={() => setShowDurationSheet(true)}
+                      className="w-full flex items-center justify-between px-4 py-3 bg-fill rounded-xl border border-line"
+                    >
+                      <span className="text-body2 text-label-alt">설정 시간</span>
+                      <span className="text-body2 font-bold text-primary">{fmtDuration(durationSecs)}</span>
+                    </motion.button>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -303,6 +312,14 @@ export default function HabitNew() {
         </div>
 
       </div>
+
+      {/* 타이머 시트 */}
+      <DurationPickerSheet
+        isOpen={showDurationSheet}
+        seconds={durationSecs}
+        onConfirm={setDurationSecs}
+        onClose={() => setShowDurationSheet(false)}
+      />
 
       {/* 알림 시트 */}
       <AlarmTimeSheet

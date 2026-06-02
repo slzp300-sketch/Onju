@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Check, Timer } from 'lucide-react';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
-import DurationPicker from '../components/ui/DurationPicker';
+import DurationPickerSheet from '../components/ui/DurationPickerSheet';
+import { fmtDuration } from '../utils/duration';
 import { useRoutineStore } from '../store/routineStore';
 import type { TimeSlot } from '../types';
 import { faithRoutineTemplates } from '../mocks/data/faithTemplates';
@@ -41,6 +42,7 @@ export default function FaithRoutineNew() {
   const [timeSlot, setTimeSlot] = useState<TimeSlot | null>(existing?.timeSlot ?? null);
   const [timerEnabled, setTimerEnabled] = useState(!!(existing?.durationSeconds));
   const [durationSeconds, setDurationSeconds] = useState(existing?.durationSeconds ?? 60);
+  const [showDurationSheet, setShowDurationSheet] = useState(false);
 
   // 뒤로가기 처리
   const handleBack = () => {
@@ -195,18 +197,32 @@ export default function FaithRoutineNew() {
                 </button>
               </div>
 
-              {/* 시간 피커 */}
+              {/* 시간 설정 칩 */}
               <AnimatePresence initial={false}>
                 {timerEnabled && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                     className="overflow-hidden border-t border-line-soft">
-                    <div className="px-4 pb-4 pt-2">
-                      <DurationPicker seconds={durationSeconds} onChange={setDurationSeconds} />
+                    <div className="px-4 pb-4 pt-3">
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => setShowDurationSheet(true)}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-fill rounded-xl border border-line"
+                      >
+                        <span className="text-body2 text-label-alt">설정 시간</span>
+                        <span className="text-body2 font-bold text-primary">{fmtDuration(durationSeconds)}</span>
+                      </motion.button>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              <DurationPickerSheet
+                isOpen={showDurationSheet}
+                seconds={durationSeconds}
+                onConfirm={setDurationSeconds}
+                onClose={() => setShowDurationSheet(false)}
+              />
             </div>
           </div>
 
