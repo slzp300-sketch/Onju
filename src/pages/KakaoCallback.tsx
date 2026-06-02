@@ -33,13 +33,17 @@ export default function KakaoCallback() {
           body: JSON.stringify({ code, redirectUri }),
         });
 
-        if (!res.ok) throw new Error();
+        if (!res.ok) {
+          const errBody = await res.json() as { error?: string; detail?: unknown };
+          throw new Error(JSON.stringify(errBody));
+        }
 
         const profile = await res.json() as KakaoProfile;
         socialLogin('kakao', profile);
         navigate('/', { replace: true });
-      } catch {
-        setError('카카오 사용자 정보를 불러오지 못했어요.');
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(`카카오 오류: ${msg}`);
       }
     };
 
