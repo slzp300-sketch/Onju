@@ -16,9 +16,7 @@ interface KakaoStatic {
   init: (key: string) => void;
   Auth: {
     login: (options: { success: () => void; fail: () => void }) => void;
-  };
-  API: {
-    request: (options: { url: string; success: (res: KakaoUserResponse) => void; fail: () => void }) => void;
+    getAccessToken: () => string | null;
   };
 }
 
@@ -87,21 +85,22 @@ export default function Login() {
       return;
     }
     window.Kakao.Auth.login({
-      success: () => {
-        window.Kakao.API.request({
-          url: '/v2/user/me',
-          success: (res: KakaoUserResponse) => {
-            const profile = res.kakao_account?.profile;
-            const email = res.kakao_account?.email;
-            socialLogin('kakao', {
-              id: String(res.id),
-              name: profile?.nickname ?? '카카오 사용자',
-              email,
-            });
-            navigate('/', { replace: true });
-          },
-          fail: () => setError('카카오 사용자 정보를 불러오지 못했어요.'),
-        });
+      success: async () => {
+        try {
+          const accessToken = window.Kakao.Auth.getAccessToken();
+          const res = await fetch('https://kapi.kakao.com/v2/user/me', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const data = await res.json() as KakaoUserResponse;
+          socialLogin('kakao', {
+            id: String(data.id),
+            name: data.kakao_account?.profile?.nickname ?? '카카오 사용자',
+            email: data.kakao_account?.email,
+          });
+          navigate('/', { replace: true });
+        } catch {
+          setError('카카오 사용자 정보를 불러오지 못했어요.');
+        }
       },
       fail: () => setError('카카오 로그인에 실패했어요.'),
     });
