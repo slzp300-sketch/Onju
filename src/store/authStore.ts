@@ -18,6 +18,7 @@ interface AuthState {
   onboardingDone: boolean;
   signup: (name: string, email: string, password: string) => { success: boolean; error?: string };
   login: (email: string, password: string) => { success: boolean; error?: string };
+  socialLogin: (provider: 'google' | 'kakao', profile: { id: string; name: string; email?: string }) => void;
   logout: () => void;
   setOnboardingDone: () => void;
   updateWeeklySlots: (slots: number) => void;
@@ -61,6 +62,31 @@ export const useAuthStore = create<AuthState>()(
           onboardingDone: account.onboardingDone,
         });
         return { success: true };
+      },
+
+      socialLogin: (provider, profile) => {
+        const accounts = getAccounts();
+        const socialId = `${provider}-${profile.id}`;
+        let account = accounts.find(a => a.id === socialId);
+        if (!account) {
+          account = {
+            id: socialId,
+            name: profile.name,
+            email: profile.email ?? `${socialId}@social`,
+            password: '',
+            weeklyGoalSlots: 3,
+            onboardingDone: false,
+          };
+          saveAccounts([...accounts, account]);
+          clearStores();
+        } else {
+          restoreUserData(account.id);
+        }
+        set({
+          user: { id: account.id, name: account.name, email: account.email, weeklyGoalSlots: account.weeklyGoalSlots },
+          isAuthenticated: true,
+          onboardingDone: account.onboardingDone,
+        });
       },
 
       logout: () => {
