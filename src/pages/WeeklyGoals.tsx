@@ -45,17 +45,17 @@ export default function WeeklyGoals() {
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="px-4 pt-5">
-        <h1 className="text-lg font-bold text-gray-900">주간 목표</h1>
-        <p className="text-xs text-gray-400 mt-0.5">{formatDateRange(weekStart, weekEnd)}</p>
+        <h1 className="text-heading2 font-bold text-label-strong font-brand">주간 목표</h1>
+        <p className="text-caption1 text-label-alt mt-0.5">{formatDateRange(weekStart, weekEnd)}</p>
       </div>
 
       {/* 목표 현황 */}
       <Card className="mx-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-gray-900">이번 주 목표 현황</p>
+          <p className="text-body2 font-semibold text-label-strong">이번 주 목표 현황</p>
           <SlotBadge total={slots.total} used={slots.used} />
         </div>
-        <div className={`rounded-xl p-3 text-xs ${shouldUnlock ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-500'}`}>
+        <div className={`rounded-xl p-3 text-caption1 ${shouldUnlock ? 'bg-positive/10 text-[#009632]' : 'bg-fill text-label-alt'}`}>
           <div className="flex items-center gap-1.5">
             <TrendingUp size={13} />
             {shouldUnlock ? (
@@ -69,7 +69,7 @@ export default function WeeklyGoals() {
         {/* 주 시작 요일 설정 */}
         <button
           onClick={() => setShowWeekSetting(v => !v)}
-          className="mt-3 flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          className="mt-3 flex items-center gap-1 text-caption1 text-label-alt hover:text-label transition-colors"
         >
           <span>주 시작: {WEEKDAY_NAMES[weekStartDay]}요일</span>
           <ChevronDown size={12} className={`transition-transform ${showWeekSetting ? 'rotate-180' : ''}`} />
@@ -80,10 +80,10 @@ export default function WeeklyGoals() {
               <button
                 key={i}
                 onClick={() => { setWeekStartDay(i); setShowWeekSetting(false); }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all border ${
+                className={`px-2.5 py-1 rounded-lg text-caption1 font-medium transition-all border ${
                   weekStartDay === i
-                    ? 'bg-indigo-500 text-white border-transparent'
-                    : 'border-gray-200 text-gray-500'
+                    ? 'bg-primary text-white border-transparent'
+                    : 'border-line text-label-alt'
                 }`}
               >
                 {name}
@@ -96,7 +96,7 @@ export default function WeeklyGoals() {
       {/* 월간 목표 */}
       {activeMonthlyGoals.length > 0 && (
         <div className="px-4">
-          <p className="text-xs font-semibold text-gray-500 mb-2">진행 중인 월간 목표</p>
+          <p className="text-caption1 font-semibold text-label-alt mb-2">진행 중인 월간 목표</p>
           {activeMonthlyGoals.map(g => <MonthlyGoalCard key={g.id} goal={g} />)}
         </div>
       )}
@@ -104,7 +104,7 @@ export default function WeeklyGoals() {
       {/* 이번 주 목표 목록 */}
       <div className="px-4">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs font-semibold text-gray-500">이번 기간 목표</p>
+          <p className="text-caption1 font-semibold text-label-alt">이번 기간 목표</p>
           <Button
             variant="ghost"
             size="sm"
@@ -116,7 +116,7 @@ export default function WeeklyGoals() {
         </div>
 
         {slots.remaining <= 0 && (
-          <p className="text-xs text-amber-600 bg-amber-50 rounded-xl px-3 py-2 mb-2">
+          <p className="text-caption1 text-cautionary bg-cautionary/10 rounded-xl px-3 py-2 mb-2">
             목표를 모두 채웠어요. 지난 주 달성률 80% 이상이면 목표 칸이 늘어나요.
           </p>
         )}

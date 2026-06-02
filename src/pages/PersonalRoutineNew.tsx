@@ -85,13 +85,13 @@ export default function PersonalRoutineNew() {
 
 
   return (
-    <div className="min-h-dvh bg-gray-50 flex flex-col">
+    <div className="min-h-dvh bg-surface-alt flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center px-4 pt-5 pb-3 bg-white border-b border-gray-100">
-        <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-gray-500">
+      <div className="flex items-center px-4 pt-5 pb-3 bg-surface border-b border-line-soft">
+        <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
-        <h1 className="flex-1 text-center text-base font-bold text-gray-900">
+        <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">
           {isEdit ? '루틴 수정하기' : '루틴 추가하기'}
         </h1>
         <div className="w-8" />
@@ -101,36 +101,36 @@ export default function PersonalRoutineNew() {
 
         {/* 루틴 이름 + 이모지 */}
         <div>
-          <p className="text-xs font-bold text-gray-500 mb-2">루틴 이름</p>
+          <p className="text-caption1 font-bold text-label-alt mb-2">루틴 이름</p>
           <div className="flex gap-2">
             <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
             <input type="text" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="루틴 이름을 입력하세요" autoFocus
-              className="flex-1 h-14 bg-white border border-gray-200 rounded-2xl px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm" />
+              className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,102,255,0.15)] shadow-emphasize transition-all" />
           </div>
         </div>
 
         {/* 언제 + 타이머 */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-          <div className="px-4 py-4 border-b border-gray-50">
+        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+          <div className="px-4 py-4 border-b border-line-soft">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-xl">⏰</span>
-              <span className="text-sm font-semibold text-gray-800">언제 할래요?</span>
+              <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
             </div>
             <input type="text" value={when} onChange={e => setWhen(e.target.value)}
               placeholder="예) 아침 7시, 출근 전"
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+              className="w-full bg-fill border border-line rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-primary focus:bg-surface transition-all" />
           </div>
           <div className="px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Timer size={20} className="text-indigo-500" />
+              <Timer size={20} className="text-primary" />
               <div>
-                <p className="text-sm font-semibold text-gray-800">타이머 기능</p>
-                <p className="text-xs text-gray-400">습관마다 시간을 설정해 순서대로 진행</p>
+                <p className="text-body2 font-semibold text-label-strong">타이머 기능</p>
+                <p className="text-caption1 text-label-alt">습관마다 시간을 설정해 순서대로 진행</p>
               </div>
             </div>
             <button onClick={() => setTimerEnabled(v => !v)}
-              className={`w-11 h-6 rounded-full transition-colors relative ${timerEnabled ? 'bg-indigo-500' : 'bg-gray-300'}`}>
+              className={`w-11 h-6 rounded-full transition-colors relative ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}>
               <motion.div animate={{ x: timerEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 className="absolute top-1 w-4 h-4 rounded-full bg-white shadow" />
             </button>
@@ -140,25 +140,24 @@ export default function PersonalRoutineNew() {
         {/* 습관 선택 + 시간 설정 통합 */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-bold text-gray-500">습관 선택</p>
+            <p className="text-caption1 font-bold text-label-alt">습관 선택</p>
             <div className="flex items-center gap-2">
               {timerEnabled && selectedIds.length > 0 && (
-                <span className="text-xs font-semibold text-gray-400">{totalDisplay}</span>
+                <span className="text-caption1 font-semibold text-label-alt">{totalDisplay}</span>
               )}
-              <span className={`text-xs font-bold ${selectedIds.length >= 2 ? 'text-indigo-500' : 'text-gray-400'}`}>
+              <span className={`text-caption1 font-bold ${selectedIds.length >= 2 ? 'text-primary' : 'text-label-assistive'}`}>
                 {selectedIds.length}개 (최소 2개)
               </span>
             </div>
           </div>
 
           {habits.length === 0 ? (
-            <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-4 text-center">
-              <p className="text-sm font-semibold text-amber-700">등록된 습관이 없어요</p>
-              <p className="text-xs text-amber-600 mt-0.5">먼저 습관을 추가해 주세요</p>
+            <div className="bg-cautionary/10 border border-cautionary/20 rounded-xl px-4 py-4 text-center">
+              <p className="text-body2 font-semibold text-[#d47800]">등록된 습관이 없어요</p>
+              <p className="text-caption1 text-cautionary mt-0.5">먼저 습관을 추가해 주세요</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {/* 선택된 습관 — 드래그 순서 변경 */}
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={selectedIds} strategy={verticalListSortingStrategy}>
                   {selectedIds.map((hId, order) => {
@@ -184,15 +183,14 @@ export default function PersonalRoutineNew() {
                 </SortableContext>
               </DndContext>
 
-              {/* 미선택 습관 — 탭해서 추가 */}
               {habits.filter(h => !selectedIds.includes(h.id)).map(h => (
                 <motion.button key={h.id} {...tap} onClick={() => toggle(h.id)}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl border border-gray-100 bg-white text-left">
-                  <div className="w-7 h-7 rounded-full border-2 border-gray-200 flex-shrink-0" />
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:bg-fill transition-colors">
+                  <div className="w-7 h-7 rounded-full border-2 border-line flex-shrink-0" />
                   <span className="text-2xl">{h.emoji}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800">{h.title}</p>
-                    {h.when && <p className="text-xs text-gray-400 truncate">{h.when}</p>}
+                    <p className="text-body2 font-semibold text-label">{h.title}</p>
+                    {h.when && <p className="text-caption1 text-label-alt truncate">{h.when}</p>}
                   </div>
                 </motion.button>
               ))}
@@ -203,12 +201,12 @@ export default function PersonalRoutineNew() {
       </div>
 
       {/* 하단 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-white border-t border-gray-100"
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-        <motion.button whileTap={{ scale: 0.97 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+        <motion.button whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
           onClick={handleSubmit}
           disabled={!title.trim() || selectedIds.length < 2}
-          className="w-full py-4 mt-3 rounded-2xl bg-indigo-500 text-white font-bold text-base disabled:opacity-40 hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-200">
+          className="w-full h-12 mt-3 rounded-lg bg-primary text-white font-bold text-body1 disabled:opacity-30 hover:bg-primary-strong transition-colors">
           {isEdit ? '수정 완료' : '시작하기'}
         </motion.button>
       </div>
@@ -241,32 +239,28 @@ function SortableHabitCard({
 
   return (
     <div ref={setNodeRef} style={style}
-      className="rounded-2xl border border-indigo-300 bg-indigo-50/60 overflow-hidden">
-      {/* 습관 행 */}
+      className="rounded-xl border border-primary/30 bg-primary-soft/40 overflow-hidden shadow-emphasize">
       <div className="flex items-center gap-3 px-4 py-3.5">
-        {/* 순서 번호 (탭해서 선택 해제) */}
         <button onClick={onToggle}
-          className="w-7 h-7 rounded-full bg-indigo-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-bold">
+          className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-label1 font-bold">
           {order}
         </button>
         <span className="text-2xl">{habit.emoji}</span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-800">{habit.title}</p>
-          {habit.when && <p className="text-xs text-gray-400 truncate">{habit.when}</p>}
+          <p className="text-body2 font-semibold text-label-strong">{habit.title}</p>
+          {habit.when && <p className="text-caption1 text-label-alt truncate">{habit.when}</p>}
         </div>
         {timerEnabled && (
-          <span className="text-xs font-semibold text-indigo-500 bg-white px-2 py-0.5 rounded-full border border-indigo-100">
+          <span className="text-caption2 font-semibold text-primary bg-surface px-2 py-0.5 rounded border border-primary/20">
             {display}
           </span>
         )}
-        {/* 드래그 핸들 */}
         <button {...listeners} {...attributes}
-          className="text-gray-400 hover:text-gray-600 touch-none p-1 cursor-grab active:cursor-grabbing">
+          className="text-label-assistive hover:text-label-alt touch-none p-1 cursor-grab active:cursor-grabbing">
           <GripVertical size={18} />
         </button>
       </div>
 
-      {/* 타이머 피커 */}
       <AnimatePresence initial={false}>
         {timerEnabled && (
           <motion.div
@@ -274,7 +268,7 @@ function SortableHabitCard({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-            className="overflow-hidden border-t border-indigo-100"
+            className="overflow-hidden border-t border-primary/20"
           >
             <div className="px-4 pb-3 pt-1">
               <DurationPicker seconds={secs} onChange={onDurationChange} />

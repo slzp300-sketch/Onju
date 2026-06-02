@@ -24,7 +24,7 @@ export default function Groups() {
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="px-4 pt-5 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-gray-900">소모임</h1>
+        <h1 className="text-heading2 font-bold text-label-strong font-brand">소모임</h1>
         <Button size="sm" onClick={() => navigate('/groups/new')}>
           <Plus size={15} /> 만들기
         </Button>
@@ -36,10 +36,10 @@ export default function Groups() {
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-label2 font-medium transition-colors ${
               tab === t.key
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 text-gray-600'
+                ? 'bg-primary text-white'
+                : 'bg-fill text-label-alt'
             }`}
           >
             {t.label}
