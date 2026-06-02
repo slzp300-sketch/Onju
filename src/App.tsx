@@ -101,25 +101,24 @@ function BottomNav() {
   );
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 z-30 max-w-md mx-auto safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-sm border-t border-line-soft z-30 max-w-md mx-auto safe-bottom">
       <div className="flex items-stretch" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {flatItems.map(item => {
           const active = isActive(item);
           const Icon = item.icon;
           return (
             <div key={item.to} className="flex flex-1">
-              {/* 그룹 사이 구분선 */}
               {item.dividerBefore && (
-                <div className="w-px bg-gray-100 my-2 flex-shrink-0" />
+                <div className="w-px bg-line-soft my-2 flex-shrink-0" />
               )}
               <NavLink
                 to={item.to}
-                className={`relative flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition-colors ${active ? 'text-indigo-600' : 'text-gray-400'}`}
+                className={`relative flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition-colors ${active ? 'text-primary' : 'text-label-assistive'}`}
               >
                 {active && (
                   <motion.span
                     layoutId="activeTabPill"
-                    className="absolute inset-x-2 top-1.5 bottom-1.5 bg-indigo-50/80 rounded-2xl -z-10"
+                    className="absolute inset-x-2 top-1.5 bottom-1.5 bg-primary-soft rounded-2xl -z-10"
                     transition={{ type: 'spring', stiffness: 650, damping: 28 }}
                   />
                 )}
@@ -200,7 +199,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <div className="max-w-md mx-auto min-h-dvh bg-gray-50 relative" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
+        <div className="max-w-md mx-auto min-h-dvh bg-surface-alt relative" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
           <AppRoutes />
           <BottomNav />
           <SlotUnlockModal />

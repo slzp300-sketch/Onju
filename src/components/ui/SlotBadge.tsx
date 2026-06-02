@@ -14,15 +14,15 @@ export default function SlotBadge({ total, used }: SlotBadgeProps) {
             'w-3 h-3 rounded-full transition-colors',
             i < total
               ? i < used
-                ? 'bg-indigo-500'
-                : 'bg-indigo-200'
-              : 'bg-gray-100',
+                ? 'bg-primary'
+                : 'bg-primary-soft'
+              : 'bg-fill',
           ].join(' ')}
         />
       ))}
-      <span className="text-xs text-gray-500 ml-1">{used}/{total} 사용</span>
+      <span className="text-caption1 text-label-alt ml-1">{used}/{total} 사용</span>
       {remaining > 0 && (
-        <span className="text-xs text-indigo-600 font-medium">{remaining}개 남음</span>
+        <span className="text-caption1 text-primary font-medium">{remaining}개 남음</span>
       )}
     </div>
   );

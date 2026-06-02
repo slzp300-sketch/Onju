@@ -29,6 +29,7 @@ export default function Modal({ isOpen, onClose, title, children, onOpenComplete
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className="fixed inset-0 bg-black/40 z-40"
             onClick={onClose}
           />
@@ -36,12 +37,12 @@ export default function Modal({ isOpen, onClose, title, children, onOpenComplete
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 60 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 max-h-[90dvh] overflow-y-auto"
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="fixed bottom-0 left-0 right-0 bg-surface rounded-t-3xl z-50 max-h-[90dvh] overflow-y-auto"
           >
-            <div className="flex items-center justify-between p-4 border-b border-gray-100">
-              {title && <h2 className="text-base font-semibold text-gray-900">{title}</h2>}
-              <button onClick={onClose} className="ml-auto p-1 text-gray-400 hover:text-gray-600">
+            <div className="flex items-center justify-between p-4 border-b border-line-soft">
+              {title && <h2 className="text-headline1 font-bold text-label-strong">{title}</h2>}
+              <button onClick={onClose} className="ml-auto p-1 text-label-assistive hover:text-label-alt transition-colors">
                 <X size={20} />
               </button>
             </div>

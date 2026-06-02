@@ -1,51 +1,49 @@
-import type { ButtonHTMLAttributes } from 'react';
+import { forwardRef } from 'react';
 import { motion, type HTMLMotionProps } from 'framer-motion';
+import { cn } from '../../lib/cn';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+type Variant = 'primary' | 'outlined' | 'assistive' | 'ghost' | 'danger';
+type Size = 'sm' | 'md' | 'lg';
+
+const VARIANTS: Record<Variant, string> = {
+  primary: 'bg-primary text-white hover:bg-primary-strong disabled:opacity-30',
+  outlined: 'bg-surface text-primary border border-primary hover:bg-primary-soft',
+  assistive: 'bg-fill text-label hover:bg-fill-strong',
+  ghost: 'bg-transparent text-label-alt hover:bg-fill',
+  danger: 'bg-negative text-white hover:opacity-90 disabled:opacity-30',
+};
+
+const SIZES: Record<Size, string> = {
+  lg: 'h-12 rounded-lg px-7 text-body1',
+  md: 'h-11 rounded-md px-5 text-body2',
+  sm: 'h-8 rounded px-3.5 text-label1',
+};
+
+export interface ButtonProps extends HTMLMotionProps<'button'> {
+  variant?: Variant;
+  size?: Size;
   fullWidth?: boolean;
 }
 
-const variantClasses = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800',
-  secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100',
-  ghost: 'text-gray-600 hover:bg-gray-100 active:bg-gray-200',
-  danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700',
-};
-
-const sizeClasses = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-6 py-3 text-base',
-};
-
-export default function Button({
-  variant = 'primary',
-  size = 'md',
-  fullWidth = false,
-  className = '',
-  disabled,
-  children,
-  ...props
-}: ButtonProps) {
-  return (
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'primary', size = 'lg', fullWidth, className, children, ...props }, ref) => (
     <motion.button
-      {...(props as HTMLMotionProps<'button'>)}
-      disabled={disabled}
-      whileTap={disabled ? undefined : { scale: 0.96 }}
-      whileHover={disabled ? undefined : { scale: 1.015 }}
-      transition={{ type: 'spring', stiffness: 700, damping: 20 }}
-      className={[
-        'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors',
-        variantClasses[variant],
-        sizeClasses[size],
-        fullWidth ? 'w-full' : '',
-        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+      ref={ref}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.12, ease: 'easeOut' }}
+      className={cn(
+        'inline-flex items-center justify-center gap-1.5 font-bold transition-colors',
+        'disabled:cursor-not-allowed',
+        SIZES[size],
+        VARIANTS[variant],
+        fullWidth && 'w-full',
         className,
-      ].join(' ')}
+      )}
+      {...props}
     >
       {children}
     </motion.button>
-  );
-}
+  ),
+);
+Button.displayName = 'Button';
+export default Button;
