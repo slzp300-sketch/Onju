@@ -209,12 +209,8 @@ export default function Dashboard() {
       <motion.div variants={itemV} className="flex-1 flex flex-col bg-surface border border-line rounded-t-3xl mx-3 overflow-hidden shadow-emphasize min-h-0">
 
         {/* 주간 날짜 스트립 */}
-        <div className="flex-shrink-0 px-3 pt-3 pb-2">
-          <div className="flex items-center gap-3 mb-2 px-1">
-            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-primary" /><span className="text-caption2 text-label-assistive font-medium">개인</span></div>
-            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-positive" /><span className="text-caption2 text-label-assistive font-medium">신앙</span></div>
-          </div>
-          <div className="flex justify-between gap-0.5">
+        <div className="flex-shrink-0 px-2 pt-3 pb-2">
+          <div className="flex gap-1">
             {weekDays.map((d, i) => {
               const ds = format(d, 'yyyy-MM-dd');
               const isToday = ds === todayStr;
@@ -222,25 +218,37 @@ export default function Dashboard() {
               const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
               const pRate = weekRates[i].personal;
               const fRate = weekRates[i].faith;
+              const bothDone = !isFuture && pRate === 100 && fRate === 100;
+              const anyDone = !isFuture && (pRate > 0 || fRate > 0);
 
               return (
                 <button key={ds} onClick={() => setSelectedDay(ds)}
-                  className="flex flex-col items-center gap-1 flex-1">
-                  <span className={`text-caption2 font-semibold ${isToday ? 'text-primary' : 'text-label-assistive'}`}>
+                  className={`flex-1 flex flex-col items-center gap-1 rounded-xl py-2 px-0.5 border-2 transition-all ${
+                    isSelected
+                      ? 'border-primary bg-primary-soft'
+                      : bothDone
+                      ? 'border-positive/30 bg-positive/5'
+                      : 'border-transparent'
+                  }`}>
+
+                  {/* 요일 */}
+                  <span className={`text-caption2 font-bold ${isToday ? 'text-primary' : 'text-label-assistive'}`}>
                     {ALL_DAY_LABELS[getDay(d)]}
                   </span>
 
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-label1 font-bold ${
-                    isSelected && isToday ? 'bg-primary text-white'
-                    : isSelected ? 'bg-label-strong text-white'
+                  {/* 날짜 */}
+                  <span className={`text-label1 font-bold ${
+                    isSelected && isToday ? 'text-primary'
+                    : isSelected ? 'text-label-strong'
                     : isToday ? 'text-primary'
                     : isFuture ? 'text-label-assistive'
                     : 'text-label'
                   }`}>
                     {format(d, 'd')}
-                  </div>
+                  </span>
 
-                  <div className="w-full h-1 bg-fill rounded-full overflow-hidden">
+                  {/* 개인 루틴 바 */}
+                  <div className="w-full h-2 bg-fill-strong rounded-full overflow-hidden">
                     {!isFuture && pRate >= 0 && (
                       <motion.div
                         className="h-full bg-primary rounded-full"
@@ -251,7 +259,8 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  <div className="w-full h-1 bg-fill rounded-full overflow-hidden">
+                  {/* 신앙 루틴 바 */}
+                  <div className="w-full h-2 bg-fill-strong rounded-full overflow-hidden">
                     {!isFuture && fRate >= 0 && (
                       <motion.div
                         className="h-full bg-positive rounded-full"
@@ -261,9 +270,22 @@ export default function Dashboard() {
                       />
                     )}
                   </div>
+
+                  {/* 완료 상태 도트 */}
+                  <div className={`w-1.5 h-1.5 rounded-full mt-0.5 ${
+                    bothDone ? 'bg-positive'
+                    : anyDone ? 'bg-primary/40'
+                    : 'bg-transparent'
+                  }`} />
                 </button>
               );
             })}
+          </div>
+
+          {/* 범례 */}
+          <div className="flex items-center gap-3 mt-2 px-1">
+            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-primary" /><span className="text-caption2 text-label-assistive">개인</span></div>
+            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-positive" /><span className="text-caption2 text-label-assistive">신앙</span></div>
           </div>
         </div>
 
