@@ -20,16 +20,16 @@ export default function ReviewBanner({ completed, weekRangeText, onStart }: Revi
       }`}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-label-alt mb-0.5">{weekRangeText}</p>
+        <p className="text-caption1 text-label-alt mb-0.5">{weekRangeText}</p>
         {completed ? (
-          <p className="text-sm font-semibold text-label-alt flex items-center gap-1.5">
+          <p className="text-label1 font-semibold text-label-alt flex items-center gap-1.5">
             <CheckCircle2 size={15} className="text-primary" />
             이번 주 리뷰 완료
           </p>
         ) : (
           <>
-            <p className="text-sm font-bold text-[#5854C7]">이번 주 리뷰하기</p>
-            <p className="text-xs text-[#7F77DD] mt-0.5">루틴을 점검하고 다음 주를 준비해요</p>
+            <p className="text-label1 font-bold text-[#5854C7]">이번 주 리뷰하기</p>
+            <p className="text-caption1 text-[#7F77DD] mt-0.5">루틴을 점검하고 다음 주를 준비해요</p>
           </>
         )}
       </div>

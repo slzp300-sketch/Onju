@@ -52,45 +52,45 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
     <Modal isOpen={isOpen} onClose={onClose} title="목표 추가">
       <div className="flex flex-col gap-4">
         <div>
-          <label className="text-xs font-medium text-label mb-1.5 block">목표 내용</label>
+          <label className="text-caption1 font-medium text-label mb-1.5 block">목표 내용</label>
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             placeholder="이번 기간 이루고 싶은 것은?"
-            className="w-full border border-line rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full border border-line rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:ring-2 focus:ring-primary"
             autoFocus
           />
         </div>
 
         <div>
-          <label className="text-xs font-medium text-label mb-1.5 block">목표 기간</label>
+          <label className="text-caption1 font-medium text-label mb-1.5 block">목표 기간</label>
           <div className="flex items-center gap-2">
             <input
               type="date"
               value={startDate}
               onChange={e => setStartDate(e.target.value)}
-              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex-1 border border-line rounded-xl px-3 py-2 text-body2 focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <span className="text-label-alt text-sm">~</span>
+            <span className="text-label-alt text-body2">~</span>
             <input
               type="date"
               value={endDate}
               min={startDate}
               onChange={e => setEndDate(e.target.value)}
-              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex-1 border border-line rounded-xl px-3 py-2 text-body2 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
         </div>
 
         {monthlyGoals.length > 0 && (
           <div>
-            <label className="text-xs font-medium text-label mb-1.5 block">월간 목표 연결 (선택)</label>
+            <label className="text-caption1 font-medium text-label mb-1.5 block">월간 목표 연결 (선택)</label>
             <select
               value={selectedMonthlyId}
               onChange={e => setSelectedMonthlyId(e.target.value)}
-              className="w-full border border-line rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-surface"
+              className="w-full border border-line rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:ring-2 focus:ring-primary bg-surface"
             >
               <option value="">연결 안 함</option>
               {monthlyGoals.map(g => (

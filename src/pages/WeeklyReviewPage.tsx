@@ -216,7 +216,7 @@ export default function WeeklyReviewPage() {
         >
           <ChevronLeft size={20} />
         </button>
-        <span className="text-xs font-semibold text-primary ml-auto">
+        <span className="text-caption1 font-semibold text-primary ml-auto">
           {step + 1} / 4
         </span>
       </div>
@@ -298,31 +298,31 @@ function ReviewSummaryStep({
 }) {
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">
-      <p className="text-xs text-label-alt mb-1">{weekRangeText}</p>
-      <h2 className="text-2xl font-bold text-label-strong mb-6">이번 주 요약</h2>
+      <p className="text-caption1 text-label-alt mb-1">{weekRangeText}</p>
+      <h2 className="text-title3 font-bold text-label-strong mb-6">이번 주 요약</h2>
 
       {/* 달성률 카드 */}
       <div className="grid grid-cols-2 gap-3 mb-6">
         <div className="bg-primary-soft rounded-2xl p-4 flex flex-col items-center">
-          <p className="text-xs font-medium text-primary mb-1">개인 루틴</p>
+          <p className="text-caption1 font-medium text-primary mb-1">개인 루틴</p>
           <p className="text-4xl font-bold text-primary">{personalRate}%</p>
         </div>
         <div className="bg-emerald-50 rounded-2xl p-4 flex flex-col items-center">
-          <p className="text-xs font-medium text-emerald-400 mb-1">신앙 루틴</p>
+          <p className="text-caption1 font-medium text-emerald-400 mb-1">신앙 루틴</p>
           <p className="text-4xl font-bold text-emerald-600">{faithRate}%</p>
         </div>
       </div>
 
       {/* 주간 목표 */}
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-sm font-semibold text-label">주간 목표</p>
-        <p className="text-xs text-label-alt">
+        <p className="text-body2 font-semibold text-label">주간 목표</p>
+        <p className="text-caption1 text-label-alt">
           {goalAchievedCount} / {goalTotalCount} 달성
         </p>
       </div>
 
       {goalTotalCount === 0 ? (
-        <p className="text-sm text-label-alt py-4 text-center">이번 주 목표가 없어요.</p>
+        <p className="text-body2 text-label-alt py-4 text-center">이번 주 목표가 없어요.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {weeklyGoals.map((goal) => {
@@ -330,11 +330,11 @@ function ReviewSummaryStep({
             return (
               <div key={goal.id} className="bg-surface-alt rounded-xl p-3">
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-sm text-label-strong font-medium flex-1 mr-2 line-clamp-1">
+                  <p className="text-body2 text-label-strong font-medium flex-1 mr-2 line-clamp-1">
                     {goal.title}
                   </p>
                   <p
-                    className={`text-xs font-semibold ${
+                    className={`text-caption1 font-semibold ${
                       low ? 'text-red-500' : 'text-emerald-600'
                     }`}
                   >
@@ -382,10 +382,10 @@ function ReviewFeedbackStep({
 }) {
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">
-      <h2 className="text-2xl font-bold text-label-strong mb-6">자기 피드백</h2>
+      <h2 className="text-title3 font-bold text-label-strong mb-6">자기 피드백</h2>
 
       {/* 기분 선택 */}
-      <p className="text-sm font-semibold text-label mb-3">이번 주 어땠나요?</p>
+      <p className="text-body2 font-semibold text-label mb-3">이번 주 어땠나요?</p>
       <div className="grid grid-cols-3 gap-2 mb-6">
         {MOODS.map((m) => (
           <button
@@ -398,7 +398,7 @@ function ReviewFeedbackStep({
             }`}
           >
             <span className="text-2xl">{m.emoji}</span>
-            <span className="text-xs font-medium text-label">{m.label}</span>
+            <span className="text-caption1 font-medium text-label">{m.label}</span>
           </button>
         ))}
       </div>
@@ -406,11 +406,11 @@ function ReviewFeedbackStep({
       {/* 목표별 별점 */}
       {weeklyGoals.length > 0 && (
         <>
-          <p className="text-sm font-semibold text-label mb-3">목표별 만족도</p>
+          <p className="text-body2 font-semibold text-label mb-3">목표별 만족도</p>
           <div className="flex flex-col gap-3 mb-6">
             {weeklyGoals.map((goal) => (
               <div key={goal.id} className="bg-surface-alt rounded-xl px-3 py-3">
-                <p className="text-sm text-label mb-2 line-clamp-1">{goal.title}</p>
+                <p className="text-body2 text-label mb-2 line-clamp-1">{goal.title}</p>
                 <StarRating
                   value={goalRatings[goal.id] ?? 0}
                   onChange={(r) => onRatingChange(goal.id, r)}
@@ -422,13 +422,13 @@ function ReviewFeedbackStep({
       )}
 
       {/* 한 줄 소감 */}
-      <p className="text-sm font-semibold text-label mb-2">한 줄 소감</p>
+      <p className="text-body2 font-semibold text-label mb-2">한 줄 소감</p>
       <textarea
         value={comment}
         onChange={(e) => onCommentChange(e.target.value)}
         placeholder="이번 주 한 줄 소감을 남겨보세요..."
         rows={3}
-        className="w-full border border-line rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+        className="w-full border border-line rounded-2xl px-4 py-3 text-body2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
       />
     </div>
   );
@@ -526,8 +526,8 @@ function ReviewImproveStep({
 
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">
-      <h2 className="text-2xl font-bold text-label-strong mb-2">루틴 개선</h2>
-      <p className="text-sm text-label-alt mb-5">다음 주 루틴을 조정해 보세요.</p>
+      <h2 className="text-title3 font-bold text-label-strong mb-2">루틴 개선</h2>
+      <p className="text-body2 text-label-alt mb-5">다음 주 루틴을 조정해 보세요.</p>
 
       <div className="flex flex-col gap-3 mb-4">
         {routines.map((routine) => {
@@ -546,19 +546,19 @@ function ReviewImproveStep({
             >
               <div className="flex items-center justify-between mb-1">
                 <p
-                  className={`text-sm font-medium ${
+                  className={`text-body2 font-medium ${
                     action === 'delete' ? 'text-red-400 line-through' : 'text-label-strong'
                   }`}
                 >
                   {routine.title}
                 </p>
-                <span className="text-xs text-label-alt ml-2 shrink-0">
+                <span className="text-caption1 text-label-alt ml-2 shrink-0">
                   {routine.type === 'personal' ? '개인' : '신앙'}
                 </span>
               </div>
 
               {rec && (
-                <p className="text-xs text-primary mb-2">{rec.message}</p>
+                <p className="text-caption1 text-primary mb-2">{rec.message}</p>
               )}
 
               {/* 액션 버튼 */}
@@ -595,7 +595,7 @@ function ReviewImproveStep({
                     onChange={(e) =>
                       updateEditData(routine.id, { title: e.target.value })
                     }
-                    className="w-full border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full border border-line rounded-xl px-3 py-2 text-body2 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <div className="flex gap-1.5">
                     {(['daily', 'weekdays', 'weekends'] as Frequency[]).map((f) => {
@@ -606,7 +606,7 @@ function ReviewImproveStep({
                         <button
                           key={f}
                           onClick={() => updateEditData(routine.id, { frequency: f })}
-                          className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          className={`flex-1 py-1.5 rounded-lg text-caption1 font-medium transition-colors ${
                             currentFreq === f
                               ? 'bg-primary-soft text-primary'
                               : 'bg-surface border border-line text-label-alt'
@@ -634,7 +634,7 @@ function ReviewImproveStep({
               onChange={(e) => setNewTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addNewRoutine()}
               placeholder="새 루틴 이름"
-              className="flex-1 border border-line rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-surface"
+              className="flex-1 border border-line rounded-xl px-3 py-2 text-body2 focus:outline-none focus:ring-2 focus:ring-primary bg-surface"
               autoFocus
             />
             <button
@@ -649,7 +649,7 @@ function ReviewImproveStep({
               <button
                 key={f}
                 onClick={() => setNewFreq(f)}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                className={`flex-1 py-1.5 rounded-lg text-caption1 font-medium transition-colors ${
                   newFreq === f
                     ? 'bg-primary-soft text-primary'
                     : 'bg-surface border border-line text-label-alt'
@@ -666,7 +666,7 @@ function ReviewImproveStep({
       ) : (
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-1.5 text-sm font-medium text-primary py-2 px-1"
+          className="flex items-center gap-1.5 text-body2 font-medium text-primary py-2 px-1"
         >
           <Plus size={16} />
           새 루틴 추가
@@ -682,8 +682,8 @@ function ReviewImproveStep({
             className="flex items-center gap-2 bg-primary-soft rounded-xl px-3 py-2.5 mt-2"
           >
             <Plus size={13} className="text-primary shrink-0" />
-            <span className="flex-1 text-sm text-label-strong">{c.newRoutine!.title}</span>
-            <span className="text-xs text-primary">
+            <span className="flex-1 text-body2 text-label-strong">{c.newRoutine!.title}</span>
+            <span className="text-caption1 text-primary">
               {FREQ_LABELS[c.newRoutine!.frequency as Frequency]}
             </span>
             <button
@@ -716,7 +716,7 @@ function ActionButton({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-caption1 font-medium transition-colors ${
         active ? activeColor : 'bg-surface border border-line text-label-alt'
       }`}
     >
@@ -742,20 +742,20 @@ function ReviewIntentionStep({
 }) {
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">
-      <h2 className="text-2xl font-bold text-label-strong mb-2">다음 주 의도</h2>
-      <p className="text-sm text-label-alt mb-5">한 가지 집중할 것을 정해보세요.</p>
+      <h2 className="text-title3 font-bold text-label-strong mb-2">다음 주 의도</h2>
+      <p className="text-body2 text-label-alt mb-5">한 가지 집중할 것을 정해보세요.</p>
 
       <textarea
         value={intention}
         onChange={(e) => onIntentionChange(e.target.value)}
         placeholder="다음 주에 집중할 한 가지는..."
         rows={4}
-        className="w-full border border-line rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary mb-6"
+        className="w-full border border-line rounded-2xl px-4 py-3 text-body2 resize-none focus:outline-none focus:ring-2 focus:ring-primary mb-6"
       />
 
       {/* 소모임 나눔 */}
-      <p className="text-sm font-semibold text-label mb-3">소모임 나눔</p>
-      <p className="text-xs text-label-alt mb-3">
+      <p className="text-body2 font-semibold text-label mb-3">소모임 나눔</p>
+      <p className="text-caption1 text-label-alt mb-3">
         선택한 소모임에 이번 주 소감과 다음 주 의도를 공유해요.
       </p>
       <div className="flex flex-col gap-2">
@@ -767,7 +767,7 @@ function ReviewIntentionStep({
               className="flex items-center gap-3 bg-surface-alt rounded-2xl px-4 py-3"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-label-strong truncate">{group.title}</p>
+                <p className="text-body2 font-medium text-label-strong truncate">{group.title}</p>
               </div>
               {/* 토글 스위치 */}
               <button

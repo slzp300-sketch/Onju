@@ -18,11 +18,11 @@ export default function WeeklyGoalCard({ goal, monthlyTitle }: WeeklyGoalCardPro
     <div className="bg-white rounded-2xl p-4 border border-line-soft shadow-sm">
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-label-strong">{goal.title}</p>
+          <p className="text-label1 font-semibold text-label-strong">{goal.title}</p>
           {monthlyTitle && (
-            <p className="text-xs text-primary mt-0.5">{monthlyTitle}</p>
+            <p className="text-caption1 text-primary mt-0.5">{monthlyTitle}</p>
           )}
-          <p className="text-xs text-label-alt mt-1">{formatDateRange(goal.startDate, goal.endDate)}</p>
+          <p className="text-caption1 text-label-alt mt-1">{formatDateRange(goal.startDate, goal.endDate)}</p>
         </div>
         <button
           onClick={() => removeWeeklyGoal(goal.id)}
@@ -42,7 +42,7 @@ export default function WeeklyGoalCard({ goal, monthlyTitle }: WeeklyGoalCardPro
             }}
           />
         </div>
-        <span className="text-xs text-label-alt w-12 text-right flex-shrink-0">
+        <span className="text-caption1 text-label-alt w-12 text-right flex-shrink-0">
           {elapsed}/{total}일
         </span>
       </div>

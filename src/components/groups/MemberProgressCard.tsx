@@ -42,17 +42,17 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
       >
         {/* 상단: 아바타 + 이름 + 응원 */}
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-full bg-primary-soft flex items-center justify-center text-primary font-semibold text-sm flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-primary-soft flex items-center justify-center text-primary font-semibold text-body2 flex-shrink-0">
             {initial}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-label-strong truncate">{member.userName}</p>
+            <p className="text-label1 font-semibold text-label-strong truncate">{member.userName}</p>
             <div className="flex items-center gap-1 text-orange-500">
               <Flame size={12} />
-              <span className="text-xs font-medium">{member.streak}일 연속</span>
+              <span className="text-caption1 font-medium">{member.streak}일 연속</span>
             </div>
           </div>
-          <span className="text-xs font-semibold text-label">{member.weeklyRate}%</span>
+          <span className="text-caption2 font-semibold text-label">{member.weeklyRate}%</span>
 
           {/* 응원 버튼 */}
           <div className="relative" onClick={e => e.stopPropagation()}>
@@ -83,7 +83,7 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
                       className="flex flex-col items-center gap-0.5 p-2 rounded-xl hover:bg-surface-alt transition-colors"
                     >
                       <span className="text-xl">{CHEER_ICONS[type]}</span>
-                      <span className="text-xs text-label-alt">{CHEER_LABELS[type]}</span>
+                      <span className="text-caption1 text-label-alt">{CHEER_LABELS[type]}</span>
                     </button>
                   ))}
                 </motion.div>
@@ -135,7 +135,7 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-primary font-semibold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-primary font-semibold text-body2">
                     {initial}
                   </div>
                   <p className="font-semibold text-label-strong">{member.userName}</p>
@@ -153,7 +153,7 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
 
               <div className="flex items-center gap-1 text-orange-500 justify-center">
                 <Flame size={16} />
-                <span className="text-sm font-semibold">{member.streak}일 연속 달성</span>
+                <span className="text-label1 font-semibold">{member.streak}일 연속 달성</span>
               </div>
             </motion.div>
           </motion.div>
@@ -167,8 +167,8 @@ function MiniBar({ label, rate, color }: { label: string; rate: number; color: s
   return (
     <div>
       <div className="flex justify-between mb-1">
-        <span className="text-xs text-label-alt">{label}</span>
-        <span className="text-xs font-medium text-label">{rate}%</span>
+        <span className="text-caption1 text-label-alt">{label}</span>
+        <span className="text-caption1 font-medium text-label">{rate}%</span>
       </div>
       <div className="bg-fill rounded-full h-1.5 overflow-hidden">
         <div
@@ -187,8 +187,8 @@ function StatPill({ label, value, color }: { label: string; value: string; color
   };
   return (
     <div className="bg-surface-alt rounded-2xl p-3 text-center">
-      <p className="text-xs text-label-alt mb-1">{label}</p>
-      <p className={`text-lg font-bold ${color ? colorMap[color] : 'text-label-strong'}`}>{value}</p>
+      <p className="text-caption1 text-label-alt mb-1">{label}</p>
+      <p className={`text-heading2 font-bold ${color ? colorMap[color] : 'text-label-strong'}`}>{value}</p>
     </div>
   );
 }

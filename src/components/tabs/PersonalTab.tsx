@@ -44,8 +44,8 @@ export default function PersonalTab() {
       <div className="relative">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
           <div className="w-20 h-20 rounded-full bg-primary-soft flex items-center justify-center text-4xl mb-5">😊</div>
-          <p className="text-base font-bold text-label mb-1">첫 번째 습관을 시작해 보세요</p>
-          <p className="text-sm text-label-alt leading-relaxed">
+          <p className="text-headline1 font-bold text-label mb-1">첫 번째 습관을 시작해 보세요</p>
+          <p className="text-body2 text-label-alt leading-relaxed">
             작은 습관 하나가 직장 생활을<br />조금 더 단단하게 만들어 줄 거예요
           </p>
         </div>
@@ -66,8 +66,8 @@ export default function PersonalTab() {
         <div>
           {personalRoutines.length > 0 && (
             <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
-              <span className="text-sm">📋</span>
-              <span className="flex-1 text-xs font-bold text-label">개별 습관</span>
+              <span className="text-body2">📋</span>
+              <span className="flex-1 text-caption2 font-bold text-label">개별 습관</span>
               <CompletedBadge habits={standaloneHabits} />
             </div>
           )}
@@ -114,14 +114,14 @@ function RoutineGroup({ routineId }: { routineId: string }) {
         </motion.button>
 
         <span className="text-lg">{routine.emoji}</span>
-        <span className="flex-1 text-sm font-bold text-label-strong">{routine.title}</span>
+        <span className="flex-1 text-label1 font-bold text-label-strong">{routine.title}</span>
 
         {routine.when && (
           <span className="text-[11px] text-label-alt mr-1">{routine.when}</span>
         )}
 
         {/* 진행률 뱃지 */}
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>
+        <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>
           {completedCount}/{routineHabits.length}
         </span>
 
@@ -192,7 +192,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
       className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${done ? 'opacity-70' : ''}`}
     >
       {/* 번호 */}
-      <span className={`text-xs font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
+      <span className={`text-caption2 font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
         {index}
       </span>
 
@@ -203,7 +203,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
 
       {/* 텍스트 */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-semibold truncate ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
+        <p className={`text-label1 font-semibold truncate ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
           {habit.title}
         </p>
         {habit.when && (
@@ -266,7 +266,7 @@ function CompletedBadge({ habits }: { habits: Habit[] }) {
   const done = habits.filter(h => isHabitCompleted(h.id, todayStr())).length;
   const allDone = done === habits.length;
   return (
-    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>
+    <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>
       {done}/{habits.length}
     </span>
   );

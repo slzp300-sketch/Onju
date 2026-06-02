@@ -20,7 +20,7 @@ export default function InsightCards() {
 
   return (
     <div className="px-4 flex flex-col gap-2">
-      <p className="text-xs font-semibold text-label-alt">패턴 분석</p>
+      <p className="text-caption2 font-semibold text-label-alt">패턴 분석</p>
       {insights.map((ins, i) => (
         <InsightCard key={ins.id} insight={ins} index={i} onAction={ins.actionPath ? () => navigate(ins.actionPath!) : undefined} />
       ))}
@@ -40,12 +40,12 @@ function InsightCard({ insight, index, onAction }: { insight: Insight; index: nu
       <div className="flex items-start gap-2">
         <span className="text-lg leading-none mt-0.5">{insight.emoji}</span>
         <div className="flex-1 min-w-0">
-          <p className={`text-sm font-semibold leading-snug ${c.title}`}>{insight.title}</p>
-          <p className={`text-xs mt-1 leading-relaxed ${c.body} opacity-80`}>{insight.body}</p>
+          <p className={`text-label1 font-semibold leading-snug ${c.title}`}>{insight.title}</p>
+          <p className={`text-caption1 mt-1 leading-relaxed ${c.body} opacity-80`}>{insight.body}</p>
           {onAction && insight.actionLabel && (
             <button
               onClick={onAction}
-              className={`mt-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white ${c.btn}`}
+              className={`mt-2.5 px-3 py-1.5 rounded-lg text-caption1 font-medium text-white ${c.btn}`}
             >
               {insight.actionLabel} →
             </button>

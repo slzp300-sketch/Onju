@@ -93,23 +93,23 @@ export default function RoutineTimer() {
   if (status === 'done') {
     const totalActual = Object.values(elapsed).reduce((s, v) => s + v, 0);
     return (
-      <div className="fixed inset-0 bg-gray-900 z-50 flex flex-col items-center justify-between px-6"
+      <div className="fixed inset-0 bg-cool-22 z-50 flex flex-col items-center justify-between px-6"
         style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))', paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
 
         <div className="flex-1 flex flex-col items-center justify-center gap-6 w-full">
           {/* 성공 아이콘 */}
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-            className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/30">
+            className="w-20 h-20 rounded-full bg-positive flex items-center justify-center shadow-lg shadow-positive/30">
             <Check size={38} className="text-white" strokeWidth={2.5} />
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="text-2xl font-bold text-white">루틴을 성공했어요!</motion.h1>
+            className="text-title3 font-bold text-white">루틴을 성공했어요!</motion.h1>
 
           {/* 총 소요 시간 */}
-          <div className="w-full bg-gray-800 rounded-2xl px-5 py-4 text-center">
-            <p className="text-gray-400 text-sm">⏱️ 총 소요시간 <span className="text-white font-bold">{totalActual}초</span></p>
+          <div className="w-full bg-cool-25 rounded-xl px-5 py-4 text-center">
+            <p className="text-cool-60 text-body2">⏱️ 총 소요시간 <span className="text-white font-bold">{totalActual}초</span></p>
           </div>
 
           {/* 습관별 결과 */}
@@ -123,10 +123,10 @@ export default function RoutineTimer() {
                   initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + i * 0.07 }}
                   className="flex items-center justify-between">
-                  <span className="text-white text-sm">{h.emoji} {h.title}</span>
+                  <span className="text-white text-body2">{h.emoji} {h.title}</span>
                   <div className="text-right">
-                    <span className="text-white text-sm font-semibold">{actual}초</span>
-                    <span className={`text-xs ml-1.5 ${diff <= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className="text-white text-body2 font-semibold">{actual}초</span>
+                    <span className={`text-caption1 ml-1.5 ${diff <= 0 ? 'text-positive' : 'text-negative'}`}>
                       ({diff > 0 ? '+' : ''}{diff}초)
                     </span>
                   </div>
@@ -140,11 +140,11 @@ export default function RoutineTimer() {
         <div className="w-full flex flex-col gap-3">
           <motion.button whileTap={{ scale: 0.97 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
             onClick={() => navigate(-1)}
-            className="w-full py-4 rounded-2xl bg-green-500 text-white font-bold text-base shadow-lg shadow-green-500/20">
+            className="w-full py-4 rounded-xl bg-positive text-white font-bold text-body1 shadow-lg shadow-positive/20">
             완료
           </motion.button>
           <button onClick={() => navigate(`/personal-routines/edit/${routine.id}`)}
-            className="text-gray-500 text-sm text-center py-2 hover:text-gray-300 transition-colors">
+            className="text-cool-50 text-body2 text-center py-2 hover:text-cool-90 transition-colors">
             수정하기
           </button>
         </div>
@@ -154,22 +154,22 @@ export default function RoutineTimer() {
 
   /* ── 타이머 실행 화면 ── */
   return (
-    <div className="fixed inset-0 bg-gray-900 z-50 flex flex-col"
+    <div className="fixed inset-0 bg-cool-22 z-50 flex flex-col"
       style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
 
       {/* 헤더 */}
       <div className="flex items-center justify-between px-5 pt-10 pb-4">
         <div className="w-8" />
-        <p className="text-gray-400 text-sm font-medium">{routine.emoji} {routine.title}</p>
-        <motion.button whileTap={{ scale: 0.88 }} onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
-          <X size={16} className="text-gray-400" />
+        <p className="text-cool-60 text-body2 font-medium">{routine.emoji} {routine.title}</p>
+        <motion.button whileTap={{ scale: 0.88 }} onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-cool-25 flex items-center justify-center">
+          <X size={16} className="text-cool-60" />
         </motion.button>
       </div>
 
       {/* 진행 도트 */}
       <div className="flex items-center justify-center gap-1.5 pb-2">
         {routineHabits.map((_, i) => (
-          <div key={i} className={`rounded-full transition-all ${i === idx ? 'w-5 h-1.5 bg-green-400' : i < idx ? 'w-1.5 h-1.5 bg-green-600' : 'w-1.5 h-1.5 bg-gray-700'}`} />
+          <div key={i} className={`rounded-full transition-all ${i === idx ? 'w-5 h-1.5 bg-positive' : i < idx ? 'w-1.5 h-1.5 bg-green-600' : 'w-1.5 h-1.5 bg-cool-30'}`} />
         ))}
       </div>
 
@@ -181,7 +181,7 @@ export default function RoutineTimer() {
             {/* 이모지 */}
             <span className="text-6xl">{current?.emoji}</span>
             {/* 이름 */}
-            <h2 className="text-2xl font-bold text-white text-center">{current?.title}</h2>
+            <h2 className="text-title3 font-bold text-white text-center">{current?.title}</h2>
           </motion.div>
         </AnimatePresence>
 
@@ -194,19 +194,19 @@ export default function RoutineTimer() {
         >
           {fmt(timeLeft)}
         </motion.p>
-        <p className="text-gray-500 text-sm">{getDuration(current?.id ?? '')}초</p>
+        <p className="text-cool-50 text-body2">{getDuration(current?.id ?? '')}초</p>
 
         {/* 프로그레스 바 */}
-        <div className="w-full h-1.5 bg-gray-700 rounded-full overflow-hidden">
-          <motion.div className="h-full bg-green-400 rounded-full"
+        <div className="w-full h-1.5 bg-cool-30 rounded-full overflow-hidden">
+          <motion.div className="h-full bg-positive rounded-full"
             animate={{ width: `${progress * 100}%` }} transition={{ duration: 1, ease: 'linear' }} />
         </div>
 
         {/* 다음 습관 */}
         {next ? (
-          <p className="text-gray-500 text-sm">다음: {next.emoji} {next.title}</p>
+          <p className="text-cool-50 text-body2">다음: {next.emoji} {next.title}</p>
         ) : (
-          <p className="text-gray-600 text-sm">마지막 습관이에요</p>
+          <p className="text-cool-50 text-body2">마지막 습관이에요</p>
         )}
       </div>
 
@@ -217,20 +217,20 @@ export default function RoutineTimer() {
           <div className="flex flex-col items-center gap-1.5">
             <motion.button whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
               onClick={() => setStatus(s => s === 'running' ? 'paused' : 'running')}
-              className="w-13 h-13 w-[52px] h-[52px] rounded-full bg-gray-700 flex items-center justify-center">
+              className="w-13 h-13 w-[52px] h-[52px] rounded-full bg-cool-30 flex items-center justify-center">
               {status === 'running'
                 ? <Pause size={22} className="text-white" />
                 : <Play size={22} className="text-white" fill="white" />
               }
             </motion.button>
-            <span className="text-gray-500 text-xs">{status === 'running' ? '정지' : '재개'}</span>
+            <span className="text-cool-50 text-caption1">{status === 'running' ? '정지' : '재개'}</span>
           </div>
 
           {/* 완료 */}
           <div className="flex flex-col items-center gap-1.5">
             <motion.button whileTap={{ scale: 0.9 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
               onClick={() => advance(false)}
-              className="w-[64px] h-[64px] rounded-full bg-green-500 flex items-center justify-center shadow-xl shadow-green-500/30">
+              className="w-[64px] h-[64px] rounded-full bg-positive flex items-center justify-center shadow-xl shadow-positive/30">
               <Check size={30} className="text-white" strokeWidth={2.5} />
             </motion.button>
           </div>
@@ -239,16 +239,16 @@ export default function RoutineTimer() {
           <div className="flex flex-col items-center gap-1.5">
             <motion.button whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
               onClick={() => advance(true)}
-              className="w-[52px] h-[52px] rounded-full bg-gray-700 flex items-center justify-center">
+              className="w-[52px] h-[52px] rounded-full bg-cool-30 flex items-center justify-center">
               <SkipForward size={22} className="text-white" />
             </motion.button>
-            <span className="text-gray-500 text-xs">스킵</span>
+            <span className="text-cool-50 text-caption1">스킵</span>
           </div>
         </div>
 
         {/* 예상 종료 시간 */}
-        <p className="text-center text-gray-600 text-sm">
-          루틴이 <span className="text-gray-300 font-medium">{fmtHHMM(estimatedEnd)}</span>에 끝나요
+        <p className="text-center text-cool-50 text-body2">
+          루틴이 <span className="text-cool-90 font-medium">{fmtHHMM(estimatedEnd)}</span>에 끝나요
         </p>
       </div>
     </div>

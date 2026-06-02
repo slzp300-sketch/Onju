@@ -40,8 +40,8 @@ export default function FaithTab() {
       <div className="relative">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
           <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-4xl mb-5">🙏</div>
-          <p className="text-base font-bold text-label mb-1">신앙으로 하루를 시작해 보세요</p>
-          <p className="text-sm text-label-alt leading-relaxed">
+          <p className="text-headline1 font-bold text-label mb-1">신앙으로 하루를 시작해 보세요</p>
+          <p className="text-body2 text-label-alt leading-relaxed">
             말씀과 기도로 쌓아가는 하루가<br />직장 생활의 든든한 버팀목이 돼요
           </p>
         </div>
@@ -59,10 +59,10 @@ export default function FaithTab() {
         return (
           <div key={group.value}>
             <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
-              <span className="text-xs font-bold text-label-alt w-10 flex-shrink-0">{group.time}</span>
-              <span className="text-sm">{group.emoji}</span>
-              <span className="flex-1 text-xs font-bold text-label">{group.label} 루틴</span>
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-label-alt'}`}>
+              <span className="text-caption2 font-bold text-label-alt w-10 flex-shrink-0">{group.time}</span>
+              <span className="text-body2">{group.emoji}</span>
+              <span className="flex-1 text-caption2 font-bold text-label">{group.label} 루틴</span>
+              <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-label-alt'}`}>
                 {cnt}/{group.routines.length}
               </span>
             </div>
@@ -85,9 +85,9 @@ export default function FaithTab() {
         <div>
           {grouped.length > 0 && (
             <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
-              <span className="text-sm">🙏</span>
-              <span className="flex-1 text-xs font-bold text-label">기타 신앙 루틴</span>
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+              <span className="text-body2">🙏</span>
+              <span className="flex-1 text-caption2 font-bold text-label">기타 신앙 루틴</span>
+              <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${
                 unslotted.filter(r => isCompleted(r.id)).length === unslotted.length
                   ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-label-alt'
               }`}>
@@ -133,7 +133,7 @@ function FaithRoutineRow({ routine, index, onRemove }: {
         className={`flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${done ? 'opacity-70' : ''}`}
       >
         {/* 번호 */}
-        <span className={`text-xs font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
+        <span className={`text-caption2 font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
           {index}
         </span>
 
@@ -144,7 +144,7 @@ function FaithRoutineRow({ routine, index, onRemove }: {
 
         {/* 텍스트 */}
         <div className="flex-1 min-w-0">
-          <p className={`text-sm font-semibold truncate ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
+          <p className={`text-label1 font-semibold truncate ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
             {routine.title}
           </p>
           {routine.durationSeconds && !done && (

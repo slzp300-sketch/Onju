@@ -57,8 +57,8 @@ export default function RoutineShare() {
     <div className="flex flex-col min-h-full">
       {/* 헤더 */}
       <div className="px-4 pt-5 pb-3">
-        <h1 className="text-lg font-bold text-label-strong">루틴 공유</h1>
-        <p className="text-xs text-label-alt mt-0.5">다른 사람의 루틴을 발견하고 나의 루틴을 공유해요</p>
+        <h1 className="text-heading2 font-bold text-label-strong">루틴 공유</h1>
+        <p className="text-caption1 text-label-alt mt-0.5">다른 사람의 루틴을 발견하고 나의 루틴을 공유해요</p>
       </div>
 
       {/* 탭 */}
@@ -68,7 +68,7 @@ export default function RoutineShare() {
           { key: 'my' as TabType, label: '내 루틴 공유' },
         ]).map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`relative pb-2.5 mr-6 text-sm font-bold transition-colors ${activeTab === tab.key ? 'text-label-strong' : 'text-label-alt'}`}>
+            className={`relative pb-2.5 mr-6 text-label1 font-bold transition-colors ${activeTab === tab.key ? 'text-label-strong' : 'text-label-alt'}`}>
             {tab.label}
             {activeTab === tab.key && (
               <motion.div layoutId="shareTabLine" className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full" />
@@ -86,14 +86,14 @@ export default function RoutineShare() {
         </div>
       ) : (
         <div className="flex flex-col gap-3 px-4 py-4 pb-24">
-          <p className="text-xs text-label-alt leading-relaxed">
+          <p className="text-caption1 text-label-alt leading-relaxed">
             내 루틴을 공유하면 다른 사람들에게 영감을 줄 수 있어요.
           </p>
           {personalRoutines.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 text-center">
               <span className="text-4xl mb-3">🗂️</span>
-              <p className="text-sm font-semibold text-label">아직 만든 루틴이 없어요</p>
-              <p className="text-xs text-label-alt mt-1">홈에서 루틴을 먼저 만들어 보세요</p>
+              <p className="text-label1 font-semibold text-label">아직 만든 루틴이 없어요</p>
+              <p className="text-caption1 text-label-alt mt-1">홈에서 루틴을 먼저 만들어 보세요</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
@@ -103,17 +103,17 @@ export default function RoutineShare() {
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">{r.emoji}</span>
                       <div>
-                        <p className="text-sm font-bold text-label-strong">{r.title}</p>
-                        {r.when && <p className="text-xs text-label-alt">{r.when}</p>}
+                        <p className="text-label1 font-bold text-label-strong">{r.title}</p>
+                        {r.when && <p className="text-caption1 text-label-alt">{r.when}</p>}
                       </div>
                     </div>
-                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded-xl hover:bg-primary transition-colors">
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-caption2 font-semibold rounded-xl hover:bg-primary transition-colors">
                       <Share2 size={12} /> 공유
                     </button>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-label-alt">{r.habitIds.length}개 습관</span>
-                    {r.timerEnabled && <span className="text-xs text-primary font-medium">· 타이머</span>}
+                    <span className="text-caption1 text-label-alt">{r.habitIds.length}개 습관</span>
+                    {r.timerEnabled && <span className="text-caption1 text-primary font-medium">· 타이머</span>}
                   </div>
                 </div>
               ))}
@@ -137,7 +137,7 @@ function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
           {data.userEmoji}
         </div>
         <div className="flex-1">
-          <p className="text-xs font-semibold text-label-strong">{data.userName}</p>
+          <p className="text-caption2 font-semibold text-label-strong">{data.userName}</p>
         </div>
         <button onClick={() => setSaved(v => !v)}
           className={`transition-colors ${saved ? 'text-primary' : 'text-label-assistive hover:text-label-alt'}`}>
@@ -150,8 +150,8 @@ function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xl">{data.routineEmoji}</span>
           <div>
-            <p className="text-sm font-bold text-label-strong">{data.routineName}</p>
-            <p className="text-xs text-label-alt">{data.when}</p>
+            <p className="text-label1 font-bold text-label-strong">{data.routineName}</p>
+            <p className="text-caption1 text-label-alt">{data.when}</p>
           </div>
         </div>
 
@@ -159,8 +159,8 @@ function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
         <div className="flex flex-col gap-1 ml-1 mb-3">
           {data.habits.map((h, idx) => (
             <div key={idx} className="flex items-center gap-2">
-              <span className="text-xs font-bold text-label-assistive w-3">{idx + 1}</span>
-              <span className="text-xs text-label">{h}</span>
+              <span className="text-caption2 font-bold text-label-assistive w-3">{idx + 1}</span>
+              <span className="text-caption1 text-label">{h}</span>
             </div>
           ))}
         </div>
@@ -168,11 +168,11 @@ function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
         {/* 좋아요 */}
         <div className="flex items-center justify-between border-t border-gray-50 pt-2.5">
           <button onClick={() => setLiked(v => !v)}
-            className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${liked ? 'text-red-400' : 'text-label-alt hover:text-red-300'}`}>
+            className={`flex items-center gap-1.5 text-caption2 font-semibold transition-colors ${liked ? 'text-red-400' : 'text-label-alt hover:text-red-300'}`}>
             <Heart size={14} fill={liked ? 'currentColor' : 'none'} />
             {data.likes + (liked ? 1 : 0)}
           </button>
-          <button className="text-xs text-primary font-semibold hover:text-primary transition-colors">
+          <button className="text-caption1 text-primary font-semibold hover:text-primary transition-colors">
             나도 따라하기
           </button>
         </div>

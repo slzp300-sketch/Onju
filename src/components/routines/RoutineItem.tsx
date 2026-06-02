@@ -44,11 +44,11 @@ export default function RoutineItem({ routine, dragHandle }: RoutineItemProps) {
         </motion.button>
 
         <div className="flex-1 min-w-0">
-          <span className={`text-sm ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
+          <span className={`text-body2 ${done ? 'line-through text-label-alt' : 'text-label-strong'}`}>
             {routine.title}
           </span>
           {routine.durationMinutes && (
-            <span className="ml-2 inline-flex items-center gap-0.5 text-xs text-label-alt">
+            <span className="ml-2 inline-flex items-center gap-0.5 text-caption1 text-label-alt">
               <Clock size={10} />
               {routine.durationMinutes}분
             </span>
@@ -60,7 +60,7 @@ export default function RoutineItem({ routine, dragHandle }: RoutineItemProps) {
             whileTap={{ scale: 0.9 }}
             onClick={() => setFocusOpen(true)}
             className={[
-              'flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors',
+              'flex items-center gap-1 px-2.5 py-1 rounded-lg text-caption1 font-medium transition-colors',
               routine.type === 'faith'
                 ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
                 : 'bg-primary-soft text-primary hover:bg-primary-soft',

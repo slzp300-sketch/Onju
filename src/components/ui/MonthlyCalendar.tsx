@@ -54,7 +54,7 @@ export default function MonthlyCalendar({
         {WEEKDAY_LABELS.map((label, i) => (
           <div
             key={label}
-            className={`text-center text-xs font-medium py-1 ${
+            className={`text-center text-caption1 font-medium py-1 ${
               i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-label-alt'
             }`}
           >
@@ -77,7 +77,7 @@ export default function MonthlyCalendar({
               isToday ? 'ring-2 ring-primary ring-offset-1' : ''
             }`}
           >
-            <div className={`text-center text-xs py-0.5 ${
+            <div className={`text-center text-caption1 py-0.5 ${
               isToday ? 'font-bold text-primary' : isFuture ? 'text-label-assistive' : 'text-label-alt'
             }`}>
               {format(day, 'd')}
@@ -118,15 +118,15 @@ export default function MonthlyCalendar({
       <div className="flex gap-3 mt-3">
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-sm bg-primary" />
-          <span className="text-xs text-label-alt">개인</span>
+          <span className="text-caption1 text-label-alt">개인</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-sm bg-emerald-400" />
-          <span className="text-xs text-label-alt">신앙</span>
+          <span className="text-caption1 text-label-alt">신앙</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-sm bg-fill" />
-          <span className="text-xs text-label-alt">미완료</span>
+          <span className="text-caption1 text-label-alt">미완료</span>
         </div>
       </div>
 
@@ -145,8 +145,8 @@ export default function MonthlyCalendar({
 function SummaryBadge({ label, count, color, bg }: { label: string; count: number; color: string; bg: string }) {
   return (
     <div className={`flex-1 rounded-xl px-2 py-1.5 text-center ${bg}`}>
-      <p className={`text-base font-bold ${color}`}>{count}</p>
-      <p className="text-xs text-label-alt mt-0.5">{label}</p>
+      <p className={`text-headline1 font-bold ${color}`}>{count}</p>
+      <p className="text-caption1 text-label-alt mt-0.5">{label}</p>
     </div>
   );
 }

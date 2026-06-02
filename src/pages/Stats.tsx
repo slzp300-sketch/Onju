@@ -238,9 +238,8 @@ function WeeklyTab() {
           <div className="flex flex-col gap-2">
             {reviews.slice(0, 4).map((review, i) => (
               <motion.button key={review.id}
-                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, duration: 0.12 }}
                 whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.12 }}
                 onClick={() => navigate(`/review/result/${review.year}-${review.weekNumber}`)}
                 className="w-full bg-surface rounded-xl p-4 border border-line shadow-emphasize text-left flex items-center gap-3 hover:bg-fill transition-colors">
                 <div className="flex-1 min-w-0">

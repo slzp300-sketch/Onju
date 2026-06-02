@@ -75,7 +75,7 @@ export default function StreakCounter({
                 />
               </div>
 
-              <p className="text-xs text-label-alt text-center">
+              <p className="text-caption1 text-label-alt text-center">
                 달성률 50% 이상이면 그날 연속 달성으로 인정돼요
               </p>
             </motion.div>
@@ -96,8 +96,8 @@ function StreakPill({ icon, value, label, color }: {
     <div className="flex items-center gap-2 flex-1">
       <span className="text-lg">{icon}</span>
       <div>
-        <p className={`text-base font-bold ${color}`}>{value}일</p>
-        <p className="text-xs text-label-alt">{label}</p>
+        <p className={`text-headline1 font-bold ${color}`}>{value}일</p>
+        <p className="text-caption1 text-label-alt">{label}</p>
       </div>
     </div>
   );
@@ -119,11 +119,11 @@ function DetailCard({ icon, label, streak, best, color }: {
   return (
     <div className={`rounded-2xl border p-4 ${colorMap[color]}`}>
       <div className="text-2xl mb-2">{icon}</div>
-      <p className="text-xs font-medium text-label-alt mb-1">{label}</p>
-      <p className="text-2xl font-bold text-label-strong">{streak}<span className="text-sm font-medium text-label-alt ml-1">일</span></p>
-      <p className="text-xs text-label-alt mt-1">최고 {best}일</p>
+      <p className="text-caption1 font-medium text-label-alt mb-1">{label}</p>
+      <p className="text-title3 font-bold text-label-strong">{streak}<span className="text-body2 font-medium text-label-alt ml-1">일</span></p>
+      <p className="text-caption1 text-label-alt mt-1">최고 {best}일</p>
       {next && (
-        <p className="text-xs mt-2 font-medium">
+        <p className="text-caption1 mt-2 font-medium">
           다음 기록 목표까지 {next - streak}일
         </p>
       )}

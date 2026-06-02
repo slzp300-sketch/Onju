@@ -8,10 +8,10 @@ export default function MonthlyGoalCard({ goal }: { goal: MonthlyGoal }) {
 
   return (
     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 border border-primary-soft">
-      <p className="text-xs font-medium text-primary mb-1">{range}</p>
-      <p className="text-sm font-semibold text-label-strong mb-1">{goal.title}</p>
+      <p className="text-caption1 font-medium text-primary mb-1">{range}</p>
+      <p className="text-label1 font-semibold text-label-strong mb-1">{goal.title}</p>
       {goal.description && (
-        <p className="text-xs text-label-alt leading-relaxed">{goal.description}</p>
+        <p className="text-caption1 text-label-alt leading-relaxed">{goal.description}</p>
       )}
     </div>
   );
