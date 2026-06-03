@@ -13,21 +13,30 @@ import StampOverlay from '../components/ui/StampOverlay';
 import type { DailyRoutine, RoutineLog, Habit } from '../types';
 
 
-function isDayCompleted(
+function isDayPerfect(
   faithRoutines: DailyRoutine[],
   logs: RoutineLog[],
   habits: Habit[],
-  habitLogs: { habitId: string; date: string; completed: boolean }[],
+  habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean }[],
   dateStr: string
 ): boolean {
+  // 루틴도 습관도 없으면 달성 아님
+  if (faithRoutines.length === 0 && habits.length === 0) return false;
+
+  // 신앙루틴: 완료 또는 쉬어가기 모두 달성으로 처리
   const faithOk = faithRoutines.length === 0 || (() => {
-    const done = new Set(logs.filter(l => l.date === dateStr && l.completed).map(l => l.routineId));
+    const done = new Set(
+      logs.filter(l => l.date === dateStr && (l.completed || l.skipped)).map(l => l.routineId)
+    );
     return faithRoutines.every(r => done.has(r.id));
   })();
+
+  // 습관: 완료 또는 쉬어가기 모두 달성으로 처리
   const habitOk = habits.length === 0 || (() => {
-    const done = habitLogs.filter(l => l.date === dateStr && l.completed).length;
+    const done = habitLogs.filter(l => l.date === dateStr && (l.completed || l.skipped)).length;
     return done >= habits.length;
   })();
+
   return faithOk && habitOk;
 }
 
@@ -129,7 +138,7 @@ export default function StreakDetail() {
                 const ds = format(d, 'yyyy-MM-dd');
                 const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
                 const isToday = ds === todayStr;
-                const completed = !isFuture && isDayCompleted(faithRoutines, logs, habits, habitLogs, ds);
+                const completed = !isFuture && isDayPerfect(faithRoutines, logs, habits, habitLogs, ds);
 
                 return (
                   <div key={ds} className="flex-1 flex flex-col items-center gap-1.5">
@@ -165,23 +174,27 @@ export default function StreakDetail() {
                         {completed ? '✓' : isToday ? '·' : isFuture ? '' : '✕'}
                       </span>
 
-                      {/* 달성 도장 */}
-                      {completed && (
-                        <motion.div
-                          initial={{ scale: 1.8, opacity: 0, rotate: -18 }}
-                          animate={{ scale: 1, opacity: 1, rotate: -13 }}
-                          transition={{ type: 'spring', stiffness: 380, damping: 20, delay: 0.15 + i * 0.05 }}
-                          className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
-                        >
-                          <svg width="52" height="52" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="46" fill="#10b981" fillOpacity="0.15" stroke="white" strokeWidth="5.5" opacity="0.9"/>
-                            <circle cx="50" cy="50" r="35" fill="none" stroke="white" strokeWidth="2.5" opacity="0.75"/>
-                            <text x="50" y="54" textAnchor="middle" dominantBaseline="middle"
-                              fill="white" fontSize="18" fontWeight="900"
-                              style={{ fontFamily: 'Pretendard, sans-serif' }}>완료</text>
-                          </svg>
-                        </motion.div>
-                      )}
+                      {/* 달성 도장 — 100% 달성 시 등장, 취소 시 사라짐 */}
+                      <AnimatePresence>
+                        {completed && (
+                          <motion.div
+                            key="stamp"
+                            initial={{ scale: 1.8, opacity: 0, rotate: -18 }}
+                            animate={{ scale: 1, opacity: 1, rotate: -13 }}
+                            exit={{ scale: 0.6, opacity: 0, transition: { duration: 0.2 } }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                            className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
+                          >
+                            <svg width="52" height="52" viewBox="0 0 100 100">
+                              <circle cx="50" cy="50" r="46" fill="#10b981" fillOpacity="0.2" stroke="white" strokeWidth="6" opacity="0.95"/>
+                              <circle cx="50" cy="50" r="35" fill="none" stroke="white" strokeWidth="2.5" opacity="0.8"/>
+                              <text x="50" y="54" textAnchor="middle" dominantBaseline="middle"
+                                fill="white" fontSize="18" fontWeight="900"
+                                style={{ fontFamily: 'Pretendard, sans-serif' }}>완료</text>
+                            </svg>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </motion.div>
                   </div>
                 );
