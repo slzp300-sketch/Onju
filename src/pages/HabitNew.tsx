@@ -33,7 +33,7 @@ export default function HabitNew() {
   const { setPermission } = useNotificationStore();
 
   const [title, setTitle] = useState(existing?.title ?? '');
-  const [emoji, setEmoji] = useState(existing?.emoji ?? '🏃');
+  const [emoji, setEmoji] = useState(existing?.emoji ?? '');
   const [freq, setFreq] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [customDays, setCustomDays] = useState<number[]>(existing?.customDays ?? []);
   const [when, setWhen] = useState(existing?.when ?? '');

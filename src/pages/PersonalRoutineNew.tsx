@@ -29,7 +29,7 @@ export default function PersonalRoutineNew() {
   const isEdit = !!existing;
 
   const [title, setTitle] = useState(existing?.title ?? '');
-  const [emoji, setEmoji] = useState(existing?.emoji ?? '🎯');
+  const [emoji, setEmoji] = useState(existing?.emoji ?? '');
   const [when, setWhen] = useState(existing?.when ?? '');
   const [selectedIds, setSelectedIds] = useState<string[]>(existing?.habitIds ?? []);
   const [timerEnabled, setTimerEnabled] = useState(existing?.timerEnabled ?? false);

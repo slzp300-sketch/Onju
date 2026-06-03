@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPicker, { type EmojiClickData, Theme, EmojiStyle } from 'emoji-picker-react';
 
 interface EmojiPickerButtonProps {
-  emoji: string;
+  emoji: string; // 빈 문자열이면 + 플레이스홀더 표시
   onChange: (emoji: string) => void;
   size?: 'sm' | 'md';
 }
@@ -38,9 +38,17 @@ export default function EmojiPickerButton({ emoji, onChange, size = 'md' }: Emoj
         whileTap={{ scale: 0.88 }}
         transition={{ type: 'spring', stiffness: 700, damping: 22 }}
         onClick={() => setOpen(v => !v)}
-        className={`${btnSize} rounded-2xl bg-white border border-line flex items-center justify-center shadow-sm hover:bg-surface-alt transition-colors`}
+        className={`${btnSize} rounded-2xl border flex items-center justify-center shadow-sm transition-colors ${
+          emoji
+            ? 'bg-surface border-line hover:bg-surface-alt'
+            : 'border-dashed border-label-assistive bg-fill hover:bg-fill-strong'
+        }`}
       >
-        {emoji}
+        {emoji || (
+          <span className={`font-medium text-label-assistive ${size === 'sm' ? 'text-lg' : 'text-2xl'}`}>
+            +
+          </span>
+        )}
       </motion.button>
 
       <AnimatePresence>

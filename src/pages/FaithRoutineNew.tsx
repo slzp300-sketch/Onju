@@ -38,7 +38,7 @@ export default function FaithRoutineNew() {
 
   // 폼 상태 (custom / template-config 공용)
   const [title, setTitle] = useState(existing?.title ?? '');
-  const [emoji, setEmoji] = useState(existing?.emoji ?? '🙏');
+  const [emoji, setEmoji] = useState(existing?.emoji ?? '');
   const [timeSlot, setTimeSlot] = useState<TimeSlot | null>(existing?.timeSlot ?? null);
   const [timerEnabled, setTimerEnabled] = useState(!!(existing?.durationSeconds));
   const [durationSeconds, setDurationSeconds] = useState(existing?.durationSeconds ?? 60);
