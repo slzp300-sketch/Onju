@@ -99,16 +99,25 @@ export default function Dashboard() {
     todo: todayTodos.length > 0 ? `${doneTodos}/${todayTodos.length}` : undefined,
   };
 
-  // 오늘 날짜 개인+신앙 둘 다 100% 달성 시 스탬프
+  // 오늘 날짜 개인+신앙 둘 다 100% 달성 시 스탬프 (하루 한 번만)
+  const PERFECT_STAMP_KEY = 'onju_perfect_stamp_date';
   const todayIdx = weekDays.findIndex(d => format(d, 'yyyy-MM-dd') === todayStr);
   const todayRates = todayIdx >= 0 ? weekRates[todayIdx] : null;
-   
+
   useEffect(() => {
     if (!todayRates) return;
     const prev = prevTodayRates.current;
     const nowPerfect = todayRates.personal === 100 && todayRates.faith === 100;
     const wasPerfect = prev ? prev.personal === 100 && prev.faith === 100 : false;
-    if (nowPerfect && !wasPerfect) setShowPerfectStamp(true);
+    if (nowPerfect && !wasPerfect) {
+      // 오늘 이미 보여줬으면 다시 표시하지 않음
+      const shownDate = localStorage.getItem(PERFECT_STAMP_KEY);
+      if (shownDate !== todayStr) {
+        localStorage.setItem(PERFECT_STAMP_KEY, todayStr);
+        const t = setTimeout(() => setShowPerfectStamp(true), 0);
+        return () => clearTimeout(t);
+      }
+    }
     prevTodayRates.current = { personal: todayRates.personal, faith: todayRates.faith };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todayRates?.personal, todayRates?.faith]);

@@ -143,7 +143,7 @@ export default function StreakDetail() {
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.05 + i * 0.04, type: 'spring', stiffness: 420, damping: 26 }}
-                      className={`w-full rounded-2xl flex flex-col items-center justify-center gap-1 py-3 ${
+                      className={`relative w-full rounded-2xl flex flex-col items-center justify-center gap-1 py-3 overflow-hidden ${
                         completed
                           ? 'bg-positive shadow-sm'
                           : isToday
@@ -164,6 +164,24 @@ export default function StreakDetail() {
                       <span className="text-[14px] leading-none">
                         {completed ? '✓' : isToday ? '·' : isFuture ? '' : '✕'}
                       </span>
+
+                      {/* 달성 도장 */}
+                      {completed && (
+                        <motion.div
+                          initial={{ scale: 1.5, opacity: 0, rotate: -16 }}
+                          animate={{ scale: 1, opacity: 1, rotate: -13 }}
+                          transition={{ type: 'spring', stiffness: 380, damping: 20, delay: 0.2 + i * 0.05 }}
+                          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                        >
+                          <svg width="62" height="62" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="46" fill="none" stroke="white" strokeWidth="5" opacity="0.85"/>
+                            <circle cx="50" cy="50" r="36" fill="none" stroke="white" strokeWidth="2" opacity="0.7"/>
+                            <text x="50" y="54" textAnchor="middle" dominantBaseline="middle"
+                              fill="white" fontSize="20" fontWeight="900" opacity="0.9"
+                              style={{ fontFamily: 'Pretendard, sans-serif' }}>완료</text>
+                          </svg>
+                        </motion.div>
+                      )}
                     </motion.div>
                   </div>
                 );
