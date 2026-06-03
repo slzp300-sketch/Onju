@@ -34,13 +34,15 @@ const TABS: { key: TabType; label: string }[] = [
 
 function getFaithRate(routines: import('../types').DailyRoutine[], logs: import('../types').RoutineLog[], dateStr: string): number {
   if (routines.length === 0) return -1;
-  const done = new Set(logs.filter(l => l.date === dateStr && l.completed).map(l => l.routineId));
+  // 완료 또는 쉬어가기 모두 달성으로 처리
+  const done = new Set(logs.filter(l => l.date === dateStr && (l.completed || l.skipped)).map(l => l.routineId));
   return Math.round((routines.filter(r => done.has(r.id)).length / routines.length) * 100);
 }
 
-function getHabitRate(habits: import('../types').Habit[], habitLogs: { habitId: string; date: string; completed: boolean }[], dateStr: string): number {
+function getHabitRate(habits: import('../types').Habit[], habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean }[], dateStr: string): number {
   if (habits.length === 0) return -1;
-  const done = habitLogs.filter(l => l.date === dateStr && l.completed).length;
+  // 완료 또는 쉬어가기 모두 달성으로 처리
+  const done = habitLogs.filter(l => l.date === dateStr && (l.completed || l.skipped)).length;
   return Math.round((done / habits.length) * 100);
 }
 
@@ -242,7 +244,7 @@ export default function Dashboard() {
 
               return (
                 <button key={ds} onClick={() => setSelectedDay(ds)}
-                  className={`flex-1 flex flex-col items-center gap-1 rounded-xl py-2 px-0.5 border-2 transition-all ${
+                  className={`relative flex-1 flex flex-col items-center gap-1 rounded-xl py-2 px-0.5 border-2 transition-all overflow-hidden ${
                     isSelected
                       ? 'border-primary bg-primary-soft'
                       : bothDone
@@ -296,6 +298,24 @@ export default function Dashboard() {
                     : anyDone ? 'bg-primary/40'
                     : 'bg-transparent'
                   }`} />
+
+                  {/* 100% 달성 도장 인장 */}
+                  {bothDone && (
+                    <motion.div
+                      initial={{ scale: 1.6, opacity: 0, rotate: -14 }}
+                      animate={{ scale: 1, opacity: 1, rotate: -12 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.3 + i * 0.05 }}
+                      className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                    >
+                      <svg width="54" height="54" viewBox="0 0 100 100" opacity="0.28">
+                        <circle cx="50" cy="50" r="46" fill="none" stroke="#10b981" strokeWidth="5"/>
+                        <circle cx="50" cy="50" r="36" fill="none" stroke="#10b981" strokeWidth="2"/>
+                        <text x="50" y="54" textAnchor="middle" dominantBaseline="middle"
+                          fill="#10b981" fontSize="22" fontWeight="900"
+                          style={{ fontFamily: 'Pretendard, sans-serif' }}>완료</text>
+                      </svg>
+                    </motion.div>
+                  )}
                 </button>
               );
             })}
