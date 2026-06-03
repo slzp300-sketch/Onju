@@ -56,21 +56,39 @@ export default function StampSeal({ label, sublabel, color, size = 200 }: StampS
         )}
       </g>
 
-      {/* 메인 텍스트 (필터 없이 선명하게) */}
-      <text
-        x="50"
-        y={sublabel ? '52' : '54'}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill={color}
-        fontSize={label.length <= 3 ? '24' : '18'}
-        fontWeight="900"
-        letterSpacing="-0.5"
-        style={{ fontFamily: 'Pretendard, sans-serif' }}
-        opacity="0.95"
-      >
-        {label}
-      </text>
+      {/* 메인 텍스트 (공백 기준 두 줄 또는 한 줄) */}
+      {label.includes(' ') ? (() => {
+        const spaceIdx = label.indexOf(' ');
+        const line1 = label.slice(0, spaceIdx);
+        const line2 = label.slice(spaceIdx + 1);
+        const baseY = sublabel ? 44 : 46;
+        const fs = '16';
+        return (
+          <>
+            <text x="50" y={baseY} textAnchor="middle" dominantBaseline="middle"
+              fill={color} fontSize={fs} fontWeight="900" letterSpacing="-0.3"
+              style={{ fontFamily: 'Pretendard, sans-serif' }} opacity="0.95">{line1}</text>
+            <text x="50" y={baseY + 17} textAnchor="middle" dominantBaseline="middle"
+              fill={color} fontSize={fs} fontWeight="900" letterSpacing="-0.3"
+              style={{ fontFamily: 'Pretendard, sans-serif' }} opacity="0.95">{line2}</text>
+          </>
+        );
+      })() : (
+        <text
+          x="50"
+          y={sublabel ? '52' : '54'}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill={color}
+          fontSize={label.length <= 3 ? '24' : '18'}
+          fontWeight="900"
+          letterSpacing="-0.5"
+          style={{ fontFamily: 'Pretendard, sans-serif' }}
+          opacity="0.95"
+        >
+          {label}
+        </text>
+      )}
 
       {/* 서브 텍스트 */}
       {sublabel && (

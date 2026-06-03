@@ -307,7 +307,7 @@ export default function Dashboard() {
                       transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.3 + i * 0.05 }}
                       className="absolute inset-0 flex items-center justify-center pointer-events-none"
                     >
-                      <svg width="54" height="54" viewBox="0 0 100 100" opacity="0.28">
+                      <svg width="54" height="54" viewBox="0 0 100 100">
                         <circle cx="50" cy="50" r="46" fill="none" stroke="#10b981" strokeWidth="5"/>
                         <circle cx="50" cy="50" r="36" fill="none" stroke="#10b981" strokeWidth="2"/>
                         <text x="50" y="54" textAnchor="middle" dominantBaseline="middle"
@@ -454,7 +454,7 @@ export default function Dashboard() {
     {/* 오늘 100% 달성 스탬프 */}
     <StampOverlay
       show={showPerfectStamp}
-      label="완벽"
+      label="참 잘했어요"
       sublabel="오늘 100% 달성"
       color="#0066ff"
       rotation={-8}
