@@ -69,12 +69,17 @@ export default function Dashboard() {
   const { current: streak } = calcStreak(faithRoutines, logs, todayStr);
   const allDone = faithRoutines.length > 0 && faithRoutines.every(r => isCompleted(r.id));
 
+  const CONFETTI_KEY = 'onju_confetti_date';
   useEffect(() => {
     if (allDone && !prevCompleteRef.current) {
-      confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#00BF40', '#0066FF', '#7C7FF5'] });
+      const shownDate = localStorage.getItem(CONFETTI_KEY);
+      if (shownDate !== todayStr) {
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#00BF40', '#0066FF', '#7C7FF5'] });
+        localStorage.setItem(CONFETTI_KEY, todayStr);
+      }
     }
     prevCompleteRef.current = allDone;
-  }, [allDone]);
+  }, [allDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   const now = new Date();
