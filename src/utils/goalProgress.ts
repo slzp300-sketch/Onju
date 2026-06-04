@@ -62,6 +62,12 @@ export interface LinkedItem {
   scheduledTotal: number; // 목표 기간 전체 예정일 수
 }
 
+/** 유효 시작일 = max(목표 시작일, 항목 생성일) — 연동 전 기간은 분모에서 제외 */
+function effectiveStart(goalStart: string, createdAt: string): string {
+  const createdIso = createdAt.slice(0, 10); // ISO datetime → yyyy-MM-dd
+  return createdIso > goalStart ? createdIso : goalStart;
+}
+
 export function getLinkedItems(
   goal: MonthlyGoal,
   habits: Habit[],
@@ -70,18 +76,17 @@ export function getLinkedItems(
   routineLogs: RoutineLog[],
   todayIso: string,
 ): LinkedItem[] {
-  const allDays = dateRange(goal.startDate, goal.endDate);
-  if (allDays.length === 0) return [];
-
-  // 분자 계산 범위: 시작 ~ min(오늘, 종료)
-  const endForCount = todayIso < goal.endDate ? todayIso : goal.endDate;
-  const elapsed = new Set(dateRange(goal.startDate, endForCount));
+  if (dateRange(goal.startDate, goal.endDate).length === 0) return [];
 
   const items: LinkedItem[] = [];
 
   habits.filter(h => h.goalId === goal.id).forEach(h => {
-    const sched = scheduledDays(allDays, h.frequency, h.customDays);
-    const scheduledTotal = sched.length;
+    const start = effectiveStart(goal.startDate, h.createdAt);
+    // 분모: 유효 시작 ~ 목표 종료 중 예정일
+    const scheduledTotal = scheduledDays(dateRange(start, goal.endDate), h.frequency, h.customDays).length;
+    // 분자: 유효 시작 ~ min(오늘, 종료) 중 완료한 예정일
+    const endForCount = todayIso < goal.endDate ? todayIso : goal.endDate;
+    const elapsed = new Set(dateRange(start, endForCount));
     const doneCount = habitLogs.filter(
       l => l.habitId === h.id && elapsed.has(l.date) && isScheduled(l.date, h.frequency, h.customDays)
         && (l.completed || l.skipped || l.substitute)
@@ -94,8 +99,10 @@ export function getLinkedItems(
   });
 
   faithRoutines.filter(r => r.goalId === goal.id).forEach(r => {
-    const sched = scheduledDays(allDays, r.frequency);
-    const scheduledTotal = sched.length;
+    const start = effectiveStart(goal.startDate, r.createdAt);
+    const scheduledTotal = scheduledDays(dateRange(start, goal.endDate), r.frequency).length;
+    const endForCount = todayIso < goal.endDate ? todayIso : goal.endDate;
+    const elapsed = new Set(dateRange(start, endForCount));
     const doneCount = routineLogs.filter(
       l => l.routineId === r.id && elapsed.has(l.date) && isScheduled(l.date, r.frequency)
         && (l.completed || l.skipped)
