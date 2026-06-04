@@ -358,32 +358,38 @@ export default function HabitNew() {
           {/* 대체 습관 */}
           <div className="border-t border-line-soft">
             <div className="px-4 py-4 bg-amber-50/60">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-base">🔥</span>
-                <span className="text-body2 font-semibold text-amber-700">대체 습관</span>
-                <span className="text-caption2 text-amber-500 ml-auto">하기 힘든 날의 대안</span>
-              </div>
+              <p className="text-body2 font-semibold text-amber-700 mb-1">🔥 대체 습관</p>
+              <p className="text-caption1 text-amber-600 mb-3 leading-relaxed">
+                하기 힘든 날 메인 습관 대신 할 수 있는 더 쉬운 버전이에요.<br />
+                예) 러닝 30분 → <span className="font-semibold">10분 스트레칭</span>
+              </p>
               <input
                 type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
-                placeholder="예: 10분 스트레칭"
+                placeholder="예: 10분 스트레칭, 5분 걷기"
                 className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300"
               />
+              <p className="text-caption2 text-amber-500 mt-1.5">
+                💡 쉬운 버전을 만들어두면 포기하지 않을 수 있어요
+              </p>
             </div>
           </div>
 
           {/* 2분 트리거 */}
           <div className="border-t border-line-soft">
             <div className="px-4 py-4 bg-emerald-50/60">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-base">⚡</span>
-                <span className="text-body2 font-semibold text-emerald-700">2분 트리거</span>
-                <span className="text-caption2 text-emerald-500 ml-auto">시작을 쉽게 만드는 동작</span>
-              </div>
+              <p className="text-body2 font-semibold text-emerald-700 mb-1">⚡ 2분 트리거</p>
+              <p className="text-caption1 text-emerald-600 mb-3 leading-relaxed">
+                습관 시작을 쉽게 만드는 2분 이내의 아주 작은 행동이에요.<br />
+                예) 러닝 30분 → <span className="font-semibold">운동복으로 갈아입기</span>
+              </p>
               <input
                 type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
-                placeholder="예: 운동복으로 갈아입기"
+                placeholder="예: 운동복 갈아입기, 러닝화 신기"
                 className="w-full bg-white/80 border border-emerald-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 transition-all placeholder:text-emerald-300"
               />
+              <p className="text-caption2 text-emerald-500 mt-1.5">
+                💡 트리거 완료 후 자동으로 메인 습관으로 연결돼요
+              </p>
             </div>
           </div>
         </div>

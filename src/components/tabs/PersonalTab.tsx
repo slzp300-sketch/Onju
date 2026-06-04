@@ -255,25 +255,25 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
             </motion.button>
           )}
 
-          {/* ⚡ 2분 트리거 버튼 */}
-          {!done && !skipped && !substituted && habit.twoMinuteHabit && (
+          {/* ▶ 실행 버튼 — 트리거 있으면 2분→습관, 없으면 바로 습관 */}
+          {!done && !skipped && !substituted && (habit.twoMinuteHabit || habit.durationSeconds) && (
             <motion.button
               whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-              onClick={e => { e.stopPropagation(); setTwoMinOpen(true); }}
-              className="w-7 h-7 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-sm"
+              onClick={e => {
+                e.stopPropagation();
+                if (habit.twoMinuteHabit) setTwoMinOpen(true);
+                else setFocusOpen(true);
+              }}
+              className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                habit.twoMinuteHabit
+                  ? 'bg-amber-100 text-amber-500'
+                  : 'bg-primary-soft text-primary'
+              }`}
             >
-              ⚡
-            </motion.button>
-          )}
-
-          {/* 타이머 버튼 */}
-          {!done && !skipped && !substituted && habit.durationSeconds && (
-            <motion.button
-              whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-              onClick={e => { e.stopPropagation(); setFocusOpen(true); }}
-              className="w-7 h-7 rounded-full bg-primary-soft text-primary flex items-center justify-center"
-            >
-              <Play size={10} fill="currentColor" />
+              {habit.twoMinuteHabit
+                ? <span className="text-sm leading-none">⚡</span>
+                : <Play size={10} fill="currentColor" />
+              }
             </motion.button>
           )}
 
