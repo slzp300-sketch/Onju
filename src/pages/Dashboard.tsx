@@ -149,7 +149,7 @@ export default function Dashboard() {
         <motion.button
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.12 }}
-          onClick={() => navigate('/goals/monthly')}
+          onClick={() => navigate('/goals')}
           className="flex-1 bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
         >
           <div className="flex items-center gap-1 mb-2">
@@ -177,7 +177,7 @@ export default function Dashboard() {
         <motion.button
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.12 }}
-          onClick={() => navigate('/goals/weekly')}
+          onClick={() => navigate('/goals')}
           className="flex-1 bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
         >
           <div className="flex items-center gap-1 mb-2">
