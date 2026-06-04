@@ -45,4 +45,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    proxy: {
+      // 로컬 개발 시 /api 요청을 Vercel 배포로 포워딩
+      '/api': {
+        target: 'https://onju-seven.vercel.app',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 })
