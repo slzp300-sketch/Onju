@@ -273,37 +273,6 @@ export default function HabitNew() {
           <p className="text-caption1 text-label-assistive mt-1.5">시작 시간이나 행동 트리거를 적어주세요</p>
         </div>
 
-        {/* 2분 트리거 카드 */}
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
-          <div className="px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">⚡</span>
-                <div>
-                  <p className="text-body2 font-semibold text-label-strong">2분 트리거</p>
-                  <p className="text-caption1 text-label-alt">습관 시작을 쉽게 만드는 작은 행동</p>
-                </div>
-              </div>
-              <button onClick={() => setTwoMinEnabled(v => !v)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${twoMinEnabled ? 'bg-emerald-500' : 'bg-fill-strong'}`}>
-                <motion.div animate={{ x: twoMinEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none" />
-              </button>
-            </div>
-            <AnimatePresence>
-              {twoMinEnabled && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden mt-3">
-                  <input type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
-                    placeholder="예: 운동복 갈아입기, 러닝화 신기"
-                    className="w-full bg-fill border border-emerald-200 rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 focus:bg-surface transition-all" />
-                  <p className="text-caption2 text-emerald-600 mt-1.5">💡 트리거 완료 후 자동으로 메인 습관으로 연결돼요</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
         {/* 타이머 카드 */}
         <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
           <div className="px-4 py-4">
@@ -330,6 +299,37 @@ export default function HabitNew() {
                     <span className="text-body2 text-label-alt">설정 시간</span>
                     <span className="text-body2 font-bold text-primary">{fmtDuration(durationSecs)}</span>
                   </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* 2분 트리거 카드 */}
+        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">⚡</span>
+                <div>
+                  <p className="text-body2 font-semibold text-label-strong">2분 트리거</p>
+                  <p className="text-caption1 text-label-alt">습관 시작을 쉽게 만드는 작은 행동</p>
+                </div>
+              </div>
+              <button onClick={() => setTwoMinEnabled(v => !v)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${twoMinEnabled ? 'bg-emerald-500' : 'bg-fill-strong'}`}>
+                <motion.div animate={{ x: twoMinEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none" />
+              </button>
+            </div>
+            <AnimatePresence>
+              {twoMinEnabled && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden mt-3">
+                  <input type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
+                    placeholder="예: 운동복 갈아입기, 러닝화 신기"
+                    className="w-full bg-fill border border-emerald-200 rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 focus:bg-surface transition-all" />
+                  <p className="text-caption2 text-emerald-600 mt-1.5">💡 트리거 완료 후 자동으로 메인 습관으로 연결돼요</p>
                 </motion.div>
               )}
             </AnimatePresence>
