@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
+import { motion } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
-import EmptyState from '../components/ui/EmptyState';
 import { useGoalStore } from '../store/goalStore';
 import type { MonthlyGoal } from '../types';
 import { formatDateRange, elapsedDays } from '../utils/date';
@@ -50,38 +50,31 @@ export default function MonthlyGoals() {
 
   return (
     <div className="flex flex-col gap-4 pb-4">
-      <div className="px-4 pt-5 flex items-center justify-between">
-        <div>
-          <h1 className="text-heading2 font-bold text-label-strong font-brand">월간 목표</h1>
-          <p className="text-caption1 text-label-alt mt-0.5">진행 중인 목표를 관리해요</p>
-        </div>
-        <Button size="sm" onClick={() => setShowCreate(true)}>
-          <Plus size={15} /> 추가
-        </Button>
+      <div className="px-4 pt-5">
+        <h1 className="text-heading2 font-bold text-label-strong font-brand">월간 목표</h1>
+        <p className="text-caption1 text-label-alt mt-0.5">진행 중인 목표를 관리해요</p>
       </div>
 
       <div className="px-4 flex flex-col gap-3">
-        {activeGoals.length === 0 && pastGoals.length === 0 ? (
-          <EmptyState
-            title="진행 중인 목표가 없어요"
-            description="목표를 추가하고 날짜를 직접 설정해 보세요"
-            action={
-              <Button size="sm" onClick={() => setShowCreate(true)}>
-                <Plus size={14} /> 목표 추가
-              </Button>
-            }
-          />
-        ) : (
+        {activeGoals.map(g => <GoalCard key={g.id} goal={g} onDelete={() => removeMonthlyGoal(g.id)} />)}
+
+        {pastGoals.length > 0 && (
           <>
-            {activeGoals.map(g => <GoalCard key={g.id} goal={g} onDelete={() => removeMonthlyGoal(g.id)} />)}
-            {pastGoals.length > 0 && (
-              <>
-                <p className="text-caption1 font-semibold text-label-assistive mt-2">종료된 목표</p>
-                {pastGoals.map(g => <GoalCard key={g.id} goal={g} onDelete={() => removeMonthlyGoal(g.id)} past />)}
-              </>
-            )}
+            <p className="text-caption1 font-semibold text-label-assistive mt-1">종료된 목표</p>
+            {pastGoals.map(g => <GoalCard key={g.id} goal={g} onDelete={() => removeMonthlyGoal(g.id)} past />)}
           </>
         )}
+
+        {/* 목표 추가 카드 */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+          onClick={() => setShowCreate(true)}
+          className="w-full rounded-xl border-2 border-dashed border-line py-5 flex items-center justify-center gap-2 text-label-assistive hover:border-primary hover:text-primary hover:bg-primary-soft/30 transition-all"
+        >
+          <Plus size={20} />
+          <span className="text-body2 font-semibold">목표 추가</span>
+        </motion.button>
       </div>
 
       <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="목표 추가">
