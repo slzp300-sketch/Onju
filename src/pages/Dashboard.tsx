@@ -39,10 +39,10 @@ function getFaithRate(routines: import('../types').DailyRoutine[], logs: import(
   return Math.round((routines.filter(r => done.has(r.id)).length / routines.length) * 100);
 }
 
-function getHabitRate(habits: import('../types').Habit[], habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean }[], dateStr: string): number {
+function getHabitRate(habits: import('../types').Habit[], habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean; substitute?: boolean }[], dateStr: string): number {
   if (habits.length === 0) return -1;
-  // 완료 또는 쉬어가기 모두 달성으로 처리
-  const done = habitLogs.filter(l => l.date === dateStr && (l.completed || l.skipped)).length;
+  // 완료·대체·쉬어가기 모두 달성으로 처리
+  const done = habitLogs.filter(l => l.date === dateStr && (l.completed || l.skipped || l.substitute)).length;
   return Math.round((done / habits.length) * 100);
 }
 

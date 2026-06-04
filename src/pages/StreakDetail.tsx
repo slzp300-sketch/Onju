@@ -17,7 +17,7 @@ function isDayPerfect(
   faithRoutines: DailyRoutine[],
   logs: RoutineLog[],
   habits: Habit[],
-  habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean }[],
+  habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean; substitute?: boolean }[],
   dateStr: string
 ): boolean {
   // 루틴도 습관도 없으면 달성 아님
@@ -33,7 +33,7 @@ function isDayPerfect(
 
   // 습관: 완료 또는 쉬어가기 모두 달성으로 처리
   const habitOk = habits.length === 0 || (() => {
-    const done = habitLogs.filter(l => l.date === dateStr && (l.completed || l.skipped)).length;
+    const done = habitLogs.filter(l => l.date === dateStr && (l.completed || l.skipped || l.substitute)).length;
     return done >= habits.length;
   })();
 

@@ -190,12 +190,12 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [focusOpen, setFocusOpen] = useState(false);
   const [twoMinOpen, setTwoMinOpen] = useState(false);
-  const [rowStamp, setRowStamp] = useState<'done' | 'rest' | null>(null);
+  const [rowStamp, setRowStamp] = useState<'done' | 'rest' | 'sub' | null>(null);
   const done = isHabitCompleted(habit.id, todayStr());
   const skipped = isHabitSkipped(habit.id, todayStr());
   const substituted = isHabitSubstituted(habit.id, todayStr());
 
-  const fireStamp = (type: 'done' | 'rest') => {
+  const fireStamp = (type: 'done' | 'rest' | 'sub') => {
     setRowStamp(type);
     setTimeout(() => setRowStamp(null), 900);
   };
@@ -209,7 +209,12 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
       >
         {/* 미니 스탬프 */}
         <AnimatePresence>
-          {rowStamp && <RowStamp type={rowStamp} color={rowStamp === 'done' ? '#0066ff' : '#f59e0b'} />}
+          {rowStamp && (
+            <RowStamp
+              type={rowStamp === 'sub' ? 'done' : rowStamp}
+              color={rowStamp === 'done' ? '#0066ff' : rowStamp === 'sub' ? '#f97316' : '#f59e0b'}
+            />
+          )}
         </AnimatePresence>
 
         {/* 번호 */}
@@ -305,6 +310,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
               rotation={7}
               onClick={e => {
                 e.stopPropagation();
+                if (!substituted) fireStamp('sub');
                 substituteHabitLog(habit.id);
               }}
             />
