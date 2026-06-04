@@ -1,10 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Habit, PersonalRoutine } from '../types';
-import { logicalToday } from '../utils/date';
-import { useSettingsStore } from './settingsStore';
+import { today } from '../utils/date';
 
-const todayKey = () => logicalToday(useSettingsStore.getState().dayStartHour);
+const todayKey = () => today();
 
 interface HabitLog {
   habitId: string;

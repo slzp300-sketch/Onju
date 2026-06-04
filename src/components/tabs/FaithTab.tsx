@@ -7,8 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import FAB from '../ui/FAB';
 import { useRoutineStore } from '../../store/routineStore';
-import { useSettingsStore } from '../../store/settingsStore';
-import { logicalToday } from '../../utils/date';
+import { today } from '../../utils/date';
 import type { DailyRoutine, TimeSlot } from '../../types';
 import FocusMode from '../routines/FocusMode';
 import TwoMinuteMode from '../routines/TwoMinuteMode';
@@ -21,8 +20,7 @@ const TIME_SLOTS: { value: TimeSlot; label: string; time: string; emoji: string 
 
 export default function FaithTab({ date, readOnly = false }: { date?: string; readOnly?: boolean } = {}) {
   const { faithRoutines, removeRoutine, isCompleted, isSkipped } = useRoutineStore();
-  const dayStartHour = useSettingsStore(s => s.dayStartHour);
-  const viewDate = date ?? logicalToday(dayStartHour);
+  const viewDate = date ?? today();
   const navigate = useNavigate();
   const isDone = (id: string) => isCompleted(id, viewDate) || isSkipped(id, viewDate);
 

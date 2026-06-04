@@ -10,9 +10,8 @@ import FAB from '../ui/FAB';
 import ConfirmModal from '../ui/ConfirmModal';
 import HabitFocusMode from '../routines/HabitFocusMode';
 import { useHabitStore } from '../../store/habitStore';
-import { useSettingsStore } from '../../store/settingsStore';
 import type { Habit } from '../../types';
-import { logicalToday } from '../../utils/date';
+import { today } from '../../utils/date';
 
 /* ════════════════════════════════════════
    개인 탭 최상위
@@ -21,8 +20,7 @@ import { logicalToday } from '../../utils/date';
 ════════════════════════════════════════ */
 export default function PersonalTab({ date, readOnly = false }: { date?: string; readOnly?: boolean } = {}) {
   const { habits, personalRoutines } = useHabitStore();
-  const dayStartHour = useSettingsStore(s => s.dayStartHour);
-  const viewDate = date ?? logicalToday(dayStartHour);
+  const viewDate = date ?? today();
   const navigate = useNavigate();
 
   const fabOptions = [

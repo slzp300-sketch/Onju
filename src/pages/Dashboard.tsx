@@ -13,7 +13,7 @@ import { useTodoStore } from '../store/todoStore';
 import { useGoalStore } from '../store/goalStore';
 import { useAuthStore } from '../store/authStore';
 import { calcStreak } from '../utils/completion';
-import { isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS, logicalToday } from '../utils/date';
+import { isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS, today, yesterday, isEditableDay, isWithinGrace } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
 import { getGoalAdherence, getLinkedItems } from '../utils/goalProgress';
 import { getDayCompletion } from '../utils/dayCompletion';
@@ -39,12 +39,12 @@ const itemV = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transiti
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { weekStartDay, dayStartHour } = useSettingsStore();
+  const { weekStartDay, graceEndHour } = useSettingsStore();
   const { faithRoutines, logs, isCompleted } = useRoutineStore();
   const { habits, habitLogs } = useHabitStore();
   const { todos, toggleTodo, removeTodo } = useTodoStore();
   const { monthlyGoals, goalSlots } = useGoalStore();
-  const todayStr = logicalToday(dayStartHour);
+  const todayStr = today();
   const prevCompleteRef = useRef(false);
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   const [selectedDay, setSelectedDay] = useState<string>(todayStr);
@@ -85,6 +85,15 @@ export default function Dashboard() {
     const c = getDayCompletion(ds, habits, habitLogs, faithRoutines, logs, d > nowMid);
     return { date: ds, personal: c.personalRate, faith: c.faithRate, state: c.state };
   });
+
+  // 선택한 날짜를 지금 체크할 수 있는지 (오늘 + 유예 구간의 어제)
+  const canEdit = isEditableDay(selectedDay, graceEndHour);
+  // 유예 구간 동안 어제에 마저 체크할 게 남았는지 (오늘 화면에서 유도용)
+  const yesterdayStr = yesterday();
+  const yState = weekRates.find(w => w.date === yesterdayStr)?.state;
+  const showGraceNudge = selectedDay === todayStr
+    && isWithinGrace(graceEndHour)
+    && (yState === 'partial' || yState === 'missed');
 
   const badges: Record<TabType, string | undefined> = {
     personal: undefined,
@@ -357,14 +366,27 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* 지난 날짜 조회 안내 */}
+          {/* 어제 마저 체크하라는 유도 (오늘 화면 + 유예 구간 + 어제 미완료) */}
+          {showGraceNudge && (
+            <button onClick={() => setSelectedDay(yesterdayStr)}
+              className="flex-shrink-0 w-full flex items-center justify-between gap-2 px-4 py-2 bg-primary-soft border-b border-line-soft">
+              <span className="text-caption1 font-medium text-primary">
+                ⏰ 어제({format(new Date(yesterdayStr + 'T12:00:00'), 'M월 d일')}) 기록을 오전 {graceEndHour}시까지 마저 체크할 수 있어요
+              </span>
+              <span className="text-caption1 font-bold text-primary whitespace-nowrap">어제 →</span>
+            </button>
+          )}
+
+          {/* 지난 날짜 조회 안내: 유예 중인 어제는 수정 가능, 그 외는 읽기 전용 */}
           {selectedDay !== todayStr && (
-            <div className="flex-shrink-0 flex items-center justify-between gap-2 px-4 py-2 bg-fill border-b border-line-soft">
-              <span className="text-caption1 font-medium text-label-alt">
-                🔒 {format(new Date(selectedDay + 'T12:00:00'), 'M월 d일')} 기록 (읽기 전용)
+            <div className={`flex-shrink-0 flex items-center justify-between gap-2 px-4 py-2 border-b border-line-soft ${canEdit ? 'bg-primary-soft' : 'bg-fill'}`}>
+              <span className={`text-caption1 font-medium ${canEdit ? 'text-primary' : 'text-label-alt'}`}>
+                {canEdit
+                  ? `⏰ 어제(${format(new Date(selectedDay + 'T12:00:00'), 'M월 d일')}) 기록 · 오전 ${graceEndHour}시까지 체크 가능`
+                  : `🔒 ${format(new Date(selectedDay + 'T12:00:00'), 'M월 d일')} 기록 (읽기 전용)`}
               </span>
               <button onClick={() => setSelectedDay(todayStr)}
-                className="text-caption1 font-bold text-primary">오늘로</button>
+                className="text-caption1 font-bold text-primary whitespace-nowrap">오늘로</button>
             </div>
           )}
 
@@ -372,17 +394,17 @@ export default function Dashboard() {
           <AnimatePresence mode="wait">
             {activeTab === 'personal' && (
               <motion.div key="p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-                <PersonalTab date={selectedDay} readOnly={selectedDay !== todayStr} />
+                <PersonalTab date={selectedDay} readOnly={!canEdit} />
               </motion.div>
             )}
             {activeTab === 'faith' && (
               <motion.div key="f" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-                <FaithTab date={selectedDay} readOnly={selectedDay !== todayStr} />
+                <FaithTab date={selectedDay} readOnly={!canEdit} />
               </motion.div>
             )}
             {activeTab === 'todo' && (
               <motion.div key="t" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-                {selectedDay === todayStr && (
+                {canEdit && (
                 <FAB options={[{
                   icon: <ListTodo size={20} />,
                   label: '투두 추가',
@@ -413,7 +435,7 @@ export default function Dashboard() {
                           {todo.emoji ?? '📝'}
                         </div>
                         <span className="flex-1 text-body2 font-semibold text-label">{todo.title}</span>
-                        {selectedDay === todayStr ? (
+                        {canEdit ? (
                           <div className="flex items-center gap-1.5 flex-shrink-0">
                             <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
                               onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
@@ -446,7 +468,7 @@ export default function Dashboard() {
                               {todo.emoji ?? '📝'}
                             </div>
                             <span className="flex-1 text-body2 font-semibold line-through text-label-assistive">{todo.title}</span>
-                            {selectedDay === todayStr ? (
+                            {canEdit ? (
                               <div className="flex items-center gap-1.5 flex-shrink-0">
                                 <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
                                   onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">

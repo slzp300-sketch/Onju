@@ -48,14 +48,31 @@ export const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 export const formatDisplay = (date: Date) => format(date, 'M월 d일 (E)', { locale: ko });
 export const today = () => formatDate(new Date());
 
-/**
- * "논리적 오늘" — 하루 경계 시각(dayStartHour) 기준.
- * 예: dayStartHour=3 이면 새벽 3시 전까지는 어제로 취급.
- */
-export const logicalToday = (dayStartHour = 0): string => {
+// 어제 날짜 (YYYY-MM-DD)
+export const yesterday = (): string => {
   const d = new Date();
-  d.setHours(d.getHours() - dayStartHour);
+  d.setDate(d.getDate() - 1);
   return formatDate(d);
+};
+
+/**
+ * 지금이 "전날 체크 유예 구간"인지.
+ * graceEndHour=6 이면 자정~새벽 6시 사이엔 어제 기록을 마저 체크할 수 있음.
+ * graceEndHour=0(자정)이면 유예 없음.
+ */
+export const isWithinGrace = (graceEndHour: number): boolean =>
+  graceEndHour > 0 && new Date().getHours() < graceEndHour;
+
+/**
+ * 해당 날짜를 지금 수정(체크)할 수 있는지.
+ * - 오늘이면 항상 가능
+ * - 어제이면 유예 구간(graceEndHour 이전) 동안 가능
+ * - 그 외(더 과거)는 불가 (읽기 전용)
+ */
+export const isEditableDay = (dateIso: string, graceEndHour: number): boolean => {
+  if (dateIso === today()) return true;
+  if (isWithinGrace(graceEndHour) && dateIso === yesterday()) return true;
+  return false;
 };
 export const currentWeek = () => getISOWeek(new Date());
 export const currentYear = () => getYear(new Date());
