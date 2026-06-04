@@ -61,6 +61,8 @@ export default function Dashboard() {
   const prevCompleteRef = useRef(false);
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   const [selectedDay, setSelectedDay] = useState<string>(todayStr);
+  const [goalIndex, setGoalIndex] = useState(0);
+  const [dragDir, setDragDir] = useState(0);
   const [showPerfectStamp, setShowPerfectStamp] = useState(false);
   const prevTodayRates = useRef<{ personal: number; faith: number } | null>(null);
 
@@ -204,39 +206,112 @@ export default function Dashboard() {
         </motion.button>
       </motion.div>
 
-      {/* 목표 카드 — 전체 너비 */}
+      {/* 목표 캐러셀 카드 */}
       <motion.div variants={itemV} className="flex-shrink-0 px-4 mb-4">
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.12 }}
-          onClick={() => navigate('/goals')}
-          className="w-full bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
-        >
-          <div className="flex items-center gap-1 mb-2">
-            <Target size={11} className="text-primary" />
-            <span className="text-caption2 font-bold text-primary">목표</span>
-            <span className="text-caption2 text-label-assistive ml-auto">{activeGoals.length}/{goalSlots}</span>
-          </div>
-          {activeGoals.length === 0 ? (
-            <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를 세워보세요</p>
-          ) : (
-            <div className="flex flex-col gap-1">
-              {activeGoals.slice(0, 3).map(g => {
+        {activeGoals.length === 0 ? (
+          /* 목표 없을 때 */
+          <motion.button
+            whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
+            onClick={() => navigate('/goals')}
+            className="w-full bg-surface border border-line rounded-xl px-4 py-4 text-left shadow-emphasize"
+          >
+            <div className="flex items-center gap-1 mb-1">
+              <Target size={11} className="text-primary" />
+              <span className="text-caption2 font-bold text-primary">목표</span>
+              <span className="text-caption2 text-label-assistive ml-auto">0/{goalSlots}</span>
+            </div>
+            <p className="text-caption1 text-label-assistive">목표를 세워보세요</p>
+          </motion.button>
+        ) : (
+          /* 캐러셀 */
+          <div className="relative overflow-hidden rounded-xl">
+            <AnimatePresence mode="wait" custom={dragDir}>
+              {(() => {
+                const safeIdx = Math.min(goalIndex, activeGoals.length - 1);
+                const g = activeGoals[safeIdx];
                 const rate = getGoalRate(g);
                 const accentColor = g.color ?? 'var(--color-primary)';
                 return (
-                  <div key={g.id} className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
-                    <p className="text-caption1 font-medium text-label truncate flex-1">{g.title}</p>
-                    <span className="text-caption2 font-bold flex-shrink-0" style={{ color: accentColor }}>
-                      {rate}%
-                    </span>
-                  </div>
+                  <motion.div
+                    key={g.id}
+                    custom={dragDir}
+                    initial={{ opacity: 0, x: dragDir * 60 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: dragDir * -60 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(_, info) => {
+                      if (info.offset.x < -40 && safeIdx < activeGoals.length - 1) {
+                        setDragDir(1);
+                        setGoalIndex(safeIdx + 1);
+                      } else if (info.offset.x > 40 && safeIdx > 0) {
+                        setDragDir(-1);
+                        setGoalIndex(safeIdx - 1);
+                      }
+                    }}
+                    onClick={() => navigate('/goals')}
+                    className="w-full bg-surface border border-line rounded-xl px-4 py-4 text-left shadow-emphasize cursor-pointer select-none"
+                    style={{ borderColor: g.color ? `${g.color}40` : undefined, backgroundColor: g.color ? `${g.color}08` : undefined }}
+                  >
+                    {/* 헤더 */}
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Target size={11} style={{ color: accentColor }} />
+                      <span className="text-caption2 font-bold" style={{ color: accentColor }}>목표</span>
+                      {g.category && (
+                        <span className={`text-[9px] font-bold px-1 py-0.5 rounded-full ${
+                          g.category === 'faith' ? 'bg-emerald-100 text-emerald-600' : 'bg-primary-soft text-primary'
+                        }`}>
+                          {g.category === 'faith' ? '🙏' : '💪'}
+                        </span>
+                      )}
+                      <span className="text-caption2 text-label-assistive ml-auto">{safeIdx + 1}/{activeGoals.length}</span>
+                    </div>
+
+                    {/* 목표 제목 */}
+                    <p className="text-body2 font-semibold text-label-strong leading-snug mb-3 line-clamp-2">
+                      {g.title}
+                    </p>
+
+                    {/* 달성률 + 프로그레스 바 */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-fill-strong rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${rate}%` }}
+                          transition={{ duration: 0.6, ease: 'easeOut' }}
+                          style={{ backgroundColor: accentColor }}
+                        />
+                      </div>
+                      <span className="text-caption1 font-bold flex-shrink-0" style={{ color: accentColor }}>
+                        {rate}%
+                      </span>
+                    </div>
+                  </motion.div>
                 );
-              })}
-            </div>
-          )}
-        </motion.button>
+              })()}
+            </AnimatePresence>
+
+            {/* 페이지 도트 */}
+            {activeGoals.length > 1 && (
+              <div className="flex justify-center gap-1.5 mt-2">
+                {activeGoals.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setDragDir(i > goalIndex ? 1 : -1); setGoalIndex(i); }}
+                    className={`rounded-full transition-all ${
+                      i === Math.min(goalIndex, activeGoals.length - 1)
+                        ? 'w-4 h-1.5 bg-primary'
+                        : 'w-1.5 h-1.5 bg-fill-strong'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </motion.div>
 
       {/* 일요일 리뷰 배너 */}
