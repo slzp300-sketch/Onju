@@ -90,7 +90,7 @@ export default function MonthlyGoalNew() {
               <textarea
                 value={toBeStatement}
                 onChange={e => setToBeStatement(e.target.value)}
-                placeholder="작은 습관으로 하루하루 더 나은 내가 되는 사람"
+                placeholder="두 발로 꾸준히 달리며 체력과 의지를 쌓아가는 사람"
                 rows={3}
                 autoFocus
                 className="w-full bg-fill border border-line rounded-xl px-4 py-3 text-body2 font-medium focus:outline-none focus:border-primary focus:bg-surface resize-none transition-all placeholder:text-label-assistive leading-relaxed"
