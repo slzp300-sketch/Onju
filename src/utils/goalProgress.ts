@@ -57,9 +57,11 @@ export interface LinkedItem {
   title: string;
   emoji?: string;
   kind: 'habit' | 'faith';
-  rate: number;          // 개별 달성률 (예정일 기준)
-  doneCount: number;     // 완료한 예정일 수
-  scheduledTotal: number; // 목표 기간 전체 예정일 수
+  rate: number;            // 전체 진척도 (완료 / 전체 예정일)
+  adherence: number;       // 수행률 (완료 / 경과 예정일) — "지키고 있나"
+  doneCount: number;       // 완료한 예정일 수
+  scheduledTotal: number;  // 목표 기간 전체 예정일 수
+  scheduledElapsed: number; // 오늘까지 경과한 예정일 수
 }
 
 /** 유효 시작일 = max(목표 시작일, 항목 생성일) — 연동 전 기간은 분모에서 제외 */
@@ -80,12 +82,12 @@ export function getLinkedItems(
 
   const items: LinkedItem[] = [];
 
+  const endForCount = todayIso < goal.endDate ? todayIso : goal.endDate;
+
   habits.filter(h => h.goalId === goal.id).forEach(h => {
     const start = effectiveStart(goal.startDate, h.createdAt);
-    // 분모: 유효 시작 ~ 목표 종료 중 예정일
     const scheduledTotal = scheduledDays(dateRange(start, goal.endDate), h.frequency, h.customDays).length;
-    // 분자: 유효 시작 ~ min(오늘, 종료) 중 완료한 예정일
-    const endForCount = todayIso < goal.endDate ? todayIso : goal.endDate;
+    const scheduledElapsed = scheduledDays(dateRange(start, endForCount), h.frequency, h.customDays).length;
     const elapsed = new Set(dateRange(start, endForCount));
     const doneCount = habitLogs.filter(
       l => l.habitId === h.id && elapsed.has(l.date) && isScheduled(l.date, h.frequency, h.customDays)
@@ -94,14 +96,15 @@ export function getLinkedItems(
     items.push({
       id: h.id, title: h.title, emoji: h.emoji, kind: 'habit',
       rate: scheduledTotal === 0 ? 0 : Math.round((doneCount / scheduledTotal) * 100),
-      doneCount, scheduledTotal,
+      adherence: scheduledElapsed === 0 ? 0 : Math.round((doneCount / scheduledElapsed) * 100),
+      doneCount, scheduledTotal, scheduledElapsed,
     });
   });
 
   faithRoutines.filter(r => r.goalId === goal.id).forEach(r => {
     const start = effectiveStart(goal.startDate, r.createdAt);
     const scheduledTotal = scheduledDays(dateRange(start, goal.endDate), r.frequency).length;
-    const endForCount = todayIso < goal.endDate ? todayIso : goal.endDate;
+    const scheduledElapsed = scheduledDays(dateRange(start, endForCount), r.frequency).length;
     const elapsed = new Set(dateRange(start, endForCount));
     const doneCount = routineLogs.filter(
       l => l.routineId === r.id && elapsed.has(l.date) && isScheduled(l.date, r.frequency)
@@ -110,7 +113,8 @@ export function getLinkedItems(
     items.push({
       id: r.id, title: r.title, emoji: r.emoji, kind: 'faith',
       rate: scheduledTotal === 0 ? 0 : Math.round((doneCount / scheduledTotal) * 100),
-      doneCount, scheduledTotal,
+      adherence: scheduledElapsed === 0 ? 0 : Math.round((doneCount / scheduledElapsed) * 100),
+      doneCount, scheduledTotal, scheduledElapsed,
     });
   });
 
@@ -134,5 +138,21 @@ export function getGoalRate(
     .filter(it => it.scheduledTotal > 0);
   if (items.length === 0) return 0;
   const sum = items.reduce((acc, it) => acc + it.rate, 0);
+  return Math.round(sum / items.length);
+}
+
+/** 목표 수행률 = 연동 항목 수행률(경과 기준)의 평균 — "지키고 있나" */
+export function getGoalAdherence(
+  goal: MonthlyGoal,
+  habits: Habit[],
+  habitLogs: HabitLog[],
+  faithRoutines: DailyRoutine[],
+  routineLogs: RoutineLog[],
+  todayIso: string,
+): number {
+  const items = getLinkedItems(goal, habits, habitLogs, faithRoutines, routineLogs, todayIso)
+    .filter(it => it.scheduledElapsed > 0);
+  if (items.length === 0) return 0;
+  const sum = items.reduce((acc, it) => acc + it.adherence, 0);
   return Math.round(sum / items.length);
 }
