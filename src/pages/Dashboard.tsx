@@ -143,49 +143,47 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      {/* 목표 + 스트릭 카드 행 */}
+      {/* 목표 통합 + 스트릭 카드 행 */}
       <motion.div variants={itemV} className="flex-shrink-0 px-4 mb-4 flex gap-2">
-        {/* 이번달 목표 */}
+
+        {/* 통합 목표 카드 */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.12 }}
           onClick={() => navigate('/goals')}
           className="flex-1 bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
         >
-          <div className="flex items-center gap-1 mb-2">
+          {/* 이번달 */}
+          <div className="flex items-center gap-1 mb-1.5">
             <CalendarDays size={11} className="text-primary" />
             <span className="text-caption2 font-bold text-primary">이번달</span>
           </div>
           {thisMonthGoals.length === 0 ? (
-            <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를<br />세워보세요</p>
+            <p className="text-caption1 text-label-assistive font-medium leading-tight mb-2.5">목표를 세워보세요</p>
           ) : (
-            <div className="flex flex-col gap-1">
-              {thisMonthGoals.slice(0, 2).map(g => (
+            <div className="flex flex-col gap-0.5 mb-2.5">
+              {thisMonthGoals.slice(0, 1).map(g => (
                 <div key={g.id} className="flex items-center gap-1.5">
                   <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${g.status === 'completed' ? 'bg-primary' : 'bg-line'}`} />
                   <p className={`text-caption1 font-medium truncate ${g.status === 'completed' ? 'line-through text-label-assistive' : 'text-label'}`}>{g.title}</p>
                 </div>
               ))}
-              {thisMonthGoals.length > 2 && (
-                <p className="text-caption2 text-label-assistive">+{thisMonthGoals.length - 2}개 더</p>
+              {thisMonthGoals.length > 1 && (
+                <p className="text-caption2 text-label-assistive pl-3">+{thisMonthGoals.length - 1}개 더</p>
               )}
             </div>
           )}
-        </motion.button>
 
-        {/* 이번주 목표 */}
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.12 }}
-          onClick={() => navigate('/goals')}
-          className="flex-1 bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
-        >
-          <div className="flex items-center gap-1 mb-2">
+          {/* 구분선 */}
+          <div className="h-px bg-line-soft mb-2.5" />
+
+          {/* 이번주 */}
+          <div className="flex items-center gap-1 mb-1.5">
             <Target size={11} className="text-primary" />
             <span className="text-caption2 font-bold text-primary">이번주</span>
           </div>
           {thisWeekGoals.length === 0 ? (
-            <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를<br />추가해보세요</p>
+            <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를 추가해보세요</p>
           ) : (
             <div className="flex flex-col gap-1">
               {thisWeekGoals.slice(0, 2).map(g => (
