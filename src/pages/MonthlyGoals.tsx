@@ -102,14 +102,16 @@ function GoalCard({ goal, past, isOpen, onToggle, onEdit, onDelete }: GoalCardPr
   const progress = Math.round((elapsed / total) * 100);
   const habit = goal.goalRoutines?.[0];
 
-  const cardBg     = goal.color ? `${goal.color}18` : past ? undefined : '#eaf2fe';
-  const cardBorder  = goal.color ? `${goal.color}50` : past ? undefined : '#0066ff33';
+  const cardBg     = goal.color ? `${goal.color}18` : undefined;
+  const cardBorder  = goal.color ? `${goal.color}50` : undefined;
   const accentColor = goal.color ?? (past ? 'var(--color-label-assistive)' : 'var(--color-primary)');
 
   return (
     <div
-      className={`rounded-xl border shadow-emphasize overflow-hidden ${past && !goal.color ? 'bg-fill border-line' : ''}`}
-      style={goal.color || !past ? { backgroundColor: cardBg, borderColor: cardBorder } : undefined}
+      className={`rounded-xl border shadow-emphasize overflow-hidden ${
+        goal.color ? '' : past ? 'bg-fill border-line' : 'bg-surface border-line'
+      }`}
+      style={goal.color ? { backgroundColor: cardBg, borderColor: cardBorder } : undefined}
     >
       {/* 카드 헤더 — 항상 표시 */}
       <button className="w-full text-left px-4 pt-4 pb-3" onClick={onToggle}>
