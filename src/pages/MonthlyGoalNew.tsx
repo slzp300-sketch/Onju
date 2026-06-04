@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, addDays } from 'date-fns';
@@ -15,16 +15,21 @@ const inputCls = 'w-full bg-fill border border-line rounded-xl px-4 py-3 text-bo
 
 export default function MonthlyGoalNew() {
   const navigate = useNavigate();
-  const { addMonthlyGoal } = useGoalStore();
+  const { id } = useParams<{ id?: string }>();
+  const { monthlyGoals, addMonthlyGoal, updateMonthlyGoal } = useGoalStore();
 
-  const [toBeStatement, setToBeStatement] = useState('');
-  const [startDate, setStartDate] = useState(todayStr);
-  const [endDate, setEndDate]     = useState(defaultEnd);
-  const [habitTitle, setHabitTitle]         = useState('');
-  const [habitWhen, setHabitWhen]           = useState('');
-  const [habitWhere, setHabitWhere]         = useState('');
-  const [miniHabit, setMiniHabit]           = useState('');
-  const [twoMinuteHabit, setTwoMinuteHabit] = useState('');
+  const existing = id ? monthlyGoals.find(g => g.id === id) : null;
+  const isEdit = !!existing;
+  const existingHabit = existing?.goalRoutines?.[0];
+
+  const [toBeStatement, setToBeStatement] = useState(existing?.toBeStatement ?? '');
+  const [startDate, setStartDate] = useState(existing?.startDate ?? todayStr());
+  const [endDate, setEndDate]     = useState(existing?.endDate ?? defaultEnd());
+  const [habitTitle, setHabitTitle]         = useState(existingHabit?.title ?? '');
+  const [habitWhen, setHabitWhen]           = useState(existingHabit?.when ?? '');
+  const [habitWhere, setHabitWhere]         = useState(existingHabit?.where ?? '');
+  const [miniHabit, setMiniHabit]           = useState(existingHabit?.miniRoutine ?? '');
+  const [twoMinuteHabit, setTwoMinuteHabit] = useState(existingHabit?.twoMinuteHabit ?? '');
 
   const canSave = toBeStatement.trim().length > 0;
 
@@ -33,7 +38,7 @@ export default function MonthlyGoalNew() {
     const s = new Date(startDate);
 
     const habit: GoalRoutineItem | undefined = habitTitle.trim() ? {
-      id: `gr-${Date.now()}`,
+      id: existingHabit?.id ?? `gr-${Date.now()}`,
       title: habitTitle.trim(),
       when: habitWhen.trim() || undefined,
       where: habitWhere.trim() || undefined,
@@ -41,21 +46,32 @@ export default function MonthlyGoalNew() {
       twoMinuteHabit: twoMinuteHabit.trim() || undefined,
     } : undefined;
 
-    const newGoal: MonthlyGoal = {
-      id: `mg-${Date.now()}`,
-      userId: 'user-1',
-      title: toBeStatement.trim(),
-      month: s.getMonth() + 1,
-      year: s.getFullYear(),
-      startDate,
-      endDate,
-      status: 'active',
-      createdAt: new Date().toISOString(),
-      toBeStatement: toBeStatement.trim(),
-      goalRoutines: habit ? [habit] : undefined,
-    };
-
-    addMonthlyGoal(newGoal);
+    if (isEdit && existing) {
+      updateMonthlyGoal(existing.id, {
+        title: toBeStatement.trim(),
+        month: s.getMonth() + 1,
+        year: s.getFullYear(),
+        startDate,
+        endDate,
+        toBeStatement: toBeStatement.trim(),
+        goalRoutines: habit ? [habit] : undefined,
+      });
+    } else {
+      const newGoal: MonthlyGoal = {
+        id: `mg-${Date.now()}`,
+        userId: 'user-1',
+        title: toBeStatement.trim(),
+        month: s.getMonth() + 1,
+        year: s.getFullYear(),
+        startDate,
+        endDate,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        toBeStatement: toBeStatement.trim(),
+        goalRoutines: habit ? [habit] : undefined,
+      };
+      addMonthlyGoal(newGoal);
+    }
     navigate('/goals/monthly');
   };
 
@@ -66,7 +82,9 @@ export default function MonthlyGoalNew() {
         <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
-        <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">목표 추가하기</h1>
+        <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">
+          {isEdit ? '목표 수정하기' : '목표 추가하기'}
+        </h1>
         <div className="w-8" />
       </div>
 
@@ -165,7 +183,7 @@ export default function MonthlyGoalNew() {
           disabled={!canSave}
           className="w-full h-12 mt-3 rounded-xl bg-primary text-white font-bold text-body1 disabled:opacity-30 hover:bg-primary-strong transition-colors"
         >
-          목표 시작하기
+          {isEdit ? '수정 완료' : '목표 시작하기'}
         </motion.button>
       </div>
     </div>

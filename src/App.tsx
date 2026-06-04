@@ -78,7 +78,7 @@ function BottomNav() {
     location.pathname === '/auth/kakao/callback' ||
     location.pathname === '/onboarding' ||
     location.pathname === '/goals/monthly/new' ||
-    location.pathname === '/goals/monthly/new' ||
+    location.pathname.startsWith('/goals/monthly/edit/') ||
     location.pathname === '/groups/new' ||
     location.pathname === '/review' ||
     location.pathname === '/notification-settings' ||
@@ -170,6 +170,7 @@ function AppRoutes() {
               <Route path="/stats" element={<PageTransition><Stats /></PageTransition>} />
               <Route path="/goals/monthly" element={<PageTransition><MonthlyGoals /></PageTransition>} />
               <Route path="/goals/monthly/new" element={<PageTransition><MonthlyGoalNew /></PageTransition>} />
+              <Route path="/goals/monthly/edit/:id" element={<PageTransition><MonthlyGoalNew /></PageTransition>} />
               <Route path="/goals/weekly" element={<PageTransition><WeeklyGoals /></PageTransition>} />
               <Route path="/routines" element={<PageTransition><Routines /></PageTransition>} />
               <Route path="/groups" element={<PageTransition><Groups /></PageTransition>} />
