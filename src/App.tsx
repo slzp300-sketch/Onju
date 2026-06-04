@@ -77,6 +77,8 @@ function BottomNav() {
     location.pathname === '/signup' ||
     location.pathname === '/auth/kakao/callback' ||
     location.pathname === '/onboarding' ||
+    location.pathname === '/goals/monthly/new' ||
+    location.pathname === '/goals/monthly/new' ||
     location.pathname === '/groups/new' ||
     location.pathname === '/review' ||
     location.pathname === '/notification-settings' ||

@@ -11,28 +11,22 @@ const tapSm = { whileTap: { scale: 0.92 }, transition: { type: 'spring' as const
 const todayStr   = () => format(new Date(), 'yyyy-MM-dd');
 const defaultEnd = () => format(addDays(new Date(), 29), 'yyyy-MM-dd');
 
-/* ── 입력 필드 공통 스타일 ── */
 const inputCls = 'w-full bg-fill border border-line rounded-xl px-4 py-3 text-body2 font-medium focus:outline-none focus:border-primary focus:bg-surface transition-all placeholder:text-label-assistive';
 
 export default function MonthlyGoalNew() {
   const navigate = useNavigate();
   const { addMonthlyGoal } = useGoalStore();
 
-  // 섹션 1: To-Be
   const [toBeStatement, setToBeStatement] = useState('');
-
-  // 섹션 2: 기간
   const [startDate, setStartDate] = useState(todayStr);
   const [endDate, setEndDate]     = useState(defaultEnd);
-
-  // 섹션 3: 핵심 습관 (1개)
   const [habitTitle, setHabitTitle]         = useState('');
   const [habitWhen, setHabitWhen]           = useState('');
   const [habitWhere, setHabitWhere]         = useState('');
   const [miniHabit, setMiniHabit]           = useState('');
   const [twoMinuteHabit, setTwoMinuteHabit] = useState('');
 
-  const canSave = toBeStatement.trim().length > 0 && startDate && endDate;
+  const canSave = toBeStatement.trim().length > 0;
 
   const handleSave = () => {
     if (!canSave) return;
@@ -76,15 +70,15 @@ export default function MonthlyGoalNew() {
         <div className="w-8" />
       </div>
 
-      {/* 스크롤 영역 */}
+      {/* 스크롤 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
         <div className="px-4 py-5 flex flex-col gap-5 pb-28">
 
-          {/* ── 섹션 1: To-Be 선언 ── */}
+          {/* ── To-Be 선언 ── */}
           <div className="bg-surface rounded-xl border border-line shadow-emphasize">
-            <div className="px-4 py-3.5 border-b border-line-soft">
-              <p className="text-body2 font-bold text-label-strong">🌟 나의 To-Be 선언</p>
-              <p className="text-caption1 text-label-alt mt-0.5">내가 되고 싶은 모습을 구체적인 문장으로</p>
+            <div className="px-4 py-4 border-b border-line-soft">
+              <p className="text-body2 font-bold text-label-strong mb-0.5">🌟 나의 To-Be 선언</p>
+              <p className="text-caption1 text-label-alt">내가 되고 싶은 모습을 구체적인 문장으로</p>
             </div>
             <div className="px-4 py-4">
               <textarea
@@ -101,38 +95,33 @@ export default function MonthlyGoalNew() {
             </div>
           </div>
 
-          {/* ── 섹션 2: 목표 기간 ── */}
+          {/* ── 목표 기간 ── */}
           <div className="bg-surface rounded-xl border border-line shadow-emphasize">
-            <div className="px-4 py-3.5 border-b border-line-soft">
+            <div className="px-4 py-4 border-b border-line-soft">
               <p className="text-body2 font-bold text-label-strong">📅 목표 기간</p>
             </div>
             <div className="px-4 py-4 flex items-center gap-3">
               <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                className="flex-1 border border-line rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-primary transition-colors bg-fill text-label" />
+                className="flex-1 border border-line rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-primary bg-fill text-label" />
               <span className="text-label-assistive text-body2 flex-shrink-0">~</span>
               <input type="date" value={endDate} min={startDate} onChange={e => setEndDate(e.target.value)}
-                className="flex-1 border border-line rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-primary transition-colors bg-fill text-label" />
+                className="flex-1 border border-line rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-primary bg-fill text-label" />
             </div>
           </div>
 
-          {/* ── 섹션 3: 핵심 습관 ── */}
+          {/* ── 핵심 습관 ── */}
           <div className="bg-surface rounded-xl border border-line shadow-emphasize">
-            <div className="px-4 py-3.5 border-b border-line-soft">
-              <p className="text-body2 font-bold text-label-strong">💪 핵심 습관</p>
-              <p className="text-caption1 text-label-alt mt-0.5">목표를 이루기 위해 매일 할 습관을 구체화해요</p>
+            <div className="px-4 py-4 border-b border-line-soft">
+              <p className="text-body2 font-bold text-label-strong mb-0.5">💪 핵심 습관</p>
+              <p className="text-caption1 text-label-alt">무엇을, 언제, 어디서 할지 구체화해요</p>
             </div>
             <div className="px-4 py-4 flex flex-col gap-3">
-              {/* 습관명 */}
               <input value={habitTitle} onChange={e => setHabitTitle(e.target.value)}
                 placeholder="습관명 (예: 러닝 30분)"
                 className={inputCls} />
-
-              {/* 언제 */}
               <input value={habitWhen} onChange={e => setHabitWhen(e.target.value)}
                 placeholder="⏰ 언제 (예: 출근 전 6시)"
                 className={inputCls} />
-
-              {/* 어디서 */}
               <input value={habitWhere} onChange={e => setHabitWhere(e.target.value)}
                 placeholder="📍 어디서 (예: 공원)"
                 className={inputCls} />
@@ -167,8 +156,8 @@ export default function MonthlyGoalNew() {
         </div>
       </div>
 
-      {/* 하단 저장 버튼 */}
-      <div className="flex-shrink-0 px-4 bg-surface border-t border-line-soft"
+      {/* 하단 고정 버튼 */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         <motion.button
           whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
