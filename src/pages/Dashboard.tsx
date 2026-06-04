@@ -91,29 +91,37 @@ export default function Dashboard() {
     const end = todayIso < goal.endDate ? todayIso : goal.endDate;
     if (start > end) return 0;
 
-    // 기간 내 날짜 배열
-    const days: string[] = [];
-    const d = new Date(start + 'T12:00:00');
-    const endDate = new Date(end + 'T12:00:00');
-    while (d <= endDate) {
-      days.push(format(d, 'yyyy-MM-dd'));
-      d.setDate(d.getDate() + 1);
+    // 전체 기간 날짜 배열 (분모)
+    const allDays: string[] = [];
+    const dAll = new Date(start + 'T12:00:00');
+    const goalEnd = new Date(goal.endDate + 'T12:00:00');
+    while (dAll <= goalEnd) {
+      allDays.push(format(dAll, 'yyyy-MM-dd'));
+      dAll.setDate(dAll.getDate() + 1);
     }
-    if (days.length === 0) return 0;
+    if (allDays.length === 0) return 0;
+
+    // 오늘까지 경과된 날짜 배열 (분자 계산 범위)
+    const elapsedDays2: string[] = [];
+    const dEl = new Date(start + 'T12:00:00');
+    const todayEnd = new Date(end + 'T12:00:00');
+    while (dEl <= todayEnd) {
+      elapsedDays2.push(format(dEl, 'yyyy-MM-dd'));
+      dEl.setDate(dEl.getDate() + 1);
+    }
 
     // 연동된 습관 찾기
     const linkedHabits = habits.filter(h => h.goalId === goal.id);
+    if (linkedHabits.length === 0) return 0;
 
-    if (linkedHabits.length === 0) return 0; // 연동 없으면 0%
-
-    // 연동된 습관 중 하나라도 완료된 날 비율
-    const completedDays = days.filter(ds =>
+    // 경과 기간 중 완료된 날 수 / 전체 기간 = 달성률
+    const completedDays = elapsedDays2.filter(ds =>
       linkedHabits.some(h =>
         habitLogs.some(l => l.habitId === h.id && l.date === ds && (l.completed || l.skipped || l.substitute))
       )
     );
 
-    return Math.round((completedDays.length / days.length) * 100);
+    return Math.round((completedDays.length / allDays.length) * 100);
   };
   const todayTodos = todos.filter(t => t.date === todayStr);
   const doneTodos = todayTodos.filter(t => t.completed).length;
