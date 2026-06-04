@@ -112,7 +112,7 @@ export default function PersonalRoutineNew() {
         {/* 월간 목표에서 루틴 가져오기 */}
         {!isEdit && activeGoalRoutines.length > 0 && (
           <div>
-            <p className="text-caption1 font-bold text-label-alt mb-2">📋 월간 목표에서 가져오기</p>
+            <p className="text-caption1 font-bold text-label-alt mb-2">💪 월간 목표 습관에서 가져오기</p>
             <div className="flex flex-col gap-2">
               {activeGoalRoutines.map(r => (
                 <motion.button key={r.id}

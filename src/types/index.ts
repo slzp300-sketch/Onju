@@ -13,10 +13,11 @@ export interface User {
 
 export interface GoalRoutineItem {
   id: string;
-  title: string;       // 루틴명 (예: "러닝 30분")
-  when?: string;       // 언제 (예: "출근 전 6시")
-  where?: string;      // 어디서 (예: "공원")
-  miniRoutine?: string; // 미니루틴 (예: "10분 스트레칭")
+  title: string;          // 습관명 (예: "러닝 30분")
+  when?: string;          // 언제 (예: "출근 전 6시")
+  where?: string;         // 어디서 (예: "공원")
+  miniRoutine?: string;   // 미니습관 (예: "10분 스트레칭")
+  twoMinuteHabit?: string; // 2분 습관 (예: "운동복으로 갈아입기")
 }
 
 export interface MonthlyGoal {
