@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, Timer, GripVertical } from 'lucide-react';
 import DurationPickerSheet from '../components/ui/DurationPickerSheet';
 import { fmtDuration } from '../utils/duration';
+import { format } from 'date-fns';
 import { useHabitStore } from '../store/habitStore';
+import { useGoalStore } from '../store/goalStore';
 import type { Habit } from '../types';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 import {
@@ -24,6 +26,12 @@ export default function PersonalRoutineNew() {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
   const { habits, personalRoutines, addPersonalRoutine, updatePersonalRoutine } = useHabitStore();
+  const { monthlyGoals } = useGoalStore();
+
+  const todayIso = format(new Date(), 'yyyy-MM-dd');
+  const activeGoalRoutines = monthlyGoals
+    .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length)
+    .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title })));
 
   const existing = id ? personalRoutines.find(r => r.id === id) : null;
   const isEdit = !!existing;
@@ -100,6 +108,34 @@ export default function PersonalRoutineNew() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5 pb-28">
+
+        {/* 월간 목표에서 루틴 가져오기 */}
+        {!isEdit && activeGoalRoutines.length > 0 && (
+          <div>
+            <p className="text-caption1 font-bold text-label-alt mb-2">📋 월간 목표에서 가져오기</p>
+            <div className="flex flex-col gap-2">
+              {activeGoalRoutines.map(r => (
+                <motion.button key={r.id}
+                  whileTap={{ scale: 0.97 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+                  onClick={() => { setTitle(r.title); if (r.when) setWhen(r.when); }}
+                  className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-body2 font-semibold text-label-strong truncate">{r.title}</p>
+                    <p className="text-caption1 text-label-alt mt-0.5">
+                      {[r.when, r.where].filter(Boolean).join(' · ')}
+                    </p>
+                    {r.miniRoutine && (
+                      <p className="text-caption1 text-amber-500 mt-0.5">🔥 미니: {r.miniRoutine}</p>
+                    )}
+                  </div>
+                  <span className="text-caption2 text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0 mt-0.5">
+                    가져오기
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 루틴 이름 + 이모지 */}
         <div>

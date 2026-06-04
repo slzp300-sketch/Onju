@@ -33,6 +33,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const KakaoCallback = lazy(() => import('./pages/KakaoCallback'));
 const WeeklyReviewPage = lazy(() => import('./pages/WeeklyReviewPage'));
+const MonthlyGoalNew = lazy(() => import('./pages/MonthlyGoalNew'));
 const ReviewResultPage = lazy(() => import('./pages/ReviewResultPage'));
 const NotificationSettings = lazy(() => import('./pages/NotificationSettings'));
 
@@ -166,6 +167,7 @@ function AppRoutes() {
               <Route path="/today" element={<PageTransition><Today /></PageTransition>} />
               <Route path="/stats" element={<PageTransition><Stats /></PageTransition>} />
               <Route path="/goals/monthly" element={<PageTransition><MonthlyGoals /></PageTransition>} />
+              <Route path="/goals/monthly/new" element={<PageTransition><MonthlyGoalNew /></PageTransition>} />
               <Route path="/goals/weekly" element={<PageTransition><WeeklyGoals /></PageTransition>} />
               <Route path="/routines" element={<PageTransition><Routines /></PageTransition>} />
               <Route path="/groups" element={<PageTransition><Groups /></PageTransition>} />

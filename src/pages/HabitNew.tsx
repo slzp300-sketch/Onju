@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
+import { format } from 'date-fns';
 import { AlarmTimeSheet, AlarmTypeSheet } from '../components/ui/HabitAlarmSheet';
 import { to12h } from '../utils/alarmTime';
 import DurationPickerSheet from '../components/ui/DurationPickerSheet';
@@ -13,6 +14,7 @@ import { useNotificationStore } from '../store/notificationStore';
 const tap = { whileTap: { scale: 0.98 }, transition: { duration: 0.12 } };
 const tapSm = { whileTap: { scale: 0.92 }, transition: { duration: 0.1 } };
 import { useHabitStore } from '../store/habitStore';
+import { useGoalStore } from '../store/goalStore';
 import type { HabitFrequency } from '../types';
 import { WEEKDAY_LABELS } from '../types';
 
@@ -27,8 +29,15 @@ export default function HabitNew() {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
   const { habits, addHabit, updateHabit } = useHabitStore();
+  const { monthlyGoals } = useGoalStore();
   const existing = id ? habits.find(h => h.id === id) : null;
   const isEdit = !!existing;
+
+  // 활성 월간 목표 중 루틴이 있는 것
+  const todayIso = format(new Date(), 'yyyy-MM-dd');
+  const activeGoalRoutines = monthlyGoals
+    .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length)
+    .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title })));
 
   const { setPermission } = useNotificationStore();
 
@@ -113,6 +122,33 @@ export default function HabitNew() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5 pb-28">
+
+        {/* 월간 목표에서 가져오기 */}
+        {!isEdit && activeGoalRoutines.length > 0 && (
+          <div>
+            <p className="text-caption1 font-bold text-label-alt mb-2">📋 월간 목표에서 가져오기</p>
+            <div className="flex flex-col gap-2">
+              {activeGoalRoutines.map(r => (
+                <motion.button key={r.id} {...tap}
+                  onClick={() => { setTitle(r.title); if (r.when) setWhen(r.when); }}
+                  className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-body2 font-semibold text-label-strong truncate">{r.title}</p>
+                    <p className="text-caption1 text-label-alt mt-0.5 truncate">
+                      {[r.when, r.where].filter(Boolean).join(' · ')}
+                    </p>
+                    {r.miniRoutine && (
+                      <p className="text-caption1 text-amber-500 mt-0.5">🔥 미니: {r.miniRoutine}</p>
+                    )}
+                  </div>
+                  <span className="text-caption2 text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0 mt-0.5">
+                    가져오기
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 습관 이름 */}
         <div>

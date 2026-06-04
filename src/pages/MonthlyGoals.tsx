@@ -1,52 +1,20 @@
-import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { format, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import Button from '../components/ui/Button';
-import Modal from '../components/ui/Modal';
+import { useNavigate } from 'react-router-dom';
 import { useGoalStore } from '../store/goalStore';
 import type { MonthlyGoal } from '../types';
 import { formatDateRange, elapsedDays } from '../utils/date';
 
-const todayStr = () => format(new Date(), 'yyyy-MM-dd');
-const defaultEnd = () => format(addDays(new Date(), 29), 'yyyy-MM-dd');
-
 export default function MonthlyGoals() {
-  const [showCreate, setShowCreate] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState(todayStr);
-  const [endDate, setEndDate] = useState(defaultEnd);
-  const { monthlyGoals, addMonthlyGoal, removeMonthlyGoal } = useGoalStore();
+  const navigate = useNavigate();
+  const { monthlyGoals, removeMonthlyGoal } = useGoalStore();
 
   const now = new Date();
   // 오늘 날짜가 startDate~endDate 범위에 포함된 목표만 표시
   const todayIso = format(now, 'yyyy-MM-dd');
   const activeGoals = monthlyGoals.filter(g => g.startDate <= todayIso && g.endDate >= todayIso);
   const pastGoals = monthlyGoals.filter(g => g.endDate < todayIso);
-
-  const handleAdd = () => {
-    if (!title.trim() || !startDate || !endDate) return;
-    const s = new Date(startDate);
-    const newGoal: MonthlyGoal = {
-      id: `mg-${Date.now()}`,
-      userId: 'user-1',
-      title: title.trim(),
-      description: description.trim() || undefined,
-      month: s.getMonth() + 1,
-      year: s.getFullYear(),
-      startDate,
-      endDate,
-      status: 'active',
-      createdAt: new Date().toISOString(),
-    };
-    addMonthlyGoal(newGoal);
-    setTitle('');
-    setDescription('');
-    setStartDate(todayStr());
-    setEndDate(defaultEnd());
-    setShowCreate(false);
-  };
 
   return (
     <div className="flex flex-col gap-4 pb-4">
@@ -69,54 +37,13 @@ export default function MonthlyGoals() {
         <motion.button
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-          onClick={() => setShowCreate(true)}
+          onClick={() => navigate('/goals/monthly/new')}
           className="w-full rounded-xl border-2 border-dashed border-line py-5 flex items-center justify-center gap-2 text-label-assistive hover:border-primary hover:text-primary hover:bg-primary-soft/30 transition-all"
         >
           <Plus size={20} />
           <span className="text-body2 font-semibold">목표 추가</span>
         </motion.button>
       </div>
-
-      <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="목표 추가">
-        <div className="flex flex-col gap-3">
-          <input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="목표 이름을 입력하세요"
-            className="input-base"
-            autoFocus
-          />
-          <textarea
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            placeholder="목표 설명 (선택)"
-            rows={2}
-            className="w-full border border-line rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,102,255,0.15)] resize-none transition-all bg-surface text-label placeholder-label-assistive"
-          />
-          <div className="flex flex-col gap-2">
-            <p className="text-caption1 font-medium text-label-alt">목표 기간</p>
-            <div className="flex items-center gap-2">
-              <input
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                className="flex-1 border border-line rounded-lg px-3 py-2 text-body2 focus:outline-none focus:border-primary transition-colors bg-surface text-label"
-              />
-              <span className="text-label-assistive text-body2">~</span>
-              <input
-                type="date"
-                value={endDate}
-                min={startDate}
-                onChange={e => setEndDate(e.target.value)}
-                className="flex-1 border border-line rounded-lg px-3 py-2 text-body2 focus:outline-none focus:border-primary transition-colors bg-surface text-label"
-              />
-            </div>
-          </div>
-          <Button onClick={handleAdd} disabled={!title.trim() || !startDate || !endDate} fullWidth>
-            추가
-          </Button>
-        </div>
-      </Modal>
     </div>
   );
 }
