@@ -121,6 +121,20 @@ export function getLinkedItems(
   return items;
 }
 
+/** 이미 계산된 items로부터 전체 달성률(평균) */
+export function rateFromItems(items: LinkedItem[]): number {
+  const valid = items.filter(it => it.scheduledTotal > 0);
+  if (valid.length === 0) return 0;
+  return Math.round(valid.reduce((a, it) => a + it.rate, 0) / valid.length);
+}
+
+/** 이미 계산된 items로부터 수행률(경과 기준 평균) */
+export function adherenceFromItems(items: LinkedItem[]): number {
+  const valid = items.filter(it => it.scheduledElapsed > 0);
+  if (valid.length === 0) return 0;
+  return Math.round(valid.reduce((a, it) => a + it.adherence, 0) / valid.length);
+}
+
 /**
  * 목표 전체 달성률 = 연동 항목 개별 달성률의 평균.
  * 각 항목은 자신의 "예정일 수"로 정규화되므로 frequency가 공정하게 반영됨.

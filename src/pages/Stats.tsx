@@ -14,10 +14,11 @@ import {
   today, getWeekDays, ALL_DAY_LABELS, elapsedDays,
   currentWeek, currentYear, isReviewCompleted, getWeekRangeText,
 } from '../utils/date';
-import { getGoalRate, getGoalAdherence, getLinkedItems, isScheduled } from '../utils/goalProgress';
+import { getLinkedItems, rateFromItems, adherenceFromItems, isScheduled } from '../utils/goalProgress';
+import { getDayCompletion, type DayState } from '../utils/dayCompletion';
 import { getHabitStat, type DayStatus } from '../utils/habitStats';
 import { fetchReviews } from '../api/reviews';
-import type { MonthlyGoal, HabitFrequency, DailyRoutine } from '../types';
+import type { MonthlyGoal, Habit, DailyRoutine } from '../types';
 
 type TabType = 'goal' | 'habit' | 'weekly';
 
@@ -96,28 +97,24 @@ function GoalStatsTab() {
     );
   }
 
+  const renderCard = (g: MonthlyGoal, past: boolean) => {
+    const items = getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso);
+    return (
+      <GoalStatCard key={g.id} goal={g} past={past}
+        rate={rateFromItems(items)} adherence={adherenceFromItems(items)} items={items}
+        onClick={() => navigate('/goals')}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4 px-4 py-4 pb-8">
-      {activeGoals.map(g => (
-        <GoalStatCard key={g.id} goal={g}
-          rate={getGoalRate(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-          adherence={getGoalAdherence(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-          items={getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-          onClick={() => navigate('/goals')}
-        />
-      ))}
+      {activeGoals.map(g => renderCard(g, false))}
 
       {pastGoals.length > 0 && (
         <>
           <p className="text-caption1 font-bold text-label-assistive mt-1">종료된 목표</p>
-          {pastGoals.map(g => (
-            <GoalStatCard key={g.id} goal={g} past
-              rate={getGoalRate(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-              adherence={getGoalAdherence(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-              items={getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-              onClick={() => navigate('/goals')}
-            />
-          ))}
+          {pastGoals.map(g => renderCard(g, true))}
         </>
       )}
     </div>
@@ -295,7 +292,7 @@ function HabitStatRow({ emoji, title, accent, stat }: {
       <div className="flex items-center gap-4 text-caption1">
         <span className="text-label-alt">🔥 연속 <span className="font-bold text-label-strong">{stat.streak}일</span></span>
         <span className="text-label-alt">최고 <span className="font-bold text-label-strong">{stat.best}일</span></span>
-        <span className="text-label-assistive ml-auto">30일 {stat.done30}/{stat.sched30}</span>
+        <span className="text-label-assistive ml-auto">최근 30일 {stat.done30}/{stat.sched30}일</span>
       </div>
     </div>
   );
@@ -304,43 +301,25 @@ function HabitStatRow({ emoji, title, accent, stat }: {
 /* ════════════════════════════════════════
    주간 통계 탭
 ════════════════════════════════════════ */
-type DayState = 'perfect' | 'partial' | 'missed' | 'rest' | 'future';
-
 interface WeekDayInfo {
   date: string;
   dow: number;
   state: DayState;
-  rate: number; // 0~100 (예정 항목 기준)
+  rate: number; // 0~100 (예정 항목 기준), rest는 0
 }
 
 function computeWeek(
   weekDays: Date[],
-  habits: { id: string; frequency: HabitFrequency; customDays?: number[] }[],
+  habits: Habit[],
   habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean; substitute?: boolean }[],
-  faithRoutines: { id: string; frequency: DailyRoutine['frequency'] }[],
-  logs: { routineId: string; date: string; completed: boolean; skipped?: boolean }[],
+  faithRoutines: DailyRoutine[],
+  logs: { id: string; routineId: string; userId: string; date: string; completed: boolean; skipped?: boolean }[],
 ): WeekDayInfo[] {
   const todayMid = new Date(new Date().setHours(23, 59, 59, 999));
   return weekDays.map(d => {
     const ds = format(d, 'yyyy-MM-dd');
-    const dow = getDay(d);
-    if (d > todayMid) return { date: ds, dow, state: 'future' as DayState, rate: 0 };
-
-    const schedHabits = habits.filter(h => isScheduled(ds, h.frequency, h.customDays));
-    const schedFaith  = faithRoutines.filter(r => isScheduled(ds, r.frequency));
-    const total = schedHabits.length + schedFaith.length;
-    if (total === 0) return { date: ds, dow, state: 'rest' as DayState, rate: 0 };
-
-    const doneH = schedHabits.filter(h =>
-      habitLogs.some(l => l.habitId === h.id && l.date === ds && (l.completed || l.skipped || l.substitute))
-    ).length;
-    const doneF = schedFaith.filter(r =>
-      logs.some(l => l.routineId === r.id && l.date === ds && (l.completed || l.skipped))
-    ).length;
-    const done = doneH + doneF;
-    const rate = Math.round((done / total) * 100);
-    const state: DayState = done === total ? 'perfect' : done > 0 ? 'partial' : 'missed';
-    return { date: ds, dow, state, rate };
+    const c = getDayCompletion(ds, habits, habitLogs, faithRoutines, logs, d > todayMid);
+    return { date: ds, dow: getDay(d), state: c.state, rate: c.combinedRate < 0 ? 0 : c.combinedRate };
   });
 }
 
@@ -362,9 +341,10 @@ function WeeklyTab() {
   const lastPerfect  = lastWeek.filter(d => d.state === 'perfect').length;
   const perfectDelta = perfectCount - lastPerfect;
 
-  const elapsedDone = week.filter(d => d.state !== 'future');
-  const avgRate = elapsedDone.length
-    ? Math.round(elapsedDone.reduce((a, d) => a + (d.state === 'rest' ? 100 : d.rate), 0) / elapsedDone.length)
+  // 의무가 있었던 날만 평균 (쉬는 날 제외)
+  const obligationDays = week.filter(d => d.state !== 'future' && d.state !== 'rest');
+  const avgRate = obligationDays.length
+    ? Math.round(obligationDays.reduce((a, d) => a + d.rate, 0) / obligationDays.length)
     : 0;
 
   // 이번 주 가장 꾸준한 습관

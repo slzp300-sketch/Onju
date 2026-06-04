@@ -16,6 +16,7 @@ import { calcStreak } from '../utils/completion';
 import { today, isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
 import { getGoalRate, getLinkedItems } from '../utils/goalProgress';
+import { getDayCompletion } from '../utils/dayCompletion';
 import StampOverlay from '../components/ui/StampOverlay';
 import ReviewBanner from '../components/review/ReviewBanner';
 import { fetchReviews } from '../api/reviews';
@@ -31,21 +32,6 @@ const TABS: { key: TabType; label: string }[] = [
   { key: 'faith', label: '신앙 루틴' },
   { key: 'todo', label: '투두' },
 ];
-
-
-function getFaithRate(routines: import('../types').DailyRoutine[], logs: import('../types').RoutineLog[], dateStr: string): number {
-  if (routines.length === 0) return -1;
-  // 완료 또는 쉬어가기 모두 달성으로 처리
-  const done = new Set(logs.filter(l => l.date === dateStr && (l.completed || l.skipped)).map(l => l.routineId));
-  return Math.round((routines.filter(r => done.has(r.id)).length / routines.length) * 100);
-}
-
-function getHabitRate(habits: import('../types').Habit[], habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean; substitute?: boolean }[], dateStr: string): number {
-  if (habits.length === 0) return -1;
-  // 완료·대체·쉬어가기 모두 달성으로 처리
-  const done = habitLogs.filter(l => l.date === dateStr && (l.completed || l.skipped || l.substitute)).length;
-  return Math.round((done / habits.length) * 100);
-}
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } } as const;
 const itemV = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 420, damping: 28 } } } as const;
@@ -63,7 +49,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   const [selectedDay, setSelectedDay] = useState<string>(todayStr);
   const [showPerfectStamp, setShowPerfectStamp] = useState(false);
-  const prevTodayRates = useRef<{ personal: number; faith: number } | null>(null);
+  const prevTodayRates = useRef<boolean>(false);
 
   const { data: reviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
 
@@ -93,13 +79,11 @@ export default function Dashboard() {
   const doneTodos = todayTodos.filter(t => t.completed).length;
   const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
 
+  const nowMid = new Date(new Date().setHours(23, 59, 59, 999));
   const weekRates = weekDays.map(d => {
     const ds = format(d, 'yyyy-MM-dd');
-    return {
-      date: ds,
-      personal: getHabitRate(habits, habitLogs, ds),
-      faith: getFaithRate(faithRoutines, logs, ds),
-    };
+    const c = getDayCompletion(ds, habits, habitLogs, faithRoutines, logs, d > nowMid);
+    return { date: ds, personal: c.personalRate, faith: c.faithRate, state: c.state };
   });
 
   const badges: Record<TabType, string | undefined> = {
@@ -108,28 +92,26 @@ export default function Dashboard() {
     todo: todayTodos.length > 0 ? `${doneTodos}/${todayTodos.length}` : undefined,
   };
 
-  // 오늘 날짜 개인+신앙 둘 다 100% 달성 시 스탬프 (하루 한 번만)
+  // 오늘 완벽한 날(예정 항목 전부 달성) 시 스탬프 (하루 한 번만)
   const PERFECT_STAMP_KEY = 'onju_perfect_stamp_date';
   const todayIdx = weekDays.findIndex(d => format(d, 'yyyy-MM-dd') === todayStr);
-  const todayRates = todayIdx >= 0 ? weekRates[todayIdx] : null;
+  const todayState = todayIdx >= 0 ? weekRates[todayIdx].state : 'rest';
 
   useEffect(() => {
-    if (!todayRates) return;
-    const prev = prevTodayRates.current;
-    const nowPerfect = todayRates.personal === 100 && todayRates.faith === 100;
-    const wasPerfect = prev ? prev.personal === 100 && prev.faith === 100 : false;
+    const nowPerfect = todayState === 'perfect';
+    const wasPerfect = prevTodayRates.current;
     if (nowPerfect && !wasPerfect) {
-      // 오늘 이미 보여줬으면 다시 표시하지 않음
       const shownDate = localStorage.getItem(PERFECT_STAMP_KEY);
       if (shownDate !== todayStr) {
         localStorage.setItem(PERFECT_STAMP_KEY, todayStr);
         const t = setTimeout(() => setShowPerfectStamp(true), 0);
+        prevTodayRates.current = true;
         return () => clearTimeout(t);
       }
     }
-    prevTodayRates.current = { personal: todayRates.personal, faith: todayRates.faith };
+    prevTodayRates.current = nowPerfect;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [todayRates?.personal, todayRates?.faith]);
+  }, [todayState]);
 
   return (
     <>
