@@ -15,7 +15,7 @@ import { useAuthStore } from '../store/authStore';
 import { calcStreak } from '../utils/completion';
 import { today, isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
-import { getGoalRate, getLinkedItems } from '../utils/goalProgress';
+import { getGoalAdherence, getLinkedItems } from '../utils/goalProgress';
 import { getDayCompletion } from '../utils/dayCompletion';
 import StampOverlay from '../components/ui/StampOverlay';
 import ReviewBanner from '../components/review/ReviewBanner';
@@ -72,9 +72,9 @@ export default function Dashboard() {
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   const activeGoals = monthlyGoals.filter(g => g.endDate >= todayIso);
 
-  // 목표별 달성률 (연동 항목 가중 평균)
+  // 목표 대표 지표 = 수행률 (지나온 날 중 지킨 비율)
   const goalRate = (goal: typeof activeGoals[0]): number =>
-    getGoalRate(goal, habits, habitLogs, faithRoutines, logs, todayIso);
+    getGoalAdherence(goal, habits, habitLogs, faithRoutines, logs, todayIso);
   const todayTodos = todos.filter(t => t.date === todayStr);
   const doneTodos = todayTodos.filter(t => t.completed).length;
   const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);

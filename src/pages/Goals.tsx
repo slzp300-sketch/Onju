@@ -8,7 +8,7 @@ import { useHabitStore } from '../store/habitStore';
 import { useRoutineStore } from '../store/routineStore';
 import type { MonthlyGoal } from '../types';
 import { elapsedDays } from '../utils/date';
-import { getLinkedItems, getGoalRate, type LinkedItem } from '../utils/goalProgress';
+import { getLinkedItems, rateFromItems, adherenceFromItems, type LinkedItem } from '../utils/goalProgress';
 
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 const MAX_SLOTS = 3;
@@ -77,6 +77,22 @@ export default function Goals() {
     navigate(goal.category === 'faith' ? '/faith-routines/new' : '/habits/new', { state: { prefill } });
   };
 
+  const renderGoal = (g: MonthlyGoal, past: boolean) => {
+    const items = getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso);
+    return (
+      <GoalCard key={g.id} goal={g} past={past}
+        isOpen={expanded.has(g.id)}
+        adherence={adherenceFromItems(items)}
+        rate={rateFromItems(items)}
+        linkedItems={items}
+        onToggle={() => toggle(g.id)}
+        onEdit={() => navigate(`/goals/monthly/edit/${g.id}`)}
+        onDelete={() => removeMonthlyGoal(g.id)}
+        onCreateHabit={() => createFromPlan(g)}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4 pb-8">
       {/* 헤더 */}
@@ -127,31 +143,11 @@ export default function Goals() {
           </div>
         ) : (
           <>
-            {activeGoals.map(g => (
-              <GoalCard key={g.id} goal={g}
-                isOpen={expanded.has(g.id)}
-                rate={getGoalRate(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-                linkedItems={getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-                onToggle={() => toggle(g.id)}
-                onEdit={() => navigate(`/goals/monthly/edit/${g.id}`)}
-                onDelete={() => removeMonthlyGoal(g.id)}
-                onCreateHabit={() => createFromPlan(g)}
-              />
-            ))}
+            {activeGoals.map(g => renderGoal(g, false))}
             {pastGoals.length > 0 && (
               <>
                 <p className="text-caption1 text-label-assistive font-semibold mt-1">종료된 목표</p>
-                {pastGoals.map(g => (
-                  <GoalCard key={g.id} goal={g} past
-                    isOpen={expanded.has(g.id)}
-                    rate={getGoalRate(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-                    linkedItems={getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso)}
-                    onToggle={() => toggle(g.id)}
-                    onEdit={() => navigate(`/goals/monthly/edit/${g.id}`)}
-                    onDelete={() => removeMonthlyGoal(g.id)}
-                    onCreateHabit={() => createFromPlan(g)}
-                  />
-                ))}
+                {pastGoals.map(g => renderGoal(g, true))}
               </>
             )}
           </>
@@ -184,9 +180,9 @@ export default function Goals() {
 }
 
 /* ── 목표 카드 ── */
-function GoalCard({ goal, past = false, isOpen, rate, linkedItems, onToggle, onEdit, onDelete, onCreateHabit }: {
+function GoalCard({ goal, past = false, isOpen, adherence, rate, linkedItems, onToggle, onEdit, onDelete, onCreateHabit }: {
   goal: MonthlyGoal; past?: boolean; isOpen: boolean;
-  rate: number; linkedItems: LinkedItem[];
+  adherence: number; rate: number; linkedItems: LinkedItem[];
   onToggle: () => void; onEdit: () => void; onDelete: () => void; onCreateHabit: () => void;
 }) {
   const { elapsed, total } = elapsedDays(goal.startDate, goal.endDate);
@@ -230,15 +226,15 @@ function GoalCard({ goal, past = false, isOpen, rate, linkedItems, onToggle, onE
           </span>
         </div>
 
-        {/* 달성률 바 */}
+        {/* 수행률 바 (대표) + 진척도 (보조) */}
         {!isPast && (
           <div className="mt-2.5">
             <div className="flex justify-between items-center text-caption2 mb-1">
-              <span className="text-label-assistive">D+{elapsed - 1} · {elapsed}/{total}일</span>
-              <span className="font-bold" style={{ color: accentColor }}>{rate}%</span>
+              <span className="text-label-assistive">D+{elapsed - 1} · {elapsed}/{total}일 · 진척 {rate}%</span>
+              <span className="font-bold" style={{ color: accentColor }}>{adherence}%</span>
             </div>
             <div className="bg-surface/60 rounded-full h-1.5 overflow-hidden">
-              <div className="h-full rounded-full transition-all" style={{ width: `${rate}%`, backgroundColor: accentColor }} />
+              <div className="h-full rounded-full transition-all" style={{ width: `${adherence}%`, backgroundColor: accentColor }} />
             </div>
           </div>
         )}
@@ -263,15 +259,15 @@ function GoalCard({ goal, past = false, isOpen, rate, linkedItems, onToggle, onE
                         {item.emoji ?? (item.kind === 'faith' ? '🙏' : '📌')} {item.title}
                       </span>
                       <span className="flex items-center gap-1.5 flex-shrink-0">
-                        <span className="text-caption2 text-label-assistive">{item.doneCount}/{item.scheduledTotal}일</span>
+                        <span className="text-caption2 text-label-assistive">{item.doneCount}/{item.scheduledElapsed}일</span>
                         <span className="text-caption1 font-bold" style={{ color: accentColor }}>
-                          {item.rate}%
+                          {item.adherence}%
                         </span>
                       </span>
                     </div>
                     <div className="bg-fill-strong rounded-full h-1 overflow-hidden">
                       <div className="h-full rounded-full transition-all"
-                        style={{ width: `${item.rate}%`, backgroundColor: accentColor }} />
+                        style={{ width: `${item.adherence}%`, backgroundColor: accentColor }} />
                     </div>
                   </div>
                 ))
