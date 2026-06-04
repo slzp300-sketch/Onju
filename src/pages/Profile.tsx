@@ -1,4 +1,4 @@
-import { User, Bell, ChevronRight, LogOut, Palette, CalendarDays } from 'lucide-react';
+import { User, Bell, ChevronRight, LogOut, Palette, CalendarDays, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
@@ -14,7 +14,7 @@ export default function Profile() {
   const { user, logout } = useAuthStore();
   const { weeklyGoals } = useGoalStore();
   const { theme, setTheme } = useThemeStore();
-  const { weekStartDay, setWeekStartDay } = useSettingsStore();
+  const { weekStartDay, setWeekStartDay, dayStartHour, setDayStartHour } = useSettingsStore();
 
   const thisWeekGoalCount = weeklyGoals.filter(
     g => g.weekNumber === currentWeek() && g.year === currentYear()
@@ -60,6 +60,34 @@ export default function Profile() {
                 onClick={() => setWeekStartDay(opt.value)}
                 className={`px-4 py-1.5 rounded-lg text-body2 font-bold transition-all ${
                   weekStartDay === opt.value
+                    ? 'bg-surface shadow-sm text-label-strong'
+                    : 'text-label-assistive'
+                }`}
+              >
+                {opt.label}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+        <div className="h-px bg-line-soft mx-4" />
+        {/* 하루 시작 시각 */}
+        <div className="px-4 py-3.5">
+          <div className="flex items-center gap-3 mb-2.5">
+            <Clock size={16} className="text-label-alt" />
+            <div>
+              <span className="text-body2 font-semibold text-label-strong">하루 시작 시각</span>
+              <p className="text-caption2 text-label-assistive mt-0.5">이 시각 전엔 전날 기록으로 체크돼요</p>
+            </div>
+          </div>
+          <div className="flex bg-fill rounded-xl p-0.5">
+            {([{ label: '자정', value: 0 }, { label: '새벽 3시', value: 3 }, { label: '새벽 5시', value: 5 }] as const).map(opt => (
+              <motion.button
+                key={opt.value}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.1 }}
+                onClick={() => setDayStartHour(opt.value)}
+                className={`flex-1 py-1.5 rounded-lg text-caption1 font-bold whitespace-nowrap transition-all ${
+                  dayStartHour === opt.value
                     ? 'bg-surface shadow-sm text-label-strong'
                     : 'text-label-assistive'
                 }`}

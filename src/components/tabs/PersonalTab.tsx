@@ -10,16 +10,19 @@ import FAB from '../ui/FAB';
 import ConfirmModal from '../ui/ConfirmModal';
 import HabitFocusMode from '../routines/HabitFocusMode';
 import { useHabitStore } from '../../store/habitStore';
+import { useSettingsStore } from '../../store/settingsStore';
 import type { Habit } from '../../types';
-import { format } from 'date-fns';
-
-const todayStr = () => format(new Date(), 'yyyy-MM-dd');
+import { logicalToday } from '../../utils/date';
 
 /* ════════════════════════════════════════
    개인 탭 최상위
+   date: 조회 날짜 (미지정 시 논리적 오늘)
+   readOnly: 지난 날짜는 읽기 전용
 ════════════════════════════════════════ */
-export default function PersonalTab() {
+export default function PersonalTab({ date, readOnly = false }: { date?: string; readOnly?: boolean } = {}) {
   const { habits, personalRoutines } = useHabitStore();
+  const dayStartHour = useSettingsStore(s => s.dayStartHour);
+  const viewDate = date ?? logicalToday(dayStartHour);
   const navigate = useNavigate();
 
   const fabOptions = [
@@ -63,7 +66,7 @@ export default function PersonalTab() {
     <div className="relative flex flex-col pb-24">
       {/* 루틴 그룹 */}
       {personalRoutines.map(r => (
-        <RoutineGroup key={r.id} routineId={r.id} />
+        <RoutineGroup key={r.id} routineId={r.id} viewDate={viewDate} readOnly={readOnly} />
       ))}
 
       {/* 단독 습관 */}
@@ -73,24 +76,24 @@ export default function PersonalTab() {
             <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
               <span className="text-body2">📋</span>
               <span className="flex-1 text-caption2 font-bold text-label">개별 습관</span>
-              <CompletedBadge habits={standaloneHabits} />
+              <CompletedBadge habits={standaloneHabits} viewDate={viewDate} />
             </div>
           )}
           <div className="bg-surface divide-y divide-line-soft">
             {standaloneHabits.map((h, idx) => (
-              <HabitRow key={h.id} habit={h} index={idx + 1} />
+              <HabitRow key={h.id} habit={h} index={idx + 1} viewDate={viewDate} readOnly={readOnly} />
             ))}
           </div>
         </div>
       )}
 
-      <FAB options={fabOptions} />
+      {!readOnly && <FAB options={fabOptions} />}
     </div>
   );
 }
 
 /* ── 루틴 그룹 (접기/펼치기 + 진행률) ── */
-function RoutineGroup({ routineId }: { routineId: string }) {
+function RoutineGroup({ routineId, viewDate, readOnly }: { routineId: string; viewDate: string; readOnly: boolean }) {
   const { habits, personalRoutines, removePersonalRoutine, isHabitCompleted, isHabitSkipped, isHabitSubstituted } = useHabitStore();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true);
@@ -100,7 +103,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
   if (!routine) return null;
   const routineHabits = routine.habitIds.map(id => habits.find(h => h.id === id)).filter(Boolean) as Habit[];
   const completedCount = routineHabits.filter(h =>
-    isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr()) || isHabitSubstituted(h.id, todayStr())
+    isHabitCompleted(h.id, viewDate) || isHabitSkipped(h.id, viewDate) || isHabitSubstituted(h.id, viewDate)
   ).length;
   const allDone = completedCount === routineHabits.length && routineHabits.length > 0;
 
@@ -136,8 +139,8 @@ function RoutineGroup({ routineId }: { routineId: string }) {
           <Timer size={14} className="text-primary flex-shrink-0" />
         )}
 
-        {/* ▶ 전체 시작 (타이머 활성화 시에만 표시) */}
-        {routine.timerEnabled && (
+        {/* ▶ 전체 시작 (타이머 활성화 + 편집 가능 시) */}
+        {routine.timerEnabled && !readOnly && (
         <motion.button
           whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
           onClick={e => { e.stopPropagation(); navigate(`/routine-timer/${routine.id}`); }}
@@ -147,12 +150,14 @@ function RoutineGroup({ routineId }: { routineId: string }) {
         </motion.button>
         )}
 
-        {/* 삭제 */}
+        {/* 삭제 (편집 가능 시) */}
+        {!readOnly && (
         <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
           onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
           className="text-label-assistive hover:text-negative transition-colors p-0.5">
           <Trash2 size={13} />
         </motion.button>
+        )}
 
       <ConfirmModal
         isOpen={confirmDelete}
@@ -175,7 +180,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
             className="overflow-hidden bg-surface divide-y divide-line-soft"
           >
             {routineHabits.map((h, idx) => (
-              <HabitRow key={h.id} habit={h} index={idx + 1} inRoutine />
+              <HabitRow key={h.id} habit={h} index={idx + 1} inRoutine viewDate={viewDate} readOnly={readOnly} />
             ))}
           </motion.div>
         )}
@@ -185,16 +190,16 @@ function RoutineGroup({ routineId }: { routineId: string }) {
 }
 
 /* ── 개별 습관 행 ── */
-function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: number; inRoutine?: boolean }) {
+function HabitRow({ habit, index, inRoutine = false, viewDate, readOnly = false }: { habit: Habit; index: number; inRoutine?: boolean; viewDate: string; readOnly?: boolean }) {
   const { toggleHabitLog, skipHabitLog, substituteHabitLog, isHabitCompleted, isHabitSkipped, isHabitSubstituted, removeHabit } = useHabitStore();
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [focusOpen, setFocusOpen] = useState(false);
   const [twoMinOpen, setTwoMinOpen] = useState(false);
   const [rowStamp, setRowStamp] = useState<'done' | 'rest' | 'sub' | null>(null);
-  const done = isHabitCompleted(habit.id, todayStr());
-  const skipped = isHabitSkipped(habit.id, todayStr());
-  const substituted = isHabitSubstituted(habit.id, todayStr());
+  const done = isHabitCompleted(habit.id, viewDate);
+  const skipped = isHabitSkipped(habit.id, viewDate);
+  const substituted = isHabitSubstituted(habit.id, viewDate);
 
   const fireStamp = (type: 'done' | 'rest' | 'sub') => {
     setRowStamp(type);
@@ -252,87 +257,68 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
           )}
         </div>
 
-        {/* 오른쪽 버튼들 */}
+        {/* 오른쪽: 읽기 전용이면 상태칩, 아니면 액션 버튼들 */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          {!done && !skipped && !inRoutine && (
-            <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-              onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
-              className="text-label-assistive hover:text-negative transition-colors p-1">
-              <Trash2 size={13} />
-            </motion.button>
-          )}
+          {readOnly ? (
+            <span className={`text-caption2 font-bold px-2 py-1 rounded-lg ${
+              done ? 'bg-primary-soft text-primary'
+              : substituted ? 'bg-orange-100 text-orange-500'
+              : skipped ? 'bg-amber-100 text-amber-500'
+              : 'bg-fill text-label-assistive'
+            }`}>
+              {done ? '완료' : substituted ? '대체' : skipped ? '쉼' : '미완료'}
+            </span>
+          ) : (
+            <>
+              {!done && !skipped && !inRoutine && (
+                <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+                  onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
+                  className="text-label-assistive hover:text-negative transition-colors p-1">
+                  <Trash2 size={13} />
+                </motion.button>
+              )}
 
-          {/* ▶ 실행 버튼 — 트리거 있으면 2분→습관, 없으면 바로 습관 */}
-          {!done && !skipped && !substituted && (habit.twoMinuteHabit || habit.durationSeconds) && (
-            <motion.button
-              whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-              onClick={e => {
-                e.stopPropagation();
-                if (habit.twoMinuteHabit) setTwoMinOpen(true);
-                else setFocusOpen(true);
-              }}
-              className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                habit.twoMinuteHabit
-                  ? 'bg-amber-100 text-amber-500'
-                  : 'bg-primary-soft text-primary'
-              }`}
-            >
-              {habit.twoMinuteHabit
-                ? <span className="text-sm leading-none">⚡</span>
-                : <Play size={10} fill="currentColor" />
-              }
-            </motion.button>
-          )}
+              {/* ▶ 실행 버튼 */}
+              {!done && !skipped && !substituted && (habit.twoMinuteHabit || habit.durationSeconds) && (
+                <motion.button
+                  whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    if (habit.twoMinuteHabit) setTwoMinOpen(true);
+                    else setFocusOpen(true);
+                  }}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                    habit.twoMinuteHabit ? 'bg-amber-100 text-amber-500' : 'bg-primary-soft text-primary'
+                  }`}
+                >
+                  {habit.twoMinuteHabit ? <span className="text-sm leading-none">⚡</span> : <Play size={10} fill="currentColor" />}
+                </motion.button>
+              )}
 
-          {/* 쉬어가기 스탬프 */}
-          {!done && !substituted && (
-            <StampButton
-              label="쉼"
-              active={skipped}
-              activeColor="bg-amber-400 border-amber-400"
-              inkColor="text-white"
-              dryColor="text-amber-500"
-              rotation={9}
-              onClick={e => {
-                e.stopPropagation();
-                if (!skipped) fireStamp('rest');
-                skipHabitLog(habit.id);
-              }}
-            />
-          )}
+              {/* 쉬어가기 */}
+              {!done && !substituted && (
+                <StampButton label="쉼" active={skipped}
+                  activeColor="bg-amber-400 border-amber-400" inkColor="text-white" dryColor="text-amber-500" rotation={9}
+                  onClick={e => { e.stopPropagation(); if (!skipped) fireStamp('rest'); skipHabitLog(habit.id, viewDate); }}
+                />
+              )}
 
-          {/* 대체 스탬프 (miniRoutine 있을 때만) */}
-          {!done && !skipped && habit.miniRoutine && (
-            <StampButton
-              label="대체"
-              active={substituted}
-              activeColor="bg-orange-400 border-orange-400"
-              inkColor="text-white"
-              dryColor="text-orange-500"
-              rotation={7}
-              onClick={e => {
-                e.stopPropagation();
-                if (!substituted) fireStamp('sub');
-                substituteHabitLog(habit.id);
-              }}
-            />
-          )}
+              {/* 대체 */}
+              {!done && !skipped && habit.miniRoutine && (
+                <StampButton label="대체" active={substituted}
+                  activeColor="bg-orange-400 border-orange-400" inkColor="text-white" dryColor="text-orange-500" rotation={7}
+                  onClick={e => { e.stopPropagation(); if (!substituted) fireStamp('sub'); substituteHabitLog(habit.id, viewDate); }}
+                />
+              )}
 
-          {/* 완료 스탬프 */}
-          {!skipped && !substituted && (
-            <StampButton
-              label="완료"
-              active={done}
-              activeColor="bg-primary border-primary"
-              inkColor="text-white"
-              dryColor="text-primary"
-              rotation={-10}
-              onClick={e => {
-                e.stopPropagation();
-                if (!done) fireStamp('done');
-                toggleHabitLog(habit.id);
-              }}
-            />
+              {/* 완료 */}
+              {!skipped && !substituted && (
+                <StampButton label="완료" active={done}
+                  activeColor="bg-primary border-primary" inkColor="text-white" dryColor="text-primary" rotation={-10}
+                  onClick={e => { e.stopPropagation(); if (!done) fireStamp('done'); toggleHabitLog(habit.id, viewDate); }}
+                />
+              )}
+            </>
           )}
         </div>
 
@@ -354,10 +340,10 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
 }
 
 /* ── 완료 뱃지 헬퍼 ── */
-function CompletedBadge({ habits }: { habits: Habit[] }) {
+function CompletedBadge({ habits, viewDate }: { habits: Habit[]; viewDate: string }) {
   const { isHabitCompleted, isHabitSkipped, isHabitSubstituted } = useHabitStore();
   const done = habits.filter(h =>
-    isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr()) || isHabitSubstituted(h.id, todayStr())
+    isHabitCompleted(h.id, viewDate) || isHabitSkipped(h.id, viewDate) || isHabitSubstituted(h.id, viewDate)
   ).length;
   const allDone = done === habits.length;
   return (

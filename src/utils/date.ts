@@ -47,6 +47,16 @@ export function elapsedDays(startDate: string, endDate: string): { elapsed: numb
 export const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 export const formatDisplay = (date: Date) => format(date, 'M월 d일 (E)', { locale: ko });
 export const today = () => formatDate(new Date());
+
+/**
+ * "논리적 오늘" — 하루 경계 시각(dayStartHour) 기준.
+ * 예: dayStartHour=3 이면 새벽 3시 전까지는 어제로 취급.
+ */
+export const logicalToday = (dayStartHour = 0): string => {
+  const d = new Date();
+  d.setHours(d.getHours() - dayStartHour);
+  return formatDate(d);
+};
 export const currentWeek = () => getISOWeek(new Date());
 export const currentYear = () => getYear(new Date());
 

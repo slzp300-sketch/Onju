@@ -1,7 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { DailyRoutine, RoutineLog } from '../types';
-import { format } from 'date-fns';
+import { logicalToday } from '../utils/date';
+import { useSettingsStore } from './settingsStore';
+
+const todayKey = () => logicalToday(useSettingsStore.getState().dayStartHour);
 
 interface RoutineState {
   personalRoutines: DailyRoutine[];
@@ -28,7 +31,7 @@ export const useRoutineStore = create<RoutineState>()(
       logs: [],
 
       toggleRoutineLog: (routineId, date) => {
-        const today = date ?? format(new Date(), 'yyyy-MM-dd');
+        const today = date ?? todayKey();
         const { logs } = get();
         const existing = logs.find(
           (l) => l.routineId === routineId && l.date === today
@@ -68,7 +71,7 @@ export const useRoutineStore = create<RoutineState>()(
       },
 
       skipRoutineLog: (routineId, date) => {
-        const today = date ?? format(new Date(), 'yyyy-MM-dd');
+        const today = date ?? todayKey();
         const { logs } = get();
         const existing = logs.find(l => l.routineId === routineId && l.date === today);
         if (existing) {
@@ -86,7 +89,7 @@ export const useRoutineStore = create<RoutineState>()(
       },
 
       isCompleted: (routineId, date) => {
-        const today = date ?? format(new Date(), 'yyyy-MM-dd');
+        const today = date ?? todayKey();
         const log = get().logs.find(
           (l) => l.routineId === routineId && l.date === today
         );
@@ -94,7 +97,7 @@ export const useRoutineStore = create<RoutineState>()(
       },
 
       isSkipped: (routineId, date) => {
-        const today = date ?? format(new Date(), 'yyyy-MM-dd');
+        const today = date ?? todayKey();
         const log = get().logs.find(l => l.routineId === routineId && l.date === today);
         return log?.skipped ?? false;
       },

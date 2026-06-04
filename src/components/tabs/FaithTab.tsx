@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import FAB from '../ui/FAB';
 import { useRoutineStore } from '../../store/routineStore';
+import { useSettingsStore } from '../../store/settingsStore';
+import { logicalToday } from '../../utils/date';
 import type { DailyRoutine, TimeSlot } from '../../types';
 import FocusMode from '../routines/FocusMode';
 import TwoMinuteMode from '../routines/TwoMinuteMode';
@@ -17,9 +19,12 @@ const TIME_SLOTS: { value: TimeSlot; label: string; time: string; emoji: string 
   { value: 'evening', label: '저녁', time: '21:00', emoji: '🌙' },
 ];
 
-export default function FaithTab() {
-  const { faithRoutines, removeRoutine, isCompleted } = useRoutineStore();
+export default function FaithTab({ date, readOnly = false }: { date?: string; readOnly?: boolean } = {}) {
+  const { faithRoutines, removeRoutine, isCompleted, isSkipped } = useRoutineStore();
+  const dayStartHour = useSettingsStore(s => s.dayStartHour);
+  const viewDate = date ?? logicalToday(dayStartHour);
   const navigate = useNavigate();
+  const isDone = (id: string) => isCompleted(id, viewDate) || isSkipped(id, viewDate);
 
   const fabOptions = [
     {
@@ -57,7 +62,7 @@ export default function FaithTab() {
     <div className="relative flex flex-col pb-24">
       {/* 시간대별 그룹 */}
       {grouped.map(group => {
-        const cnt = group.routines.filter(r => isCompleted(r.id)).length;
+        const cnt = group.routines.filter(r => isDone(r.id)).length;
         const allDone = cnt === group.routines.length;
         return (
           <div key={group.value}>
@@ -75,6 +80,8 @@ export default function FaithTab() {
                   key={r.id}
                   routine={r}
                   index={idx + 1}
+                  viewDate={viewDate}
+                  readOnly={readOnly}
                   onRemove={() => removeRoutine(r.id)}
                 />
               ))}
@@ -91,10 +98,10 @@ export default function FaithTab() {
               <span className="text-body2">🙏</span>
               <span className="flex-1 text-caption2 font-bold text-label">기타 신앙 루틴</span>
               <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${
-                unslotted.filter(r => isCompleted(r.id)).length === unslotted.length
+                unslotted.filter(r => isDone(r.id)).length === unslotted.length
                   ? 'bg-emerald-100 text-emerald-600' : 'bg-fill text-label-alt'
               }`}>
-                {unslotted.filter(r => isCompleted(r.id)).length}/{unslotted.length}
+                {unslotted.filter(r => isDone(r.id)).length}/{unslotted.length}
               </span>
             </div>
           )}
@@ -104,6 +111,8 @@ export default function FaithTab() {
                 key={r.id}
                 routine={r}
                 index={idx + 1}
+                viewDate={viewDate}
+                readOnly={readOnly}
                 onRemove={() => removeRoutine(r.id)}
               />
             ))}
@@ -111,15 +120,17 @@ export default function FaithTab() {
         </div>
       )}
 
-      <FAB options={fabOptions} />
+      {!readOnly && <FAB options={fabOptions} />}
     </div>
   );
 }
 
 /* ── 신앙 루틴 행 ── */
-function FaithRoutineRow({ routine, index, onRemove }: {
+function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove }: {
   routine: DailyRoutine;
   index: number;
+  viewDate: string;
+  readOnly?: boolean;
   onRemove: () => void;
 }) {
   const { toggleRoutineLog, skipRoutineLog, isCompleted, isSkipped } = useRoutineStore();
@@ -128,8 +139,8 @@ function FaithRoutineRow({ routine, index, onRemove }: {
   const [twoMinOpen, setTwoMinOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [rowStamp, setRowStamp] = useState<'done' | 'rest' | null>(null);
-  const done = isCompleted(routine.id);
-  const skipped = isSkipped(routine.id);
+  const done = isCompleted(routine.id, viewDate);
+  const skipped = isSkipped(routine.id, viewDate);
 
   const fireStamp = (type: 'done' | 'rest') => {
     setRowStamp(type);
@@ -182,79 +193,65 @@ function FaithRoutineRow({ routine, index, onRemove }: {
           )}
         </div>
 
-        {/* 오른쪽: 포커스 시작 + 수정/삭제 + 체크 */}
+        {/* 오른쪽: 읽기 전용이면 상태칩, 아니면 액션 버튼 */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          {!done && !skipped && (
+          {readOnly ? (
+            <span className={`text-caption2 font-bold px-2 py-1 rounded-lg ${
+              done ? 'bg-emerald-100 text-emerald-600'
+              : skipped ? 'bg-amber-100 text-amber-500'
+              : 'bg-fill text-label-assistive'
+            }`}>
+              {done ? '완료' : skipped ? '쉼' : '미완료'}
+            </span>
+          ) : (
             <>
-              {/* ⚡/▶ 실행 버튼 */}
-              {(routine.twoMinuteHabit || routine.durationSeconds) && (
-                <motion.button
-                  whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-                  onClick={e => {
-                    e.stopPropagation();
-                    if (routine.twoMinuteHabit) setTwoMinOpen(true);
-                    else setFocusOpen(true);
-                  }}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                    routine.twoMinuteHabit
-                      ? 'bg-amber-100 text-amber-500'
-                      : 'bg-emerald-50 text-emerald-500'
-                  }`}
-                >
-                  {routine.twoMinuteHabit
-                    ? <span className="text-sm leading-none">⚡</span>
-                    : <Play size={11} fill="currentColor" />}
-                </motion.button>
+              {!done && !skipped && (
+                <>
+                  {(routine.twoMinuteHabit || routine.durationSeconds) && (
+                    <motion.button
+                      whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (routine.twoMinuteHabit) setTwoMinOpen(true);
+                        else setFocusOpen(true);
+                      }}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                        routine.twoMinuteHabit ? 'bg-amber-100 text-amber-500' : 'bg-emerald-50 text-emerald-500'
+                      }`}
+                    >
+                      {routine.twoMinuteHabit ? <span className="text-sm leading-none">⚡</span> : <Play size={11} fill="currentColor" />}
+                    </motion.button>
+                  )}
+                  {!routine.twoMinuteHabit && !routine.durationSeconds && (
+                    <motion.button
+                      whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+                      onClick={e => { e.stopPropagation(); setFocusOpen(true); }}
+                      className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center"
+                    >
+                      <Play size={11} fill="currentColor" />
+                    </motion.button>
+                  )}
+                  <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+                    onClick={e => { e.stopPropagation(); setConfirmDelete(true); }} className="text-label-assistive hover:text-negative transition-colors p-1">
+                    <Trash2 size={13} />
+                  </motion.button>
+                </>
               )}
-              {/* 타이머 없을 때 포커스 버튼 */}
-              {!routine.twoMinuteHabit && !routine.durationSeconds && (
-              <motion.button
-                whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-                onClick={e => { e.stopPropagation(); setFocusOpen(true); }}
-                className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center"
-              >
-                <Play size={11} fill="currentColor" />
-              </motion.button>
+
+              {!done && (
+                <StampButton label="쉼" active={skipped}
+                  activeColor="bg-amber-400 border-amber-400" inkColor="text-white" dryColor="text-amber-500" rotation={9}
+                  onClick={e => { e.stopPropagation(); if (!skipped) fireStamp('rest'); skipRoutineLog(routine.id, viewDate); }}
+                />
               )}
-              <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                onClick={e => { e.stopPropagation(); setConfirmDelete(true); }} className="text-label-assistive hover:text-negative transition-colors p-1">
-                <Trash2 size={13} />
-              </motion.button>
+
+              {!skipped && (
+                <StampButton label="완료" active={done}
+                  activeColor="bg-emerald-500 border-emerald-500" inkColor="text-white" dryColor="text-emerald-600" rotation={-10}
+                  onClick={e => { e.stopPropagation(); if (!done) fireStamp('done'); toggleRoutineLog(routine.id, viewDate); }}
+                />
+              )}
             </>
-          )}
-
-          {/* 쉬어가기 스탬프 */}
-          {!done && (
-            <StampButton
-              label="쉼"
-              active={skipped}
-              activeColor="bg-amber-400 border-amber-400"
-              inkColor="text-white"
-              dryColor="text-amber-500"
-              rotation={9}
-              onClick={e => {
-                e.stopPropagation();
-                if (!skipped) fireStamp('rest');
-                skipRoutineLog(routine.id);
-              }}
-            />
-          )}
-
-          {/* 완료 스탬프 */}
-          {!skipped && (
-            <StampButton
-              label="완료"
-              active={done}
-              activeColor="bg-emerald-500 border-emerald-500"
-              inkColor="text-white"
-              dryColor="text-emerald-600"
-              rotation={-10}
-              onClick={e => {
-                e.stopPropagation();
-                if (!done) fireStamp('done');
-                toggleRoutineLog(routine.id);
-              }}
-            />
           )}
         </div>
       </motion.div>

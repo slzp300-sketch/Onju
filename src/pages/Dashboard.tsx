@@ -13,7 +13,7 @@ import { useTodoStore } from '../store/todoStore';
 import { useGoalStore } from '../store/goalStore';
 import { useAuthStore } from '../store/authStore';
 import { calcStreak } from '../utils/completion';
-import { today, isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
+import { isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS, logicalToday } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
 import { getGoalAdherence, getLinkedItems } from '../utils/goalProgress';
 import { getDayCompletion } from '../utils/dayCompletion';
@@ -39,12 +39,12 @@ const itemV = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transiti
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { weekStartDay } = useSettingsStore();
+  const { weekStartDay, dayStartHour } = useSettingsStore();
   const { faithRoutines, logs, isCompleted } = useRoutineStore();
   const { habits, habitLogs } = useHabitStore();
   const { todos, toggleTodo, removeTodo } = useTodoStore();
   const { monthlyGoals, goalSlots } = useGoalStore();
-  const todayStr = today();
+  const todayStr = logicalToday(dayStartHour);
   const prevCompleteRef = useRef(false);
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   const [selectedDay, setSelectedDay] = useState<string>(todayStr);
@@ -75,7 +75,7 @@ export default function Dashboard() {
   // 목표 대표 지표 = 수행률 (지나온 날 중 지킨 비율)
   const goalRate = (goal: typeof activeGoals[0]): number =>
     getGoalAdherence(goal, habits, habitLogs, faithRoutines, logs, todayIso);
-  const todayTodos = todos.filter(t => t.date === todayStr);
+  const todayTodos = todos.filter(t => t.date === selectedDay);
   const doneTodos = todayTodos.filter(t => t.completed).length;
   const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
 
@@ -253,8 +253,8 @@ export default function Dashboard() {
               const anyDone = !isFuture && (pRate > 0 || fRate > 0);
 
               return (
-                <button key={ds} onClick={() => setSelectedDay(ds)}
-                  className={`relative flex-1 flex flex-col items-center gap-1 rounded-xl py-2 px-0.5 border-2 transition-all overflow-hidden ${
+                <button key={ds} disabled={isFuture} onClick={() => !isFuture && setSelectedDay(ds)}
+                  className={`relative flex-1 flex flex-col items-center gap-1 rounded-xl py-2 px-0.5 border-2 transition-all overflow-hidden ${isFuture ? 'cursor-default' : ''} ${
                     isSelected
                       ? 'border-primary bg-primary-soft'
                       : bothDone
@@ -357,20 +357,32 @@ export default function Dashboard() {
             ))}
           </div>
 
+          {/* 지난 날짜 조회 안내 */}
+          {selectedDay !== todayStr && (
+            <div className="flex-shrink-0 flex items-center justify-between gap-2 px-4 py-2 bg-fill border-b border-line-soft">
+              <span className="text-caption1 font-medium text-label-alt">
+                🔒 {format(new Date(selectedDay + 'T12:00:00'), 'M월 d일')} 기록 (읽기 전용)
+              </span>
+              <button onClick={() => setSelectedDay(todayStr)}
+                className="text-caption1 font-bold text-primary">오늘로</button>
+            </div>
+          )}
+
           <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}>
           <AnimatePresence mode="wait">
             {activeTab === 'personal' && (
               <motion.div key="p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-                <PersonalTab />
+                <PersonalTab date={selectedDay} readOnly={selectedDay !== todayStr} />
               </motion.div>
             )}
             {activeTab === 'faith' && (
               <motion.div key="f" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-                <FaithTab />
+                <FaithTab date={selectedDay} readOnly={selectedDay !== todayStr} />
               </motion.div>
             )}
             {activeTab === 'todo' && (
               <motion.div key="t" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
+                {selectedDay === todayStr && (
                 <FAB options={[{
                   icon: <ListTodo size={20} />,
                   label: '투두 추가',
@@ -378,6 +390,7 @@ export default function Dashboard() {
                   color: 'bg-primary',
                   onClick: () => navigate('/todos/new'),
                 }]} />
+                )}
 
                 {todayTodos.length === 0 ? (
                   <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
@@ -400,16 +413,20 @@ export default function Dashboard() {
                           {todo.emoji ?? '📝'}
                         </div>
                         <span className="flex-1 text-body2 font-semibold text-label">{todo.title}</span>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
-                            onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
-                            <Trash2 size={13} />
-                          </motion.button>
-                          <motion.button whileTap={{ scale: 0.82 }} transition={{ duration: 0.08 }}
-                            onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
-                            className="w-7 h-7 rounded-full border-2 border-line hover:border-primary flex items-center justify-center transition-colors">
-                          </motion.button>
-                        </div>
+                        {selectedDay === todayStr ? (
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
+                              onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
+                              <Trash2 size={13} />
+                            </motion.button>
+                            <motion.button whileTap={{ scale: 0.82 }} transition={{ duration: 0.08 }}
+                              onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
+                              className="w-7 h-7 rounded-full border-2 border-line hover:border-primary flex items-center justify-center transition-colors">
+                            </motion.button>
+                          </div>
+                        ) : (
+                          <span className="text-caption2 font-bold px-2 py-1 rounded-lg bg-fill text-label-assistive flex-shrink-0">미완료</span>
+                        )}
                       </motion.div>
                     ))}
 
@@ -429,23 +446,27 @@ export default function Dashboard() {
                               {todo.emoji ?? '📝'}
                             </div>
                             <span className="flex-1 text-body2 font-semibold line-through text-label-assistive">{todo.title}</span>
-                            <div className="flex items-center gap-1.5 flex-shrink-0">
-                              <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
-                                onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
-                                <Trash2 size={13} />
-                              </motion.button>
-                              <motion.button whileTap={{ scale: 0.82 }} transition={{ duration: 0.08 }}
-                                onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
-                                className="w-7 h-7 rounded-full bg-primary border-2 border-primary flex items-center justify-center">
-                                <AnimatePresence mode="wait" initial={false}>
-                                  <motion.svg key="chk" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.15 }}
-                                    width="11" height="9" viewBox="0 0 11 9" fill="none">
-                                    <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                  </motion.svg>
-                                </AnimatePresence>
-                              </motion.button>
-                            </div>
+                            {selectedDay === todayStr ? (
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
+                                  onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
+                                  <Trash2 size={13} />
+                                </motion.button>
+                                <motion.button whileTap={{ scale: 0.82 }} transition={{ duration: 0.08 }}
+                                  onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
+                                  className="w-7 h-7 rounded-full bg-primary border-2 border-primary flex items-center justify-center">
+                                  <AnimatePresence mode="wait" initial={false}>
+                                    <motion.svg key="chk" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                                      exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.15 }}
+                                      width="11" height="9" viewBox="0 0 11 9" fill="none">
+                                      <path d="M1 4.5L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </motion.svg>
+                                  </AnimatePresence>
+                                </motion.button>
+                              </div>
+                            ) : (
+                              <span className="text-caption2 font-bold px-2 py-1 rounded-lg bg-primary-soft text-primary flex-shrink-0">완료</span>
+                            )}
                           </motion.div>
                         ))}
                       </>

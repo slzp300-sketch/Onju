@@ -1,7 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { format } from 'date-fns';
 import type { Habit, PersonalRoutine } from '../types';
+import { logicalToday } from '../utils/date';
+import { useSettingsStore } from './settingsStore';
+
+const todayKey = () => logicalToday(useSettingsStore.getState().dayStartHour);
 
 interface HabitLog {
   habitId: string;
@@ -56,7 +59,7 @@ export const useHabitStore = create<HabitState>()(
         })),
 
       toggleHabitLog: (habitId, date) => {
-        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const d = date ?? todayKey();
         const { habitLogs } = get();
         const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
         if (existing) {
@@ -71,7 +74,7 @@ export const useHabitStore = create<HabitState>()(
       },
 
       skipHabitLog: (habitId, date) => {
-        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const d = date ?? todayKey();
         const { habitLogs } = get();
         const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
         if (existing) {
@@ -86,7 +89,7 @@ export const useHabitStore = create<HabitState>()(
       },
 
       substituteHabitLog: (habitId, date) => {
-        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const d = date ?? todayKey();
         const { habitLogs } = get();
         const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
         if (existing) {
@@ -101,19 +104,19 @@ export const useHabitStore = create<HabitState>()(
       },
 
       isHabitCompleted: (habitId, date) => {
-        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const d = date ?? todayKey();
         const log = get().habitLogs.find(l => l.habitId === habitId && l.date === d);
         return log?.completed ?? false;
       },
 
       isHabitSkipped: (habitId, date) => {
-        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const d = date ?? todayKey();
         const log = get().habitLogs.find(l => l.habitId === habitId && l.date === d);
         return log?.skipped ?? false;
       },
 
       isHabitSubstituted: (habitId, date) => {
-        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const d = date ?? todayKey();
         const log = get().habitLogs.find(l => l.habitId === habitId && l.date === d);
         return log?.substitute ?? false;
       },
