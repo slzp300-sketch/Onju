@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
 import StampButton from '../ui/StampButton';
 import RowStamp from '../ui/RowStamp';
+import TwoMinuteMode from '../routines/TwoMinuteMode';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import FAB from '../ui/FAB';
@@ -89,7 +90,7 @@ export default function PersonalTab() {
 
 /* ── 루틴 그룹 (접기/펼치기 + 진행률) ── */
 function RoutineGroup({ routineId }: { routineId: string }) {
-  const { habits, personalRoutines, removePersonalRoutine, isHabitCompleted, isHabitSkipped } = useHabitStore();
+  const { habits, personalRoutines, removePersonalRoutine, isHabitCompleted, isHabitSkipped, isHabitSubstituted } = useHabitStore();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -98,7 +99,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
   if (!routine) return null;
   const routineHabits = routine.habitIds.map(id => habits.find(h => h.id === id)).filter(Boolean) as Habit[];
   const completedCount = routineHabits.filter(h =>
-    isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr())
+    isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr()) || isHabitSubstituted(h.id, todayStr())
   ).length;
   const allDone = completedCount === routineHabits.length && routineHabits.length > 0;
 
@@ -184,13 +185,15 @@ function RoutineGroup({ routineId }: { routineId: string }) {
 
 /* ── 개별 습관 행 ── */
 function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: number; inRoutine?: boolean }) {
-  const { toggleHabitLog, skipHabitLog, isHabitCompleted, isHabitSkipped, removeHabit } = useHabitStore();
+  const { toggleHabitLog, skipHabitLog, substituteHabitLog, isHabitCompleted, isHabitSkipped, isHabitSubstituted, removeHabit } = useHabitStore();
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [focusOpen, setFocusOpen] = useState(false);
+  const [twoMinOpen, setTwoMinOpen] = useState(false);
   const [rowStamp, setRowStamp] = useState<'done' | 'rest' | null>(null);
   const done = isHabitCompleted(habit.id, todayStr());
   const skipped = isHabitSkipped(habit.id, todayStr());
+  const substituted = isHabitSubstituted(habit.id, todayStr());
 
   const fireStamp = (type: 'done' | 'rest') => {
     setRowStamp(type);
@@ -202,7 +205,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
       <motion.div
         layout
         onClick={() => navigate(`/habits/edit/${habit.id}`)}
-        className={`relative flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
+        className={`relative flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped || substituted) ? 'opacity-70' : ''}`}
       >
         {/* 미니 스탬프 */}
         <AnimatePresence>
@@ -216,7 +219,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
 
         {/* 이모지 */}
         <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${
-          done ? 'bg-primary-soft' : skipped ? 'bg-amber-50' : 'bg-fill'
+          done ? 'bg-primary-soft' : substituted ? 'bg-orange-50' : skipped ? 'bg-amber-50' : 'bg-fill'
         }`}>
           {habit.emoji}
         </div>
@@ -225,15 +228,19 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
         <div className="flex-1 min-w-0">
           <p className={`text-label1 font-semibold truncate ${
             done ? 'line-through text-label-alt'
+            : substituted ? 'line-through text-label-assistive'
             : skipped ? 'line-through text-label-assistive'
             : 'text-label-strong'
           }`}>
             {habit.title}
           </p>
-          {skipped && (
+          {substituted && (
+            <p className="text-[11px] text-orange-400 font-medium mt-0.5">🔥 대체 완료 — {habit.miniRoutine}</p>
+          )}
+          {skipped && !substituted && (
             <p className="text-[11px] text-amber-400 font-medium mt-0.5">오늘 쉬어가요 ☁️</p>
           )}
-          {!skipped && habit.when && (
+          {!skipped && !substituted && habit.when && (
             <p className="text-[11px] text-label-alt mt-0.5 truncate">{habit.when}</p>
           )}
         </div>
@@ -248,8 +255,19 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
             </motion.button>
           )}
 
-          {/* 타이머 버튼 (durationSeconds 있을 때만) */}
-          {!done && !skipped && habit.durationSeconds && (
+          {/* ⚡ 2분 트리거 버튼 */}
+          {!done && !skipped && !substituted && habit.twoMinuteHabit && (
+            <motion.button
+              whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+              onClick={e => { e.stopPropagation(); setTwoMinOpen(true); }}
+              className="w-7 h-7 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-sm"
+            >
+              ⚡
+            </motion.button>
+          )}
+
+          {/* 타이머 버튼 */}
+          {!done && !skipped && !substituted && habit.durationSeconds && (
             <motion.button
               whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
               onClick={e => { e.stopPropagation(); setFocusOpen(true); }}
@@ -260,7 +278,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
           )}
 
           {/* 쉬어가기 스탬프 */}
-          {!done && (
+          {!done && !substituted && (
             <StampButton
               label="쉼"
               active={skipped}
@@ -276,8 +294,24 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
             />
           )}
 
+          {/* 대체 스탬프 (miniRoutine 있을 때만) */}
+          {!done && !skipped && habit.miniRoutine && (
+            <StampButton
+              label="대체"
+              active={substituted}
+              activeColor="bg-orange-400 border-orange-400"
+              inkColor="text-white"
+              dryColor="text-orange-500"
+              rotation={7}
+              onClick={e => {
+                e.stopPropagation();
+                substituteHabitLog(habit.id);
+              }}
+            />
+          )}
+
           {/* 완료 스탬프 */}
-          {!skipped && (
+          {!skipped && !substituted && (
             <StampButton
               label="완료"
               active={done}
@@ -305,6 +339,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
 
       <AnimatePresence>
         {focusOpen && <HabitFocusMode habit={habit} onClose={() => setFocusOpen(false)} />}
+        {twoMinOpen && <TwoMinuteMode habit={habit} onClose={() => setTwoMinOpen(false)} />}
       </AnimatePresence>
     </>
   );
@@ -312,8 +347,10 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
 
 /* ── 완료 뱃지 헬퍼 ── */
 function CompletedBadge({ habits }: { habits: Habit[] }) {
-  const { isHabitCompleted, isHabitSkipped } = useHabitStore();
-  const done = habits.filter(h => isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr())).length;
+  const { isHabitCompleted, isHabitSkipped, isHabitSubstituted } = useHabitStore();
+  const done = habits.filter(h =>
+    isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr()) || isHabitSubstituted(h.id, todayStr())
+  ).length;
   const allDone = done === habits.length;
   return (
     <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-primary-soft text-primary' : 'bg-fill text-label-alt'}`}>

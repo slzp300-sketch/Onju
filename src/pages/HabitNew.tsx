@@ -46,6 +46,8 @@ export default function HabitNew() {
   const [freq, setFreq] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [customDays, setCustomDays] = useState<number[]>(existing?.customDays ?? []);
   const [when, setWhen] = useState(existing?.when ?? '');
+  const [miniRoutine, setMiniRoutine] = useState(existing?.miniRoutine ?? '');
+  const [twoMinuteHabit, setTwoMinuteHabit] = useState(existing?.twoMinuteHabit ?? '');
 
   // 타이머
   const [timerEnabled, setTimerEnabled] = useState(!!(existing?.durationSeconds));
@@ -96,6 +98,8 @@ export default function HabitNew() {
       ...(freq === 'custom' ? { customDays } : {}),
       when: when.trim(),
       durationSeconds: timerEnabled ? durationSecs : undefined,
+      miniRoutine: miniRoutine.trim() || undefined,
+      twoMinuteHabit: twoMinuteHabit.trim() || undefined,
       notification: notifEnabled
         ? { enabled: true, type: notifType, times: notifTimes }
         : undefined,
@@ -130,7 +134,12 @@ export default function HabitNew() {
             <div className="flex flex-col gap-2">
               {activeGoalRoutines.map(r => (
                 <motion.button key={r.id} {...tap}
-                  onClick={() => { setTitle(r.title); if (r.when) setWhen(r.when); }}
+                  onClick={() => {
+                    setTitle(r.title);
+                    if (r.when) setWhen(r.when);
+                    if (r.miniRoutine) setMiniRoutine(r.miniRoutine);
+                    if (r.twoMinuteHabit) setTwoMinuteHabit(r.twoMinuteHabit);
+                  }}
                   className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
                   <div className="flex-1 min-w-0">
                     <p className="text-body2 font-semibold text-label-strong truncate">{r.title}</p>
@@ -344,6 +353,38 @@ export default function HabitNew() {
               className="w-full bg-fill border border-line rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-primary focus:bg-surface transition-all"
             />
             <p className="text-caption1 text-label-assistive mt-1.5">시작 시간이나 행동 트리거를 적어주세요</p>
+          </div>
+
+          {/* 대체 습관 */}
+          <div className="border-t border-line-soft">
+            <div className="px-4 py-4 bg-amber-50/60">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-base">🔥</span>
+                <span className="text-body2 font-semibold text-amber-700">대체 습관</span>
+                <span className="text-caption2 text-amber-500 ml-auto">하기 힘든 날의 대안</span>
+              </div>
+              <input
+                type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
+                placeholder="예: 10분 스트레칭"
+                className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300"
+              />
+            </div>
+          </div>
+
+          {/* 2분 트리거 */}
+          <div className="border-t border-line-soft">
+            <div className="px-4 py-4 bg-emerald-50/60">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-base">⚡</span>
+                <span className="text-body2 font-semibold text-emerald-700">2분 트리거</span>
+                <span className="text-caption2 text-emerald-500 ml-auto">시작을 쉽게 만드는 동작</span>
+              </div>
+              <input
+                type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
+                placeholder="예: 운동복으로 갈아입기"
+                className="w-full bg-white/80 border border-emerald-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 transition-all placeholder:text-emerald-300"
+              />
+            </div>
           </div>
         </div>
 

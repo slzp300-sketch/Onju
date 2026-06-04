@@ -7,7 +7,8 @@ interface HabitLog {
   habitId: string;
   date: string; // YYYY-MM-DD
   completed: boolean;
-  skipped?: boolean; // 쉬어가기 (completed와 상호배타)
+  skipped?: boolean;    // 쉬어가기
+  substitute?: boolean; // 대체 습관으로 완료
 }
 
 interface HabitState {
@@ -25,8 +26,10 @@ interface HabitState {
 
   toggleHabitLog: (habitId: string, date?: string) => void;
   skipHabitLog: (habitId: string, date?: string) => void;
+  substituteHabitLog: (habitId: string, date?: string) => void;
   isHabitCompleted: (habitId: string, date?: string) => boolean;
   isHabitSkipped: (habitId: string, date?: string) => boolean;
+  isHabitSubstituted: (habitId: string, date?: string) => boolean;
 }
 
 export const useHabitStore = create<HabitState>()(
@@ -74,11 +77,26 @@ export const useHabitStore = create<HabitState>()(
         if (existing) {
           set({ habitLogs: habitLogs.map(l =>
             l.habitId === habitId && l.date === d
-              ? { ...l, skipped: !l.skipped, completed: false }
+              ? { ...l, skipped: !l.skipped, completed: false, substitute: false }
               : l
           )});
         } else {
-          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: false, skipped: true }] });
+          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: false, skipped: true, substitute: false }] });
+        }
+      },
+
+      substituteHabitLog: (habitId, date) => {
+        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const { habitLogs } = get();
+        const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
+        if (existing) {
+          set({ habitLogs: habitLogs.map(l =>
+            l.habitId === habitId && l.date === d
+              ? { ...l, substitute: !l.substitute, completed: false, skipped: false }
+              : l
+          )});
+        } else {
+          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: false, substitute: true, skipped: false }] });
         }
       },
 
@@ -92,6 +110,12 @@ export const useHabitStore = create<HabitState>()(
         const d = date ?? format(new Date(), 'yyyy-MM-dd');
         const log = get().habitLogs.find(l => l.habitId === habitId && l.date === d);
         return log?.skipped ?? false;
+      },
+
+      isHabitSubstituted: (habitId, date) => {
+        const d = date ?? format(new Date(), 'yyyy-MM-dd');
+        const log = get().habitLogs.find(l => l.habitId === habitId && l.date === d);
+        return log?.substitute ?? false;
       },
     }),
     { name: 'habit-store' }
