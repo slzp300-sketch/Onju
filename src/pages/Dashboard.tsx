@@ -84,6 +84,35 @@ export default function Dashboard() {
 
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   const activeGoals = monthlyGoals.filter(g => g.endDate >= todayIso);
+
+  // 목표별 달성률: 목표 시작일~오늘 중 습관/루틴을 완료한 날 비율
+  const getGoalRate = (goal: typeof activeGoals[0]): number => {
+    const start = goal.startDate;
+    const end = todayIso < goal.endDate ? todayIso : goal.endDate;
+    if (start > end) return 0;
+
+    const days: string[] = [];
+    const d = new Date(start + 'T12:00:00');
+    const endDate = new Date(end + 'T12:00:00');
+    while (d <= endDate) {
+      days.push(format(d, 'yyyy-MM-dd'));
+      d.setDate(d.getDate() + 1);
+    }
+    if (days.length === 0) return 0;
+
+    const isPersonal = goal.category === 'personal';
+    const isFaith    = goal.category === 'faith';
+
+    const completedDays = days.filter(ds => {
+      if (isPersonal || !isFaith) {
+        return habitLogs.some(l => l.date === ds && (l.completed || l.skipped || l.substitute));
+      }
+      // faith
+      return logs.some(l => l.date === ds && (l.completed || l.skipped));
+    });
+
+    return Math.round((completedDays.length / days.length) * 100);
+  };
   const todayTodos = todos.filter(t => t.date === todayStr);
   const doneTodos = todayTodos.filter(t => t.completed).length;
   const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
@@ -181,16 +210,30 @@ export default function Dashboard() {
           {activeGoals.length === 0 ? (
             <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를 세워보세요</p>
           ) : (
-            <div className="flex flex-col gap-1">
-              {activeGoals.slice(0, 2).map(g => (
-                <div key={g.id} className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-primary" />
-                  <p className="text-caption1 font-medium text-label truncate">{g.title}</p>
-                </div>
-              ))}
-              {activeGoals.length > 2 && (
-                <p className="text-caption2 text-label-assistive">+{activeGoals.length - 2}개 더</p>
-              )}
+            <div className="flex flex-col gap-2">
+              {activeGoals.slice(0, 3).map(g => {
+                const rate = getGoalRate(g);
+                const accentColor = g.color ?? 'var(--color-primary)';
+                return (
+                  <div key={g.id}>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <p className="text-caption1 font-medium text-label truncate flex-1 mr-2">{g.title}</p>
+                      <span className="text-caption2 font-bold flex-shrink-0" style={{ color: accentColor }}>
+                        {rate}%
+                      </span>
+                    </div>
+                    <div className="h-1 bg-fill-strong rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${rate}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                        style={{ backgroundColor: accentColor }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </motion.button>
