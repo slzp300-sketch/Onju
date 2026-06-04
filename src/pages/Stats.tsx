@@ -4,21 +4,20 @@ import { ChevronRight, Target } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, getDay } from 'date-fns';
-import Card from '../components/ui/Card';
 import ReviewBanner from '../components/review/ReviewBanner';
+import StampSeal from '../components/ui/StampSeal';
 import { useRoutineStore } from '../store/routineStore';
 import { useHabitStore } from '../store/habitStore';
 import { useGoalStore } from '../store/goalStore';
-import { useTodoStore } from '../store/todoStore';
 import { useSettingsStore } from '../store/settingsStore';
 import {
   today, getWeekDays, ALL_DAY_LABELS, elapsedDays,
   currentWeek, currentYear, isReviewCompleted, getWeekRangeText,
 } from '../utils/date';
-import { getGoalRate, getGoalAdherence, getLinkedItems } from '../utils/goalProgress';
+import { getGoalRate, getGoalAdherence, getLinkedItems, isScheduled } from '../utils/goalProgress';
 import { getHabitStat, type DayStatus } from '../utils/habitStats';
 import { fetchReviews } from '../api/reviews';
-import type { MonthlyGoal } from '../types';
+import type { MonthlyGoal, HabitFrequency, DailyRoutine } from '../types';
 
 type TabType = 'goal' | 'habit' | 'weekly';
 
@@ -305,82 +304,140 @@ function HabitStatRow({ emoji, title, accent, stat }: {
 /* ════════════════════════════════════════
    주간 통계 탭
 ════════════════════════════════════════ */
+type DayState = 'perfect' | 'partial' | 'missed' | 'rest' | 'future';
+
+interface WeekDayInfo {
+  date: string;
+  dow: number;
+  state: DayState;
+  rate: number; // 0~100 (예정 항목 기준)
+}
+
+function computeWeek(
+  weekDays: Date[],
+  habits: { id: string; frequency: HabitFrequency; customDays?: number[] }[],
+  habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean; substitute?: boolean }[],
+  faithRoutines: { id: string; frequency: DailyRoutine['frequency'] }[],
+  logs: { routineId: string; date: string; completed: boolean; skipped?: boolean }[],
+): WeekDayInfo[] {
+  const todayMid = new Date(new Date().setHours(23, 59, 59, 999));
+  return weekDays.map(d => {
+    const ds = format(d, 'yyyy-MM-dd');
+    const dow = getDay(d);
+    if (d > todayMid) return { date: ds, dow, state: 'future' as DayState, rate: 0 };
+
+    const schedHabits = habits.filter(h => isScheduled(ds, h.frequency, h.customDays));
+    const schedFaith  = faithRoutines.filter(r => isScheduled(ds, r.frequency));
+    const total = schedHabits.length + schedFaith.length;
+    if (total === 0) return { date: ds, dow, state: 'rest' as DayState, rate: 0 };
+
+    const doneH = schedHabits.filter(h =>
+      habitLogs.some(l => l.habitId === h.id && l.date === ds && (l.completed || l.skipped || l.substitute))
+    ).length;
+    const doneF = schedFaith.filter(r =>
+      logs.some(l => l.routineId === r.id && l.date === ds && (l.completed || l.skipped))
+    ).length;
+    const done = doneH + doneF;
+    const rate = Math.round((done / total) * 100);
+    const state: DayState = done === total ? 'perfect' : done > 0 ? 'partial' : 'missed';
+    return { date: ds, dow, state, rate };
+  });
+}
+
 function WeeklyTab() {
   const navigate = useNavigate();
   const { faithRoutines, logs } = useRoutineStore();
   const { habits, habitLogs } = useHabitStore();
-  const { todos } = useTodoStore();
   const { data: reviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
-
   const { weekStartDay } = useSettingsStore();
-  const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
 
-  const getRates = (type: 'faith' | 'habit' | 'todo') => {
-    return weekDays.map(d => {
-      const ds = format(d, 'yyyy-MM-dd');
-      const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
-      if (isFuture) return { ds, rate: null };
+  const thisWeekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
+  const lastWeekDate = new Date(); lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+  const lastWeekDays = getWeekDays(lastWeekDate, weekStartDay as 0 | 1);
 
-      if (type === 'faith') {
-        if (faithRoutines.length === 0) return { ds, rate: 0 };
-        const done = new Set(logs.filter(l => l.date === ds && (l.completed || l.skipped)).map(l => l.routineId));
-        return { ds, rate: Math.round(faithRoutines.filter(r => done.has(r.id)).length / faithRoutines.length * 100) };
-      }
-      if (type === 'habit') {
-        if (habits.length === 0) return { ds, rate: 0 };
-        const done = habitLogs.filter(l => l.date === ds && (l.completed || l.skipped || l.substitute)).length;
-        return { ds, rate: Math.round(done / habits.length * 100) };
-      }
-      const dayTodos = todos.filter(t => t.date === ds);
-      if (dayTodos.length === 0) return { ds, rate: 0 };
-      return { ds, rate: Math.round(dayTodos.filter(t => t.completed).length / dayTodos.length * 100) };
-    });
-  };
+  const week     = computeWeek(thisWeekDays, habits, habitLogs, faithRoutines, logs);
+  const lastWeek = computeWeek(lastWeekDays, habits, habitLogs, faithRoutines, logs);
 
-  const faithRates = getRates('faith');
-  const habitRates = getRates('habit');
-  const todoRates = getRates('todo');
+  const perfectCount = week.filter(d => d.state === 'perfect').length;
+  const lastPerfect  = lastWeek.filter(d => d.state === 'perfect').length;
+  const perfectDelta = perfectCount - lastPerfect;
 
-  const avg = (rates: { rate: number | null }[]) => {
-    const valid = rates.filter(r => r.rate !== null).map(r => r.rate!);
-    return valid.length ? Math.round(valid.reduce((a, b) => a + b, 0) / valid.length) : 0;
-  };
+  const elapsedDone = week.filter(d => d.state !== 'future');
+  const avgRate = elapsedDone.length
+    ? Math.round(elapsedDone.reduce((a, d) => a + (d.state === 'rest' ? 100 : d.rate), 0) / elapsedDone.length)
+    : 0;
+
+  // 이번 주 가장 꾸준한 습관
+  const weekIsos = week.map(d => d.date);
+  const habitConsistency = [
+    ...habits.map(h => ({
+      title: h.title, emoji: h.emoji,
+      done: weekIsos.filter(ds => isScheduled(ds, h.frequency, h.customDays)
+        && habitLogs.some(l => l.habitId === h.id && l.date === ds && (l.completed || l.skipped || l.substitute))).length,
+    })),
+    ...faithRoutines.map(r => ({
+      title: r.title, emoji: r.emoji ?? '✝️',
+      done: weekIsos.filter(ds => isScheduled(ds, r.frequency)
+        && logs.some(l => l.routineId === r.id && l.date === ds && (l.completed || l.skipped))).length,
+    })),
+  ].sort((a, b) => b.done - a.done);
+  const bestHabit = habitConsistency[0]?.done > 0 ? habitConsistency[0] : null;
 
   const reviewDone = isReviewCompleted(reviews, currentWeek(), currentYear());
 
+  const encourage =
+    perfectCount >= 5 ? '🔥 완벽한 한 주를 보내고 있어요!' :
+    perfectCount >= 2 ? '👏 꾸준히 잘 해내고 있어요' :
+    avgRate >= 50 ? '🌱 조금씩 쌓여가고 있어요' :
+    '💪 오늘부터 다시 시작해봐요';
+
+  const hasData = habits.length > 0 || faithRoutines.length > 0;
+
   return (
     <div className="flex flex-col gap-4 px-4 py-4 pb-8">
-      {/* 리뷰 배너 — 한 주 점검 */}
+      {/* ── 이번 주 도장 캘린더 ── */}
+      <div className="bg-surface rounded-2xl border border-line shadow-emphasize px-4 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-body2 font-bold text-label-strong">이번 주 달성</p>
+          <p className="text-caption1 text-label-alt">{getWeekRangeText(new Date(), weekStartDay as 0 | 1)}</p>
+        </div>
+
+        {hasData ? (
+          <>
+            <div className="flex gap-1.5">
+              {week.map((d, i) => (
+                <WeekStampCell key={d.date} info={d} isToday={d.date === today()} delay={i * 0.05} />
+              ))}
+            </div>
+            <p className="text-caption1 text-center font-semibold text-label-alt mt-3">{encourage}</p>
+          </>
+        ) : (
+          <p className="text-caption1 text-label-assistive text-center py-6">습관·루틴을 추가하면 달성 현황이 표시돼요</p>
+        )}
+      </div>
+
+      {/* ── 주간 요약 ── */}
+      {hasData && (
+        <div className="grid grid-cols-3 gap-2">
+          <SummaryStat label="완벽한 날" value={`${perfectCount}일`}
+            sub={perfectDelta === 0 ? '지난주와 동일' : perfectDelta > 0 ? `지난주 +${perfectDelta}` : `지난주 ${perfectDelta}`}
+            subColor={perfectDelta > 0 ? 'text-positive' : perfectDelta < 0 ? 'text-negative' : 'text-label-assistive'} />
+          <SummaryStat label="평균 달성률" value={`${avgRate}%`} sub="경과일 기준" subColor="text-label-assistive" />
+          <SummaryStat label="베스트 습관" value={bestHabit ? `${bestHabit.done}회` : '-'}
+            sub={bestHabit ? `${bestHabit.emoji} ${bestHabit.title}` : '아직 없어요'} subColor="text-label-alt" />
+        </div>
+      )}
+
+      {/* ── 주간 리뷰 ── */}
       <ReviewBanner
         completed={reviewDone}
         weekRangeText={getWeekRangeText(new Date(), weekStartDay as 0 | 1)}
         onStart={() => navigate('/review')}
       />
 
-      {/* 주간 평균 */}
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { label: '개인 루틴', avg: avg(habitRates) },
-          { label: '신앙 루틴', avg: avg(faithRates) },
-          { label: '투두', avg: avg(todoRates) },
-        ].map((c, i) => (
-          <motion.div key={c.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-            className="rounded-xl border border-line bg-surface shadow-emphasize p-3">
-            <p className="text-caption2 text-label-alt font-medium mb-1">{c.label}</p>
-            <p className="text-title3 font-bold text-primary">{c.avg}%</p>
-            <p className="text-caption2 text-label-assistive mt-0.5">주간 평균</p>
-          </motion.div>
-        ))}
-      </div>
-
-      <WeeklyBarChart label="📌 개인 루틴" rates={habitRates} emptyText={habits.length === 0 ? '등록된 개인 루틴이 없어요' : undefined} />
-      <WeeklyBarChart label="🙏 신앙 루틴" rates={faithRates} emptyText={faithRoutines.length === 0 ? '등록된 신앙 루틴이 없어요' : undefined} />
-      <WeeklyBarChart label="✅ 투두" rates={todoRates} emptyText={undefined} />
-
-      {/* 리뷰 히스토리 */}
       {reviews.length > 0 && (
         <div>
-          <p className="text-caption1 font-bold text-label-alt mb-3">주간 리뷰 히스토리</p>
+          <p className="text-caption1 font-bold text-label-alt mb-3">지난 리뷰</p>
           <div className="flex flex-col gap-2">
             {reviews.slice(0, 6).map((review, i) => (
               <motion.button key={review.id}
@@ -408,42 +465,50 @@ function WeeklyTab() {
   );
 }
 
-function WeeklyBarChart({ label, rates, emptyText }: {
-  label: string;
-  rates: { ds: string; rate: number | null }[];
-  emptyText?: string;
+function SummaryStat({ label, value, sub, subColor }: {
+  label: string; value: string; sub: string; subColor: string;
 }) {
-  const todayStr = today();
   return (
-    <Card>
-      <p className="text-caption1 font-bold text-label mb-3">{label}</p>
-      {emptyText ? (
-        <p className="text-caption1 text-label-assistive text-center py-3">{emptyText}</p>
-      ) : (
-        <div className="flex items-end gap-1.5" style={{ height: 72 }}>
-          {rates.map((d, i) => {
-            const isFuture = d.rate === null;
-            const rate = d.rate ?? 0;
-            const barH = isFuture ? 0 : Math.max(rate, 4);
-            const isToday = d.ds === todayStr;
-            return (
-              <div key={d.ds} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full flex flex-col justify-end" style={{ height: 56 }}>
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: isFuture ? 0 : `${barH}%` }}
-                    transition={{ duration: 0.5, delay: i * 0.04 }}
-                    className={`w-full rounded-t-sm ${isFuture ? 'bg-transparent' : rate === 100 ? 'bg-primary' : rate > 0 ? 'bg-primary opacity-50' : 'bg-fill'}`}
-                  />
-                </div>
-                <span className={`text-caption2 font-semibold ${isToday ? 'text-primary' : 'text-label-assistive'}`}>
-                  {ALL_DAY_LABELS[getDay(new Date(d.ds + 'T12:00:00'))]}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </Card>
+    <div className="rounded-xl border border-line bg-surface shadow-emphasize p-3">
+      <p className="text-caption2 text-label-alt font-medium mb-1">{label}</p>
+      <p className="text-title3 font-bold text-label-strong leading-none">{value}</p>
+      <p className={`text-caption2 mt-1 truncate ${subColor}`}>{sub}</p>
+    </div>
+  );
+}
+
+/* 도장 캘린더 셀 */
+function WeekStampCell({ info, isToday, delay }: { info: WeekDayInfo; isToday: boolean; delay: number }) {
+  const ring = 2 * Math.PI * 15;
+  return (
+    <div className="flex-1 flex flex-col items-center gap-1.5">
+      <span className={`text-caption2 font-bold ${isToday ? 'text-primary' : 'text-label-assistive'}`}>
+        {ALL_DAY_LABELS[info.dow]}
+      </span>
+      <div className={`relative w-full aspect-square rounded-2xl flex items-center justify-center ${
+        isToday ? 'bg-primary-soft' : info.state === 'rest' ? 'bg-fill' : 'bg-fill/60'
+      }`}>
+        {info.state === 'perfect' ? (
+          <motion.div initial={{ scale: 1.6, opacity: 0, rotate: -16 }} animate={{ scale: 1, opacity: 1, rotate: -10 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 18, delay }}>
+            <StampSeal label="완료" color="#10b981" size={40} />
+          </motion.div>
+        ) : info.state === 'partial' ? (
+          <svg className="w-[60%] h-[60%] -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-fill-strong)" strokeWidth="3.5" />
+            <motion.circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-primary)" strokeWidth="3.5"
+              strokeLinecap="round" strokeDasharray={ring}
+              initial={{ strokeDashoffset: ring }} animate={{ strokeDashoffset: ring * (1 - info.rate / 100) }}
+              transition={{ duration: 0.6, delay }} />
+          </svg>
+        ) : info.state === 'missed' ? (
+          <span className="text-label-assistive text-sm">·</span>
+        ) : info.state === 'rest' ? (
+          <span className="text-label-assistive text-xs">😴</span>
+        ) : (
+          <span className="text-label-assistive text-[10px]">{format(new Date(info.date + 'T12:00:00'), 'd')}</span>
+        )}
+      </div>
+    </div>
   );
 }
