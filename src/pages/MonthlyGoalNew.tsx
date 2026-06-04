@@ -127,15 +127,15 @@ export default function MonthlyGoalNew() {
                 placeholder="습관명 (예: 러닝 30분)"
                 className={inputCls} />
 
-              {/* 언제 / 어디서 */}
-              <div className="flex gap-2">
-                <input value={habitWhen} onChange={e => setHabitWhen(e.target.value)}
-                  placeholder="⏰ 언제 (예: 출근 전 6시)"
-                  className={`flex-1 bg-fill border border-line rounded-xl px-3 py-3 text-body2 focus:outline-none focus:border-primary focus:bg-surface transition-all placeholder:text-label-assistive`} />
-                <input value={habitWhere} onChange={e => setHabitWhere(e.target.value)}
-                  placeholder="📍 어디서"
-                  className={`flex-1 bg-fill border border-line rounded-xl px-3 py-3 text-body2 focus:outline-none focus:border-primary focus:bg-surface transition-all placeholder:text-label-assistive`} />
-              </div>
+              {/* 언제 */}
+              <input value={habitWhen} onChange={e => setHabitWhen(e.target.value)}
+                placeholder="⏰ 언제 (예: 출근 전 6시)"
+                className={inputCls} />
+
+              {/* 어디서 */}
+              <input value={habitWhere} onChange={e => setHabitWhere(e.target.value)}
+                placeholder="📍 어디서 (예: 공원)"
+                className={inputCls} />
             </div>
 
             {/* 미니 습관 */}
