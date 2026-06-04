@@ -210,27 +210,17 @@ export default function Dashboard() {
           {activeGoals.length === 0 ? (
             <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를 세워보세요</p>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               {activeGoals.slice(0, 3).map(g => {
                 const rate = getGoalRate(g);
                 const accentColor = g.color ?? 'var(--color-primary)';
                 return (
-                  <div key={g.id}>
-                    <div className="flex items-center justify-between mb-0.5">
-                      <p className="text-caption1 font-medium text-label truncate flex-1 mr-2">{g.title}</p>
-                      <span className="text-caption2 font-bold flex-shrink-0" style={{ color: accentColor }}>
-                        {rate}%
-                      </span>
-                    </div>
-                    <div className="h-1 bg-fill-strong rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${rate}%` }}
-                        transition={{ duration: 0.6, ease: 'easeOut' }}
-                        style={{ backgroundColor: accentColor }}
-                      />
-                    </div>
+                  <div key={g.id} className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
+                    <p className="text-caption1 font-medium text-label truncate flex-1">{g.title}</p>
+                    <span className="text-caption2 font-bold flex-shrink-0" style={{ color: accentColor }}>
+                      {rate}%
+                    </span>
                   </div>
                 );
               })}
