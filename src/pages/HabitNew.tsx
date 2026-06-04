@@ -48,6 +48,7 @@ export default function HabitNew() {
   const [when, setWhen] = useState(existing?.when ?? '');
   const [miniRoutine, setMiniRoutine] = useState(existing?.miniRoutine ?? '');
   const [twoMinuteHabit, setTwoMinuteHabit] = useState(existing?.twoMinuteHabit ?? '');
+  const [twoMinEnabled, setTwoMinEnabled] = useState(!!(existing?.twoMinuteHabit));
 
   // 타이머
   const [timerEnabled, setTimerEnabled] = useState(!!(existing?.durationSeconds));
@@ -99,7 +100,7 @@ export default function HabitNew() {
       when: when.trim(),
       durationSeconds: timerEnabled ? durationSecs : undefined,
       miniRoutine: miniRoutine.trim() || undefined,
-      twoMinuteHabit: twoMinuteHabit.trim() || undefined,
+      twoMinuteHabit: twoMinEnabled ? twoMinuteHabit.trim() || undefined : undefined,
       notification: notifEnabled
         ? { enabled: true, type: notifType, times: notifTimes }
         : undefined,
@@ -175,7 +176,7 @@ export default function HabitNew() {
           </div>
         </div>
 
-        {/* 설정 */}
+        {/* 설정 — 순서: 알림 → 반복주기 → 언제 → 2분트리거 → 타이머 → 대체습관 */}
         <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
 
           {/* 알림 */}
@@ -257,51 +258,6 @@ export default function HabitNew() {
             </div>
           </div>
 
-          {/* 타이머 */}
-          <div className="border-b border-line-soft">
-            <div className="px-4 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Timer size={20} className="text-primary" />
-                  <div>
-                    <p className="text-body2 font-semibold text-label-strong">타이머</p>
-                    <p className="text-caption1 text-label-alt">루틴 생성 시 자동으로 적용돼요</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setTimerEnabled(v => !v)}
-                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}
-                >
-                  <motion.div
-                    animate={{ x: timerEnabled ? 20 : 2 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none"
-                  />
-                </button>
-              </div>
-              <AnimatePresence>
-                {timerEnabled && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden mt-3"
-                  >
-                    <motion.button
-                      {...tapSm}
-                      onClick={() => setShowDurationSheet(true)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-fill rounded-xl border border-line"
-                    >
-                      <span className="text-body2 text-label-alt">설정 시간</span>
-                      <span className="text-body2 font-bold text-primary">{fmtDuration(durationSecs)}</span>
-                    </motion.button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
           {/* 반복 주기 */}
           <div className="border-b border-line-soft">
             <div className="px-4 py-4">
@@ -341,7 +297,7 @@ export default function HabitNew() {
           </div>
 
           {/* 언제 할래요? */}
-          <div className="px-4 py-4">
+          <div className="border-b border-line-soft px-4 py-4">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-xl">✅</span>
               <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
@@ -355,42 +311,108 @@ export default function HabitNew() {
             <p className="text-caption1 text-label-assistive mt-1.5">시작 시간이나 행동 트리거를 적어주세요</p>
           </div>
 
-          {/* 대체 습관 */}
-          <div className="border-t border-line-soft">
-            <div className="px-4 py-4 bg-amber-50/60">
-              <p className="text-body2 font-semibold text-amber-700 mb-1">🔥 대체 습관</p>
-              <p className="text-caption1 text-amber-600 mb-3 leading-relaxed">
-                하기 힘든 날 메인 습관 대신 할 수 있는 더 쉬운 버전이에요.<br />
-                예) 러닝 30분 → <span className="font-semibold">10분 스트레칭</span>
-              </p>
-              <input
-                type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
-                placeholder="예: 10분 스트레칭, 5분 걷기"
-                className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300"
-              />
-              <p className="text-caption2 text-amber-500 mt-1.5">
-                💡 쉬운 버전을 만들어두면 포기하지 않을 수 있어요
-              </p>
+          {/* 2분 트리거 */}
+          <div className="border-b border-line-soft">
+            <div className="px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">⚡</span>
+                  <div>
+                    <p className="text-body2 font-semibold text-label-strong">2분 트리거</p>
+                    <p className="text-caption1 text-label-alt">습관 시작을 쉽게 만드는 작은 행동</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setTwoMinEnabled(v => !v)}
+                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${twoMinEnabled ? 'bg-emerald-500' : 'bg-fill-strong'}`}
+                >
+                  <motion.div
+                    animate={{ x: twoMinEnabled ? 20 : 2 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none"
+                  />
+                </button>
+              </div>
+              <AnimatePresence>
+                {twoMinEnabled && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+                    className="overflow-hidden mt-3"
+                  >
+                    <input
+                      type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
+                      placeholder="예: 운동복 갈아입기, 러닝화 신기"
+                      className="w-full bg-fill border border-emerald-200 rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 focus:bg-surface transition-all"
+                    />
+                    <p className="text-caption2 text-emerald-600 mt-1.5">
+                      💡 트리거 완료 후 자동으로 메인 습관으로 연결돼요
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
-          {/* 2분 트리거 */}
-          <div className="border-t border-line-soft">
-            <div className="px-4 py-4 bg-emerald-50/60">
-              <p className="text-body2 font-semibold text-emerald-700 mb-1">⚡ 2분 트리거</p>
-              <p className="text-caption1 text-emerald-600 mb-3 leading-relaxed">
-                습관 시작을 쉽게 만드는 2분 이내의 아주 작은 행동이에요.<br />
-                예) 러닝 30분 → <span className="font-semibold">운동복으로 갈아입기</span>
-              </p>
-              <input
-                type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
-                placeholder="예: 운동복 갈아입기, 러닝화 신기"
-                className="w-full bg-white/80 border border-emerald-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 transition-all placeholder:text-emerald-300"
-              />
-              <p className="text-caption2 text-emerald-500 mt-1.5">
-                💡 트리거 완료 후 자동으로 메인 습관으로 연결돼요
-              </p>
+          {/* 타이머 */}
+          <div className="border-b border-line-soft">
+            <div className="px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Timer size={20} className="text-primary" />
+                  <div>
+                    <p className="text-body2 font-semibold text-label-strong">타이머</p>
+                    <p className="text-caption1 text-label-alt">루틴 생성 시 자동으로 적용돼요</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setTimerEnabled(v => !v)}
+                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}
+                >
+                  <motion.div
+                    animate={{ x: timerEnabled ? 20 : 2 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none"
+                  />
+                </button>
+              </div>
+              <AnimatePresence>
+                {timerEnabled && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+                    className="overflow-hidden mt-3"
+                  >
+                    <motion.button
+                      {...tapSm} onClick={() => setShowDurationSheet(true)}
+                      className="w-full flex items-center justify-between px-4 py-3 bg-fill rounded-xl border border-line"
+                    >
+                      <span className="text-body2 text-label-alt">설정 시간</span>
+                      <span className="text-body2 font-bold text-primary">{fmtDuration(durationSecs)}</span>
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
+          </div>
+
+          {/* 대체 습관 */}
+          <div className="px-4 py-4 bg-amber-50/40">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-xl">🔥</span>
+              <div>
+                <p className="text-body2 font-semibold text-amber-700">대체 습관</p>
+                <p className="text-caption1 text-amber-600">하기 힘든 날의 더 쉬운 버전</p>
+              </div>
+            </div>
+            <input
+              type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
+              placeholder="예: 10분 스트레칭, 5분 걷기"
+              className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300"
+            />
+            <p className="text-caption2 text-amber-500 mt-1.5">
+              💡 쉬운 버전을 만들어두면 포기하지 않을 수 있어요
+            </p>
           </div>
         </div>
 
