@@ -15,6 +15,7 @@ import { useAuthStore } from '../store/authStore';
 import { calcStreak } from '../utils/completion';
 import { today, isSunday, currentWeek, currentYear, isReviewCompleted, getWeekRangeText, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
+import { getGoalRate, getLinkedItems } from '../utils/goalProgress';
 import StampOverlay from '../components/ui/StampOverlay';
 import ReviewBanner from '../components/review/ReviewBanner';
 import { fetchReviews } from '../api/reviews';
@@ -85,51 +86,9 @@ export default function Dashboard() {
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   const activeGoals = monthlyGoals.filter(g => g.endDate >= todayIso);
 
-  // 목표별 달성률: 연동된 습관 기준 (연동 없으면 0%)
-  const getGoalRate = (goal: typeof activeGoals[0]): number => {
-    const start = goal.startDate;
-    const end = todayIso < goal.endDate ? todayIso : goal.endDate;
-    if (start > end) return 0;
-
-    // 전체 기간 날짜 배열 (분모)
-    const allDays: string[] = [];
-    const dAll = new Date(start + 'T12:00:00');
-    const goalEnd = new Date(goal.endDate + 'T12:00:00');
-    while (dAll <= goalEnd) {
-      allDays.push(format(dAll, 'yyyy-MM-dd'));
-      dAll.setDate(dAll.getDate() + 1);
-    }
-    if (allDays.length === 0) return 0;
-
-    // 오늘까지 경과된 날짜 배열 (분자 계산 범위)
-    const elapsedDays2: string[] = [];
-    const dEl = new Date(start + 'T12:00:00');
-    const todayEnd = new Date(end + 'T12:00:00');
-    while (dEl <= todayEnd) {
-      elapsedDays2.push(format(dEl, 'yyyy-MM-dd'));
-      dEl.setDate(dEl.getDate() + 1);
-    }
-
-    // 연동된 개인 습관
-    const linkedHabits = habits.filter(h => h.goalId === goal.id);
-    // 연동된 신앙 루틴
-    const linkedRoutines = faithRoutines.filter(r => r.goalId === goal.id);
-
-    if (linkedHabits.length === 0 && linkedRoutines.length === 0) return 0;
-
-    // 경과 기간 중 완료된 날 수 / 전체 기간 = 달성률
-    const completedDays = elapsedDays2.filter(ds => {
-      const habitDone = linkedHabits.some(h =>
-        habitLogs.some(l => l.habitId === h.id && l.date === ds && (l.completed || l.skipped || l.substitute))
-      );
-      const routineDone = linkedRoutines.some(r =>
-        logs.some(l => l.routineId === r.id && l.date === ds && (l.completed || l.skipped))
-      );
-      return habitDone || routineDone;
-    });
-
-    return Math.round((completedDays.length / allDays.length) * 100);
-  };
+  // 목표별 달성률 (연동 항목 가중 평균)
+  const goalRate = (goal: typeof activeGoals[0]): number =>
+    getGoalRate(goal, habits, habitLogs, faithRoutines, logs, todayIso);
   const todayTodos = todos.filter(t => t.date === todayStr);
   const doneTodos = todayTodos.filter(t => t.completed).length;
   const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
@@ -234,7 +193,8 @@ export default function Dashboard() {
             style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
           >
             {activeGoals.map(g => {
-              const rate = getGoalRate(g);
+              const rate = goalRate(g);
+              const linkedCount = getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso).length;
               const accentColor = g.color ?? 'var(--color-primary)';
               return (
                 <motion.button
@@ -249,10 +209,15 @@ export default function Dashboard() {
                     backgroundColor: g.color ? `${g.color}0a` : undefined,
                   } as React.CSSProperties}
                 >
-                  {/* 카테고리 */}
-                  <span className="text-[10px]">
-                    {g.category === 'faith' ? '🙏' : '💪'}
-                  </span>
+                  {/* 카테고리 + 연동 개수 */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px]">
+                      {g.category === 'faith' ? '🙏' : '💪'}
+                    </span>
+                    {linkedCount > 0 && (
+                      <span className="text-[9px] font-bold text-label-assistive">🔗{linkedCount}</span>
+                    )}
+                  </div>
 
                   {/* 제목 */}
                   <p className="text-caption1 font-semibold text-label-strong leading-snug mt-1 mb-2"

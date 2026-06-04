@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useGoalStore } from '../store/goalStore';
 import { useHabitStore } from '../store/habitStore';
+import { useRoutineStore } from '../store/routineStore';
 import type { MonthlyGoal } from '../types';
 import { elapsedDays } from '../utils/date';
+import { getLinkedItems, getGoalRate, type LinkedItem } from '../utils/goalProgress';
 
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 const MAX_SLOTS = 3;
@@ -33,6 +35,7 @@ export default function Goals() {
   const navigate = useNavigate();
   const { monthlyGoals, goalSlots, removeMonthlyGoal, unlockGoalSlot } = useGoalStore();
   const { habits, habitLogs } = useHabitStore();
+  const { faithRoutines, logs } = useRoutineStore();
 
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [unlockBanner, setUnlockBanner] = useState(false);
@@ -113,6 +116,8 @@ export default function Goals() {
             {activeGoals.map(g => (
               <GoalCard key={g.id} goal={g}
                 isOpen={expanded.has(g.id)}
+                rate={getGoalRate(g, habits, habitLogs, faithRoutines, logs, todayIso)}
+                linkedItems={getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso)}
                 onToggle={() => toggle(g.id)}
                 onEdit={() => navigate(`/goals/monthly/edit/${g.id}`)}
                 onDelete={() => removeMonthlyGoal(g.id)}
@@ -124,6 +129,8 @@ export default function Goals() {
                 {pastGoals.map(g => (
                   <GoalCard key={g.id} goal={g} past
                     isOpen={expanded.has(g.id)}
+                    rate={getGoalRate(g, habits, habitLogs, faithRoutines, logs, todayIso)}
+                    linkedItems={getLinkedItems(g, habits, habitLogs, faithRoutines, logs, todayIso)}
                     onToggle={() => toggle(g.id)}
                     onEdit={() => navigate(`/goals/monthly/edit/${g.id}`)}
                     onDelete={() => removeMonthlyGoal(g.id)}
@@ -161,12 +168,12 @@ export default function Goals() {
 }
 
 /* ── 목표 카드 ── */
-function GoalCard({ goal, past = false, isOpen, onToggle, onEdit, onDelete }: {
+function GoalCard({ goal, past = false, isOpen, rate, linkedItems, onToggle, onEdit, onDelete }: {
   goal: MonthlyGoal; past?: boolean; isOpen: boolean;
+  rate: number; linkedItems: LinkedItem[];
   onToggle: () => void; onEdit: () => void; onDelete: () => void;
 }) {
   const { elapsed, total } = elapsedDays(goal.startDate, goal.endDate);
-  const progress = Math.round((elapsed / total) * 100);
   const habit = goal.goalRoutines?.[0];
   const cardBg    = goal.color ? `${goal.color}18` : undefined;
   const cardBorder = goal.color ? `${goal.color}50` : undefined;
@@ -206,13 +213,16 @@ function GoalCard({ goal, past = false, isOpen, onToggle, onEdit, onDelete }: {
             {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </span>
         </div>
+
+        {/* 달성률 바 */}
         {!isPast && (
           <div className="mt-2.5">
-            <div className="flex justify-between text-caption2 text-label-assistive mb-1">
-              <span>D+{elapsed - 1}</span><span>{elapsed}/{total}일</span>
+            <div className="flex justify-between items-center text-caption2 mb-1">
+              <span className="text-label-assistive">D+{elapsed - 1} · {elapsed}/{total}일</span>
+              <span className="font-bold" style={{ color: accentColor }}>{rate}%</span>
             </div>
             <div className="bg-surface/60 rounded-full h-1.5 overflow-hidden">
-              <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: accentColor }} />
+              <div className="h-full rounded-full transition-all" style={{ width: `${rate}%`, backgroundColor: accentColor }} />
             </div>
           </div>
         )}
@@ -223,20 +233,48 @@ function GoalCard({ goal, past = false, isOpen, onToggle, onEdit, onDelete }: {
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 35 }}
             className="overflow-hidden">
-            <div className="mx-3 mb-3 rounded-xl px-4 py-3.5 flex flex-col gap-2 bg-surface/60 border border-line-soft">
-              {habit ? (
-                <>
-                  <p className="text-caption1 font-bold text-label-strong">💪 핵심 습관</p>
-                  <p className="text-body2 text-label">📌 {habit.title}</p>
-                  {habit.when  && <p className="text-body2 text-label-alt">⏰ {habit.when}</p>}
-                  {habit.where && <p className="text-body2 text-label-alt">📍 {habit.where}</p>}
-                  {habit.miniRoutine     && <p className="text-caption1 text-amber-600">🔥 미니: {habit.miniRoutine}</p>}
-                  {habit.twoMinuteHabit && <p className="text-caption1 text-emerald-600">⚡ 2분: {habit.twoMinuteHabit}</p>}
-                </>
+
+            {/* 연동된 습관/루틴 + 개별 달성률 */}
+            <div className="mx-3 mb-2 rounded-xl px-4 py-3.5 flex flex-col gap-2.5 bg-surface/60 border border-line-soft">
+              <p className="text-caption1 font-bold text-label-strong">
+                🔗 연동된 습관 {linkedItems.length > 0 && `(${linkedItems.length})`}
+              </p>
+              {linkedItems.length > 0 ? (
+                linkedItems.map(item => (
+                  <div key={item.id}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-body2 text-label truncate flex-1 mr-2">
+                        {item.emoji ?? (item.kind === 'faith' ? '🙏' : '📌')} {item.title}
+                      </span>
+                      <span className="text-caption1 font-bold flex-shrink-0" style={{ color: accentColor }}>
+                        {item.rate}%
+                      </span>
+                    </div>
+                    <div className="bg-fill-strong rounded-full h-1 overflow-hidden">
+                      <div className="h-full rounded-full transition-all"
+                        style={{ width: `${item.rate}%`, backgroundColor: accentColor }} />
+                    </div>
+                  </div>
+                ))
               ) : (
-                <p className="text-caption1 text-label-assistive">설정된 습관이 없어요</p>
+                <p className="text-caption1 text-label-assistive leading-relaxed">
+                  아직 연동된 습관이 없어요.<br />
+                  습관·루틴을 추가할 때 이 목표를 연동하면 달성률에 반영돼요.
+                </p>
               )}
             </div>
+
+            {/* 목표 설정 메모 (참고) */}
+            {habit && (
+              <div className="mx-3 mb-3 rounded-xl px-4 py-3 flex flex-col gap-1 bg-fill/60 border border-line-soft">
+                <p className="text-caption2 font-bold text-label-assistive mb-0.5">📝 목표 설정 메모</p>
+                <p className="text-caption1 text-label-alt">📌 {habit.title}</p>
+                {habit.when  && <p className="text-caption1 text-label-assistive">⏰ {habit.when}</p>}
+                {habit.miniRoutine     && <p className="text-caption1 text-amber-600">🔥 미니: {habit.miniRoutine}</p>}
+                {habit.twoMinuteHabit && <p className="text-caption1 text-emerald-600">⚡ 2분: {habit.twoMinuteHabit}</p>}
+              </div>
+            )}
+
             <div className="flex items-center justify-end gap-1 px-4 pb-3">
               <motion.button {...tapSm} onClick={onEdit}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-caption1 font-semibold text-primary bg-primary-soft">
