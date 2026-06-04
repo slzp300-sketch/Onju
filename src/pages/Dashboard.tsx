@@ -141,23 +141,30 @@ export default function Dashboard() {
           <h1 className="text-heading2 font-bold text-label-strong font-brand mt-0.5">안녕하세요, {user?.name}님</h1>
         </div>
 
-        {/* 🔥 스트릭 아이콘 버튼 */}
+        {/* 🔥 스트릭 칩 버튼 */}
         <motion.button
-          whileTap={{ scale: 0.88 }}
-          transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+          whileTap={{ scale: 0.92 }}
+          transition={{ type: 'spring', stiffness: 600, damping: 22 }}
           onClick={() => navigate('/streak')}
-          className="flex flex-col items-center gap-0.5 ml-3 mt-0.5"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border shadow-emphasize transition-colors ${
+            streak > 0
+              ? 'bg-cautionary/10 border-cautionary/20'
+              : 'bg-surface border-line'
+          }`}
         >
           <motion.span
             animate={streak > 0 ? { scale: [1, 1.2, 1] } : {}}
             transition={{ repeat: Infinity, repeatDelay: 3, duration: 0.4 }}
-            className="text-2xl leading-none"
+            className="text-base leading-none"
           >
             🔥
           </motion.span>
-          <span className={`text-caption2 font-bold tabular-nums ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
-            {streak}일
-          </span>
+          <div className="flex flex-col leading-none">
+            <span className={`text-label1 font-bold tabular-nums ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
+              {streak}일
+            </span>
+            <span className="text-[9px] text-label-assistive font-medium">연속</span>
+          </div>
         </motion.button>
       </motion.div>
 
