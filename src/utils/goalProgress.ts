@@ -26,7 +26,7 @@ function dateRange(startIso: string, endIso: string): string[] {
  * 해당 날짜가 습관/루틴의 "예정일"인지 판정.
  * getDay(): 0=일 ~ 6=토 (customDays/number[]도 동일 인덱스 사용)
  */
-function isScheduled(
+export function isScheduled(
   dateIso: string,
   frequency: HabitFrequency | DailyRoutine['frequency'],
   customDays?: number[],

@@ -16,10 +16,11 @@ import {
   currentWeek, currentYear, isReviewCompleted, getWeekRangeText,
 } from '../utils/date';
 import { getGoalRate, getGoalAdherence, getLinkedItems } from '../utils/goalProgress';
+import { getHabitStat, type DayStatus } from '../utils/habitStats';
 import { fetchReviews } from '../api/reviews';
 import type { MonthlyGoal } from '../types';
 
-type TabType = 'goal' | 'weekly';
+type TabType = 'goal' | 'habit' | 'weekly';
 
 const MOOD_EMOJI: Record<string, string> = { hard: '😓', normal: '😊', easy: '😌' };
 
@@ -34,7 +35,7 @@ export default function Stats() {
 
       <div className="px-4 mb-1">
         <div className="flex bg-fill rounded-xl p-1">
-          {([['goal', '목표'], ['weekly', '주간']] as [TabType, string][]).map(([key, label]) => (
+          {([['goal', '목표'], ['habit', '습관'], ['weekly', '주간']] as [TabType, string][]).map(([key, label]) => (
             <motion.button key={key} whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.12 }}
               onClick={() => setActiveTab(key)}
@@ -46,11 +47,17 @@ export default function Stats() {
       </div>
 
       <AnimatePresence mode="wait">
-        {activeTab === 'goal' ? (
+        {activeTab === 'goal' && (
           <motion.div key="g" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
             <GoalStatsTab />
           </motion.div>
-        ) : (
+        )}
+        {activeTab === 'habit' && (
+          <motion.div key="h" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            <HabitStatsTab />
+          </motion.div>
+        )}
+        {activeTab === 'weekly' && (
           <motion.div key="w" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
             <WeeklyTab />
           </motion.div>
@@ -199,6 +206,99 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
         )}
       </div>
     </motion.button>
+  );
+}
+
+/* ════════════════════════════════════════
+   습관 통계 탭
+════════════════════════════════════════ */
+function HabitStatsTab() {
+  const navigate = useNavigate();
+  const { habits, habitLogs } = useHabitStore();
+  const { faithRoutines, logs } = useRoutineStore();
+
+  if (habits.length === 0 && faithRoutines.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
+        <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center mb-4 text-3xl">📊</div>
+        <p className="text-body1 font-bold text-label-strong mb-1">아직 습관이 없어요</p>
+        <p className="text-caption1 text-label-alt mb-5">습관을 추가하면 진행 통계를 볼 수 있어요</p>
+        <motion.button whileTap={{ scale: 0.97 }}
+          onClick={() => navigate('/habits/new')}
+          className="px-5 py-2.5 rounded-xl bg-primary text-white text-body2 font-bold">
+          습관 추가하기
+        </motion.button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4 px-4 py-4 pb-8">
+      {habits.length > 0 && (
+        <div className="flex flex-col gap-2.5">
+          <p className="text-caption1 font-bold text-label-alt">📌 개인 습관</p>
+          {habits.map(h => (
+            <HabitStatRow key={h.id}
+              emoji={h.emoji} title={h.title} accent="var(--color-primary)"
+              stat={getHabitStat(h.frequency, h.customDays, h.createdAt,
+                habitLogs.filter(l => l.habitId === h.id))}
+            />
+          ))}
+        </div>
+      )}
+
+      {faithRoutines.length > 0 && (
+        <div className="flex flex-col gap-2.5">
+          <p className="text-caption1 font-bold text-label-alt">🙏 신앙 루틴</p>
+          {faithRoutines.map(r => (
+            <HabitStatRow key={r.id}
+              emoji={r.emoji ?? '✝️'} title={r.title} accent="var(--color-positive)"
+              stat={getHabitStat(r.frequency, undefined, r.createdAt,
+                logs.filter(l => l.routineId === r.id))}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const STATUS_STYLE: Record<DayStatus, string> = {
+  done:  'bg-primary',
+  sub:   'bg-orange-400',
+  rest:  'bg-amber-300',
+  miss:  'bg-fill-strong',
+  off:   'bg-transparent border border-line-soft',
+  future:'bg-transparent border border-dashed border-line-soft',
+};
+
+function HabitStatRow({ emoji, title, accent, stat }: {
+  emoji: string; title: string; accent: string;
+  stat: ReturnType<typeof getHabitStat>;
+}) {
+  return (
+    <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5">
+      <div className="flex items-center gap-2.5 mb-3">
+        <span className="text-xl">{emoji}</span>
+        <span className="flex-1 text-body2 font-bold text-label-strong truncate">{title}</span>
+        <span className="text-title3 font-bold" style={{ color: accent }}>{stat.rate30}%</span>
+      </div>
+
+      {/* 최근 14일 도트 */}
+      <div className="flex gap-1 mb-3">
+        {stat.recent.map((d, i) => (
+          <div key={i} className={`flex-1 h-5 rounded-md ${STATUS_STYLE[d.status]}`}
+            style={d.status === 'done' ? { backgroundColor: accent } : undefined} />
+        ))}
+      </div>
+
+      {/* 지표 행 */}
+      <div className="flex items-center gap-4 text-caption1">
+        <span className="text-label-alt">🔥 연속 <span className="font-bold text-label-strong">{stat.streak}일</span></span>
+        <span className="text-label-alt">최고 <span className="font-bold text-label-strong">{stat.best}일</span></span>
+        <span className="text-label-assistive ml-auto">30일 {stat.done30}/{stat.sched30}</span>
+      </div>
+    </div>
   );
 }
 
