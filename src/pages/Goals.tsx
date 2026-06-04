@@ -246,8 +246,11 @@ function GoalCard({ goal, past = false, isOpen, rate, linkedItems, onToggle, onE
                       <span className="text-body2 text-label truncate flex-1 mr-2">
                         {item.emoji ?? (item.kind === 'faith' ? '🙏' : '📌')} {item.title}
                       </span>
-                      <span className="text-caption1 font-bold flex-shrink-0" style={{ color: accentColor }}>
-                        {item.rate}%
+                      <span className="flex items-center gap-1.5 flex-shrink-0">
+                        <span className="text-caption2 text-label-assistive">{item.doneCount}/{item.scheduledTotal}일</span>
+                        <span className="text-caption1 font-bold" style={{ color: accentColor }}>
+                          {item.rate}%
+                        </span>
                       </span>
                     </div>
                     <div className="bg-fill-strong rounded-full h-1 overflow-hidden">

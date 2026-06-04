@@ -1,5 +1,5 @@
-import { format } from 'date-fns';
-import type { MonthlyGoal, Habit, DailyRoutine, RoutineLog } from '../types';
+import { format, getDay } from 'date-fns';
+import type { MonthlyGoal, Habit, DailyRoutine, RoutineLog, HabitFrequency } from '../types';
 
 interface HabitLog {
   habitId: string;
@@ -22,13 +22,44 @@ function dateRange(startIso: string, endIso: string): string[] {
   return days;
 }
 
+/**
+ * 해당 날짜가 습관/루틴의 "예정일"인지 판정.
+ * getDay(): 0=일 ~ 6=토 (customDays/number[]도 동일 인덱스 사용)
+ */
+function isScheduled(
+  dateIso: string,
+  frequency: HabitFrequency | DailyRoutine['frequency'],
+  customDays?: number[],
+): boolean {
+  const dow = getDay(new Date(dateIso + 'T12:00:00')); // 0=일 ~ 6=토
+  if (Array.isArray(frequency)) return frequency.includes(dow);
+  switch (frequency) {
+    case 'daily':    return true;
+    case 'weekdays': return dow >= 1 && dow <= 5;
+    case 'weekends': return dow === 0 || dow === 6;
+    case 'custom':   return (customDays ?? []).includes(dow);
+    default:         return true;
+  }
+}
+
+/** 기간 내 예정일만 추출 */
+function scheduledDays(
+  days: string[],
+  frequency: HabitFrequency | DailyRoutine['frequency'],
+  customDays?: number[],
+): string[] {
+  return days.filter(d => isScheduled(d, frequency, customDays));
+}
+
 /** 목표에 연동된 항목 (개인 습관 + 신앙 루틴) */
 export interface LinkedItem {
   id: string;
   title: string;
   emoji?: string;
   kind: 'habit' | 'faith';
-  rate: number; // 개별 달성률 (완료 횟수 / 전체 기간 일수)
+  rate: number;          // 개별 달성률 (예정일 기준)
+  doneCount: number;     // 완료한 예정일 수
+  scheduledTotal: number; // 목표 기간 전체 예정일 수
 }
 
 export function getLinkedItems(
@@ -39,8 +70,8 @@ export function getLinkedItems(
   routineLogs: RoutineLog[],
   todayIso: string,
 ): LinkedItem[] {
-  const totalDays = dateRange(goal.startDate, goal.endDate).length;
-  if (totalDays === 0) return [];
+  const allDays = dateRange(goal.startDate, goal.endDate);
+  if (allDays.length === 0) return [];
 
   // 분자 계산 범위: 시작 ~ min(오늘, 종료)
   const endForCount = todayIso < goal.endDate ? todayIso : goal.endDate;
@@ -49,22 +80,30 @@ export function getLinkedItems(
   const items: LinkedItem[] = [];
 
   habits.filter(h => h.goalId === goal.id).forEach(h => {
+    const sched = scheduledDays(allDays, h.frequency, h.customDays);
+    const scheduledTotal = sched.length;
     const doneCount = habitLogs.filter(
-      l => l.habitId === h.id && elapsed.has(l.date) && (l.completed || l.skipped || l.substitute)
+      l => l.habitId === h.id && elapsed.has(l.date) && isScheduled(l.date, h.frequency, h.customDays)
+        && (l.completed || l.skipped || l.substitute)
     ).length;
     items.push({
       id: h.id, title: h.title, emoji: h.emoji, kind: 'habit',
-      rate: Math.round((doneCount / totalDays) * 100),
+      rate: scheduledTotal === 0 ? 0 : Math.round((doneCount / scheduledTotal) * 100),
+      doneCount, scheduledTotal,
     });
   });
 
   faithRoutines.filter(r => r.goalId === goal.id).forEach(r => {
+    const sched = scheduledDays(allDays, r.frequency);
+    const scheduledTotal = sched.length;
     const doneCount = routineLogs.filter(
-      l => l.routineId === r.id && elapsed.has(l.date) && (l.completed || l.skipped)
+      l => l.routineId === r.id && elapsed.has(l.date) && isScheduled(l.date, r.frequency)
+        && (l.completed || l.skipped)
     ).length;
     items.push({
       id: r.id, title: r.title, emoji: r.emoji, kind: 'faith',
-      rate: Math.round((doneCount / totalDays) * 100),
+      rate: scheduledTotal === 0 ? 0 : Math.round((doneCount / scheduledTotal) * 100),
+      doneCount, scheduledTotal,
     });
   });
 
@@ -72,8 +111,9 @@ export function getLinkedItems(
 }
 
 /**
- * 목표 전체 달성률 = 연동 항목 개별 달성률의 평균 (가중 평균)
- * = 총 완료 횟수 / (연동 항목 수 × 전체 기간 일수) × 100
+ * 목표 전체 달성률 = 연동 항목 개별 달성률의 평균.
+ * 각 항목은 자신의 "예정일 수"로 정규화되므로 frequency가 공정하게 반영됨.
+ * 예정일이 0인 항목(이 기간에 해당 없음)은 평균에서 제외.
  */
 export function getGoalRate(
   goal: MonthlyGoal,
@@ -83,7 +123,8 @@ export function getGoalRate(
   routineLogs: RoutineLog[],
   todayIso: string,
 ): number {
-  const items = getLinkedItems(goal, habits, habitLogs, faithRoutines, routineLogs, todayIso);
+  const items = getLinkedItems(goal, habits, habitLogs, faithRoutines, routineLogs, todayIso)
+    .filter(it => it.scheduledTotal > 0);
   if (items.length === 0) return 0;
   const sum = items.reduce((acc, it) => acc + it.rate, 0);
   return Math.round(sum / items.length);
