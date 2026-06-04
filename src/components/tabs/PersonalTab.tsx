@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
 import StampButton from '../ui/StampButton';
 import RowStamp from '../ui/RowStamp';
+import RowRestAnim from '../ui/RowRestAnim';
 import TwoMinuteMode from '../routines/TwoMinuteMode';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -209,10 +210,11 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
       >
         {/* 미니 스탬프 */}
         <AnimatePresence>
-          {rowStamp && (
+          {rowStamp === 'rest' && <RowRestAnim />}
+          {(rowStamp === 'done' || rowStamp === 'sub') && (
             <RowStamp
-              type={rowStamp === 'sub' ? 'done' : rowStamp}
-              color={rowStamp === 'done' ? '#0066ff' : rowStamp === 'sub' ? '#f97316' : '#f59e0b'}
+              type="done"
+              color={rowStamp === 'sub' ? '#f97316' : '#0066ff'}
             />
           )}
         </AnimatePresence>
