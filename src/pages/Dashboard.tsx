@@ -85,12 +85,13 @@ export default function Dashboard() {
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   const activeGoals = monthlyGoals.filter(g => g.endDate >= todayIso);
 
-  // 목표별 달성률: 목표 시작일~오늘 중 습관/루틴을 완료한 날 비율
+  // 목표별 달성률: 연동된 습관 기준 (연동 없으면 0%)
   const getGoalRate = (goal: typeof activeGoals[0]): number => {
     const start = goal.startDate;
     const end = todayIso < goal.endDate ? todayIso : goal.endDate;
     if (start > end) return 0;
 
+    // 기간 내 날짜 배열
     const days: string[] = [];
     const d = new Date(start + 'T12:00:00');
     const endDate = new Date(end + 'T12:00:00');
@@ -100,16 +101,17 @@ export default function Dashboard() {
     }
     if (days.length === 0) return 0;
 
-    const isPersonal = goal.category === 'personal';
-    const isFaith    = goal.category === 'faith';
+    // 연동된 습관 찾기
+    const linkedHabits = habits.filter(h => h.goalId === goal.id);
 
-    const completedDays = days.filter(ds => {
-      if (isPersonal || !isFaith) {
-        return habitLogs.some(l => l.date === ds && (l.completed || l.skipped || l.substitute));
-      }
-      // faith
-      return logs.some(l => l.date === ds && (l.completed || l.skipped));
-    });
+    if (linkedHabits.length === 0) return 0; // 연동 없으면 0%
+
+    // 연동된 습관 중 하나라도 완료된 날 비율
+    const completedDays = days.filter(ds =>
+      linkedHabits.some(h =>
+        habitLogs.some(l => l.habitId === h.id && l.date === ds && (l.completed || l.skipped || l.substitute))
+      )
+    );
 
     return Math.round((completedDays.length / days.length) * 100);
   };
