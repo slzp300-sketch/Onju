@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, CalendarDays, Trash2, ListTodo } from 'lucide-react';
+import { Target, Trash2, ListTodo } from 'lucide-react';
 import FAB from '../components/ui/FAB';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -56,7 +56,7 @@ export default function Dashboard() {
   const { faithRoutines, logs, isCompleted } = useRoutineStore();
   const { habits, habitLogs } = useHabitStore();
   const { todos, toggleTodo, removeTodo } = useTodoStore();
-  const { weeklyGoals, monthlyGoals } = useGoalStore();
+  const { monthlyGoals, goalSlots } = useGoalStore();
   const todayStr = today();
   const prevCompleteRef = useRef(false);
   const [activeTab, setActiveTab] = useState<TabType>('personal');
@@ -82,9 +82,8 @@ export default function Dashboard() {
   }, [allDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
-  const now = new Date();
-  const thisMonthGoals = monthlyGoals.filter(g => g.month === now.getMonth() + 1 && g.year === now.getFullYear());
-  const thisWeekGoals = weeklyGoals.filter(g => g.weekNumber === currentWeek() && g.year === currentYear());
+  const todayIso = format(new Date(), 'yyyy-MM-dd');
+  const activeGoals = monthlyGoals.filter(g => g.endDate >= todayIso);
   const todayTodos = todos.filter(t => t.date === todayStr);
   const doneTodos = todayTodos.filter(t => t.completed).length;
   const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
@@ -143,65 +142,33 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      {/* 목표 통합 + 스트릭 카드 행 */}
+      {/* 목표 + 스트릭 카드 행 */}
       <motion.div variants={itemV} className="flex-shrink-0 px-4 mb-4 flex gap-2">
 
-        {/* 통합 목표 카드 */}
+        {/* 목표 요약 카드 */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.12 }}
           onClick={() => navigate('/goals')}
           className="flex-1 bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
         >
-          {/* 이번달 */}
-          <div className="flex items-center gap-1 mb-1.5">
-            <CalendarDays size={11} className="text-primary" />
-            <span className="text-caption2 font-bold text-primary">이번달</span>
-          </div>
-          {thisMonthGoals.length === 0 ? (
-            <p className="text-caption1 text-label-assistive font-medium leading-tight mb-2.5">목표를 세워보세요</p>
-          ) : (
-            <div className="flex flex-col gap-0.5 mb-2.5">
-              {thisMonthGoals.slice(0, 1).map(g => (
-                <div key={g.id} className="flex items-center gap-1.5">
-                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${g.status === 'completed' ? 'bg-primary' : 'bg-line'}`} />
-                  <p className={`text-caption1 font-medium truncate ${g.status === 'completed' ? 'line-through text-label-assistive' : 'text-label'}`}>{g.title}</p>
-                </div>
-              ))}
-              {thisMonthGoals.length > 1 && (
-                <p className="text-caption2 text-label-assistive pl-3">+{thisMonthGoals.length - 1}개 더</p>
-              )}
-            </div>
-          )}
-
-          {/* 구분선 */}
-          <div className="h-px bg-line-soft mb-2.5" />
-
-          {/* 이번주 */}
-          <div className="flex items-center gap-1 mb-1.5">
+          <div className="flex items-center gap-1 mb-2">
             <Target size={11} className="text-primary" />
-            <span className="text-caption2 font-bold text-primary">이번주</span>
+            <span className="text-caption2 font-bold text-primary">목표</span>
+            <span className="text-caption2 text-label-assistive ml-auto">{activeGoals.length}/{goalSlots}</span>
           </div>
-          {thisWeekGoals.length === 0 ? (
-            <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를 추가해보세요</p>
+          {activeGoals.length === 0 ? (
+            <p className="text-caption1 text-label-assistive font-medium leading-tight">목표를 세워보세요</p>
           ) : (
             <div className="flex flex-col gap-1">
-              {thisWeekGoals.slice(0, 2).map(g => (
+              {activeGoals.slice(0, 2).map(g => (
                 <div key={g.id} className="flex items-center gap-1.5">
-                  <div className="relative w-4 h-4 flex-shrink-0">
-                    <svg className="w-4 h-4 -rotate-90" viewBox="0 0 16 16">
-                      <circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-fill-strong)" strokeWidth="2" />
-                      <circle cx="8" cy="8" r="6" fill="none" stroke="var(--color-primary)" strokeWidth="2"
-                        strokeDasharray={`${2 * Math.PI * 6}`}
-                        strokeDashoffset={`${2 * Math.PI * 6 * (1 - g.completionRate / 100)}`}
-                        strokeLinecap="round" />
-                    </svg>
-                  </div>
+                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-primary" />
                   <p className="text-caption1 font-medium text-label truncate">{g.title}</p>
                 </div>
               ))}
-              {thisWeekGoals.length > 2 && (
-                <p className="text-caption2 text-label-assistive">+{thisWeekGoals.length - 2}개 더</p>
+              {activeGoals.length > 2 && (
+                <p className="text-caption2 text-label-assistive">+{activeGoals.length - 2}개 더</p>
               )}
             </div>
           )}

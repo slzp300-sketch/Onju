@@ -5,6 +5,7 @@ import type { MonthlyGoal, WeeklyGoal } from '../types';
 interface GoalState {
   monthlyGoals: MonthlyGoal[];
   weeklyGoals: WeeklyGoal[];
+  goalSlots: number; // 현재 사용 가능한 목표 슬롯 (1~3)
   setMonthlyGoals: (goals: MonthlyGoal[]) => void;
   setWeeklyGoals: (goals: WeeklyGoal[]) => void;
   addMonthlyGoal: (goal: MonthlyGoal) => void;
@@ -13,6 +14,7 @@ interface GoalState {
   removeMonthlyGoal: (id: string) => void;
   updateMonthlyGoal: (id: string, patch: Partial<MonthlyGoal>) => void;
   updateWeeklyGoal: (id: string, patch: Partial<WeeklyGoal>) => void;
+  unlockGoalSlot: () => void; // 달성률 80%+ 시 슬롯 +1 (최대 3)
 }
 
 export const useGoalStore = create<GoalState>()(
@@ -20,6 +22,7 @@ export const useGoalStore = create<GoalState>()(
     (set) => ({
       monthlyGoals: [],
       weeklyGoals: [],
+      goalSlots: 1,
       setMonthlyGoals: (goals) => set({ monthlyGoals: goals }),
       setWeeklyGoals: (goals) => set({ weeklyGoals: goals }),
       addMonthlyGoal: (goal) => set((s) => ({ monthlyGoals: [...s.monthlyGoals, goal] })),
@@ -30,6 +33,8 @@ export const useGoalStore = create<GoalState>()(
         set((s) => ({ monthlyGoals: s.monthlyGoals.map(g => g.id === id ? { ...g, ...patch } : g) })),
       updateWeeklyGoal: (id, patch) =>
         set((s) => ({ weeklyGoals: s.weeklyGoals.map(g => g.id === id ? { ...g, ...patch } : g) })),
+      unlockGoalSlot: () =>
+        set((s) => ({ goalSlots: Math.min(3, s.goalSlots + 1) })),
     }),
     { name: 'goal-store' }
   )
