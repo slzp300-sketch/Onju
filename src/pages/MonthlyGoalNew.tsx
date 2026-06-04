@@ -185,6 +185,7 @@ export default function MonthlyGoalNew() {
 
           {/* ── 색상 선택 ── */}
           <div className="bg-surface rounded-xl border border-line shadow-emphasize">
+            {/* 토글 헤더 */}
             <div className="px-4 py-4 flex items-center justify-between">
               <div>
                 <p className="text-body2 font-bold text-label-strong">🎨 색상 선택</p>
@@ -202,28 +203,33 @@ export default function MonthlyGoalNew() {
               </button>
             </div>
 
-            {colorEnabled && (
-              <div className="px-4 pb-4">
-                <div className="grid grid-cols-6 gap-2.5">
-                  {COLORS.map(c => (
+            {/* 색상 그리드 — 항상 표시, 비활성 시 채도 낮음 */}
+            <div className="px-4 pb-4">
+              <div className="grid grid-cols-6 gap-2.5">
+                {COLORS.map(c => {
+                  const isSelected = colorEnabled && selectedColor === c;
+                  return (
                     <motion.button
                       key={c}
-                      whileTap={{ scale: 0.85 }}
-                      onClick={() => setSelectedColor(prev => prev === c ? '' : c)}
+                      whileTap={colorEnabled ? { scale: 0.85 } : {}}
+                      onClick={() => colorEnabled && setSelectedColor(prev => prev === c ? '' : c)}
                       className="w-full aspect-square rounded-full flex items-center justify-center transition-all"
                       style={{
                         backgroundColor: c,
-                        boxShadow: selectedColor === c ? `0 0 0 3px white, 0 0 0 5px ${c}` : 'none',
+                        filter: colorEnabled ? 'none' : 'saturate(0.2) brightness(0.8)',
+                        boxShadow: isSelected ? `0 0 0 3px white, 0 0 0 5px ${c}` : 'none',
+                        transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+                        cursor: colorEnabled ? 'pointer' : 'default',
                       }}
                     >
-                      {selectedColor === c && (
-                        <Check size={16} className="text-white" strokeWidth={2.5} />
+                      {isSelected && (
+                        <Check size={14} className="text-white" strokeWidth={3} />
                       )}
                     </motion.button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
           </div>
 
         </div>
