@@ -134,23 +134,40 @@ export default function Dashboard() {
       style={{ height: '100dvh' }}
     >
 
-      {/* 헤더 */}
+      {/* 헤더 — 🔥 스트릭 버튼을 우측 상단에 배치 */}
       <motion.div variants={itemV} className="flex-shrink-0 px-4 pt-5 pb-3 flex items-start justify-between">
         <div>
           <p className="text-caption1 text-label-alt font-medium">{format(new Date(), 'yyyy년 M월', { locale: ko })}</p>
           <h1 className="text-heading2 font-bold text-label-strong font-brand mt-0.5">안녕하세요, {user?.name}님</h1>
         </div>
+
+        {/* 🔥 스트릭 아이콘 버튼 */}
+        <motion.button
+          whileTap={{ scale: 0.88 }}
+          transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+          onClick={() => navigate('/streak')}
+          className="flex flex-col items-center gap-0.5 ml-3 mt-0.5"
+        >
+          <motion.span
+            animate={streak > 0 ? { scale: [1, 1.2, 1] } : {}}
+            transition={{ repeat: Infinity, repeatDelay: 3, duration: 0.4 }}
+            className="text-2xl leading-none"
+          >
+            🔥
+          </motion.span>
+          <span className={`text-caption2 font-bold tabular-nums ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
+            {streak}일
+          </span>
+        </motion.button>
       </motion.div>
 
-      {/* 목표 + 스트릭 카드 행 */}
-      <motion.div variants={itemV} className="flex-shrink-0 px-4 mb-4 flex gap-2">
-
-        {/* 목표 요약 카드 */}
+      {/* 목표 카드 — 전체 너비 */}
+      <motion.div variants={itemV} className="flex-shrink-0 px-4 mb-4">
         <motion.button
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.12 }}
           onClick={() => navigate('/goals')}
-          className="flex-1 bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
+          className="w-full bg-surface border border-line rounded-xl px-3 py-3 text-left shadow-emphasize hover:bg-fill transition-colors"
         >
           <div className="flex items-center gap-1 mb-2">
             <Target size={11} className="text-primary" />
@@ -172,29 +189,6 @@ export default function Dashboard() {
               )}
             </div>
           )}
-        </motion.button>
-
-        {/* 스트릭 */}
-        <motion.button
-          whileTap={{ scale: 0.93 }}
-          transition={{ duration: 0.12 }}
-          onClick={() => navigate('/streak')}
-          className="bg-surface border border-line rounded-xl px-3 py-3 text-center shadow-emphasize hover:bg-fill transition-colors"
-          style={{ minWidth: 72 }}
-        >
-          <div className="flex flex-col items-center gap-1">
-            <motion.span
-              animate={streak > 0 ? { scale: [1, 1.15, 1] } : {}}
-              transition={{ repeat: Infinity, repeatDelay: 3, duration: 0.4 }}
-              className="text-2xl leading-none"
-            >
-              🔥
-            </motion.span>
-            <span className={`text-label1 font-bold ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
-              {streak}일
-            </span>
-            <span className="text-caption2 text-label-assistive font-medium">연속</span>
-          </div>
         </motion.button>
       </motion.div>
 
