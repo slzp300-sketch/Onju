@@ -215,9 +215,9 @@ export default function MonthlyGoalNew() {
                       onClick={() => colorEnabled && setSelectedColor(prev => prev === c ? '' : c)}
                       className="w-full aspect-square rounded-full flex items-center justify-center transition-all"
                       style={{
-                        backgroundColor: c,
-                        filter: colorEnabled ? 'none' : 'saturate(0.2) brightness(0.8)',
-                        boxShadow: isSelected ? `0 0 0 3px white, 0 0 0 5px ${c}` : 'none',
+                        backgroundColor: colorEnabled ? c : 'var(--color-fill)',
+                        border: colorEnabled ? 'none' : '1.5px solid var(--color-line-soft)',
+                        boxShadow: isSelected ? `0 0 0 3px var(--color-surface), 0 0 0 5px ${c}` : 'none',
                         transform: isSelected ? 'scale(1.1)' : 'scale(1)',
                         cursor: colorEnabled ? 'pointer' : 'default',
                       }}
