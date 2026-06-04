@@ -176,227 +176,168 @@ export default function HabitNew() {
           </div>
         </div>
 
-        {/* 설정 — 순서: 알림 → 반복주기 → 언제 → 2분트리거 → 타이머 → 대체습관 */}
+        {/* 알림 카드 */}
         <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
-
-          {/* 알림 */}
-          <div className="border-b border-line-soft">
-            <div className="px-4 py-4">
-              {/* 토글 행 */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">🔔</span>
-                  <span className="text-body2 font-semibold text-label-strong">알림</span>
-                </div>
-                <button
-                  onClick={handleToggleNotif}
-                  className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${notifEnabled ? 'bg-positive' : 'bg-fill-strong'}`}
-                >
-                  <motion.div
-                    animate={{ x: notifEnabled ? 20 : 2 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm pointer-events-none"
-                  />
-                </button>
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">🔔</span>
+                <span className="text-body2 font-semibold text-label-strong">알림</span>
               </div>
-
-              {/* 시간 칩 목록 + 타입 (enabled 시) */}
-              <AnimatePresence>
-                {notifEnabled && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="flex items-center justify-between mt-3">
-                      {/* 시간 칩들 + 추가 버튼 */}
-                      <div className="flex flex-wrap items-center gap-2 flex-1 mr-2">
-                        {notifTimes.map((t, idx) => {
-                          const { ampmIdx, hourIdx, minuteIdx } = to12h(t);
-                          const label = `${ampmIdx === 0 ? '오전' : '오후'} ${hourIdx + 1}:${String(minuteIdx).padStart(2, '0')}`;
-                          return (
-                            <motion.button
-                              key={idx}
-                              {...tapSm}
-                              onClick={() => { setEditingIdx(idx); setShowTimePicker(true); }}
-                              className="px-3 py-1.5 rounded-xl bg-fill border border-line text-body2 font-semibold text-label-strong"
-                            >
-                              {label}
-                            </motion.button>
-                          );
-                        })}
-                        {/* + 추가 버튼 */}
-                        <motion.button
-                          {...tapSm}
-                          onClick={() => {
-                            const newIdx = notifTimes.length;
-                            setNotifTimes(prev => [...prev, '09:00']);
-                            setEditingIdx(newIdx);
-                            setShowTimePicker(true);
-                          }}
-                          className="w-8 h-8 rounded-xl border border-dashed border-line flex items-center justify-center text-label-assistive text-lg"
-                        >
-                          +
-                        </motion.button>
-                      </div>
-
-                      {/* 타입 */}
-                      <motion.button
-                        {...tapSm}
-                        onClick={() => setShowTypePicker(true)}
-                        className="flex items-center gap-1 text-body2 text-label-alt shrink-0"
-                      >
-                        <span>{notifType === 'push' ? '푸시' : '알림음'}</span>
-                        <ChevronRight size={16} className="text-label-assistive" />
-                      </motion.button>
+              <button onClick={handleToggleNotif}
+                className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${notifEnabled ? 'bg-positive' : 'bg-fill-strong'}`}>
+                <motion.div animate={{ x: notifEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm pointer-events-none" />
+              </button>
+            </div>
+            <AnimatePresence>
+              {notifEnabled && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex flex-wrap items-center gap-2 flex-1 mr-2">
+                      {notifTimes.map((t, idx) => {
+                        const { ampmIdx, hourIdx, minuteIdx } = to12h(t);
+                        const label = `${ampmIdx === 0 ? '오전' : '오후'} ${hourIdx + 1}:${String(minuteIdx).padStart(2, '0')}`;
+                        return (
+                          <motion.button key={idx} {...tapSm}
+                            onClick={() => { setEditingIdx(idx); setShowTimePicker(true); }}
+                            className="px-3 py-1.5 rounded-xl bg-fill border border-line text-body2 font-semibold text-label-strong">
+                            {label}
+                          </motion.button>
+                        );
+                      })}
+                      <motion.button {...tapSm}
+                        onClick={() => { const i = notifTimes.length; setNotifTimes(p => [...p, '09:00']); setEditingIdx(i); setShowTimePicker(true); }}
+                        className="w-8 h-8 rounded-xl border border-dashed border-line flex items-center justify-center text-label-assistive text-lg">+</motion.button>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* 반복 주기 */}
-          <div className="border-b border-line-soft">
-            <div className="px-4 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">📅</span>
-                  <span className="text-body2 font-semibold text-label-strong">반복 주기</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-body2 text-label-alt">{freqLabel}</span>
-                  <ChevronRight size={16} className="text-label-assistive" />
-                </div>
-              </div>
-              <div className="flex gap-2 mt-3 flex-wrap">
-                {FREQ_OPTIONS.map(f => (
-                  <motion.button key={f.value} {...tap} onClick={() => setFreq(f.value)}
-                    className={`px-4 py-2 rounded-lg text-body2 font-medium border transition-all ${freq === f.value ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt bg-fill'}`}>
-                    {f.label}
-                  </motion.button>
-                ))}
-              </div>
-              <AnimatePresence>
-                {freq === 'custom' && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                    <div className="flex gap-1.5 mt-3">
-                      {WEEKDAY_LABELS.map((label, idx) => (
-                        <motion.button key={idx} {...tap} onClick={() => setCustomDays(d => d.includes(idx) ? d.filter(x => x !== idx) : [...d, idx])}
-                          className={`flex-1 py-2 rounded-lg text-caption1 font-bold border transition-all ${customDays.includes(idx) ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt bg-fill'}`}>
-                          {label}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* 언제 할래요? */}
-          <div className="border-b border-line-soft px-4 py-4">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-xl">✅</span>
-              <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
-              <span className="text-caption1 text-label-assistive ml-auto">{whenPlaceholder}</span>
-            </div>
-            <input
-              type="text" value={when} onChange={e => setWhen(e.target.value)}
-              placeholder={whenPlaceholder}
-              className="w-full bg-fill border border-line rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-primary focus:bg-surface transition-all"
-            />
-            <p className="text-caption1 text-label-assistive mt-1.5">시작 시간이나 행동 트리거를 적어주세요</p>
-          </div>
-
-          {/* 2분 트리거 */}
-          <div className="border-b border-line-soft">
-            <div className="px-4 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">⚡</span>
-                  <div>
-                    <p className="text-body2 font-semibold text-label-strong">2분 트리거</p>
-                    <p className="text-caption1 text-label-alt">습관 시작을 쉽게 만드는 작은 행동</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setTwoMinEnabled(v => !v)}
-                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${twoMinEnabled ? 'bg-emerald-500' : 'bg-fill-strong'}`}
-                >
-                  <motion.div
-                    animate={{ x: twoMinEnabled ? 20 : 2 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none"
-                  />
-                </button>
-              </div>
-              <AnimatePresence>
-                {twoMinEnabled && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
-                    className="overflow-hidden mt-3"
-                  >
-                    <input
-                      type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
-                      placeholder="예: 운동복 갈아입기, 러닝화 신기"
-                      className="w-full bg-fill border border-emerald-200 rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 focus:bg-surface transition-all"
-                    />
-                    <p className="text-caption2 text-emerald-600 mt-1.5">
-                      💡 트리거 완료 후 자동으로 메인 습관으로 연결돼요
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* 타이머 */}
-          <div className="border-b border-line-soft">
-            <div className="px-4 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Timer size={20} className="text-primary" />
-                  <div>
-                    <p className="text-body2 font-semibold text-label-strong">타이머</p>
-                    <p className="text-caption1 text-label-alt">루틴 생성 시 자동으로 적용돼요</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setTimerEnabled(v => !v)}
-                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}
-                >
-                  <motion.div
-                    animate={{ x: timerEnabled ? 20 : 2 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none"
-                  />
-                </button>
-              </div>
-              <AnimatePresence>
-                {timerEnabled && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
-                    className="overflow-hidden mt-3"
-                  >
-                    <motion.button
-                      {...tapSm} onClick={() => setShowDurationSheet(true)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-fill rounded-xl border border-line"
-                    >
-                      <span className="text-body2 text-label-alt">설정 시간</span>
-                      <span className="text-body2 font-bold text-primary">{fmtDuration(durationSecs)}</span>
+                    <motion.button {...tapSm} onClick={() => setShowTypePicker(true)}
+                      className="flex items-center gap-1 text-body2 text-label-alt shrink-0">
+                      <span>{notifType === 'push' ? '푸시' : '알림음'}</span>
+                      <ChevronRight size={16} className="text-label-assistive" />
                     </motion.button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
+        </div>
 
-          {/* 대체 습관 */}
+        {/* 반복 주기 카드 */}
+        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">📅</span>
+                <span className="text-body2 font-semibold text-label-strong">반복 주기</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-body2 text-label-alt">{freqLabel}</span>
+                <ChevronRight size={16} className="text-label-assistive" />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-3 flex-wrap">
+              {FREQ_OPTIONS.map(f => (
+                <motion.button key={f.value} {...tap} onClick={() => setFreq(f.value)}
+                  className={`px-4 py-2 rounded-lg text-body2 font-medium border transition-all ${freq === f.value ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt bg-fill'}`}>
+                  {f.label}
+                </motion.button>
+              ))}
+            </div>
+            <AnimatePresence>
+              {freq === 'custom' && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                  <div className="flex gap-1.5 mt-3">
+                    {WEEKDAY_LABELS.map((label, idx) => (
+                      <motion.button key={idx} {...tap} onClick={() => setCustomDays(d => d.includes(idx) ? d.filter(x => x !== idx) : [...d, idx])}
+                        className={`flex-1 py-2 rounded-lg text-caption1 font-bold border transition-all ${customDays.includes(idx) ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt bg-fill'}`}>
+                        {label}
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* 언제 할래요? 카드 */}
+        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden px-4 py-4">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-xl">✅</span>
+            <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
+          </div>
+          <input type="text" value={when} onChange={e => setWhen(e.target.value)}
+            placeholder={whenPlaceholder}
+            className="w-full bg-fill border border-line rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-primary focus:bg-surface transition-all" />
+          <p className="text-caption1 text-label-assistive mt-1.5">시작 시간이나 행동 트리거를 적어주세요</p>
+        </div>
+
+        {/* 2분 트리거 카드 */}
+        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">⚡</span>
+                <div>
+                  <p className="text-body2 font-semibold text-label-strong">2분 트리거</p>
+                  <p className="text-caption1 text-label-alt">습관 시작을 쉽게 만드는 작은 행동</p>
+                </div>
+              </div>
+              <button onClick={() => setTwoMinEnabled(v => !v)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${twoMinEnabled ? 'bg-emerald-500' : 'bg-fill-strong'}`}>
+                <motion.div animate={{ x: twoMinEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none" />
+              </button>
+            </div>
+            <AnimatePresence>
+              {twoMinEnabled && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden mt-3">
+                  <input type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
+                    placeholder="예: 운동복 갈아입기, 러닝화 신기"
+                    className="w-full bg-fill border border-emerald-200 rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 focus:bg-surface transition-all" />
+                  <p className="text-caption2 text-emerald-600 mt-1.5">💡 트리거 완료 후 자동으로 메인 습관으로 연결돼요</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* 타이머 카드 */}
+        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Timer size={20} className="text-primary" />
+                <div>
+                  <p className="text-body2 font-semibold text-label-strong">타이머</p>
+                  <p className="text-caption1 text-label-alt">루틴 생성 시 자동으로 적용돼요</p>
+                </div>
+              </div>
+              <button onClick={() => setTimerEnabled(v => !v)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}>
+                <motion.div animate={{ x: timerEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none" />
+              </button>
+            </div>
+            <AnimatePresence>
+              {timerEnabled && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden mt-3">
+                  <motion.button {...tapSm} onClick={() => setShowDurationSheet(true)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-fill rounded-xl border border-line">
+                    <span className="text-body2 text-label-alt">설정 시간</span>
+                    <span className="text-body2 font-bold text-primary">{fmtDuration(durationSecs)}</span>
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* 대체 습관 카드 */}
+        <div className="bg-surface rounded-xl border border-amber-200/60 shadow-emphasize overflow-hidden">
           <div className="px-4 py-4 bg-amber-50/40">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-xl">🔥</span>
@@ -405,14 +346,10 @@ export default function HabitNew() {
                 <p className="text-caption1 text-amber-600">하기 힘든 날의 더 쉬운 버전</p>
               </div>
             </div>
-            <input
-              type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
+            <input type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
               placeholder="예: 10분 스트레칭, 5분 걷기"
-              className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300"
-            />
-            <p className="text-caption2 text-amber-500 mt-1.5">
-              💡 쉬운 버전을 만들어두면 포기하지 않을 수 있어요
-            </p>
+              className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300" />
+            <p className="text-caption2 text-amber-500 mt-1.5">💡 쉬운 버전을 만들어두면 포기하지 않을 수 있어요</p>
           </div>
         </div>
 
