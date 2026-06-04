@@ -64,11 +64,11 @@ export default function FaithTab() {
               <span className="text-caption2 font-bold text-label-alt w-10 flex-shrink-0">{group.time}</span>
               <span className="text-body2">{group.emoji}</span>
               <span className="flex-1 text-caption2 font-bold text-label">{group.label} 루틴</span>
-              <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-label-alt'}`}>
+              <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-emerald-100 text-emerald-600' : 'bg-fill text-label-alt'}`}>
                 {cnt}/{group.routines.length}
               </span>
             </div>
-            <div className="bg-white divide-y divide-y divide-line-soft">
+            <div className="bg-surface divide-y divide-line-soft">
               {group.routines.map((r, idx) => (
                 <FaithRoutineRow
                   key={r.id}
@@ -91,13 +91,13 @@ export default function FaithTab() {
               <span className="flex-1 text-caption2 font-bold text-label">기타 신앙 루틴</span>
               <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${
                 unslotted.filter(r => isCompleted(r.id)).length === unslotted.length
-                  ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-label-alt'
+                  ? 'bg-emerald-100 text-emerald-600' : 'bg-fill text-label-alt'
               }`}>
                 {unslotted.filter(r => isCompleted(r.id)).length}/{unslotted.length}
               </span>
             </div>
           )}
-          <div className="bg-white divide-y divide-y divide-line-soft">
+          <div className="bg-surface divide-y divide-line-soft">
             {unslotted.map((r, idx) => (
               <FaithRoutineRow
                 key={r.id}
@@ -192,7 +192,7 @@ function FaithRoutineRow({ routine, index, onRemove }: {
                 <Play size={11} fill="currentColor" />
               </motion.button>
               <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                onClick={e => { e.stopPropagation(); setConfirmDelete(true); }} className="text-gray-200 hover:text-red-400 transition-colors p-1">
+                onClick={e => { e.stopPropagation(); setConfirmDelete(true); }} className="text-label-assistive hover:text-negative transition-colors p-1">
                 <Trash2 size={13} />
               </motion.button>
             </>

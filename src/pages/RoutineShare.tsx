@@ -71,7 +71,7 @@ export default function RoutineShare() {
             className={`relative pb-2.5 mr-6 text-label1 font-bold transition-colors ${activeTab === tab.key ? 'text-label-strong' : 'text-label-alt'}`}>
             {tab.label}
             {activeTab === tab.key && (
-              <motion.div layoutId="shareTabLine" className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full" />
+              <motion.div layoutId="shareTabLine" className="absolute bottom-0 left-0 right-0 h-0.5 bg-label-strong rounded-full" />
             )}
           </button>
         ))}
@@ -132,7 +132,7 @@ function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
   return (
     <div className="bg-white border border-line-soft rounded-2xl overflow-hidden">
       {/* 카드 헤더 */}
-      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-50">
+      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-line-soft">
         <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-lg flex-shrink-0">
           {data.userEmoji}
         </div>
@@ -166,7 +166,7 @@ function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
         </div>
 
         {/* 좋아요 */}
-        <div className="flex items-center justify-between border-t border-gray-50 pt-2.5">
+        <div className="flex items-center justify-between border-t border-line-soft pt-2.5">
           <button onClick={() => setLiked(v => !v)}
             className={`flex items-center gap-1.5 text-caption2 font-semibold transition-colors ${liked ? 'text-red-400' : 'text-label-alt hover:text-red-300'}`}>
             <Heart size={14} fill={liked ? 'currentColor' : 'none'} />

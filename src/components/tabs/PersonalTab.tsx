@@ -32,7 +32,7 @@ export default function PersonalTab() {
       icon: <LayoutList size={20} />,
       label: '루틴 추가',
       sub: '2개 이상의 습관 묶음',
-      color: 'bg-gray-700',
+      color: 'bg-label-strong',
       onClick: () => navigate('/personal-routines/new'),
     },
   ];
@@ -74,7 +74,7 @@ export default function PersonalTab() {
               <CompletedBadge habits={standaloneHabits} />
             </div>
           )}
-          <div className="bg-surface divide-y divide-y divide-line-soft">
+          <div className="bg-surface divide-y divide-line-soft">
             {standaloneHabits.map((h, idx) => (
               <HabitRow key={h.id} habit={h} index={idx + 1} />
             ))}
@@ -125,7 +125,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
         )}
 
         {/* 진행률 뱃지 */}
-        <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>
+        <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${allDone ? 'bg-primary-soft text-primary' : 'bg-fill text-label-alt'}`}>
           {completedCount}/{routineHabits.length}
         </span>
 
@@ -148,7 +148,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
         {/* 삭제 */}
         <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
           onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
-          className="text-gray-200 hover:text-red-400 transition-colors p-0.5">
+          className="text-label-assistive hover:text-negative transition-colors p-0.5">
           <Trash2 size={13} />
         </motion.button>
 
@@ -170,7 +170,7 @@ function RoutineGroup({ routineId }: { routineId: string }) {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-            className="overflow-hidden bg-surface divide-y divide-y divide-line-soft"
+            className="overflow-hidden bg-surface divide-y divide-line-soft"
           >
             {routineHabits.map((h, idx) => (
               <HabitRow key={h.id} habit={h} index={idx + 1} inRoutine />
@@ -243,7 +243,7 @@ function HabitRow({ habit, index, inRoutine = false }: { habit: Habit; index: nu
           {!done && !skipped && !inRoutine && (
             <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
               onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
-              className="text-gray-200 hover:text-red-400 transition-colors p-1">
+              className="text-label-assistive hover:text-negative transition-colors p-1">
               <Trash2 size={13} />
             </motion.button>
           )}
@@ -316,7 +316,7 @@ function CompletedBadge({ habits }: { habits: Habit[] }) {
   const done = habits.filter(h => isHabitCompleted(h.id, todayStr()) || isHabitSkipped(h.id, todayStr())).length;
   const allDone = done === habits.length;
   return (
-    <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-primary-soft text-primary' : 'bg-gray-200 text-label-alt'}`}>
+    <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-primary-soft text-primary' : 'bg-fill text-label-alt'}`}>
       {done}/{habits.length}
     </span>
   );

@@ -341,7 +341,7 @@ function ReviewSummaryStep({
                     {goal.completionRate}%
                   </p>
                 </div>
-                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-1.5 bg-fill-strong rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full ${low ? 'bg-red-400' : 'bg-emerald-400'}`}
                     style={{ width: `${goal.completionRate}%` }}
@@ -773,7 +773,7 @@ function ReviewIntentionStep({
               <button
                 onClick={() => onToggleGroup(group.id)}
                 className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
-                  on ? 'bg-primary' : 'bg-gray-200'
+                  on ? 'bg-primary' : 'bg-fill-strong'
                 }`}
               >
                 <motion.div

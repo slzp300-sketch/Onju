@@ -135,7 +135,7 @@ function GoalCard({ goal, past, isOpen, onToggle, onEdit, onDelete }: GoalCardPr
               <span>D+{elapsed - 1}</span>
               <span>{elapsed}/{total}일</span>
             </div>
-            <div className="bg-white/60 rounded-full h-1.5 overflow-hidden">
+            <div className="bg-surface/60 rounded-full h-1.5 overflow-hidden">
               <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: accentColor }} />
             </div>
           </div>
@@ -153,7 +153,7 @@ function GoalCard({ goal, past, isOpen, onToggle, onEdit, onDelete }: GoalCardPr
             className="overflow-hidden"
           >
             <div className={`mx-3 mb-3 rounded-xl px-4 py-3.5 flex flex-col gap-2.5 ${
-              past ? 'bg-surface border border-line-soft' : 'bg-white/60 border border-primary/10'
+              past ? 'bg-surface border border-line-soft' : 'bg-surface/60 border border-primary/10'
             }`}>
               {habit ? (
                 <>

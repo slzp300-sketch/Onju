@@ -20,7 +20,7 @@ export default function GroupDetail() {
   if (!group) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 px-4">
-        <p className="text-gray-400 text-sm">소모임을 찾을 수 없어요</p>
+        <p className="text-label-assistive text-sm">소모임을 찾을 수 없어요</p>
         <Button variant="ghost" onClick={() => navigate(-1)}>돌아가기</Button>
       </div>
     );

@@ -54,7 +54,7 @@ export default function KakaoCallback() {
     <div className="min-h-dvh bg-surface flex flex-col items-center justify-center px-6 text-center">
       {error ? (
         <>
-          <p className="text-sm font-semibold text-gray-800">{error}</p>
+          <p className="text-sm font-semibold text-label-strong">{error}</p>
           <button
             onClick={() => navigate('/login', { replace: true })}
             className="mt-5 h-12 rounded-2xl bg-indigo-500 px-6 text-sm font-bold text-white"
@@ -65,7 +65,7 @@ export default function KakaoCallback() {
       ) : (
         <>
           <LoadingSpinner />
-          <p className="mt-5 text-sm text-gray-400">카카오 로그인 중이에요.</p>
+          <p className="mt-5 text-sm text-label-assistive">카카오 로그인 중이에요.</p>
         </>
       )}
     </div>
