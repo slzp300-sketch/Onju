@@ -159,12 +159,9 @@ export default function Dashboard() {
           >
             🔥
           </motion.span>
-          <div className="flex flex-col leading-none">
-            <span className={`text-label1 font-bold tabular-nums ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
-              {streak}일
-            </span>
-            <span className="text-[9px] text-label-assistive font-medium">연속</span>
-          </div>
+          <span className={`text-label1 font-bold tabular-nums ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
+            {streak}일
+          </span>
         </motion.button>
       </motion.div>
 
