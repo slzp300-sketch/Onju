@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
@@ -30,30 +30,32 @@ export default function HabitNew() {
   const { id } = useParams<{ id?: string }>();
   const { habits, addHabit, updateHabit } = useHabitStore();
   const { monthlyGoals } = useGoalStore();
+  const location = useLocation();
   const existing = id ? habits.find(h => h.id === id) : null;
   const isEdit = !!existing;
+
+  // 목표 상세 "습관으로 만들기"에서 넘어온 프리필
+  const prefill = (location.state as { prefill?: {
+    title?: string; when?: string; miniRoutine?: string; twoMinuteHabit?: string; goalId?: string;
+  } } | null)?.prefill;
 
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   // 연동 가능한 개인 목표 (활성)
   const linkableGoals = monthlyGoals.filter(
     g => g.startDate <= todayIso && g.endDate >= todayIso && g.category === 'personal'
   );
-  // 가져오기용 (습관 설정된 것)
-  const activeGoalRoutines = linkableGoals
-    .filter(g => g.goalRoutines?.length)
-    .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title, goalId: g.id })));
 
   const { setPermission } = useNotificationStore();
 
-  const [title, setTitle] = useState(existing?.title ?? '');
+  const [title, setTitle] = useState(existing?.title ?? prefill?.title ?? '');
   const [emoji, setEmoji] = useState(existing?.emoji ?? '');
   const [freq, setFreq] = useState<HabitFrequency>(existing?.frequency ?? 'daily');
   const [customDays, setCustomDays] = useState<number[]>(existing?.customDays ?? []);
-  const [when, setWhen] = useState(existing?.when ?? '');
-  const [goalId, setGoalId] = useState<string | undefined>(existing?.goalId);
-  const [miniRoutine, setMiniRoutine] = useState(existing?.miniRoutine ?? '');
-  const [twoMinuteHabit, setTwoMinuteHabit] = useState(existing?.twoMinuteHabit ?? '');
-  const [twoMinEnabled, setTwoMinEnabled] = useState(!!(existing?.twoMinuteHabit));
+  const [when, setWhen] = useState(existing?.when ?? prefill?.when ?? '');
+  const [goalId, setGoalId] = useState<string | undefined>(existing?.goalId ?? prefill?.goalId);
+  const [miniRoutine, setMiniRoutine] = useState(existing?.miniRoutine ?? prefill?.miniRoutine ?? '');
+  const [twoMinuteHabit, setTwoMinuteHabit] = useState(existing?.twoMinuteHabit ?? prefill?.twoMinuteHabit ?? '');
+  const [twoMinEnabled, setTwoMinEnabled] = useState(!!(existing?.twoMinuteHabit) || !!prefill?.twoMinuteHabit);
 
   // 타이머
   const [timerEnabled, setTimerEnabled] = useState(!!(existing?.durationSeconds));
@@ -133,39 +135,6 @@ export default function HabitNew() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5 pb-28">
-
-        {/* 월간 목표에서 가져오기 */}
-        {!isEdit && activeGoalRoutines.length > 0 && (
-          <div>
-            <p className="text-caption1 font-bold text-label-alt mb-2">💪 월간 목표 습관에서 가져오기</p>
-            <div className="flex flex-col gap-2">
-              {activeGoalRoutines.map(r => (
-                <motion.button key={r.id} {...tap}
-                  onClick={() => {
-                    setTitle(r.title);
-                    if (r.when) setWhen(r.when);
-                    if (r.miniRoutine) setMiniRoutine(r.miniRoutine);
-                    if (r.twoMinuteHabit) setTwoMinuteHabit(r.twoMinuteHabit);
-                    if (r.goalId) setGoalId(r.goalId);
-                  }}
-                  className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-body2 font-semibold text-label-strong truncate">{r.title}</p>
-                    <p className="text-caption1 text-label-alt mt-0.5 truncate">
-                      {[r.when, r.where].filter(Boolean).join(' · ')}
-                    </p>
-                    {r.miniRoutine && (
-                      <p className="text-caption1 text-amber-500 mt-0.5">🔥 미니: {r.miniRoutine}</p>
-                    )}
-                  </div>
-                  <span className="text-caption2 text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0 mt-0.5">
-                    가져오기
-                  </span>
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* 습관 이름 */}
         <div>

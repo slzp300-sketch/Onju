@@ -63,6 +63,20 @@ export default function Goals() {
       return next;
     });
 
+  // 계획한 습관 → 습관/루틴 생성 화면으로 (미리채움 + 목표 자동 연동)
+  const createFromPlan = (goal: MonthlyGoal) => {
+    const plan = goal.goalRoutines?.[0];
+    if (!plan) return;
+    const prefill = {
+      title: plan.title,
+      when: plan.when,
+      miniRoutine: plan.miniRoutine,
+      twoMinuteHabit: plan.twoMinuteHabit,
+      goalId: goal.id,
+    };
+    navigate(goal.category === 'faith' ? '/faith-routines/new' : '/habits/new', { state: { prefill } });
+  };
+
   return (
     <div className="flex flex-col gap-4 pb-8">
       {/* 헤더 */}
@@ -121,6 +135,7 @@ export default function Goals() {
                 onToggle={() => toggle(g.id)}
                 onEdit={() => navigate(`/goals/monthly/edit/${g.id}`)}
                 onDelete={() => removeMonthlyGoal(g.id)}
+                onCreateHabit={() => createFromPlan(g)}
               />
             ))}
             {pastGoals.length > 0 && (
@@ -134,6 +149,7 @@ export default function Goals() {
                     onToggle={() => toggle(g.id)}
                     onEdit={() => navigate(`/goals/monthly/edit/${g.id}`)}
                     onDelete={() => removeMonthlyGoal(g.id)}
+                    onCreateHabit={() => createFromPlan(g)}
                   />
                 ))}
               </>
@@ -168,10 +184,10 @@ export default function Goals() {
 }
 
 /* ── 목표 카드 ── */
-function GoalCard({ goal, past = false, isOpen, rate, linkedItems, onToggle, onEdit, onDelete }: {
+function GoalCard({ goal, past = false, isOpen, rate, linkedItems, onToggle, onEdit, onDelete, onCreateHabit }: {
   goal: MonthlyGoal; past?: boolean; isOpen: boolean;
   rate: number; linkedItems: LinkedItem[];
-  onToggle: () => void; onEdit: () => void; onDelete: () => void;
+  onToggle: () => void; onEdit: () => void; onDelete: () => void; onCreateHabit: () => void;
 }) {
   const { elapsed, total } = elapsedDays(goal.startDate, goal.endDate);
   const habit = goal.goalRoutines?.[0];
@@ -267,16 +283,30 @@ function GoalCard({ goal, past = false, isOpen, rate, linkedItems, onToggle, onE
               )}
             </div>
 
-            {/* 목표 설정 메모 (참고) */}
-            {habit && (
-              <div className="mx-3 mb-3 rounded-xl px-4 py-3 flex flex-col gap-1 bg-fill/60 border border-line-soft">
-                <p className="text-caption2 font-bold text-label-assistive mb-0.5">📝 목표 설정 메모</p>
-                <p className="text-caption1 text-label-alt">📌 {habit.title}</p>
-                {habit.when  && <p className="text-caption1 text-label-assistive">⏰ {habit.when}</p>}
-                {habit.miniRoutine     && <p className="text-caption1 text-amber-600">🔥 미니: {habit.miniRoutine}</p>}
-                {habit.twoMinuteHabit && <p className="text-caption1 text-emerald-600">⚡ 2분: {habit.twoMinuteHabit}</p>}
-              </div>
-            )}
+            {/* 계획한 습관 → 습관으로 만들기 */}
+            {habit && (() => {
+              const alreadyTracked = linkedItems.some(it => it.title === habit.title);
+              return (
+                <div className="mx-3 mb-3 rounded-xl px-4 py-3 flex flex-col gap-2 bg-fill/60 border border-line-soft">
+                  <div className="flex items-center justify-between">
+                    <p className="text-caption2 font-bold text-label-assistive">📋 계획한 습관</p>
+                    {alreadyTracked ? (
+                      <span className="text-caption2 font-bold text-positive">✓ 추적 중</span>
+                    ) : !isPast && (
+                      <motion.button {...tapSm} onClick={onCreateHabit}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-caption2 font-bold text-white"
+                        style={{ backgroundColor: accentColor }}>
+                        <Plus size={11} /> 습관으로 만들기
+                      </motion.button>
+                    )}
+                  </div>
+                  <p className="text-caption1 text-label-alt">📌 {habit.title}</p>
+                  {habit.when  && <p className="text-caption1 text-label-assistive">⏰ {habit.when}</p>}
+                  {habit.miniRoutine     && <p className="text-caption1 text-amber-600">🔥 미니: {habit.miniRoutine}</p>}
+                  {habit.twoMinuteHabit && <p className="text-caption1 text-emerald-600">⚡ 2분: {habit.twoMinuteHabit}</p>}
+                </div>
+              );
+            })()}
 
             <div className="flex items-center justify-end gap-1 px-4 pb-3">
               <motion.button {...tapSm} onClick={onEdit}

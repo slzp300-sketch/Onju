@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Check, Timer } from 'lucide-react';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
@@ -40,27 +40,30 @@ const FREQ_OPTIONS: { value: HabitFreq; label: string }[] = [
 
 export default function FaithRoutineNew() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams<{ id?: string }>();
   const { faithRoutines, addRoutine, updateRoutine } = useRoutineStore();
   const { setPermission } = useNotificationStore();
   const { monthlyGoals } = useGoalStore();
 
+  // 목표 상세 "습관으로 만들기" 프리필
+  const prefill = (location.state as { prefill?: {
+    title?: string; when?: string; twoMinuteHabit?: string; goalId?: string;
+  } } | null)?.prefill;
+
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   const linkableFaithGoals = monthlyGoals.filter(
     g => g.startDate <= todayIso && g.endDate >= todayIso && g.category === 'faith'
   );
-  const activeGoalRoutines = linkableFaithGoals
-    .filter(g => g.goalRoutines?.length)
-    .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title, goalId: g.id })));
 
   const existing = id ? faithRoutines.find(r => r.id === id) : null;
   const isEdit = !!existing;
 
-  const [mode, setMode] = useState<Mode>(isEdit ? 'custom' : 'choose');
+  const [mode, setMode] = useState<Mode>(isEdit || prefill ? 'custom' : 'choose');
 
   // 기본 필드
-  const [goalId, setGoalId] = useState<string | undefined>(existing?.goalId);
-  const [title, setTitle]   = useState(existing?.title ?? '');
+  const [goalId, setGoalId] = useState<string | undefined>(existing?.goalId ?? prefill?.goalId);
+  const [title, setTitle]   = useState(existing?.title ?? prefill?.title ?? '');
   const [emoji, setEmoji]   = useState(existing?.emoji ?? '');
   const [timeSlot, setTimeSlot] = useState<TimeSlot | null>(existing?.timeSlot ?? null);
 
@@ -77,11 +80,11 @@ export default function FaithRoutineNew() {
   );
 
   // 언제
-  const [when, setWhen] = useState(existing?.when ?? '');
+  const [when, setWhen] = useState(existing?.when ?? prefill?.when ?? '');
 
   // 2분 트리거
-  const [twoMinEnabled, setTwoMinEnabled] = useState(!!(existing?.twoMinuteHabit));
-  const [twoMinuteHabit, setTwoMinuteHabit] = useState(existing?.twoMinuteHabit ?? '');
+  const [twoMinEnabled, setTwoMinEnabled] = useState(!!(existing?.twoMinuteHabit) || !!prefill?.twoMinuteHabit);
+  const [twoMinuteHabit, setTwoMinuteHabit] = useState(existing?.twoMinuteHabit ?? prefill?.twoMinuteHabit ?? '');
 
   // 타이머
   const [timerEnabled, setTimerEnabled] = useState(!!(existing?.durationSeconds));
@@ -238,32 +241,6 @@ export default function FaithRoutineNew() {
                     className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,102,255,0.15)] shadow-emphasize transition-all" />
                 </div>
               </div>
-
-              {/* 목표에서 가져오기 */}
-              {!isEdit && activeGoalRoutines.length > 0 && (
-                <div>
-                  <p className="text-caption1 font-bold text-label-alt mb-2">🙏 신앙 목표 습관에서 가져오기</p>
-                  <div className="flex flex-col gap-2">
-                    {activeGoalRoutines.map(r => (
-                      <motion.button key={r.id} {...tap}
-                        onClick={() => {
-                          setTitle(r.title);
-                          if (r.when) setWhen(r.when);
-                          if (r.twoMinuteHabit) { setTwoMinEnabled(true); setTwoMinuteHabit(r.twoMinuteHabit); }
-                          if (r.goalId) setGoalId(r.goalId);
-                        }}
-                        className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-body2 font-semibold text-label-strong truncate">{r.title}</p>
-                          {r.when && <p className="text-caption1 text-label-alt mt-0.5">⏰ {r.when}</p>}
-                          {r.twoMinuteHabit && <p className="text-caption1 text-emerald-600 mt-0.5">⚡ {r.twoMinuteHabit}</p>}
-                        </div>
-                        <span className="text-caption2 text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0 mt-0.5">가져오기</span>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* 알림 카드 */}
               <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
