@@ -10,6 +10,7 @@ import { useNotificationScheduler } from './hooks/useNotificationScheduler';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import PageTransition from './components/ui/PageTransition';
 import SlotUnlockModal from './components/ui/SlotUnlockModal';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Today = lazy(() => import('./pages/Today'));
@@ -152,6 +153,7 @@ function AppRoutes() {
   }, [isAuthenticated, deduplicateFaithRoutines]);
 
   return (
+    <ErrorBoundary>
     <AnimatePresence mode="wait">
       <Suspense fallback={<LoadingSpinner />}>
         <Routes location={location} key={location.pathname}>
@@ -198,6 +200,7 @@ function AppRoutes() {
         </Routes>
       </Suspense>
     </AnimatePresence>
+    </ErrorBoundary>
   );
 }
 

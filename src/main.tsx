@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
 import App from './App.tsx'
+import ErrorBoundary from './components/ui/ErrorBoundary.tsx'
 
 async function startApp() {
   if (import.meta.env.DEV) {
@@ -12,9 +13,11 @@ async function startApp() {
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <App />
-      </GoogleOAuthProvider>
+      <ErrorBoundary>
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''}>
+          <App />
+        </GoogleOAuthProvider>
+      </ErrorBoundary>
     </StrictMode>,
   );
 }
