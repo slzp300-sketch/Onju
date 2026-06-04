@@ -46,9 +46,12 @@ export default function FaithRoutineNew() {
   const { monthlyGoals } = useGoalStore();
 
   const todayIso = format(new Date(), 'yyyy-MM-dd');
-  const activeGoalRoutines = monthlyGoals
-    .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length && g.category === 'faith')
-    .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title })));
+  const linkableFaithGoals = monthlyGoals.filter(
+    g => g.startDate <= todayIso && g.endDate >= todayIso && g.category === 'faith'
+  );
+  const activeGoalRoutines = linkableFaithGoals
+    .filter(g => g.goalRoutines?.length)
+    .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title, goalId: g.id })));
 
   const existing = id ? faithRoutines.find(r => r.id === id) : null;
   const isEdit = !!existing;
@@ -56,6 +59,7 @@ export default function FaithRoutineNew() {
   const [mode, setMode] = useState<Mode>(isEdit ? 'custom' : 'choose');
 
   // 기본 필드
+  const [goalId, setGoalId] = useState<string | undefined>(existing?.goalId);
   const [title, setTitle]   = useState(existing?.title ?? '');
   const [emoji, setEmoji]   = useState(existing?.emoji ?? '');
   const [timeSlot, setTimeSlot] = useState<TimeSlot | null>(existing?.timeSlot ?? null);
@@ -127,6 +131,7 @@ export default function FaithRoutineNew() {
       when: when.trim() || undefined,
       twoMinuteHabit: twoMinEnabled ? twoMinuteHabit.trim() || undefined : undefined,
       notification,
+      goalId: goalId || undefined,
     };
 
     if (isEdit && existing) {
@@ -245,6 +250,7 @@ export default function FaithRoutineNew() {
                           setTitle(r.title);
                           if (r.when) setWhen(r.when);
                           if (r.twoMinuteHabit) { setTwoMinEnabled(true); setTwoMinuteHabit(r.twoMinuteHabit); }
+                          if (r.goalId) setGoalId(r.goalId);
                         }}
                         className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
                         <div className="flex-1 min-w-0">
@@ -361,6 +367,46 @@ export default function FaithRoutineNew() {
                   ))}
                 </div>
               </div>
+
+              {/* 목표 연동 카드 */}
+              {linkableFaithGoals.length > 0 && (
+                <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+                  <div className="px-4 py-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-xl">🎯</span>
+                      <div>
+                        <p className="text-body2 font-semibold text-label-strong">월간 목표 연동</p>
+                        <p className="text-caption1 text-label-alt">이 루틴의 달성이 목표 달성률에 반영돼요</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <motion.button {...tapSm}
+                        onClick={() => setGoalId(undefined)}
+                        className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-all ${
+                          !goalId ? 'border-primary bg-primary-soft' : 'border-line bg-fill'
+                        }`}>
+                        <span className={`text-caption1 font-semibold ${!goalId ? 'text-primary' : 'text-label-alt'}`}>연동 안 함</span>
+                      </motion.button>
+                      {linkableFaithGoals.map(g => (
+                        <motion.button key={g.id} {...tapSm}
+                          onClick={() => setGoalId(g.id)}
+                          className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-all ${
+                            goalId === g.id ? 'border-primary bg-primary-soft' : 'border-line bg-fill'
+                          }`}>
+                          <div className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: g.color ?? 'var(--color-primary)' }} />
+                          <p className={`text-caption1 font-semibold truncate flex-1 text-left ${
+                            goalId === g.id ? 'text-primary' : 'text-label'
+                          }`}>{g.title}</p>
+                          {goalId === g.id && (
+                            <span className="text-caption2 text-primary font-bold flex-shrink-0">✓ 연동됨</span>
+                          )}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* 2분 트리거 카드 */}
               <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">

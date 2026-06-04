@@ -73,6 +73,7 @@ export interface DailyRoutine {
   when?: string;              // 언제 할지 텍스트
   twoMinuteHabit?: string;    // 2분 트리거
   notification?: HabitNotification; // 개별 알림
+  goalId?: string;            // 연동된 월간 목표 ID
 }
 
 export interface FaithRoutineTemplate {

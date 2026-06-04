@@ -110,16 +110,23 @@ export default function Dashboard() {
       dEl.setDate(dEl.getDate() + 1);
     }
 
-    // 연동된 습관 찾기
+    // 연동된 개인 습관
     const linkedHabits = habits.filter(h => h.goalId === goal.id);
-    if (linkedHabits.length === 0) return 0;
+    // 연동된 신앙 루틴
+    const linkedRoutines = faithRoutines.filter(r => r.goalId === goal.id);
+
+    if (linkedHabits.length === 0 && linkedRoutines.length === 0) return 0;
 
     // 경과 기간 중 완료된 날 수 / 전체 기간 = 달성률
-    const completedDays = elapsedDays2.filter(ds =>
-      linkedHabits.some(h =>
+    const completedDays = elapsedDays2.filter(ds => {
+      const habitDone = linkedHabits.some(h =>
         habitLogs.some(l => l.habitId === h.id && l.date === ds && (l.completed || l.skipped || l.substitute))
-      )
-    );
+      );
+      const routineDone = linkedRoutines.some(r =>
+        logs.some(l => l.routineId === r.id && l.date === ds && (l.completed || l.skipped))
+      );
+      return habitDone || routineDone;
+    });
 
     return Math.round((completedDays.length / allDays.length) * 100);
   };
