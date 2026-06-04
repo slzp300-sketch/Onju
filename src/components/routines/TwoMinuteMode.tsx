@@ -1,12 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Zap } from 'lucide-react';
-import type { Habit } from '../../types';
+import type { Habit, DailyRoutine } from '../../types';
 import HabitFocusMode from './HabitFocusMode';
+import FocusMode from './FocusMode';
+
+// Habit 또는 DailyRoutine 모두 처리
+type TwoMinuteTarget = Habit | DailyRoutine;
 
 interface TwoMinuteModeProps {
-  habit: Habit;
+  habit: TwoMinuteTarget;
   onClose: () => void;
+}
+
+function isHabit(t: TwoMinuteTarget): t is Habit {
+  return !('type' in t) || (t as DailyRoutine).type === undefined;
 }
 
 function fmt(s: number) {
@@ -67,11 +75,13 @@ export default function TwoMinuteMode({ habit, onClose }: TwoMinuteModeProps) {
     );
   }
 
-  /* ── 2분 이후: 메인 습관으로 전환 ── */
+  /* ── 2분 이후: 메인 습관/루틴으로 전환 ── */
   if (phase === 'habit') {
     return (
       <AnimatePresence>
-        <HabitFocusMode habit={habit} onClose={onClose} />
+        {isHabit(habit)
+          ? <HabitFocusMode habit={habit} onClose={onClose} />
+          : <FocusMode routine={habit as DailyRoutine} onClose={onClose} />}
       </AnimatePresence>
     );
   }

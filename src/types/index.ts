@@ -67,8 +67,11 @@ export interface DailyRoutine {
   order: number;
   createdAt: string;
   durationMinutes?: number;
-  durationSeconds?: number;   // 타이머 초 단위 (durationMinutes보다 우선)
+  durationSeconds?: number;   // 타이머 초 단위
   timeSlot?: TimeSlot;
+  when?: string;              // 언제 할지 텍스트
+  twoMinuteHabit?: string;    // 2분 트리거
+  notification?: HabitNotification; // 개별 알림
 }
 
 export interface FaithRoutineTemplate {

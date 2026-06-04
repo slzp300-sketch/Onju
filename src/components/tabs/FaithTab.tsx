@@ -9,6 +9,7 @@ import FAB from '../ui/FAB';
 import { useRoutineStore } from '../../store/routineStore';
 import type { DailyRoutine, TimeSlot } from '../../types';
 import FocusMode from '../routines/FocusMode';
+import TwoMinuteMode from '../routines/TwoMinuteMode';
 
 const TIME_SLOTS: { value: TimeSlot; label: string; time: string; emoji: string }[] = [
   { value: 'morning', label: '아침', time: '07:00', emoji: '🌅' },
@@ -124,6 +125,7 @@ function FaithRoutineRow({ routine, index, onRemove }: {
   const { toggleRoutineLog, skipRoutineLog, isCompleted, isSkipped } = useRoutineStore();
   const navigate = useNavigate();
   const [focusOpen, setFocusOpen] = useState(false);
+  const [twoMinOpen, setTwoMinOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [rowStamp, setRowStamp] = useState<'done' | 'rest' | null>(null);
   const done = isCompleted(routine.id);
@@ -184,6 +186,28 @@ function FaithRoutineRow({ routine, index, onRemove }: {
         <div className="flex items-center gap-1.5 flex-shrink-0">
           {!done && !skipped && (
             <>
+              {/* ⚡/▶ 실행 버튼 */}
+              {(routine.twoMinuteHabit || routine.durationSeconds) && (
+                <motion.button
+                  whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    if (routine.twoMinuteHabit) setTwoMinOpen(true);
+                    else setFocusOpen(true);
+                  }}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                    routine.twoMinuteHabit
+                      ? 'bg-amber-100 text-amber-500'
+                      : 'bg-emerald-50 text-emerald-500'
+                  }`}
+                >
+                  {routine.twoMinuteHabit
+                    ? <span className="text-sm leading-none">⚡</span>
+                    : <Play size={11} fill="currentColor" />}
+                </motion.button>
+              )}
+              {/* 타이머 없을 때 포커스 버튼 */}
+              {!routine.twoMinuteHabit && !routine.durationSeconds && (
               <motion.button
                 whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
                 onClick={e => { e.stopPropagation(); setFocusOpen(true); }}
@@ -191,6 +215,7 @@ function FaithRoutineRow({ routine, index, onRemove }: {
               >
                 <Play size={11} fill="currentColor" />
               </motion.button>
+              )}
               <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
                 onClick={e => { e.stopPropagation(); setConfirmDelete(true); }} className="text-label-assistive hover:text-negative transition-colors p-1">
                 <Trash2 size={13} />
@@ -236,6 +261,7 @@ function FaithRoutineRow({ routine, index, onRemove }: {
 
       <AnimatePresence>
         {focusOpen && <FocusMode routine={routine} onClose={() => setFocusOpen(false)} />}
+        {twoMinOpen && <TwoMinuteMode habit={routine} onClose={() => setTwoMinOpen(false)} />}
       </AnimatePresence>
 
       <ConfirmModal

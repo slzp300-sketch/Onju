@@ -117,6 +117,33 @@ export function useNotificationScheduler() {
       markSent('review');
     }
 
+    // 신앙루틴 개별 알림
+    faithRoutines.forEach(routine => {
+      const n = routine.notification;
+      if (!n?.enabled || n.type !== 'push') return;
+      n.times.forEach((timeStr, tIdx) => {
+        const { h, m } = parseTime(timeStr);
+        const key = `faith-${routine.id}-${tIdx}`;
+        const nowH = now.getHours();
+        const nowM = now.getMinutes();
+        const passed = nowH > h || (nowH === h && nowM >= m);
+        if (passed && !alreadySentToday(key)) {
+          sendNotification(`${routine.emoji ?? '🙏'} ${routine.title}`, '신앙 루틴을 실천할 시간이에요!');
+          markSent(key);
+        } else if (!passed) {
+          const delay = msUntil(h, m);
+          if (delay > 0) {
+            timers.current.push(setTimeout(() => {
+              if (!alreadySentToday(key)) {
+                sendNotification(`${routine.emoji ?? '🙏'} ${routine.title}`, '신앙 루틴을 실천할 시간이에요!');
+                markSent(key);
+              }
+            }, delay));
+          }
+        }
+      });
+    });
+
     // 습관별 개별 알림 (시간마다 별도 스케줄)
     habits.forEach(habit => {
       const n = habit.notification;
