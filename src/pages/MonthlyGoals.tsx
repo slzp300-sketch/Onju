@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Trash2, Pencil, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Pencil, ChevronDown, ChevronUp, ChevronLeft } from 'lucide-react';
+import { motion as m } from 'framer-motion';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,9 +43,16 @@ export default function MonthlyGoals() {
 
   return (
     <div className="flex flex-col gap-4 pb-4">
-      <div className="px-4 pt-5">
-        <h1 className="text-heading2 font-bold text-label-strong font-brand">월간 목표</h1>
-        <p className="text-caption1 text-label-alt mt-0.5">진행 중인 목표를 관리해요</p>
+      <div className="px-4 pt-5 flex items-center gap-2">
+        <m.button
+          whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+          onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt flex-shrink-0">
+          <ChevronLeft size={24} />
+        </m.button>
+        <div>
+          <h1 className="text-heading2 font-bold text-label-strong font-brand">월간 목표</h1>
+          <p className="text-caption1 text-label-alt mt-0.5">진행 중인 목표를 관리해요</p>
+        </div>
       </div>
 
       <div className="px-4 flex flex-col gap-5">

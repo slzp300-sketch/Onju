@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Plus, TrendingUp, ChevronDown } from 'lucide-react';
+import { Plus, TrendingUp, ChevronDown, ChevronLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import SlotBadge from '../components/ui/SlotBadge';
@@ -17,6 +19,7 @@ import { getWeekRangeFor, formatDateRange } from '../utils/date';
 const WEEKDAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
 
 export default function WeeklyGoals() {
+  const navigate = useNavigate();
   const [showCreate, setShowCreate] = useState(false);
   const [showWeekSetting, setShowWeekSetting] = useState(false);
   const { weeklyGoals, monthlyGoals } = useGoalStore();
@@ -44,9 +47,16 @@ export default function WeeklyGoals() {
 
   return (
     <div className="flex flex-col gap-4 pb-4">
-      <div className="px-4 pt-5">
-        <h1 className="text-heading2 font-bold text-label-strong font-brand">주간 목표</h1>
-        <p className="text-caption1 text-label-alt mt-0.5">{formatDateRange(weekStart, weekEnd)}</p>
+      <div className="px-4 pt-5 flex items-center gap-2">
+        <motion.button
+          whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+          onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt flex-shrink-0">
+          <ChevronLeft size={24} />
+        </motion.button>
+        <div>
+          <h1 className="text-heading2 font-bold text-label-strong font-brand">주간 목표</h1>
+          <p className="text-caption1 text-label-alt mt-0.5">{formatDateRange(weekStart, weekEnd)}</p>
+        </div>
       </div>
 
       {/* 목표 현황 */}
