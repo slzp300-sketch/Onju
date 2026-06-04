@@ -102,15 +102,20 @@ function GoalCard({ goal, past, isOpen, onToggle, onEdit, onDelete }: GoalCardPr
   const progress = Math.round((elapsed / total) * 100);
   const habit = goal.goalRoutines?.[0];
 
+  const cardBg     = goal.color ? `${goal.color}18` : past ? undefined : '#eaf2fe';
+  const cardBorder  = goal.color ? `${goal.color}50` : past ? undefined : '#0066ff33';
+  const accentColor = goal.color ?? (past ? 'var(--color-label-assistive)' : 'var(--color-primary)');
+
   return (
-    <div className={`rounded-xl border shadow-emphasize overflow-hidden ${
-      past ? 'bg-fill border-line' : 'bg-primary-soft border-primary/20'
-    }`}>
+    <div
+      className={`rounded-xl border shadow-emphasize overflow-hidden ${past && !goal.color ? 'bg-fill border-line' : ''}`}
+      style={goal.color || !past ? { backgroundColor: cardBg, borderColor: cardBorder } : undefined}
+    >
       {/* 카드 헤더 — 항상 표시 */}
       <button className="w-full text-left px-4 pt-4 pb-3" onClick={onToggle}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <p className={`text-caption1 font-medium mb-1 ${past ? 'text-label-assistive' : 'text-primary'}`}>
+            <p className="text-caption1 font-medium mb-1" style={{ color: accentColor }}>
               {formatDateRange(goal.startDate, goal.endDate)}
             </p>
             <p className={`text-body2 font-semibold leading-snug ${past ? 'text-label-alt' : 'text-label-strong'}`}>
@@ -129,7 +134,7 @@ function GoalCard({ goal, past, isOpen, onToggle, onEdit, onDelete }: GoalCardPr
               <span>{elapsed}/{total}일</span>
             </div>
             <div className="bg-white/60 rounded-full h-1.5 overflow-hidden">
-              <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+              <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: accentColor }} />
             </div>
           </div>
         )}

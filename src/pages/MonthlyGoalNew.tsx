@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, addDays } from 'date-fns';
 import { useGoalStore } from '../store/goalStore';
@@ -12,6 +12,12 @@ const todayStr   = () => format(new Date(), 'yyyy-MM-dd');
 const defaultEnd = () => format(addDays(new Date(), 29), 'yyyy-MM-dd');
 
 const inputCls = 'w-full bg-fill border border-line rounded-xl px-4 py-3 text-body2 font-medium focus:outline-none focus:border-primary focus:bg-surface transition-all placeholder:text-label-assistive';
+
+const COLORS = [
+  '#6366f1', '#ef4444', '#f59e0b', '#10b981',
+  '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6',
+  '#f97316', '#84cc16', '#06b6d4', '#64748b',
+];
 
 export default function MonthlyGoalNew() {
   const navigate = useNavigate();
@@ -30,6 +36,8 @@ export default function MonthlyGoalNew() {
   const [habitWhere, setHabitWhere]         = useState(existingHabit?.where ?? '');
   const [miniHabit, setMiniHabit]           = useState(existingHabit?.miniRoutine ?? '');
   const [twoMinuteHabit, setTwoMinuteHabit] = useState(existingHabit?.twoMinuteHabit ?? '');
+  const [colorEnabled, setColorEnabled] = useState(!!existing?.color);
+  const [selectedColor, setSelectedColor] = useState<string>(existing?.color ?? '');
 
   const canSave = toBeStatement.trim().length > 0;
 
@@ -46,6 +54,8 @@ export default function MonthlyGoalNew() {
       twoMinuteHabit: twoMinuteHabit.trim() || undefined,
     } : undefined;
 
+    const color = colorEnabled && selectedColor ? selectedColor : undefined;
+
     if (isEdit && existing) {
       updateMonthlyGoal(existing.id, {
         title: toBeStatement.trim(),
@@ -55,6 +65,7 @@ export default function MonthlyGoalNew() {
         endDate,
         toBeStatement: toBeStatement.trim(),
         goalRoutines: habit ? [habit] : undefined,
+        color,
       });
     } else {
       const newGoal: MonthlyGoal = {
@@ -69,6 +80,7 @@ export default function MonthlyGoalNew() {
         createdAt: new Date().toISOString(),
         toBeStatement: toBeStatement.trim(),
         goalRoutines: habit ? [habit] : undefined,
+        color,
       };
       addMonthlyGoal(newGoal);
     }
@@ -169,6 +181,49 @@ export default function MonthlyGoalNew() {
                 💡 "일단 시작"하게 만드는 초소형 행동이에요
               </p>
             </div>
+          </div>{/* 핵심 습관 카드 닫기 */}
+
+          {/* ── 색상 선택 ── */}
+          <div className="bg-surface rounded-xl border border-line shadow-emphasize">
+            <div className="px-4 py-4 flex items-center justify-between">
+              <div>
+                <p className="text-body2 font-bold text-label-strong">🎨 색상 선택</p>
+                <p className="text-caption1 text-label-alt mt-0.5">카드에 표시될 색상을 골라요</p>
+              </div>
+              <button
+                onClick={() => { setColorEnabled(v => !v); if (colorEnabled) setSelectedColor(''); }}
+                className={`relative w-11 h-6 rounded-full transition-colors ${colorEnabled ? 'bg-primary' : 'bg-fill-strong'}`}
+              >
+                <motion.div
+                  animate={{ x: colorEnabled ? 20 : 2 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none"
+                />
+              </button>
+            </div>
+
+            {colorEnabled && (
+              <div className="px-4 pb-4">
+                <div className="grid grid-cols-6 gap-2.5">
+                  {COLORS.map(c => (
+                    <motion.button
+                      key={c}
+                      whileTap={{ scale: 0.85 }}
+                      onClick={() => setSelectedColor(prev => prev === c ? '' : c)}
+                      className="w-full aspect-square rounded-full flex items-center justify-center transition-all"
+                      style={{
+                        backgroundColor: c,
+                        boxShadow: selectedColor === c ? `0 0 0 3px white, 0 0 0 5px ${c}` : 'none',
+                      }}
+                    >
+                      {selectedColor === c && (
+                        <Check size={16} className="text-white" strokeWidth={2.5} />
+                      )}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
