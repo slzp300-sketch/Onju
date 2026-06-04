@@ -36,7 +36,7 @@ export default function HabitNew() {
   // 활성 월간 목표 중 루틴이 있는 것
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   const activeGoalRoutines = monthlyGoals
-    .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length)
+    .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length && g.category === 'personal')
     .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title })));
 
   const { setPermission } = useNotificationStore();

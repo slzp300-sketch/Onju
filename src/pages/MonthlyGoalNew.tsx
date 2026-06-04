@@ -36,6 +36,7 @@ export default function MonthlyGoalNew() {
   const [habitWhere, setHabitWhere]         = useState(existingHabit?.where ?? '');
   const [miniHabit, setMiniHabit]           = useState(existingHabit?.miniRoutine ?? '');
   const [twoMinuteHabit, setTwoMinuteHabit] = useState(existingHabit?.twoMinuteHabit ?? '');
+  const [category, setCategory] = useState<'personal' | 'faith'>(existing?.category ?? 'personal');
   const [colorEnabled, setColorEnabled] = useState(!!existing?.color);
   const [selectedColor, setSelectedColor] = useState<string>(existing?.color ?? '');
 
@@ -66,6 +67,7 @@ export default function MonthlyGoalNew() {
         toBeStatement: toBeStatement.trim(),
         goalRoutines: habit ? [habit] : undefined,
         color,
+        category,
       });
     } else {
       const newGoal: MonthlyGoal = {
@@ -81,6 +83,7 @@ export default function MonthlyGoalNew() {
         toBeStatement: toBeStatement.trim(),
         goalRoutines: habit ? [habit] : undefined,
         color,
+        category,
       };
       addMonthlyGoal(newGoal);
     }
@@ -103,6 +106,38 @@ export default function MonthlyGoalNew() {
       {/* 스크롤 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
         <div className="px-4 py-5 flex flex-col gap-5 pb-28">
+
+          {/* ── 카테고리 선택 ── */}
+          <div className="bg-surface rounded-xl border border-line shadow-emphasize">
+            <div className="px-4 py-4">
+              <p className="text-body2 font-bold text-label-strong mb-3">목표 유형</p>
+              <div className="flex gap-3">
+                {([
+                  { value: 'personal', label: '개인', emoji: '💪', desc: '개인 습관·루틴 목표' },
+                  { value: 'faith',    label: '신앙', emoji: '🙏', desc: '신앙 루틴 목표' },
+                ] as const).map(opt => (
+                  <motion.button
+                    key={opt.value}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setCategory(opt.value)}
+                    className={`flex-1 flex flex-col items-center gap-1.5 py-3.5 rounded-xl border-2 transition-all ${
+                      category === opt.value
+                        ? 'border-primary bg-primary-soft'
+                        : 'border-line bg-fill'
+                    }`}
+                  >
+                    <span className="text-2xl">{opt.emoji}</span>
+                    <p className={`text-body2 font-bold ${category === opt.value ? 'text-primary' : 'text-label-alt'}`}>
+                      {opt.label}
+                    </p>
+                    <p className={`text-caption2 ${category === opt.value ? 'text-primary/70' : 'text-label-assistive'}`}>
+                      {opt.desc}
+                    </p>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* ── To-Be 선언 ── */}
           <div className="bg-surface rounded-xl border border-line shadow-emphasize">

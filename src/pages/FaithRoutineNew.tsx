@@ -7,8 +7,10 @@ import DurationPickerSheet from '../components/ui/DurationPickerSheet';
 import { AlarmTimeSheet, AlarmTypeSheet } from '../components/ui/HabitAlarmSheet';
 import { fmtDuration } from '../utils/duration';
 import { to12h } from '../utils/alarmTime';
+import { format } from 'date-fns';
 import { useRoutineStore } from '../store/routineStore';
 import { useNotificationStore } from '../store/notificationStore';
+import { useGoalStore } from '../store/goalStore';
 import type { TimeSlot } from '../types';
 import { WEEKDAY_LABELS } from '../types';
 import { faithRoutineTemplates } from '../mocks/data/faithTemplates';
@@ -41,6 +43,12 @@ export default function FaithRoutineNew() {
   const { id } = useParams<{ id?: string }>();
   const { faithRoutines, addRoutine, updateRoutine } = useRoutineStore();
   const { setPermission } = useNotificationStore();
+  const { monthlyGoals } = useGoalStore();
+
+  const todayIso = format(new Date(), 'yyyy-MM-dd');
+  const activeGoalRoutines = monthlyGoals
+    .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length && g.category === 'faith')
+    .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title })));
 
   const existing = id ? faithRoutines.find(r => r.id === id) : null;
   const isEdit = !!existing;
@@ -225,6 +233,31 @@ export default function FaithRoutineNew() {
                     className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,102,255,0.15)] shadow-emphasize transition-all" />
                 </div>
               </div>
+
+              {/* 목표에서 가져오기 */}
+              {!isEdit && activeGoalRoutines.length > 0 && (
+                <div>
+                  <p className="text-caption1 font-bold text-label-alt mb-2">🙏 신앙 목표 습관에서 가져오기</p>
+                  <div className="flex flex-col gap-2">
+                    {activeGoalRoutines.map(r => (
+                      <motion.button key={r.id} {...tap}
+                        onClick={() => {
+                          setTitle(r.title);
+                          if (r.when) setWhen(r.when);
+                          if (r.twoMinuteHabit) { setTwoMinEnabled(true); setTwoMinuteHabit(r.twoMinuteHabit); }
+                        }}
+                        className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-body2 font-semibold text-label-strong truncate">{r.title}</p>
+                          {r.when && <p className="text-caption1 text-label-alt mt-0.5">⏰ {r.when}</p>}
+                          {r.twoMinuteHabit && <p className="text-caption1 text-emerald-600 mt-0.5">⚡ {r.twoMinuteHabit}</p>}
+                        </div>
+                        <span className="text-caption2 text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0 mt-0.5">가져오기</span>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* 알림 카드 */}
               <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">

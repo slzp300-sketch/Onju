@@ -35,6 +35,7 @@ export interface MonthlyGoal {
   toBeStatement?: string;        // "나는 X하는 사람이야"
   goalRoutines?: GoalRoutineItem[]; // 루틴으로 쪼개기
   color?: string;                // 카드 색상 (hex)
+  category?: 'personal' | 'faith'; // 개인 / 신앙
 }
 
 export interface WeeklyGoal {

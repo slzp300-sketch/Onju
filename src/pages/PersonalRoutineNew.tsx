@@ -30,7 +30,7 @@ export default function PersonalRoutineNew() {
 
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   const activeGoalRoutines = monthlyGoals
-    .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length)
+    .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length && g.category === 'personal')
     .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title })));
 
   const existing = id ? personalRoutines.find(r => r.id === id) : null;

@@ -184,9 +184,20 @@ function GoalCard({ goal, past = false, isOpen, onToggle, onEdit, onDelete }: {
       <button className="w-full text-left px-4 pt-4 pb-3" onClick={onToggle}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <p className="text-caption1 font-medium mb-0.5" style={{ color: accentColor }}>
-              {format(new Date(goal.startDate + 'T12:00:00'), 'M/d')} ~ {format(new Date(goal.endDate + 'T12:00:00'), 'M/d')}
-            </p>
+            <div className="flex items-center gap-2 mb-0.5">
+              <p className="text-caption1 font-medium" style={{ color: accentColor }}>
+                {format(new Date(goal.startDate + 'T12:00:00'), 'M/d')} ~ {format(new Date(goal.endDate + 'T12:00:00'), 'M/d')}
+              </p>
+              {goal.category && (
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                  goal.category === 'faith'
+                    ? 'bg-emerald-100 text-emerald-600'
+                    : 'bg-primary-soft text-primary'
+                }`}>
+                  {goal.category === 'faith' ? '🙏 신앙' : '💪 개인'}
+                </span>
+              )}
+            </div>
             <p className={`text-body2 font-semibold leading-snug ${isPast ? 'text-label-alt' : 'text-label-strong'}`}>
               {goal.title}
             </p>
