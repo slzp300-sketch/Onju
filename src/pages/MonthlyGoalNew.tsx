@@ -90,30 +90,14 @@ export default function MonthlyGoalNew() {
               <textarea
                 value={toBeStatement}
                 onChange={e => setToBeStatement(e.target.value)}
-                placeholder="강철 체력을 만들어 하고 싶은 일 다하는 사람"
+                placeholder="작은 습관으로 하루하루 더 나은 내가 되는 사람"
                 rows={3}
                 autoFocus
                 className="w-full bg-fill border border-line rounded-xl px-4 py-3 text-body2 font-medium focus:outline-none focus:border-primary focus:bg-surface resize-none transition-all placeholder:text-label-assistive leading-relaxed"
               />
-
-              {/* 예시 칩 */}
-              <div className="flex flex-col gap-1.5 mt-2">
-                <p className="text-caption2 text-label-assistive px-0.5">💡 예시를 탭하면 바로 입력돼요</p>
-                {[
-                  '강철 체력을 만들어 하고 싶은 일 다하는 사람',
-                  '매일 아침 나를 위해 하루를 시작하는 사람',
-                  '꾸준함으로 조금씩 성장해가는 사람',
-                ].map(ex => (
-                  <button
-                    key={ex}
-                    type="button"
-                    onClick={() => setToBeStatement(ex)}
-                    className="text-left text-caption1 text-label-alt bg-fill hover:bg-primary-soft hover:text-primary border border-line hover:border-primary/30 rounded-xl px-3 py-2 transition-all"
-                  >
-                    {ex}
-                  </button>
-                ))}
-              </div>
+              <p className="text-caption2 text-label-assistive mt-1.5">
+                💡 내가 되고 싶은 모습을 구체적인 문장으로 적어주세요
+              </p>
             </div>
           </div>
 
