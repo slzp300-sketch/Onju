@@ -11,9 +11,11 @@ import ReviewBanner from '../components/review/ReviewBanner';
 import { useRoutineStore } from '../store/routineStore';
 import { useTodoStore } from '../store/todoStore';
 import { useAuthStore } from '../store/authStore';
-import { formatDisplay, today, isSunday, getWeekRangeText, currentWeek, currentYear, isReviewCompleted } from '../utils/date';
+import { formatDisplay, today, getReviewPrompt } from '../utils/date';
 import { getTodayRates, calcStreak } from '../utils/completion';
-import { fetchReviews } from '../api/reviews';
+import { fetchReviews, fetchWeeklyShares } from '../api/reviews';
+import { calcReviewStreak } from '../utils/reviewStreak';
+import { useGroupStore } from '../store/groupStore';
 import type { TimeSlot } from '../types';
 import RoutineItem from '../components/routines/RoutineItem';
 
@@ -43,6 +45,18 @@ export default function Today() {
   const [todoInput, setTodoInput] = useState('');
 
   const { data: reviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
+  const reviewPrompt = getReviewPrompt(reviews);
+  const reviewStreak = calcReviewStreak(reviews);
+
+  // 소모임 나눔 현황 — 리뷰 윈도우 중에만 fetc
+  const { groups, myGroupIds } = useGroupStore();
+  const myGroups = groups.filter(g => myGroupIds.includes(g.id));
+  const week = reviewPrompt.weekNumber;
+  const { data: nanumShares = [] } = useQuery({
+    queryKey: ['weekly-shares', myGroupIds[0], week],
+    queryFn: () => fetchWeeklyShares(myGroupIds[0], week),
+    enabled: reviewPrompt.show && myGroupIds.length > 0,
+  });
 
   const todayLogs = logs.filter(l => l.date === todayStr);
   const { personal, faith } = getTodayRates(personalRoutines, faithRoutines, todayLogs, todayStr);
@@ -83,14 +97,40 @@ export default function Today() {
         </h1>
       </motion.div>
 
-      {/* 일요일 리뷰 배너 */}
-      {isSunday() && (
-        <motion.div variants={itemVariants} className="px-4">
+      {/* 주간 리뷰 배너 — 일요일~월요일(유예) 윈도우 */}
+      {reviewPrompt.show && (
+        <motion.div variants={itemVariants} className="px-4 flex flex-col gap-2">
           <ReviewBanner
-            completed={isReviewCompleted(reviews, currentWeek(), currentYear())}
-            weekRangeText={getWeekRangeText()}
-            onStart={() => navigate('/review')}
+            completed={reviewPrompt.completed}
+            overdue={reviewPrompt.overdue}
+            weekRangeText={reviewPrompt.weekRangeText}
+            streak={reviewStreak}
+            onStart={() => navigate('/review', {
+              state: {
+                targetWeek: reviewPrompt.weekNumber,
+                targetYear: reviewPrompt.year,
+                weekStart: reviewPrompt.weekStart,
+                weekEnd: reviewPrompt.weekEnd,
+              },
+            })}
           />
+          {/* 소모임 나눔 현황 */}
+          {myGroups.length > 0 && (() => {
+            const group = myGroups[0];
+            const shareCount = nanumShares.length;
+            const memberCount = group.currentMemberCount;
+            return (
+              <div className="flex items-center gap-2 px-3 py-2 bg-surface-alt rounded-xl border border-line-soft">
+                <span className="text-caption2 text-label-alt flex-1">
+                  <span className="font-semibold text-label">{group.title}</span>에서{' '}
+                  <span className="font-bold text-primary">{shareCount}/{memberCount}명</span>이 이번 주 나눔 완료
+                </span>
+                {shareCount === memberCount && memberCount > 0 && (
+                  <span className="text-caption2 font-bold text-positive">🎉 전원 완료!</span>
+                )}
+              </div>
+            );
+          })()}
         </motion.div>
       )}
 

@@ -3,7 +3,7 @@ import { getNextWeekApplyTime } from './date';
 
 interface RoutineStoreActions {
   deactivateRoutine: (id: string) => void;
-  updateRoutine: (id: string, changes: Partial<Pick<DailyRoutine, 'title' | 'frequency'>>) => void;
+  updateRoutine: (id: string, changes: Partial<Pick<DailyRoutine, 'title' | 'frequency' | 'when' | 'twoMinuteHabit' | 'emoji'>>) => void;
   addRoutine: (routine: DailyRoutine) => void;
 }
 

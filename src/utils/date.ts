@@ -119,3 +119,48 @@ export const isReviewCompleted = (
   year: number
 ): boolean =>
   reviews.some(r => r.weekNumber === weekNumber && r.year === year && r.completedAt !== null);
+
+// 주간 리뷰 노출/대상 정보
+export interface ReviewPrompt {
+  show: boolean;          // 홈에 노출할지
+  completed: boolean;     // 대상 주 리뷰 완료 여부
+  overdue: boolean;       // 지난주 리뷰를 유예 기간에 처리 중인지
+  weekNumber: number;     // 리뷰 대상 주
+  year: number;
+  weekStart: string;      // YYYY-MM-DD
+  weekEnd: string;        // YYYY-MM-DD
+  weekRangeText: string;
+}
+
+/**
+ * 한 주를 닫는 "리뷰 윈도우" 계산.
+ * - 일요일: 이번 주를 대상으로 항상 노출 (완료/미완료 모두)
+ * - 월요일: 지난주 리뷰가 미완료일 때만 노출 (유예 구간, overdue)
+ * - 그 외 요일: 노출하지 않음 (윈도우 종료)
+ */
+export const getReviewPrompt = (
+  reviews: WeeklyReview[],
+  date: Date = new Date(),
+): ReviewPrompt => {
+  const day = getDay(date); // 0=일, 1=월
+  const isGrace = day === 1;                       // 월요일 유예
+  const targetDate = isGrace ? subWeeks(date, 1) : date;
+
+  const weekNumber = getISOWeek(targetDate);
+  const year = getYear(targetDate);
+  const { start, end } = getCurrentWeekRange(targetDate);
+  const completed = isReviewCompleted(reviews, weekNumber, year);
+
+  const show = day === 0 || (isGrace && !completed);
+
+  return {
+    show,
+    completed,
+    overdue: isGrace && !completed,
+    weekNumber,
+    year,
+    weekStart: formatDate(start),
+    weekEnd: formatDate(end),
+    weekRangeText: getWeekRangeText(targetDate),
+  };
+};

@@ -6,13 +6,30 @@ import { ko } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useGoalStore } from '../store/goalStore';
+import { useHabitStore } from '../store/habitStore';
+import { useRoutineStore } from '../store/routineStore';
 import type { MonthlyGoal } from '../types';
 import { formatDateRange, elapsedDays } from '../utils/date';
 
 export default function MonthlyGoals() {
   const navigate = useNavigate();
   const { monthlyGoals, removeMonthlyGoal } = useGoalStore();
+  const { habits } = useHabitStore();
+  const { faithRoutines } = useRoutineStore();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  const createFromPlan = (goal: MonthlyGoal) => {
+    const plan = goal.goalRoutines?.[0];
+    if (!plan) return;
+    const prefill = {
+      title: plan.title,
+      when: plan.when,
+      miniRoutine: plan.miniRoutine,
+      twoMinuteHabit: plan.twoMinuteHabit,
+      goalId: goal.id,
+    };
+    navigate(goal.category === 'faith' ? '/faith-routines/new' : '/habits/new', { state: { prefill } });
+  };
 
   const toggle = (id: string) =>
     setExpanded(prev => {
@@ -64,15 +81,20 @@ export default function MonthlyGoals() {
               {goals.map(g => {
                 const past = g.endDate < todayIso;
                 const isOpen = expanded.has(g.id);
+                const alreadyTracked =
+                  habits.some(h => h.goalId === g.id) ||
+                  faithRoutines.some(r => r.goalId === g.id);
                 return (
                   <GoalCard
                     key={g.id}
                     goal={g}
                     past={past}
                     isOpen={isOpen}
+                    alreadyTracked={alreadyTracked}
                     onToggle={() => toggle(g.id)}
                     onEdit={() => navigate(`/goals/monthly/edit/${g.id}`)}
                     onDelete={() => removeMonthlyGoal(g.id)}
+                    onCreateHabit={() => createFromPlan(g)}
                   />
                 );
               })}
@@ -100,12 +122,14 @@ interface GoalCardProps {
   goal: MonthlyGoal;
   past: boolean;
   isOpen: boolean;
+  alreadyTracked: boolean;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onCreateHabit: () => void;
 }
 
-function GoalCard({ goal, past, isOpen, onToggle, onEdit, onDelete }: GoalCardProps) {
+function GoalCard({ goal, past, isOpen, alreadyTracked, onToggle, onEdit, onDelete, onCreateHabit }: GoalCardProps) {
   const { elapsed, total } = elapsedDays(goal.startDate, goal.endDate);
   const progress = Math.round((elapsed / total) * 100);
   const habit = goal.goalRoutines?.[0];
@@ -166,7 +190,21 @@ function GoalCard({ goal, past, isOpen, onToggle, onEdit, onDelete }: GoalCardPr
               {habit ? (
                 <>
                   {/* 핵심 습관 */}
-                  <p className="text-caption1 font-bold text-label-strong">💪 핵심 습관</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-caption1 font-bold text-label-strong">💪 핵심 습관</p>
+                    {alreadyTracked ? (
+                      <span className="text-caption2 font-bold text-positive">✓ 추적 중</span>
+                    ) : !past && (
+                      <motion.button
+                        whileTap={{ scale: 0.88 }}
+                        transition={{ type: 'spring', stiffness: 700, damping: 22 }}
+                        onClick={onCreateHabit}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-caption2 font-bold text-white bg-primary"
+                      >
+                        <Plus size={11} /> 습관으로 만들기
+                      </motion.button>
+                    )}
+                  </div>
                   <DetailRow icon="📌" label={habit.title} />
                   {habit.when  && <DetailRow icon="⏰" label={habit.when} />}
                   {habit.where && <DetailRow icon="📍" label={habit.where} />}

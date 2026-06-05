@@ -12,8 +12,9 @@ import { useGoalStore } from '../store/goalStore';
 import { useSettingsStore } from '../store/settingsStore';
 import {
   today, getWeekDays, ALL_DAY_LABELS, elapsedDays,
-  currentWeek, currentYear, isReviewCompleted, getWeekRangeText,
+  getWeekRangeText, getReviewPrompt,
 } from '../utils/date';
+import { calcReviewStreak } from '../utils/reviewStreak';
 import { getLinkedItems, rateFromItems, adherenceFromItems, isScheduled } from '../utils/goalProgress';
 import { getDayCompletion, type DayState } from '../utils/dayCompletion';
 import { getHabitStat, type DayStatus } from '../utils/habitStats';
@@ -363,7 +364,8 @@ function WeeklyTab() {
   ].sort((a, b) => b.done - a.done);
   const bestHabit = habitConsistency[0]?.done > 0 ? habitConsistency[0] : null;
 
-  const reviewDone = isReviewCompleted(reviews, currentWeek(), currentYear());
+  const reviewPrompt = getReviewPrompt(reviews);
+  const reviewStreak = calcReviewStreak(reviews);
 
   const encourage =
     perfectCount >= 5 ? '🔥 완벽한 한 주를 보내고 있어요!' :
@@ -398,21 +400,34 @@ function WeeklyTab() {
 
       {/* ── 주간 요약 ── */}
       {hasData && (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <SummaryStat label="완벽한 날" value={`${perfectCount}일`}
             sub={perfectDelta === 0 ? '지난주와 동일' : perfectDelta > 0 ? `지난주 +${perfectDelta}` : `지난주 ${perfectDelta}`}
             subColor={perfectDelta > 0 ? 'text-positive' : perfectDelta < 0 ? 'text-negative' : 'text-label-assistive'} />
           <SummaryStat label="평균 달성률" value={`${avgRate}%`} sub="경과일 기준" subColor="text-label-assistive" />
           <SummaryStat label="베스트 습관" value={bestHabit ? `${bestHabit.done}회` : '-'}
             sub={bestHabit ? `${bestHabit.emoji} ${bestHabit.title}` : '아직 없어요'} subColor="text-label-alt" />
+          <SummaryStat label="리뷰 연속"
+            value={reviewStreak > 0 ? `${reviewStreak}주` : '-'}
+            sub={reviewStreak >= 2 ? '🔥 연속 리뷰 중' : reviewStreak === 1 ? '이번 주 완료' : '아직 없어요'}
+            subColor={reviewStreak >= 2 ? 'text-orange-500' : 'text-label-assistive'} />
         </div>
       )}
 
       {/* ── 주간 리뷰 ── */}
       <ReviewBanner
-        completed={reviewDone}
+        completed={reviewPrompt.completed}
+        overdue={reviewPrompt.overdue}
         weekRangeText={getWeekRangeText(new Date(), weekStartDay as 0 | 1)}
-        onStart={() => navigate('/review')}
+        streak={reviewStreak}
+        onStart={() => navigate('/review', {
+          state: {
+            targetWeek: reviewPrompt.weekNumber,
+            targetYear: reviewPrompt.year,
+            weekStart: reviewPrompt.weekStart,
+            weekEnd: reviewPrompt.weekEnd,
+          },
+        })}
       />
 
       {reviews.length > 0 && (

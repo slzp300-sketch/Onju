@@ -87,7 +87,7 @@ export default function MonthlyGoalNew() {
       };
       addMonthlyGoal(newGoal);
     }
-    navigate('/goals/monthly');
+    navigate('/goals/monthly', { replace: true });
   };
 
   return (

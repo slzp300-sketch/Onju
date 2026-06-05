@@ -39,7 +39,7 @@ export default function GroupNew() {
       createdAt: now.toISOString(),
     };
     addGroup(group);
-    navigate('/groups');
+    navigate('/groups', { replace: true });
   };
 
   return (

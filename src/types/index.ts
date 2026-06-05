@@ -231,9 +231,26 @@ export interface RoutineChange {
     title?: string;
     frequency?: DailyRoutine['frequency'];
     weeklyGoalId?: string | null;
+    when?: string;
+    twoMinuteHabit?: string;
+    emoji?: string;
   };
   newRoutine?: Omit<DailyRoutine, 'id' | 'userId' | 'createdAt'>;
   appliedAt?: string;
+}
+
+// 습관 조정 내역
+export interface HabitChange {
+  habitId: string;
+  action: 'keep' | 'edit' | 'delete';
+  changes?: {
+    title?: string;
+    frequency?: HabitFrequency;
+    customDays?: number[];
+    when?: string;
+    miniRoutine?: string;
+    twoMinuteHabit?: string;
+  };
 }
 
 // 주간 리뷰

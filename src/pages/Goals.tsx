@@ -11,7 +11,7 @@ import { elapsedDays } from '../utils/date';
 import { getLinkedItems, rateFromItems, adherenceFromItems, type LinkedItem } from '../utils/goalProgress';
 
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
-const MAX_SLOTS = 3;
+const MAX_SLOTS = 5;
 
 /** 최근 7일 습관 달성률 계산 */
 function calcWeeklyHabitRate(
