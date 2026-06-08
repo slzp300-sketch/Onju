@@ -4,26 +4,34 @@ import { ChevronRight, Target } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, getDay } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import ReviewBanner from '../components/review/ReviewBanner';
 import StampSeal from '../components/ui/StampSeal';
 import { useRoutineStore } from '../store/routineStore';
 import { useHabitStore } from '../store/habitStore';
 import { useGoalStore } from '../store/goalStore';
+import { useDiaryStore } from '../store/diaryStore';
 import { useSettingsStore } from '../store/settingsStore';
 import {
   today, getWeekDays, ALL_DAY_LABELS, elapsedDays,
   getWeekRangeText, getReviewPrompt,
 } from '../utils/date';
 import { calcReviewStreak } from '../utils/reviewStreak';
+import { calcDiaryStreak, DIARY_MOODS } from '../utils/diaryStats';
 import { getLinkedItems, rateFromItems, adherenceFromItems, isScheduled } from '../utils/goalProgress';
 import { getDayCompletion, type DayState } from '../utils/dayCompletion';
 import { getHabitStat, type DayStatus } from '../utils/habitStats';
 import { fetchReviews } from '../api/reviews';
 import type { MonthlyGoal, Habit, DailyRoutine } from '../types';
 
-type TabType = 'goal' | 'habit' | 'weekly';
+type TabType = 'goal' | 'habit' | 'weekly' | 'records';
 
 const MOOD_EMOJI: Record<string, string> = { hard: '😓', normal: '😊', easy: '😌' };
+const REVIEW_MOOD_META: { key: 'easy' | 'normal' | 'hard'; emoji: string; label: string }[] = [
+  { key: 'easy', emoji: '😌', label: '수월' },
+  { key: 'normal', emoji: '😊', label: '보통' },
+  { key: 'hard', emoji: '😓', label: '힘듦' },
+];
 
 export default function Stats() {
   const [activeTab, setActiveTab] = useState<TabType>('goal');
@@ -36,7 +44,7 @@ export default function Stats() {
 
       <div className="px-4 mb-1">
         <div className="flex bg-fill rounded-xl p-1">
-          {([['goal', '목표'], ['habit', '습관'], ['weekly', '주간']] as [TabType, string][]).map(([key, label]) => (
+          {([['goal', '목표'], ['habit', '습관'], ['weekly', '주간'], ['records', '기록']] as [TabType, string][]).map(([key, label]) => (
             <motion.button key={key} whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.12 }}
               onClick={() => setActiveTab(key)}
@@ -61,6 +69,11 @@ export default function Stats() {
         {activeTab === 'weekly' && (
           <motion.div key="w" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
             <WeeklyTab />
+          </motion.div>
+        )}
+        {activeTab === 'records' && (
+          <motion.div key="r" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            <RecordsTab />
           </motion.div>
         )}
       </AnimatePresence>
@@ -325,10 +338,8 @@ function computeWeek(
 }
 
 function WeeklyTab() {
-  const navigate = useNavigate();
   const { faithRoutines, logs } = useRoutineStore();
   const { habits, habitLogs } = useHabitStore();
-  const { data: reviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
   const { weekStartDay } = useSettingsStore();
 
   const thisWeekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
@@ -364,8 +375,38 @@ function WeeklyTab() {
   ].sort((a, b) => b.done - a.done);
   const bestHabit = habitConsistency[0]?.done > 0 ? habitConsistency[0] : null;
 
-  const reviewPrompt = getReviewPrompt(reviews);
-  const reviewStreak = calcReviewStreak(reviews);
+  const nowMid = new Date(new Date().setHours(23, 59, 59, 999));
+
+  // 이번 주 vs 지난주 평균 달성률
+  const lastObligation = lastWeek.filter(d => d.state !== 'future' && d.state !== 'rest');
+  const lastAvgRate = lastObligation.length
+    ? Math.round(lastObligation.reduce((a, d) => a + d.rate, 0) / lastObligation.length)
+    : 0;
+  const avgDelta = avgRate - lastAvgRate;
+
+  // 이번 주 개인 / 신앙 카테고리별 평균
+  const thisWeekComp = thisWeekDays
+    .map(d => getDayCompletion(format(d, 'yyyy-MM-dd'), habits, habitLogs, faithRoutines, logs, d > nowMid))
+    .filter(c => c.state !== 'future'); // 아직 오지 않은 날은 평균에서 제외
+  const avgOf = (vals: number[]) => vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : -1;
+  const personalWeekRate = avgOf(thisWeekComp.filter(c => c.personalRate >= 0).map(c => c.personalRate));
+  const faithWeekRate    = avgOf(thisWeekComp.filter(c => c.faithRate >= 0).map(c => c.faithRate));
+
+  // 요일별 패턴 (최근 4주 의무일 평균)
+  const weekdayBuckets = Array.from({ length: 7 }, () => ({ sum: 0, count: 0 }));
+  for (let i = 0; i < 28; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (d > nowMid) continue;
+    const c = getDayCompletion(format(d, 'yyyy-MM-dd'), habits, habitLogs, faithRoutines, logs, false);
+    if (c.combinedRate < 0) continue; // 쉬는 날 제외
+    const b = weekdayBuckets[getDay(d)];
+    b.sum += c.combinedRate; b.count += 1;
+  }
+  const weekdayAvg = weekdayBuckets.map(b => (b.count ? Math.round(b.sum / b.count) : null));
+  const orderedDows = thisWeekDays.map(d => getDay(d)); // 주 시작 요일 순서
+  const dowWithData = orderedDows.filter(dow => weekdayAvg[dow] !== null);
+  const bestDow = dowWithData.length ? dowWithData.reduce((a, b) => (weekdayAvg[b]! > weekdayAvg[a]! ? b : a)) : null;
+  const worstDow = dowWithData.length ? dowWithData.reduce((a, b) => (weekdayAvg[b]! < weekdayAvg[a]! ? b : a)) : null;
 
   const encourage =
     perfectCount >= 5 ? '🔥 완벽한 한 주를 보내고 있어요!' :
@@ -400,21 +441,114 @@ function WeeklyTab() {
 
       {/* ── 주간 요약 ── */}
       {hasData && (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <SummaryStat label="완벽한 날" value={`${perfectCount}일`}
             sub={perfectDelta === 0 ? '지난주와 동일' : perfectDelta > 0 ? `지난주 +${perfectDelta}` : `지난주 ${perfectDelta}`}
             subColor={perfectDelta > 0 ? 'text-positive' : perfectDelta < 0 ? 'text-negative' : 'text-label-assistive'} />
           <SummaryStat label="평균 달성률" value={`${avgRate}%`} sub="경과일 기준" subColor="text-label-assistive" />
           <SummaryStat label="베스트 습관" value={bestHabit ? `${bestHabit.done}회` : '-'}
             sub={bestHabit ? `${bestHabit.emoji} ${bestHabit.title}` : '아직 없어요'} subColor="text-label-alt" />
-          <SummaryStat label="리뷰 연속"
-            value={reviewStreak > 0 ? `${reviewStreak}주` : '-'}
-            sub={reviewStreak >= 2 ? '🔥 연속 리뷰 중' : reviewStreak === 1 ? '이번 주 완료' : '아직 없어요'}
-            subColor={reviewStreak >= 2 ? 'text-orange-500' : 'text-label-assistive'} />
         </div>
       )}
 
-      {/* ── 주간 리뷰 ── */}
+      {hasData && (
+        <>
+          {/* ── 이번 주 vs 지난주 ── */}
+          <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <p className="text-caption1 font-bold text-label-strong">이번 주 vs 지난주</p>
+              <span className={`text-caption1 font-bold tabular-nums ${
+                avgDelta > 0 ? 'text-positive' : avgDelta < 0 ? 'text-negative' : 'text-label-assistive'
+              }`}>
+                {avgDelta > 0 ? `▲ +${avgDelta}%p` : avgDelta < 0 ? `▼ ${avgDelta}%p` : '지난주와 동일'}
+              </span>
+            </div>
+            <BarRow label="이번 주" value={avgRate} color="var(--color-primary)" highlight />
+            <BarRow label="지난주" value={lastAvgRate} color="var(--color-label-assistive)" />
+          </div>
+
+          {/* ── 이번 주 개인·신앙 ── */}
+          <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5 flex flex-col gap-3">
+            <p className="text-caption1 font-bold text-label-strong">이번 주 개인·신앙</p>
+            <BarRow label="💪 개인" value={personalWeekRate} color="var(--color-primary)" highlight />
+            <BarRow label="🙏 신앙" value={faithWeekRate} color="var(--color-positive)" highlight />
+          </div>
+
+          {/* ── 요일별 패턴 ── */}
+          <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5">
+            <p className="text-caption1 font-bold text-label-strong mb-3">
+              요일별 패턴 <span className="text-caption2 text-label-assistive font-medium">· 최근 4주</span>
+            </p>
+            <div className="flex gap-1.5">
+              {orderedDows.map(dow => {
+                const avg = weekdayAvg[dow];
+                const isBest = bestDow === dow && dowWithData.length > 1;
+                return (
+                  <div key={dow} className="flex-1 flex flex-col items-center gap-1.5">
+                    <div className="w-full h-16 bg-fill rounded-md flex items-end overflow-hidden">
+                      {avg !== null && (
+                        <motion.div initial={{ height: 0 }} animate={{ height: `${avg}%` }} transition={{ duration: 0.5 }}
+                          className="w-full rounded-md" style={{ backgroundColor: isBest ? 'var(--color-positive)' : 'var(--color-primary)' }} />
+                      )}
+                    </div>
+                    <span className={`text-caption2 font-bold ${isBest ? 'text-positive' : 'text-label-assistive'}`}>
+                      {ALL_DAY_LABELS[dow]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            {bestDow !== null && worstDow !== null && dowWithData.length > 1 ? (
+              <p className="text-caption1 text-center font-semibold text-label-alt mt-3">
+                💪 {ALL_DAY_LABELS[bestDow]}요일에 가장 꾸준해요{bestDow !== worstDow ? ` · ${ALL_DAY_LABELS[worstDow]}요일은 조금 약해요` : ''}
+              </p>
+            ) : (
+              <p className="text-caption1 text-center text-label-assistive mt-3">기록이 쌓이면 요일별 패턴이 보여요</p>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════
+   기록 통계 탭 (일기 + 주간 리뷰)
+════════════════════════════════════════ */
+function RecordsTab() {
+  const navigate = useNavigate();
+  const { entries } = useDiaryStore();
+  const { data: reviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
+  const { weekStartDay } = useSettingsStore();
+  const reviewPrompt = getReviewPrompt(reviews);
+
+  /* ── 일기 집계 ── */
+  const diaries = [...entries].sort((a, b) => (a.date < b.date ? 1 : -1));
+  const diaryStreak = calcDiaryStreak(entries.map(e => e.date));
+  const thisMonth = format(new Date(), 'yyyy-MM');
+  const thisMonthCount = entries.filter(e => e.date.startsWith(thisMonth)).length;
+  const diaryMoodCounts = DIARY_MOODS.map(m => ({
+    ...m, count: entries.filter(e => e.mood === m.key).length,
+  }));
+  const diaryMoodTotal = diaryMoodCounts.reduce((a, m) => a + m.count, 0);
+
+  /* ── 리뷰 집계 ── */
+  const completedReviews = reviews
+    .filter(r => r.completedAt !== null)
+    .sort((a, b) => (a.year !== b.year ? b.year - a.year : b.weekNumber - a.weekNumber));
+  const reviewStreak = calcReviewStreak(reviews);
+  const avgPersonal = completedReviews.length
+    ? Math.round(completedReviews.reduce((a, r) => a + r.personalRate, 0) / completedReviews.length) : 0;
+  const avgFaith = completedReviews.length
+    ? Math.round(completedReviews.reduce((a, r) => a + r.faithRate, 0) / completedReviews.length) : 0;
+  const reviewMoodCounts = REVIEW_MOOD_META.map(m => ({
+    ...m, count: completedReviews.filter(r => r.mood === m.key).length,
+  }));
+  const reviewMoodTotal = reviewMoodCounts.reduce((a, m) => a + m.count, 0);
+
+  return (
+    <div className="flex flex-col gap-6 px-4 py-4 pb-8">
+      {/* ════ 이번 주 리뷰 작성 배너 ════ */}
       <ReviewBanner
         completed={reviewPrompt.completed}
         overdue={reviewPrompt.overdue}
@@ -430,32 +564,166 @@ function WeeklyTab() {
         })}
       />
 
-      {reviews.length > 0 && (
-        <div>
-          <p className="text-caption1 font-bold text-label-alt mb-3">지난 리뷰</p>
-          <div className="flex flex-col gap-2">
-            {reviews.slice(0, 6).map((review, i) => (
-              <motion.button key={review.id}
-                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, duration: 0.12 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => navigate(`/review/result/${review.year}-${review.weekNumber}`)}
-                className="w-full bg-surface rounded-xl p-4 border border-line shadow-emphasize text-left flex items-center gap-3 hover:bg-fill transition-colors">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-label2 font-semibold text-label">{review.year}년 {review.weekNumber}주차</p>
-                    {review.mood && <span>{MOOD_EMOJI[review.mood]}</span>}
+      {/* ════ 일기 ════ */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-body2 font-bold text-label-strong flex items-center gap-1.5">📖 하루 일기</h2>
+
+        {entries.length === 0 ? (
+          <EmptyRecord
+            text="아직 작성한 일기가 없어요" sub="홈 상단 📖 버튼으로 오늘을 기록해 보세요"
+            ctaLabel="일기 쓰러 가기" onCta={() => navigate('/diary')} />
+        ) : (
+          <>
+            <div className="grid grid-cols-3 gap-2">
+              <SummaryStat label="총 일기" value={`${entries.length}개`} sub="지금까지" subColor="text-label-assistive" />
+              <SummaryStat label="연속 작성" value={diaryStreak > 0 ? `${diaryStreak}일` : '-'}
+                sub={diaryStreak >= 2 ? '🔥 이어가는 중' : diaryStreak === 1 ? '오늘 작성' : '오늘 써볼까요'}
+                subColor={diaryStreak >= 2 ? 'text-orange-500' : 'text-label-assistive'} />
+              <SummaryStat label="이번 달" value={`${thisMonthCount}일`} sub={format(new Date(), 'M월')} subColor="text-label-assistive" />
+            </div>
+
+            {diaryMoodTotal > 0 && (
+              <MoodDistribution title="기분 분포" items={diaryMoodCounts} total={diaryMoodTotal} color="var(--color-primary)" />
+            )}
+
+            <div className="flex flex-col gap-2">
+              <p className="text-caption1 font-bold text-label-alt mt-1">최근 일기</p>
+              {diaries.slice(0, 5).map((d, i) => (
+                <motion.button key={d.date}
+                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04, duration: 0.12 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate('/diary', { state: { date: d.date } })}
+                  className="w-full bg-surface rounded-xl p-3.5 border border-line shadow-emphasize text-left flex items-center gap-3 hover:bg-fill transition-colors">
+                  <span className="text-2xl flex-shrink-0">{d.mood ? DIARY_MOODS.find(m => m.key === d.mood)?.emoji : '📝'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-caption1 font-semibold text-label-strong">
+                      {format(new Date(d.date + 'T12:00:00'), 'M월 d일 (EEE)', { locale: ko })}
+                    </p>
+                    <p className="text-caption1 text-label-alt truncate mt-0.5">{d.content || '내용 없음'}</p>
                   </div>
-                  <div className="flex gap-3 text-caption1">
-                    <span className="text-primary">개인 {review.personalRate}%</span>
-                    <span className="text-positive">신앙 {review.faithRate}%</span>
+                  <ChevronRight size={16} className="text-label-assistive flex-shrink-0" />
+                </motion.button>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* ════ 주간 리뷰 ════ */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-body2 font-bold text-label-strong flex items-center gap-1.5">📝 주간 리뷰</h2>
+
+        {completedReviews.length === 0 ? (
+          <EmptyRecord
+            text="아직 완료한 리뷰가 없어요" sub="한 주를 돌아보며 첫 리뷰를 남겨보세요"
+            ctaLabel="리뷰 쓰러 가기" onCta={() => navigate('/review')} />
+        ) : (
+          <>
+            <div className="grid grid-cols-3 gap-2">
+              <SummaryStat label="총 리뷰" value={`${completedReviews.length}개`} sub="완료 기준" subColor="text-label-assistive" />
+              <SummaryStat label="리뷰 연속" value={reviewStreak > 0 ? `${reviewStreak}주` : '-'}
+                sub={reviewStreak >= 2 ? '🔥 연속 리뷰 중' : reviewStreak === 1 ? '이번 주 완료' : '이어가 볼까요'}
+                subColor={reviewStreak >= 2 ? 'text-orange-500' : 'text-label-assistive'} />
+              <SummaryStat label="평균 달성" value={`${avgPersonal}%`} sub={`신앙 ${avgFaith}%`} subColor="text-positive" />
+            </div>
+
+            {reviewMoodTotal > 0 && (
+              <MoodDistribution title="한 주 난이도" items={reviewMoodCounts} total={reviewMoodTotal} color="var(--color-positive)" />
+            )}
+
+            <div className="flex flex-col gap-2">
+              <p className="text-caption1 font-bold text-label-alt mt-1">최근 리뷰</p>
+              {completedReviews.slice(0, 5).map((review, i) => (
+                <motion.button key={review.id}
+                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04, duration: 0.12 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate(`/review/result/${review.year}-${review.weekNumber}`)}
+                  className="w-full bg-surface rounded-xl p-3.5 border border-line shadow-emphasize text-left flex items-center gap-3 hover:bg-fill transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-caption1 font-semibold text-label-strong">{review.year}년 {review.weekNumber}주차</p>
+                      {review.mood && <span>{MOOD_EMOJI[review.mood]}</span>}
+                    </div>
+                    {review.comment ? (
+                      <p className="text-caption1 text-label-alt truncate">{review.comment}</p>
+                    ) : (
+                      <div className="flex gap-3 text-caption1">
+                        <span className="text-primary">개인 {review.personalRate}%</span>
+                        <span className="text-positive">신앙 {review.faithRate}%</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                <ChevronRight size={16} className="text-label-assistive" />
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      )}
+                  <ChevronRight size={16} className="text-label-assistive flex-shrink-0" />
+                </motion.button>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function MoodDistribution({ title, items, total, color }: {
+  title: string;
+  items: { emoji: string; label: string; count: number }[];
+  total: number;
+  color: string;
+}) {
+  return (
+    <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5">
+      <p className="text-caption1 font-bold text-label-strong mb-3">{title}</p>
+      <div className="flex flex-col gap-2">
+        {items.map(m => {
+          const pct = total ? Math.round((m.count / total) * 100) : 0;
+          return (
+            <div key={m.label} className="flex items-center gap-2.5">
+              <span className="text-base w-5 text-center flex-shrink-0">{m.emoji}</span>
+              <span className="text-caption1 text-label-alt w-8 flex-shrink-0">{m.label}</span>
+              <div className="flex-1 h-2 bg-fill-strong rounded-full overflow-hidden">
+                <motion.div className="h-full rounded-full" style={{ backgroundColor: color }}
+                  initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.5 }} />
+              </div>
+              <span className="text-caption1 font-bold text-label-strong w-8 text-right flex-shrink-0 tabular-nums">{m.count}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function EmptyRecord({ text, sub, ctaLabel, onCta }: {
+  text: string; sub: string; ctaLabel: string; onCta: () => void;
+}) {
+  return (
+    <div className="bg-surface rounded-xl border border-line shadow-emphasize flex flex-col items-center text-center px-6 py-8">
+      <p className="text-body2 font-bold text-label-strong mb-1">{text}</p>
+      <p className="text-caption1 text-label-alt mb-4">{sub}</p>
+      <motion.button whileTap={{ scale: 0.97 }} onClick={onCta}
+        className="px-4 py-2 rounded-lg bg-primary text-white text-caption1 font-bold">
+        {ctaLabel}
+      </motion.button>
+    </div>
+  );
+}
+
+function BarRow({ label, value, color, highlight = false }: {
+  label: string; value: number; color: string; highlight?: boolean;
+}) {
+  const has = value >= 0;
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="text-caption1 text-label-alt w-12 flex-shrink-0">{label}</span>
+      <div className="flex-1 h-2.5 bg-fill-strong rounded-full overflow-hidden">
+        {has && (
+          <motion.div className="h-full rounded-full" style={{ backgroundColor: color }}
+            initial={{ width: 0 }} animate={{ width: `${value}%` }} transition={{ duration: 0.5 }} />
+        )}
+      </div>
+      <span className={`text-caption1 font-bold w-10 text-right flex-shrink-0 tabular-nums ${highlight ? 'text-label-strong' : 'text-label-alt'}`}>
+        {has ? `${value}%` : '-'}
+      </span>
     </div>
   );
 }

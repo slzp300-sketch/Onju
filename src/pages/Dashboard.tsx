@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, Trash2, ListTodo } from 'lucide-react';
+import { Target, Trash2, ListTodo, BookOpen } from 'lucide-react';
 import FAB from '../components/ui/FAB';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -137,28 +137,41 @@ export default function Dashboard() {
           <h1 className="text-heading2 font-bold text-label-strong font-brand mt-0.5">안녕하세요, {user?.name}님</h1>
         </div>
 
-        {/* 🔥 스트릭 칩 버튼 */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          transition={{ type: 'spring', stiffness: 600, damping: 22 }}
-          onClick={() => navigate('/streak')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border shadow-emphasize transition-colors ${
-            streak > 0
-              ? 'bg-cautionary/10 border-cautionary/20'
-              : 'bg-surface border-line'
-          }`}
-        >
-          <motion.span
-            animate={streak > 0 ? { scale: [1, 1.2, 1] } : {}}
-            transition={{ repeat: Infinity, repeatDelay: 3, duration: 0.4 }}
-            className="text-base leading-none"
+        <div className="flex items-center gap-2">
+          {/* 📖 하루 일기 버튼 */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 600, damping: 22 }}
+            onClick={() => navigate('/diary')}
+            aria-label="하루 일기"
+            className="flex items-center justify-center w-9 h-9 rounded-2xl border border-line bg-surface shadow-emphasize text-label-alt hover:text-primary hover:border-primary/30 transition-colors"
           >
-            🔥
-          </motion.span>
-          <span className={`text-label1 font-bold tabular-nums ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
-            {streak}일
-          </span>
-        </motion.button>
+            <BookOpen size={18} />
+          </motion.button>
+
+          {/* 🔥 스트릭 칩 버튼 */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 600, damping: 22 }}
+            onClick={() => navigate('/streak')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border shadow-emphasize transition-colors ${
+              streak > 0
+                ? 'bg-cautionary/10 border-cautionary/20'
+                : 'bg-surface border-line'
+            }`}
+          >
+            <motion.span
+              animate={streak > 0 ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ repeat: Infinity, repeatDelay: 3, duration: 0.4 }}
+              className="text-base leading-none"
+            >
+              🔥
+            </motion.span>
+            <span className={`text-label1 font-bold tabular-nums ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
+              {streak}일
+            </span>
+          </motion.button>
+        </div>
       </motion.div>
 
       {/* 목표 카드 — 3개 나란히 가로 스크롤 */}

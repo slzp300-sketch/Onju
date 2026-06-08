@@ -38,6 +38,7 @@ const MonthlyGoalNew = lazy(() => import('./pages/MonthlyGoalNew'));
 const Goals = lazy(() => import('./pages/Goals'));
 const ReviewResultPage = lazy(() => import('./pages/ReviewResultPage'));
 const NotificationSettings = lazy(() => import('./pages/NotificationSettings'));
+const Diary = lazy(() => import('./pages/Diary'));
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 1000 * 30 } },
@@ -84,6 +85,7 @@ function BottomNav() {
     location.pathname === '/groups/new' ||
     location.pathname === '/review' ||
     location.pathname === '/notification-settings' ||
+    location.pathname === '/diary' ||
     location.pathname === '/streak' ||
     location.pathname.startsWith('/routine-timer/') ||
     location.pathname.startsWith('/todos/') ||
@@ -195,6 +197,7 @@ function AppRoutes() {
               <Route path="/review" element={<PageTransition><WeeklyReviewPage /></PageTransition>} />
               <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />
               <Route path="/notification-settings" element={<PageTransition><NotificationSettings /></PageTransition>} />
+              <Route path="/diary" element={<PageTransition><Diary /></PageTransition>} />
             </>
           )}
         </Routes>

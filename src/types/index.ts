@@ -2,6 +2,7 @@ export type GoalStatus = 'active' | 'completed' | 'failed';
 export type RoutineType = 'personal' | 'faith';
 export type GroupStatus = 'recruiting' | 'active' | 'completed';
 export type GroupRole = 'creator' | 'member';
+export type GroupCategory = 'faith' | 'growth' | 'work' | 'health' | 'etc';
 
 export interface User {
   id: string;
@@ -108,6 +109,11 @@ export interface SmallGroup {
   status: GroupStatus;
   isPublic: boolean;
   createdAt: string;
+  // 생성 시 구체 구성 (선택)
+  category?: GroupCategory;
+  emoji?: string;
+  color?: string;       // 액센트 hex
+  rules?: string[];     // 약속 목록
 }
 
 export interface GroupMembership {
@@ -221,6 +227,16 @@ export interface Todo {
   completed: boolean;
   completedAt?: string;
   createdAt: string;
+}
+
+// 하루 일기 (날짜당 1개)
+export type DiaryMood = 'great' | 'good' | 'neutral' | 'down' | 'bad';
+
+export interface DiaryEntry {
+  date: string; // YYYY-MM-DD (날짜를 키로 사용)
+  mood: DiaryMood | null;
+  content: string;
+  updatedAt: string;
 }
 
 // 루틴 조정 내역

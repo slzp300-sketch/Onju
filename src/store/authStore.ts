@@ -22,6 +22,7 @@ interface AuthState {
   logout: () => void;
   setOnboardingDone: () => void;
   updateWeeklySlots: (slots: number) => void;
+  checkEmailDuplicate: (email: string) => boolean;
 }
 
 function getAccounts(): Account[] {
@@ -109,6 +110,10 @@ export const useAuthStore = create<AuthState>()(
         if (!user) return;
         saveAccounts(getAccounts().map(a => a.id === user.id ? { ...a, weeklyGoalSlots: slots } : a));
         set({ user: { ...user, weeklyGoalSlots: slots } });
+      },
+
+      checkEmailDuplicate: (email) => {
+        return getAccounts().some(a => a.email === email);
       },
     }),
     { name: 'auth-store' }
