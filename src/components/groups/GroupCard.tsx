@@ -2,19 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Calendar } from 'lucide-react';
 import type { SmallGroup } from '../../types';
 import Badge from '../ui/Badge';
-import { GROUP_CATEGORY_LABEL } from '../../utils/groupMeta';
+import { GROUP_CATEGORY_LABEL, GROUP_STATUS_META, effectiveStatus } from '../../utils/groupMeta';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
-const statusMap: Record<SmallGroup['status'], { label: string; color: 'green' | 'indigo' | 'gray' }> = {
-  recruiting: { label: '모집 중', color: 'green' },
-  active: { label: '진행 중', color: 'indigo' },
-  completed: { label: '완료', color: 'gray' },
-};
-
 export default function GroupCard({ group }: { group: SmallGroup }) {
   const navigate = useNavigate();
-  const { label, color } = statusMap[group.status];
+  const { label, color } = GROUP_STATUS_META[effectiveStatus(group)];
   const isFull = group.currentMemberCount >= group.maxMembers;
 
   return (

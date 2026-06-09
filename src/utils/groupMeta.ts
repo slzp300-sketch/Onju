@@ -1,4 +1,16 @@
-import type { GroupCategory } from '../types';
+import type { GroupCategory, GroupStatus, SmallGroup } from '../types';
+
+export const GROUP_STATUS_META: Record<GroupStatus, { label: string; color: 'green' | 'indigo' | 'gray' }> = {
+  recruiting: { label: '모집 중', color: 'green' },
+  active: { label: '진행 중', color: 'indigo' },
+  completed: { label: '완료', color: 'gray' },
+};
+
+// 종료일이 지나면 자동으로 '완료'로 간주
+export function effectiveStatus(g: Pick<SmallGroup, 'status' | 'endDate'>): GroupStatus {
+  if (g.status !== 'completed' && new Date(g.endDate).getTime() < Date.now()) return 'completed';
+  return g.status;
+}
 
 export const GROUP_CATEGORIES: { key: GroupCategory; label: string; emoji: string }[] = [
   { key: 'faith', label: '신앙', emoji: '🙏' },

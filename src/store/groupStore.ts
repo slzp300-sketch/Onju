@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { SmallGroup } from '../types';
+import type { SmallGroup, GroupStatus } from '../types';
 
 interface GroupState {
-  groups: SmallGroup[];
+  groups: SmallGroup[];   // 내가 만들거나 참여한 소모임 (영속). 탐색 목록은 API에서 가져옴.
   myGroupIds: string[];
   addGroup: (group: SmallGroup) => void;
-  joinGroup: (id: string) => void;
+  joinGroup: (group: SmallGroup) => void;   // 탐색/시드 그룹을 스냅샷으로 가입
+  leaveGroup: (id: string) => void;
+  setGroupStatus: (id: string, status: GroupStatus) => void;
   getById: (id: string) => SmallGroup | undefined;
 }
 
@@ -23,13 +25,27 @@ export const useGroupStore = create<GroupState>()(
         }));
       },
 
-      joinGroup: (id) => {
+      joinGroup: (group) => {
+        set((s) => {
+          const exists = s.groups.some(g => g.id === group.id);
+          return {
+            groups: exists
+              ? s.groups.map(g => g.id === group.id ? { ...g, currentMemberCount: g.currentMemberCount + 1 } : g)
+              : [{ ...group, currentMemberCount: group.currentMemberCount + 1 }, ...s.groups],
+            myGroupIds: s.myGroupIds.includes(group.id) ? s.myGroupIds : [...s.myGroupIds, group.id],
+          };
+        });
+      },
+
+      leaveGroup: (id) => {
         set((s) => ({
-          groups: s.groups.map(g =>
-            g.id === id ? { ...g, currentMemberCount: g.currentMemberCount + 1 } : g
-          ),
-          myGroupIds: s.myGroupIds.includes(id) ? s.myGroupIds : [...s.myGroupIds, id],
+          groups: s.groups.filter(g => g.id !== id),
+          myGroupIds: s.myGroupIds.filter(x => x !== id),
         }));
+      },
+
+      setGroupStatus: (id, status) => {
+        set((s) => ({ groups: s.groups.map(g => g.id === id ? { ...g, status } : g) }));
       },
 
       getById: (id) => get().groups.find(g => g.id === id),

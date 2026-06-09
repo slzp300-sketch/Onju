@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Users, Check } from 'lucide-react';
+import { ChevronLeft, Users, Check, LogOut, Play, Flag } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -7,24 +7,33 @@ import { ko } from 'date-fns/locale';
 import { useGroupStore } from '../store/groupStore';
 import { useAuthStore } from '../store/authStore';
 import { useCheerStore } from '../store/cheerStore';
-import { fetchGroupMembers } from '../api/groups';
+import { fetchGroupMembers, fetchGroupById } from '../api/groups';
 import { fetchWeeklyShares } from '../api/reviews';
-import { GROUP_CATEGORY_LABEL } from '../utils/groupMeta';
+import { GROUP_CATEGORY_LABEL, GROUP_STATUS_META, effectiveStatus } from '../utils/groupMeta';
 import type { MemberGroupProgress, GroupWeeklyShare, CheerType } from '../types';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 
 export default function GroupDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id = '' } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getById, joinGroup, myGroupIds } = useGroupStore();
+  const { getById, joinGroup, leaveGroup, setGroupStatus, myGroupIds } = useGroupStore();
   const { user } = useAuthStore();
 
-  const group = getById(id ?? '');
-  const isMember = myGroupIds.includes(id ?? '');
+  // 로컬(내 소모임)에 없으면 API(탐색 진입)에서 조회
+  const local = getById(id);
+  const { data: remote, isLoading } = useQuery({
+    queryKey: ['group', id],
+    queryFn: () => fetchGroupById(id),
+    enabled: !local && !!id,
+  });
+  const group = local ?? remote;
 
   if (!group) {
+    if (isLoading) {
+      return <div className="flex items-center justify-center h-64 text-caption1 text-label-assistive">불러오는 중…</div>;
+    }
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 px-4">
         <p className="text-label-assistive text-sm">소모임을 찾을 수 없어요</p>
@@ -33,10 +42,18 @@ export default function GroupDetail() {
     );
   }
 
+  const status = effectiveStatus(group);
+  const statusMeta = GROUP_STATUS_META[status];
   const isFull = group.currentMemberCount >= group.maxMembers;
+  const isMember = myGroupIds.includes(id);
   const isCreator = group.creatorId === user?.id;
   const isJoined = isMember || isCreator;
-  const canJoin = group.status === 'recruiting' && !isFull && !isMember && !isCreator;
+  const canJoin = status === 'recruiting' && !isFull && !isMember && !isCreator;
+
+  const handleLeave = () => {
+    leaveGroup(id);
+    navigate('/groups', { replace: true });
+  };
 
   return (
     <div className="flex flex-col gap-4 pb-8">
@@ -58,10 +75,7 @@ export default function GroupDetail() {
             </div>
           )}
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge
-              label={group.status === 'recruiting' ? '모집 중' : group.status === 'active' ? '진행 중' : '완료'}
-              color={group.status === 'recruiting' ? 'green' : group.status === 'active' ? 'indigo' : 'gray'}
-            />
+            <Badge label={statusMeta.label} color={statusMeta.color} />
             {group.category && (
               <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-fill text-label-alt">
                 {GROUP_CATEGORY_LABEL[group.category]}
@@ -99,12 +113,17 @@ export default function GroupDetail() {
       {/* 참여 전 상태 */}
       {canJoin && (
         <div className="px-4">
-          <Button fullWidth onClick={() => joinGroup(id!)}>소모임 참여하기</Button>
+          <Button fullWidth onClick={() => joinGroup(group)}>소모임 참여하기</Button>
         </div>
       )}
       {isFull && !isJoined && (
         <div className="px-4">
           <p className="text-center text-body2 text-label-alt bg-fill rounded-xl py-3">정원이 마감되었습니다.</p>
+        </div>
+      )}
+      {status === 'completed' && !isJoined && (
+        <div className="px-4">
+          <p className="text-center text-body2 text-label-alt bg-fill rounded-xl py-3">종료된 소모임이에요.</p>
         </div>
       )}
 
@@ -116,8 +135,35 @@ export default function GroupDetail() {
               {isCreator ? '내가 만든 소모임이에요' : '참여 중인 소모임이에요'}
             </p>
           </div>
-          <MemberBoard groupId={id!} />
-          <WeeklyShareFeed groupId={id!} />
+
+          {/* 방장 관리 */}
+          {isCreator && status === 'recruiting' && (
+            <div className="px-4">
+              <Button fullWidth variant="outlined" onClick={() => setGroupStatus(id, 'active')}>
+                <Play size={16} /> 모집 마감하고 시작하기
+              </Button>
+            </div>
+          )}
+          {isCreator && status === 'active' && (
+            <div className="px-4">
+              <Button fullWidth variant="assistive" onClick={() => setGroupStatus(id, 'completed')}>
+                <Flag size={16} /> 소모임 종료하기
+              </Button>
+            </div>
+          )}
+
+          <MemberBoard groupId={id} />
+          <WeeklyShareFeed groupId={id} />
+
+          {/* 나가기 (방장 제외) */}
+          {!isCreator && (
+            <div className="px-4 mt-2">
+              <button onClick={handleLeave}
+                className="w-full flex items-center justify-center gap-1.5 py-3 text-caption1 font-medium text-label-assistive hover:text-negative transition-colors">
+                <LogOut size={14} /> 소모임 나가기
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
