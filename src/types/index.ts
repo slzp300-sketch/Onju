@@ -111,7 +111,7 @@ export interface SmallGroup {
   createdAt: string;
   // 생성 시 구체 구성 (선택)
   category?: GroupCategory;
-  emoji?: string;
+  coverIcon?: string;   // 커버 아이콘 키 (groupMeta COVER_ICONS)
   color?: string;       // 액센트 hex
   rules?: string[];     // 약속 목록
 }

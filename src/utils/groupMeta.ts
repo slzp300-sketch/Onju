@@ -1,3 +1,8 @@
+import {
+  Church, Sprout, Briefcase, Dumbbell, Sparkles,
+  Sunrise, BookOpen, Footprints, Sun, Flame, Cross, Target,
+  type LucideIcon,
+} from 'lucide-react';
 import type { GroupCategory, GroupStatus, SmallGroup } from '../types';
 
 export const GROUP_STATUS_META: Record<GroupStatus, { label: string; color: 'green' | 'indigo' | 'gray' }> = {
@@ -12,21 +17,25 @@ export function effectiveStatus(g: Pick<SmallGroup, 'status' | 'endDate'>): Grou
   return g.status;
 }
 
-export const GROUP_CATEGORIES: { key: GroupCategory; label: string; emoji: string }[] = [
-  { key: 'faith', label: '신앙', emoji: '🙏' },
-  { key: 'growth', label: '자기계발', emoji: '🌱' },
-  { key: 'work', label: '직장', emoji: '💼' },
-  { key: 'health', label: '운동·건강', emoji: '💪' },
-  { key: 'etc', label: '기타', emoji: '✨' },
+export const GROUP_CATEGORIES: { key: GroupCategory; label: string; Icon: LucideIcon }[] = [
+  { key: 'faith', label: '신앙', Icon: Church },
+  { key: 'growth', label: '자기계발', Icon: Sprout },
+  { key: 'work', label: '직장', Icon: Briefcase },
+  { key: 'health', label: '운동·건강', Icon: Dumbbell },
+  { key: 'etc', label: '기타', Icon: Sparkles },
 ];
 
 export const GROUP_CATEGORY_LABEL = Object.fromEntries(
   GROUP_CATEGORIES.map(c => [c.key, c.label])
 ) as Record<GroupCategory, string>;
 
-// 커버 프리셋
-export const COVER_EMOJIS = ['🌅', '🙏', '💪', '📖', '🏃', '☀️', '🔥', '🌱', '✝️', '🎯'];
-export const GROUP_COLORS = ['#0066FF', '#7C7FF5', '#00BF40', '#FF6B6B', '#F59E0B', '#06B6D4'];
+// 커버 아이콘 프리셋 (저장 값 = 아이콘 키)
+export const COVER_ICONS: Record<string, LucideIcon> = {
+  sunrise: Sunrise, church: Church, dumbbell: Dumbbell, book: BookOpen, run: Footprints,
+  sun: Sun, flame: Flame, sprout: Sprout, cross: Cross, target: Target,
+};
+export const COVER_ICON_KEYS = Object.keys(COVER_ICONS);
+export const GROUP_COLORS = ['#1f6bff', '#7C7FF5', '#00BF40', '#FF6B6B', '#F59E0B', '#06B6D4'];
 
 // 약속(규칙) 프리셋
 export const GROUP_RULES = [

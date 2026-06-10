@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Calendar } from 'lucide-react';
 import type { SmallGroup } from '../../types';
 import Badge from '../ui/Badge';
-import { GROUP_CATEGORY_LABEL, GROUP_STATUS_META, effectiveStatus } from '../../utils/groupMeta';
+import { GROUP_CATEGORY_LABEL, GROUP_STATUS_META, effectiveStatus, COVER_ICONS } from '../../utils/groupMeta';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
@@ -14,13 +14,13 @@ export default function GroupCard({ group }: { group: SmallGroup }) {
   return (
     <button
       onClick={() => navigate(`/groups/${group.id}`)}
-      className="w-full bg-white rounded-2xl p-4 border border-line-soft shadow-sm text-left hover:border-primary-soft transition-colors"
+      className="w-full bg-white rounded-2xl p-4 border border-line-soft text-left hover:border-primary-soft transition-colors"
     >
       <div className="flex items-start gap-3 mb-2">
-        {group.emoji && (
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-            style={{ backgroundColor: `${group.color ?? '#0066FF'}1a` }}>
-            {group.emoji}
+        {group.coverIcon && COVER_ICONS[group.coverIcon] && (
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: `${group.color ?? '#1f6bff'}1a` }}>
+            {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={20} strokeWidth={1.9} style={{ color: group.color ?? '#1f6bff' }} />; })()}
           </div>
         )}
         <div className="flex-1 min-w-0">

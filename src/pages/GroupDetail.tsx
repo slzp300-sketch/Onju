@@ -9,7 +9,7 @@ import { useAuthStore } from '../store/authStore';
 import { useCheerStore } from '../store/cheerStore';
 import { fetchGroupMembers, fetchGroupById } from '../api/groups';
 import { fetchWeeklyShares } from '../api/reviews';
-import { GROUP_CATEGORY_LABEL, GROUP_STATUS_META, effectiveStatus } from '../utils/groupMeta';
+import { GROUP_CATEGORY_LABEL, GROUP_STATUS_META, effectiveStatus, COVER_ICONS } from '../utils/groupMeta';
 import type { ReactNode } from 'react';
 import type { MemberGroupProgress, GroupWeeklyShare, CheerType } from '../types';
 import Card from '../components/ui/Card';
@@ -69,10 +69,10 @@ export default function GroupDetail() {
       {/* 그룹 정보 */}
       <Card className="mx-4">
         <div className="flex items-start gap-3 mb-2">
-          {group.emoji && (
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-              style={{ backgroundColor: `${group.color ?? '#0066FF'}1a` }}>
-              {group.emoji}
+          {group.coverIcon && COVER_ICONS[group.coverIcon] && (
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: `${group.color ?? '#1f6bff'}1a` }}>
+              {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={24} strokeWidth={1.9} style={{ color: group.color ?? '#1f6bff' }} />; })()}
             </div>
           )}
           <div className="flex items-center gap-2 flex-wrap">

@@ -6,11 +6,11 @@ import { format, addDays } from 'date-fns';
 import { useGroupStore } from '../store/groupStore';
 import { useAuthStore } from '../store/authStore';
 import Button from '../components/ui/Button';
-import { GROUP_CATEGORIES, COVER_EMOJIS, GROUP_COLORS, GROUP_RULES } from '../utils/groupMeta';
+import { GROUP_CATEGORIES, COVER_ICONS, COVER_ICON_KEYS, GROUP_COLORS, GROUP_RULES } from '../utils/groupMeta';
 import type { SmallGroup, GroupCategory } from '../types';
 
 interface FormState {
-  emoji: string;
+  coverIcon: string;
   color: string;
   title: string;
   goal: string;
@@ -28,7 +28,7 @@ export default function GroupNew() {
 
   const [step, setStep] = useState<1 | 2>(1);
   const [form, setForm] = useState<FormState>({
-    emoji: COVER_EMOJIS[0],
+    coverIcon: COVER_ICON_KEYS[0],
     color: GROUP_COLORS[0],
     title: '',
     goal: '',
@@ -61,7 +61,7 @@ export default function GroupNew() {
       isPublic: form.isPublic,
       createdAt: now.toISOString(),
       category: form.category,
-      emoji: form.emoji,
+      coverIcon: form.coverIcon,
       color: form.color,
       rules: form.rules,
     };
@@ -100,19 +100,23 @@ export default function GroupNew() {
               transition={{ duration: 0.2 }} className="flex flex-col gap-6">
               {/* 커버 */}
               <div className="flex flex-col items-center gap-3">
-                <div className="w-20 h-20 rounded-3xl flex items-center justify-center text-4xl border border-line"
+                <div className="w-20 h-20 rounded-3xl flex items-center justify-center border border-line"
                   style={{ backgroundColor: `${form.color}1a` }}>
-                  {form.emoji}
+                  {(() => { const Icon = COVER_ICONS[form.coverIcon]; return <Icon size={34} strokeWidth={1.8} style={{ color: form.color }} />; })()}
                 </div>
                 <div className="flex flex-wrap justify-center gap-2">
-                  {COVER_EMOJIS.map(e => (
-                    <motion.button key={e} whileTap={{ scale: 0.85 }} onClick={() => patch({ emoji: e })}
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-colors ${
-                        form.emoji === e ? 'bg-primary-soft ring-2 ring-primary' : 'bg-surface border border-line'
-                      }`}>
-                      {e}
-                    </motion.button>
-                  ))}
+                  {COVER_ICON_KEYS.map(key => {
+                    const Icon = COVER_ICONS[key];
+                    const active = form.coverIcon === key;
+                    return (
+                      <motion.button key={key} whileTap={{ scale: 0.85 }} onClick={() => patch({ coverIcon: key })}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                          active ? 'bg-primary-soft ring-2 ring-primary text-primary' : 'bg-surface border border-line text-label-alt'
+                        }`}>
+                        <Icon size={18} strokeWidth={1.9} />
+                      </motion.button>
+                    );
+                  })}
                 </div>
                 <div className="flex gap-2.5">
                   {GROUP_COLORS.map(c => (
@@ -140,10 +144,10 @@ export default function GroupNew() {
                 <div className="flex flex-wrap gap-2">
                   {GROUP_CATEGORIES.map(c => (
                     <motion.button key={c.key} whileTap={{ scale: 0.96 }} onClick={() => patch({ category: c.key })}
-                      className={`px-3.5 py-2 rounded-xl text-label1 font-semibold transition-colors ${
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-label1 font-semibold transition-colors ${
                         form.category === c.key ? 'bg-primary text-white' : 'bg-surface border border-line text-label-alt'
                       }`}>
-                      {c.emoji} {c.label}
+                      <c.Icon size={15} strokeWidth={1.9} /> {c.label}
                     </motion.button>
                   ))}
                 </div>
