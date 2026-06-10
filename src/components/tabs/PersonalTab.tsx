@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown } from 'lucide-react';
+import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown, Smile, ClipboardList, Flame, Cloud, Zap } from 'lucide-react';
 import StampButton from '../ui/StampButton';
 import RowStamp from '../ui/RowStamp';
 import RowRestAnim from '../ui/RowRestAnim';
@@ -49,7 +49,7 @@ export default function PersonalTab({ date, readOnly = false }: { date?: string;
     return (
       <div className="relative">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-          <div className="w-20 h-20 rounded-full bg-primary-soft flex items-center justify-center text-4xl mb-5">😊</div>
+          <div className="w-20 h-20 rounded-full bg-primary-soft flex items-center justify-center text-primary mb-5"><Smile size={36} strokeWidth={1.9} /></div>
           <p className="text-headline1 font-bold text-label mb-1">첫 번째 습관을 시작해 보세요</p>
           <p className="text-body2 text-label-alt leading-relaxed">
             작은 습관 하나가 직장 생활을<br />조금 더 단단하게 만들어 줄 거예요
@@ -72,7 +72,7 @@ export default function PersonalTab({ date, readOnly = false }: { date?: string;
         <div>
           {personalRoutines.length > 0 && (
             <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
-              <span className="text-body2">📋</span>
+              <ClipboardList size={15} className="text-label-alt" strokeWidth={1.9} />
               <span className="flex-1 text-caption2 font-bold text-label">개별 습관</span>
               <CompletedBadge habits={standaloneHabits} viewDate={viewDate} />
             </div>
@@ -245,10 +245,10 @@ function HabitRow({ habit, index, inRoutine = false, viewDate, readOnly = false 
             {habit.title}
           </p>
           {substituted && (
-            <p className="text-[11px] text-orange-400 font-medium mt-0.5">🔥 대체 완료 — {habit.miniRoutine}</p>
+            <p className="text-[11px] text-orange-400 font-medium mt-0.5 flex items-center gap-0.5"><Flame size={11} strokeWidth={1.9} /> 대체 완료 — {habit.miniRoutine}</p>
           )}
           {skipped && !substituted && (
-            <p className="text-[11px] text-amber-400 font-medium mt-0.5">오늘 쉬어가요 ☁️</p>
+            <p className="text-[11px] text-amber-400 font-medium mt-0.5 flex items-center gap-0.5">오늘 쉬어가요 <Cloud size={11} strokeWidth={1.9} /></p>
           )}
           {!skipped && !substituted && habit.when && (
             <p className="text-[11px] text-label-alt mt-0.5 truncate">{habit.when}</p>
@@ -289,7 +289,7 @@ function HabitRow({ habit, index, inRoutine = false, viewDate, readOnly = false 
                     habit.twoMinuteHabit ? 'bg-amber-100 text-amber-500' : 'bg-primary-soft text-primary'
                   }`}
                 >
-                  {habit.twoMinuteHabit ? <span className="text-sm leading-none">⚡</span> : <Play size={10} fill="currentColor" />}
+                  {habit.twoMinuteHabit ? <Zap size={13} strokeWidth={1.9} /> : <Play size={10} fill="currentColor" />}
                 </motion.button>
               )}
 

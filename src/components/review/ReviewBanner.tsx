@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ChevronRight, CheckCircle2, Sparkles, AlarmClock } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Sparkles, AlarmClock, Flame } from 'lucide-react';
 
 interface ReviewBannerProps {
   completed: boolean;
@@ -28,7 +28,7 @@ export default function ReviewBanner({ completed, overdue = false, weekRangeText
         </div>
         {streak >= 2 && (
           <span className="flex items-center gap-1 text-caption2 font-bold text-primary bg-primary-soft px-2.5 py-1 rounded-full flex-shrink-0">
-            🔥 {streak}주 연속
+            <Flame size={13} strokeWidth={1.9} /> {streak}주 연속
           </span>
         )}
         <ChevronRight size={18} className="text-label-assistive flex-shrink-0" />

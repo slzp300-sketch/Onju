@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Users, Check, LogOut, Play, Flag } from 'lucide-react';
+import { ChevronLeft, Users, Check, LogOut, Play, Flag, BarChart3, Sprout, Flame, Heart, Church } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -10,6 +10,7 @@ import { useCheerStore } from '../store/cheerStore';
 import { fetchGroupMembers, fetchGroupById } from '../api/groups';
 import { fetchWeeklyShares } from '../api/reviews';
 import { GROUP_CATEGORY_LABEL, GROUP_STATUS_META, effectiveStatus } from '../utils/groupMeta';
+import type { ReactNode } from 'react';
 import type { MemberGroupProgress, GroupWeeklyShare, CheerType } from '../types';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -185,16 +186,18 @@ function MemberBoard({ groupId }: { groupId: string }) {
   return (
     <section className="px-4">
       <div className="flex items-center justify-between mb-2 px-1">
-        <h2 className="text-body2 font-bold text-label-strong">📊 멤버 현황판</h2>
+        <h2 className="text-body2 font-bold text-label-strong flex items-center gap-1.5">
+          <BarChart3 size={16} strokeWidth={1.9} /> 멤버 현황판
+        </h2>
         <span className="text-caption2 text-label-assistive">주간 달성률 순</span>
       </div>
 
       {isLoading ? (
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize py-10 text-center text-caption1 text-label-assistive">
+        <div className="bg-surface rounded-xl border border-line py-10 text-center text-caption1 text-label-assistive">
           불러오는 중…
         </div>
       ) : (
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize divide-y divide-line-soft overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line divide-y divide-line-soft overflow-hidden">
           {sorted.map((m, i) => (
             <MemberRow key={m.userId} member={m} rank={i + 1} isMe={m.userId === user?.id} />
           ))}
@@ -220,7 +223,9 @@ function MemberRow({ member, rank, isMe }: { member: MemberGroupProgress; rank: 
             {member.userName}{isMe && <span className="text-caption2 text-primary font-bold"> (나)</span>}
           </span>
           {member.streak > 0 && (
-            <span className="text-caption2 font-bold text-orange-500 flex-shrink-0">🔥{member.streak}</span>
+            <span className="text-caption2 font-bold text-orange-500 flex-shrink-0 flex items-center gap-0.5">
+              <Flame size={12} strokeWidth={1.9} />{member.streak}
+            </span>
           )}
           <span className="ml-auto text-label1 font-bold text-primary tabular-nums flex-shrink-0">{member.weeklyRate}%</span>
         </div>
@@ -252,12 +257,12 @@ function WeeklyShareFeed({ groupId }: { groupId: string }) {
       <h2 className="text-body2 font-bold text-label-strong mb-2 px-1">💬 주간 나눔</h2>
 
       {isLoading ? (
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize py-10 text-center text-caption1 text-label-assistive">
+        <div className="bg-surface rounded-xl border border-line py-10 text-center text-caption1 text-label-assistive">
           불러오는 중…
         </div>
       ) : sorted.length === 0 ? (
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize flex flex-col items-center text-center px-6 py-8">
-          <span className="text-3xl mb-2">🌱</span>
+        <div className="bg-surface rounded-xl border border-line flex flex-col items-center text-center px-6 py-8">
+          <Sprout size={36} strokeWidth={1.9} className="text-label-assistive mb-2" />
           <p className="text-body2 font-bold text-label-strong mb-1">아직 이번 주 나눔이 없어요</p>
           <p className="text-caption1 text-label-alt">주간 리뷰를 완료하고 소모임에 나눠보세요</p>
         </div>
@@ -270,10 +275,10 @@ function WeeklyShareFeed({ groupId }: { groupId: string }) {
   );
 }
 
-const CHEERS: { key: CheerType; emoji: string }[] = [
-  { key: 'heart', emoji: '❤️' },
-  { key: 'fire', emoji: '🔥' },
-  { key: 'pray', emoji: '🙏' },
+const CHEERS: { key: CheerType; icon: ReactNode }[] = [
+  { key: 'heart', icon: <Heart size={14} strokeWidth={1.9} /> },
+  { key: 'fire', icon: <Flame size={14} strokeWidth={1.9} /> },
+  { key: 'pray', icon: <Church size={14} strokeWidth={1.9} /> },
 ];
 
 function ShareCard({ share }: { share: GroupWeeklyShare }) {
@@ -282,7 +287,7 @@ function ShareCard({ share }: { share: GroupWeeklyShare }) {
   const isOn = (k: CheerType) => !!cheered[`${share.id}:${k}`];
 
   return (
-    <div className="bg-surface rounded-2xl border border-line shadow-emphasize overflow-hidden">
+    <div className="bg-surface rounded-2xl border border-line overflow-hidden">
       <div className="px-4 pt-3.5 pb-3">
         <div className="flex items-center gap-2.5 mb-3">
           <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-label2 font-bold text-primary flex-shrink-0">
@@ -316,7 +321,7 @@ function ShareCard({ share }: { share: GroupWeeklyShare }) {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-caption1 font-bold transition-colors ${
                 isOn(c.key) ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt'
               }`}>
-              <span className="text-sm leading-none">{c.emoji}</span>
+              {c.icon}
               <span className="tabular-nums">{isOn(c.key) ? 1 : 0}</span>
             </motion.button>
           ))}

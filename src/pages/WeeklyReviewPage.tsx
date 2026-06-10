@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronRight, Check, Plus, X, Pencil, ChevronLeft, Trash2, Target } from 'lucide-react';
+import { ChevronRight, Check, Plus, X, Pencil, ChevronLeft, Trash2, Target, PartyPopper, Dumbbell, Sprout, BookOpen, Smile, Zap, Flame } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRoutineStore } from '../store/routineStore';
 import { useGoalStore } from '../store/goalStore';
@@ -209,9 +209,9 @@ function ReviewSummaryStep({ weekRangeText, personalRate, faithRate, activeMonth
 }) {
   const overallRate    = Math.round((personalRate + faithRate) / 2);
   const encouragement  =
-    overallRate >= 80 ? '🎉 이번 주 정말 잘했어요!'
-    : overallRate >= 50 ? '💪 꾸준히 해나가고 있어요'
-    : '🌱 다음 주도 한 걸음씩!';
+    overallRate >= 80 ? { Icon: PartyPopper, text: '이번 주 정말 잘했어요!' }
+    : overallRate >= 50 ? { Icon: Dumbbell, text: '꾸준히 해나가고 있어요' }
+    : { Icon: Sprout, text: '다음 주도 한 걸음씩!' };
 
   return (
     <div className="flex flex-col px-6 pt-6 pb-6">
@@ -232,7 +232,9 @@ function ReviewSummaryStep({ weekRangeText, personalRate, faithRate, activeMonth
       <div className="bg-surface-alt rounded-2xl px-4 py-3.5 mb-6 flex items-center justify-between">
         <div>
           <p className="text-caption1 text-label-alt">이번 주 전체 달성률</p>
-          <p className="text-body2 font-semibold text-label-strong mt-0.5">{encouragement}</p>
+          <p className="text-body2 font-semibold text-label-strong mt-0.5 flex items-center gap-1.5">
+            <encouragement.Icon size={16} strokeWidth={1.9} /> {encouragement.text}
+          </p>
         </div>
         <p className="text-3xl font-bold text-label-strong">{overallRate}%</p>
       </div>
@@ -255,8 +257,11 @@ function ReviewSummaryStep({ weekRangeText, personalRate, faithRate, activeMonth
               style={goal.color ? { borderLeft: `3px solid ${goal.color}` } : {}}>
               <div className="flex-1 min-w-0">
                 <p className="text-body2 font-semibold text-label-strong truncate">{goal.title}</p>
-                <p className="text-caption2 text-label-assistive mt-0.5">
-                  {goal.category === 'faith' ? '🙏 신앙' : '💪 개인'} · {goal.startDate.slice(5).replace('-', '/')} ~ {goal.endDate.slice(5).replace('-', '/')}
+                <p className="text-caption2 text-label-assistive mt-0.5 flex items-center gap-1">
+                  {goal.category === 'faith'
+                    ? <BookOpen size={12} strokeWidth={1.9} className="text-label-assistive" />
+                    : <Dumbbell size={12} strokeWidth={1.9} className="text-label-assistive" />}
+                  {goal.category === 'faith' ? '신앙' : '개인'} · {goal.startDate.slice(5).replace('-', '/')} ~ {goal.endDate.slice(5).replace('-', '/')}
                 </p>
               </div>
             </div>
@@ -335,11 +340,11 @@ function calcRoutineWeeklyRate(routine: DailyRoutine, routineLogs: RoutineLog[],
 }
 
 function getGoalFeedback(rate: number | null) {
-  if (rate === null) return { feedback: '아직 연동된 루틴이나 습관이 없어요.', suggestion: '목표 카드에서 "습관으로 만들기"를 눌러 시작해보세요.', accent: 'text-label-alt', bg: 'bg-surface-alt', bar: '#cbd5e1' };
-  if (rate >= 80)    return { feedback: '이번 주 목표 루틴을 잘 지켜냈어요! 💪',       suggestion: '지금 리듬을 유지하세요. 좋은 습관이 쌓이고 있어요.',                          accent: 'text-emerald-600', bg: 'bg-emerald-50', bar: '#10b981' };
-  if (rate >= 50)    return { feedback: '절반 이상 달성했어요. 일관성을 높여볼까요? 😊', suggestion: '언제, 어디서 할지를 더 구체적으로 정해두면 도움이 돼요.',                        accent: 'text-amber-600',   bg: 'bg-amber-50',   bar: '#f59e0b' };
-  if (rate > 0)      return { feedback: '이번 주 쉽지 않았네요. 같이 방법을 찾아봐요. 🌱', suggestion: '루틴을 더 작게 쪼개거나 빈도를 줄여보는 건 어떨까요?',                       accent: 'text-red-500',     bg: 'bg-red-50',     bar: '#ef4444' };
-  return               { feedback: '이번 주 관련 루틴이 진행되지 않았어요.',             suggestion: '2분 습관처럼 아주 작게 시작해보세요.',                                          accent: 'text-red-500',     bg: 'bg-red-50',     bar: '#ef4444' };
+  if (rate === null) return { feedback: '아직 연동된 루틴이나 습관이 없어요.', Icon: null, suggestion: '목표 카드에서 "습관으로 만들기"를 눌러 시작해보세요.', accent: 'text-label-alt', bg: 'bg-surface-alt', bar: '#cbd5e1' };
+  if (rate >= 80)    return { feedback: '이번 주 목표 루틴을 잘 지켜냈어요!',       Icon: Dumbbell, suggestion: '지금 리듬을 유지하세요. 좋은 습관이 쌓이고 있어요.',                          accent: 'text-emerald-600', bg: 'bg-emerald-50', bar: '#10b981' };
+  if (rate >= 50)    return { feedback: '절반 이상 달성했어요. 일관성을 높여볼까요?', Icon: Smile, suggestion: '언제, 어디서 할지를 더 구체적으로 정해두면 도움이 돼요.',                        accent: 'text-amber-600',   bg: 'bg-amber-50',   bar: '#f59e0b' };
+  if (rate > 0)      return { feedback: '이번 주 쉽지 않았네요. 같이 방법을 찾아봐요.', Icon: Sprout, suggestion: '루틴을 더 작게 쪼개거나 빈도를 줄여보는 건 어떨까요?',                       accent: 'text-red-500',     bg: 'bg-red-50',     bar: '#ef4444' };
+  return               { feedback: '이번 주 관련 루틴이 진행되지 않았어요.',             Icon: null, suggestion: '2분 습관처럼 아주 작게 시작해보세요.',                                          accent: 'text-red-500',     bg: 'bg-red-50',     bar: '#ef4444' };
 }
 
 function RateBar({ rate, bar }: { rate: number; bar: string }) {
@@ -430,7 +435,7 @@ function ReviewImproveStep({
       {/* ── 목표별 섹션 ── */}
       {activeMonthlyGoals.map(goal => {
         const rate = getGoalRate(goal.id);
-        const { feedback, suggestion, accent, bg, bar } = getGoalFeedback(rate);
+        const { feedback, Icon: FeedbackIcon, suggestion, accent, bg, bar } = getGoalFeedback(rate);
         const gh = getGoalHabits(goal.id);
         const gr = getGoalRoutines(goal.id);
 
@@ -440,9 +445,14 @@ function ReviewImproveStep({
             <div className="px-4 py-3 flex items-center gap-2 border-b border-line-soft"
               style={goal.color ? { backgroundColor: `${goal.color}12` } : { backgroundColor: 'var(--color-surface-alt)' }}>
               <p className="text-body2 font-bold text-label-strong flex-1 truncate">{goal.title}</p>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 inline-flex items-center gap-1 ${
                 goal.category === 'faith' ? 'bg-emerald-100 text-emerald-600' : 'bg-primary-soft text-primary'
-              }`}>{goal.category === 'faith' ? '🙏 신앙' : '💪 개인'}</span>
+              }`}>
+                {goal.category === 'faith'
+                  ? <BookOpen size={11} strokeWidth={1.9} />
+                  : <Dumbbell size={11} strokeWidth={1.9} />}
+                {goal.category === 'faith' ? '신앙' : '개인'}
+              </span>
             </div>
 
             <div className="px-4 py-3 flex flex-col gap-3">
@@ -458,7 +468,9 @@ function ReviewImproveStep({
                     <div className="mb-2" />
                   </>
                 )}
-                <p className={`text-caption1 font-semibold ${accent} mb-0.5`}>{feedback}</p>
+                <p className={`text-caption1 font-semibold ${accent} mb-0.5 flex items-center gap-1`}>
+                  {FeedbackIcon && <FeedbackIcon size={13} strokeWidth={1.9} />}{feedback}
+                </p>
                 <p className="text-caption2 text-label-alt leading-relaxed">{suggestion}</p>
               </div>
 
@@ -649,7 +661,7 @@ function RoutineEditCard({
           </FieldGroup>
 
           {/* 2분 트리거 */}
-          <FieldGroup label="⚡ 2분 트리거 (선택)">
+          <FieldGroup label={<span className="flex items-center gap-1"><Zap size={12} strokeWidth={1.9} /> 2분 트리거 (선택)</span>}>
             <input value={changes?.twoMinuteHabit ?? original.twoMinuteHabit ?? ''} onChange={e => onPatch({ twoMinuteHabit: e.target.value })}
               placeholder="예: 책 펴기, 스트레칭 1회"
               className="w-full border border-line rounded-xl px-3 py-2 text-body2 focus:outline-none focus:ring-2 focus:ring-primary" />
@@ -735,14 +747,14 @@ function HabitEditCard({
           </FieldGroup>
 
           {/* 미니 습관 */}
-          <FieldGroup label="🔥 미니 습관 (대체용)">
+          <FieldGroup label={<span className="flex items-center gap-1"><Flame size={12} strokeWidth={1.9} /> 미니 습관 (대체용)</span>}>
             <input value={changes?.miniRoutine ?? habit.miniRoutine ?? ''} onChange={e => onPatch({ miniRoutine: e.target.value })}
               placeholder="예: 10분 걷기, 영상 1개"
               className="w-full border border-line rounded-xl px-3 py-2 text-body2 focus:outline-none focus:ring-2 focus:ring-primary" />
           </FieldGroup>
 
           {/* 2분 트리거 */}
-          <FieldGroup label="⚡ 2분 트리거">
+          <FieldGroup label={<span className="flex items-center gap-1"><Zap size={12} strokeWidth={1.9} /> 2분 트리거</span>}>
             <input value={changes?.twoMinuteHabit ?? habit.twoMinuteHabit ?? ''} onChange={e => onPatch({ twoMinuteHabit: e.target.value })}
               placeholder="예: 운동복 입기, 책 펴기"
               className="w-full border border-line rounded-xl px-3 py-2 text-body2 focus:outline-none focus:ring-2 focus:ring-primary" />
@@ -754,7 +766,7 @@ function HabitEditCard({
 }
 
 // ── 공용 컴포넌트 ──────────────────────────────────────
-function FieldGroup({ label, children }: { label: string; children: ReactNode }) {
+function FieldGroup({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
       <p className="text-caption2 font-semibold text-label-alt">{label}</p>

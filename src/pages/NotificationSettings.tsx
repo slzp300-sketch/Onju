@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Bell, BellOff } from 'lucide-react';
+import { ChevronLeft, Bell, BellOff, Sunrise, Moon, ClipboardList } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
 import { useNotificationStore } from '../store/notificationStore';
@@ -65,7 +65,7 @@ export default function NotificationSettings() {
       <Card className="mx-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-body2 font-semibold text-label-strong">🌅 아침 알림</p>
+            <p className="text-body2 font-semibold text-label-strong flex items-center gap-1.5"><Sunrise size={16} strokeWidth={1.9} className="text-label-alt" />아침 알림</p>
             <p className="text-caption1 text-label-alt mt-0.5">오늘의 루틴을 시작하도록 알려줘요</p>
           </div>
           <Toggle
@@ -91,7 +91,7 @@ export default function NotificationSettings() {
       <Card className="mx-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-body2 font-semibold text-label-strong">🌙 저녁 리마인드</p>
+            <p className="text-body2 font-semibold text-label-strong flex items-center gap-1.5"><Moon size={16} strokeWidth={1.9} className="text-label-alt" />저녁 리마인드</p>
             <p className="text-caption1 text-label-alt mt-0.5">미완료 루틴이 있을 때 알려줘요</p>
           </div>
           <Toggle
@@ -117,7 +117,7 @@ export default function NotificationSettings() {
       <Card className="mx-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-body2 font-semibold text-label-strong">📋 주간 리뷰 알림</p>
+            <p className="text-body2 font-semibold text-label-strong flex items-center gap-1.5"><ClipboardList size={16} strokeWidth={1.9} className="text-label-alt" />주간 리뷰 알림</p>
             <p className="text-caption1 text-label-alt mt-0.5">일요일에 주간 리뷰를 상기시켜줘요</p>
           </div>
           <Toggle

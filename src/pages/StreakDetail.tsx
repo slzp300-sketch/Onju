@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Shield, X, Flame } from 'lucide-react';
+import { ChevronLeft, Shield, X, Flame, Check } from 'lucide-react';
 import { format, getDay } from 'date-fns';
 import { useRoutineStore } from '../store/routineStore';
 import { useHabitStore } from '../store/habitStore';
@@ -96,13 +96,13 @@ export default function StreakDetail() {
 
         {/* 히어로 — 스트릭 수 */}
         <motion.div variants={itemV} className="mx-4 mb-4">
-          <div className="bg-surface rounded-xl shadow-emphasize px-6 py-8 flex flex-col items-center gap-3">
+          <div className="bg-surface rounded-xl border border-line px-6 py-8 flex flex-col items-center gap-3">
             <motion.span
               animate={streak > 0 ? { scale: [1, 1.12, 1] } : {}}
               transition={{ repeat: Infinity, repeatDelay: 2.5, duration: 0.45 }}
-              className="text-6xl leading-none"
+              className="leading-none"
             >
-              🔥
+              <Flame size={60} strokeWidth={1.9} className="text-cautionary" />
             </motion.span>
 
             <div className="text-center">
@@ -129,7 +129,7 @@ export default function StreakDetail() {
 
         {/* 이번 주 캘린더 */}
         <motion.div variants={itemV} className="mx-4 mb-4">
-          <div className="bg-surface rounded-xl shadow-emphasize px-4 py-4">
+          <div className="bg-surface rounded-xl border border-line px-4 py-4">
             <p className="text-label1 font-bold text-label-strong mb-4">이번 주 달성 현황</p>
 
             {/* 요일 + 날짜 타일 */}
@@ -170,8 +170,11 @@ export default function StreakDetail() {
                       }`}>
                         {format(d, 'd')}
                       </span>
-                      <span className="text-[14px] leading-none">
-                        {completed ? '✓' : isToday ? '·' : isFuture ? '' : '✕'}
+                      <span className="leading-none flex items-center justify-center h-[14px]">
+                        {completed ? <Check size={14} strokeWidth={2.4} className="text-white" />
+                          : isToday ? '·'
+                          : isFuture ? ''
+                          : <X size={14} strokeWidth={2.4} className="text-label-alt" />}
                       </span>
 
                       {/* 달성 도장 — 100% 달성 시 등장, 취소 시 사라짐 */}
@@ -213,7 +216,7 @@ export default function StreakDetail() {
         <motion.div variants={itemV} className="mx-4 mb-4">
           <button
             onClick={() => setShowShieldInfo(true)}
-            className="w-full bg-surface rounded-xl shadow-emphasize px-4 py-4 flex items-center gap-3 hover:bg-fill transition-colors text-left"
+            className="w-full bg-surface rounded-xl border border-line px-4 py-4 flex items-center gap-3 hover:bg-fill transition-colors text-left"
           >
             <div className="w-11 h-11 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
               <Shield size={22} className="text-primary" />
@@ -241,7 +244,7 @@ export default function StreakDetail() {
 
         {/* 다음 방패까지 프로그레스 */}
         <motion.div variants={itemV} className="mx-4">
-          <div className="bg-surface rounded-xl shadow-emphasize px-4 py-4">
+          <div className="bg-surface rounded-xl border border-line px-4 py-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Flame size={16} className="text-cautionary" />

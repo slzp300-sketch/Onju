@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Sunrise, Sun, Moon, CheckCircle2, Circle } from 'lucide-react';
+import { Plus, Sunrise, Sun, Moon, CheckCircle2, Circle, PartyPopper } from 'lucide-react';
 import Card from '../components/ui/Card';
 import DailyProgress from '../components/routines/DailyProgress';
 import StreakCounter from '../components/ui/StreakCounter';
@@ -126,7 +126,7 @@ export default function Today() {
                   <span className="font-bold text-primary">{shareCount}/{memberCount}명</span>이 이번 주 나눔 완료
                 </span>
                 {shareCount === memberCount && memberCount > 0 && (
-                  <span className="text-caption2 font-bold text-positive">🎉 전원 완료!</span>
+                  <span className="text-caption2 font-bold text-positive inline-flex items-center gap-1"><PartyPopper size={13} strokeWidth={1.9} /> 전원 완료!</span>
                 )}
               </div>
             );
@@ -172,7 +172,7 @@ export default function Today() {
                   <span className="text-label-alt">{group.icon}</span>
                   <span className="text-caption1 font-semibold text-label-alt">{group.label}</span>
                 </div>
-                <div className="bg-surface rounded-xl border border-line overflow-hidden divide-y divide-line-soft shadow-emphasize">
+                <div className="bg-surface rounded-xl border border-line overflow-hidden divide-y divide-line-soft">
                   {group.routines.map(r => (
                     <RoutineItem key={r.id} routine={r} />
                   ))}
@@ -187,7 +187,7 @@ export default function Today() {
                     <span className="text-caption1 font-semibold text-label-alt">기타</span>
                   </div>
                 )}
-                <div className="bg-surface rounded-xl border border-line overflow-hidden divide-y divide-line-soft shadow-emphasize">
+                <div className="bg-surface rounded-xl border border-line overflow-hidden divide-y divide-line-soft">
                   {unslotted.map(r => (
                     <RoutineItem key={r.id} routine={r} />
                   ))}
@@ -231,7 +231,7 @@ export default function Today() {
             <p className="text-body2 text-label-alt">오늘의 할 일이 없어요</p>
           </div>
         ) : (
-          <div className="bg-surface rounded-xl border border-line overflow-hidden divide-y divide-line-soft shadow-emphasize">
+          <div className="bg-surface rounded-xl border border-line overflow-hidden divide-y divide-line-soft">
             {todayTodos.map(todo => (
               <button
                 key={todo.id}

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { PartyPopper, Check } from 'lucide-react';
 import { useUIStore } from '../../store/uiStore';
 
 export default function SlotUnlockModal() {
@@ -37,7 +38,7 @@ export default function SlotUnlockModal() {
             className="bg-white rounded-3xl p-8 w-full max-w-xs text-center shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            <div className="text-4xl mb-3">🎉</div>
+            <div className="flex justify-center mb-3"><PartyPopper size={40} strokeWidth={1.9} className="text-primary" /></div>
             <h2 className="text-heading1 font-bold text-label-strong mb-1">목표 칸이 늘어났어요!</h2>
             <p className="text-body2 text-label-alt mb-6">
               지난 주 달성률이 80%를 넘었어요.<br />이제 주간 목표를 하나 더 세울 수 있어요!
@@ -57,7 +58,7 @@ export default function SlotUnlockModal() {
                       : 'bg-fill text-label-assistive'
                   }`}
                 >
-                  {i < newSlotCount ? '✓' : ''}
+                  {i < newSlotCount ? <Check size={16} strokeWidth={2.5} /> : ''}
                 </motion.div>
               ))}
             </div>

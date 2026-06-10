@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Zap } from 'lucide-react';
+import { X, Check, Zap, PartyPopper } from 'lucide-react';
 import type { Habit, DailyRoutine } from '../../types';
 import HabitFocusMode from './HabitFocusMode';
 import FocusMode from './FocusMode';
@@ -65,7 +65,7 @@ export default function TwoMinuteMode({ habit, onClose }: TwoMinuteModeProps) {
           transition={{ type: 'spring', stiffness: 350, damping: 22 }}
           className="flex flex-col items-center gap-4"
         >
-          <span className="text-6xl">🎉</span>
+          <PartyPopper size={48} strokeWidth={1.9} className="text-amber-400" />
           <p className="text-white text-title3 font-bold">준비 완료!</p>
           <p className="text-cool-60 text-body2">
             이제 <span className="text-white font-semibold">{habit.title}</span> 시작해봐요

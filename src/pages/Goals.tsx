@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, ChevronLeft, ChevronDown, ChevronUp, Pencil, Trash2, Lock } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronDown, ChevronUp, Pencil, Trash2, Lock, PartyPopper, BookOpen, Dumbbell, Link2, ClipboardList, Pin, Clock, CheckCircle2, Flame, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -122,7 +122,7 @@ export default function Goals() {
             className="mx-4 bg-positive/10 border border-positive/20 rounded-xl px-4 py-3 flex items-center justify-between"
           >
             <div>
-              <p className="text-body2 font-bold text-positive">🎉 목표 슬롯이 열렸어요!</p>
+              <p className="text-body2 font-bold text-positive flex items-center gap-1.5"><PartyPopper size={16} strokeWidth={1.9} /> 목표 슬롯이 열렸어요!</p>
               <p className="text-caption1 text-label-alt mt-0.5">달성률 {weeklyRate}% 달성! 목표를 하나 더 추가할 수 있어요</p>
             </div>
             <motion.button {...tapSm}
@@ -195,7 +195,7 @@ function GoalCard({ goal, past = false, isOpen, adherence, rate, linkedItems, on
 
   return (
     <div
-      className={`rounded-xl border shadow-emphasize overflow-hidden ${
+      className={`rounded-xl border overflow-hidden ${
         goal.color ? '' : isPast ? 'bg-fill border-line' : 'bg-surface border-line'
       }`}
       style={goal.color ? { backgroundColor: cardBg, borderColor: cardBorder } : undefined}
@@ -208,12 +208,14 @@ function GoalCard({ goal, past = false, isOpen, adherence, rate, linkedItems, on
                 {format(new Date(goal.startDate + 'T12:00:00'), 'M/d')} ~ {format(new Date(goal.endDate + 'T12:00:00'), 'M/d')}
               </p>
               {goal.category && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
                   goal.category === 'faith'
                     ? 'bg-emerald-100 text-emerald-600'
                     : 'bg-primary-soft text-primary'
                 }`}>
-                  {goal.category === 'faith' ? '🙏 신앙' : '💪 개인'}
+                  {goal.category === 'faith'
+                    ? <><BookOpen size={11} strokeWidth={1.9} /> 신앙</>
+                    : <><Dumbbell size={11} strokeWidth={1.9} /> 개인</>}
                 </span>
               )}
             </div>
@@ -248,15 +250,17 @@ function GoalCard({ goal, past = false, isOpen, adherence, rate, linkedItems, on
 
             {/* 연동된 습관/루틴 + 개별 달성률 */}
             <div className="mx-3 mb-2 rounded-xl px-4 py-3.5 flex flex-col gap-2.5 bg-surface/60 border border-line-soft">
-              <p className="text-caption1 font-bold text-label-strong">
-                🔗 연동된 습관 {linkedItems.length > 0 && `(${linkedItems.length})`}
+              <p className="text-caption1 font-bold text-label-strong flex items-center gap-1.5">
+                <Link2 size={14} strokeWidth={1.9} /> 연동된 습관 {linkedItems.length > 0 && `(${linkedItems.length})`}
               </p>
               {linkedItems.length > 0 ? (
                 linkedItems.map(item => (
                   <div key={item.id}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-body2 text-label truncate flex-1 mr-2">
-                        {item.emoji ?? (item.kind === 'faith' ? '🙏' : '📌')} {item.title}
+                      <span className="text-body2 text-label truncate flex-1 mr-2 inline-flex items-center gap-1.5">
+                        {item.emoji ?? (item.kind === 'faith'
+                          ? <BookOpen size={13} strokeWidth={1.9} className="flex-shrink-0" />
+                          : <Pin size={13} strokeWidth={1.9} className="flex-shrink-0" />)} {item.title}
                       </span>
                       <span className="flex items-center gap-1.5 flex-shrink-0">
                         <span className="text-caption2 text-label-assistive">{item.doneCount}/{item.scheduledElapsed}일</span>
@@ -285,9 +289,9 @@ function GoalCard({ goal, past = false, isOpen, adherence, rate, linkedItems, on
               return (
                 <div className="mx-3 mb-3 rounded-xl px-4 py-3 flex flex-col gap-2 bg-fill/60 border border-line-soft">
                   <div className="flex items-center justify-between">
-                    <p className="text-caption2 font-bold text-label-assistive">📋 계획한 습관</p>
+                    <p className="text-caption2 font-bold text-label-assistive flex items-center gap-1.5"><ClipboardList size={13} strokeWidth={1.9} /> 계획한 습관</p>
                     {alreadyTracked ? (
-                      <span className="text-caption2 font-bold text-positive">✓ 추적 중</span>
+                      <span className="text-caption2 font-bold text-positive flex items-center gap-1"><CheckCircle2 size={13} strokeWidth={1.9} /> 추적 중</span>
                     ) : !isPast && (
                       <motion.button {...tapSm} onClick={onCreateHabit}
                         className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-caption2 font-bold text-white"
@@ -296,10 +300,10 @@ function GoalCard({ goal, past = false, isOpen, adherence, rate, linkedItems, on
                       </motion.button>
                     )}
                   </div>
-                  <p className="text-caption1 text-label-alt">📌 {habit.title}</p>
-                  {habit.when  && <p className="text-caption1 text-label-assistive">⏰ {habit.when}</p>}
-                  {habit.miniRoutine     && <p className="text-caption1 text-amber-600">🔥 미니: {habit.miniRoutine}</p>}
-                  {habit.twoMinuteHabit && <p className="text-caption1 text-emerald-600">⚡ 2분: {habit.twoMinuteHabit}</p>}
+                  <p className="text-caption1 text-label-alt flex items-center gap-1.5"><Pin size={13} strokeWidth={1.9} className="flex-shrink-0" /> {habit.title}</p>
+                  {habit.when  && <p className="text-caption1 text-label-assistive flex items-center gap-1.5"><Clock size={13} strokeWidth={1.9} className="flex-shrink-0" /> {habit.when}</p>}
+                  {habit.miniRoutine     && <p className="text-caption1 text-amber-600 flex items-center gap-1.5"><Flame size={13} strokeWidth={1.9} className="flex-shrink-0" /> 미니: {habit.miniRoutine}</p>}
+                  {habit.twoMinuteHabit && <p className="text-caption1 text-emerald-600 flex items-center gap-1.5"><Zap size={13} strokeWidth={1.9} className="flex-shrink-0" /> 2분: {habit.twoMinuteHabit}</p>}
                 </div>
               );
             })()}

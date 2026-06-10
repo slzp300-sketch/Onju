@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { BookOpen, Dumbbell, BarChart3, Sunrise, Sparkles, PenLine, Flame, Moon, Church, FileText } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
 /* ── 고정 데이터 (render마다 값이 바뀌지 않도록) ── */
@@ -34,13 +35,13 @@ const SLIDES = [
         <p className="text-caption2 font-bold text-primary tracking-widest">ONJU</p>
         <div className="flex gap-4 mt-1">
           {[
-            { emoji: '🙏', label: '신앙 루틴' },
-            { emoji: '💪', label: '개인 루틴' },
-            { emoji: '📊', label: '목표 통계' },
+            { Icon: BookOpen, label: '신앙 루틴' },
+            { Icon: Dumbbell, label: '개인 루틴' },
+            { Icon: BarChart3, label: '목표 통계' },
           ].map(item => (
             <div key={item.label} className="flex flex-col items-center gap-1.5">
-              <div className="w-10 h-10 rounded-xl bg-surface flex items-center justify-center text-xl shadow-emphasize">
-                {item.emoji}
+              <div className="w-10 h-10 rounded-xl bg-surface flex items-center justify-center text-primary shadow-emphasize">
+                <item.Icon size={20} strokeWidth={1.9} />
               </div>
               <span className="text-[10px] font-medium text-label-alt">{item.label}</span>
             </div>
@@ -53,20 +54,20 @@ const SLIDES = [
     title: '루틴으로\n하루를 설계해요',
     description: '습관들을 루틴 그룹으로 묶어\n아침부터 저녁까지 순서대로 관리해요.\n완료·쉬기·대체 기록으로 유연하게.',
     visual: (
-      <div className="w-full bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+      <div className="w-full bg-surface rounded-xl border border-line overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
-          <span className="text-base">🌅</span>
+          <Sunrise size={16} strokeWidth={1.9} className="text-label-strong" />
           <span className="flex-1 text-caption1 font-bold text-label-strong">아침 루틴</span>
           <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-primary-soft text-primary">1/3</span>
         </div>
         {[
-          { emoji: '🧘', title: '모닝 스트레칭', done: true },
-          { emoji: '📖', title: '독서 15분', done: false },
-          { emoji: '✍️', title: '일기 쓰기', done: false },
+          { Icon: Sparkles, title: '모닝 스트레칭', done: true },
+          { Icon: BookOpen, title: '독서 15분', done: false },
+          { Icon: PenLine, title: '일기 쓰기', done: false },
         ].map((item, idx) => (
           <div key={idx} className={`flex items-center gap-3 px-4 py-2.5 ${idx > 0 ? 'border-t border-line-soft' : ''}`}>
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0 ${item.done ? 'bg-primary-soft' : 'bg-fill'}`}>
-              {item.emoji}
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${item.done ? 'bg-primary-soft text-primary' : 'bg-fill text-label-alt'}`}>
+              <item.Icon size={16} strokeWidth={1.9} />
             </div>
             <span className={`flex-1 text-caption1 font-medium ${item.done ? 'line-through text-label-assistive' : 'text-label-strong'}`}>
               {item.title}
@@ -100,21 +101,21 @@ const SLIDES = [
       <div className="w-full flex flex-col gap-2">
         <div className="flex items-center justify-between bg-amber-50 border border-amber-200/60 rounded-2xl px-4 py-2.5">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🔥</span>
+            <Flame size={20} strokeWidth={1.9} className="text-amber-500" />
             <span className="text-label1 font-bold text-amber-500">12일</span>
             <span className="text-caption1 text-label-alt">연속 달성 중</span>
           </div>
           <span className="text-caption2 font-semibold text-amber-400">계속 이어가요!</span>
         </div>
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden">
           {[
-            { time: '07:00', emoji: '🌅', label: '아침 루틴', items: [{ e: '🙏', t: '아침 기도', done: true }, { e: '📖', t: '말씀 묵상', done: true }], allDone: true },
-            { time: '21:00', emoji: '🌙', label: '저녁 루틴', items: [{ e: '✝️', t: '저녁 큐티', done: false }], allDone: false },
+            { time: '07:00', Icon: Sunrise, label: '아침 루틴', items: [{ Icon: BookOpen, t: '아침 기도', done: true }, { Icon: BookOpen, t: '말씀 묵상', done: true }], allDone: true },
+            { time: '21:00', Icon: Moon, label: '저녁 루틴', items: [{ Icon: Church, t: '저녁 큐티', done: false }], allDone: false },
           ].map((slot, si) => (
             <div key={si} className={si > 0 ? 'border-t border-line-soft' : ''}>
               <div className="flex items-center gap-2 px-4 py-2 bg-surface-alt">
                 <span className="text-caption2 text-label-assistive w-10">{slot.time}</span>
-                <span className="text-sm">{slot.emoji}</span>
+                <slot.Icon size={14} strokeWidth={1.9} className="text-label" />
                 <span className="flex-1 text-caption2 font-bold text-label">{slot.label}</span>
                 <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${slot.allDone ? 'bg-emerald-100 text-emerald-600' : 'bg-fill text-label-alt'}`}>
                   {slot.items.filter(i => i.done).length}/{slot.items.length}
@@ -122,8 +123,8 @@ const SLIDES = [
               </div>
               {slot.items.map((item, ii) => (
                 <div key={ii} className="flex items-center gap-3 px-4 py-2.5 border-t border-line-soft">
-                  <div className={`w-7 h-7 rounded-xl flex items-center justify-center text-sm flex-shrink-0 ${item.done ? 'bg-emerald-50' : 'bg-fill'}`}>
-                    {item.e}
+                  <div className={`w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 ${item.done ? 'bg-emerald-50 text-emerald-600' : 'bg-fill text-label-alt'}`}>
+                    <item.Icon size={14} strokeWidth={1.9} />
                   </div>
                   <span className={`flex-1 text-caption1 font-medium ${item.done ? 'line-through text-label-assistive' : 'text-label-strong'}`}>
                     {item.t}
@@ -144,7 +145,7 @@ const SLIDES = [
     description: '이번 주 루틴 달성률을 요일별로 확인하고\n오늘의 투두를 체크해요.\n지난 날 기록도 조회할 수 있어요.',
     visual: (
       <div className="w-full flex flex-col gap-2">
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize p-3">
+        <div className="bg-surface rounded-xl border border-line p-3">
           <p className="text-caption2 font-bold text-label-assistive mb-2">이번 주 달성률</p>
           <div className="flex gap-1">
             {WEEK_DATA.map((d, i) => (
@@ -170,9 +171,9 @@ const SLIDES = [
             <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[9px] text-label-assistive">신앙</span></div>
           </div>
         </div>
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden">
           <div className="px-4 py-2 bg-surface-alt border-b border-line-soft flex items-center justify-between">
-            <span className="text-caption1 font-bold text-label-strong">📝 오늘의 투두</span>
+            <span className="text-caption1 font-bold text-label-strong flex items-center gap-1.5"><FileText size={14} strokeWidth={1.9} /> 오늘의 투두</span>
             <span className="text-caption2 font-bold text-primary bg-primary-soft px-2 py-0.5 rounded-full">1/2</span>
           </div>
           {[
@@ -195,10 +196,10 @@ const SLIDES = [
     description: '이번 달 목표를 세우고 루틴과 연결해요.\n수행률·진척도·습관 캘린더 등\n다양한 통계로 성장 흐름을 확인해요.',
     visual: (
       <div className="w-full flex flex-col gap-2">
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden">
           <div className="px-4 pt-3 pb-2">
             <div className="flex items-center gap-1.5 mb-1">
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary-soft text-primary">💪 개인</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary-soft text-primary inline-flex items-center gap-1"><Dumbbell size={11} strokeWidth={1.9} /> 개인</span>
               <span className="text-caption2 text-label-assistive ml-auto">14/30일 · D+14</span>
             </div>
             <p className="text-body2 font-bold text-label-strong leading-snug">매일 운동으로 체력 키우기</p>
@@ -216,7 +217,7 @@ const SLIDES = [
             </div>
           </div>
         </div>
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3">
+        <div className="bg-surface rounded-xl border border-line px-4 py-3">
           <p className="text-caption2 font-bold text-label-assistive mb-2">습관 달성 캘린더</p>
           <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
             {(['월', '화', '수', '목', '금', '토', '일'] as const).map(d => (

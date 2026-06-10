@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, X } from 'lucide-react';
+import { Flame, X, Heart, Church } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { MemberGroupProgress, CheerType } from '../../types';
 
-const CHEER_ICONS: Record<CheerType, string> = {
-  heart: '❤️',
-  fire: '🔥',
-  pray: '🙏',
+const CHEER_ICONS: Record<CheerType, LucideIcon> = {
+  heart: Heart,
+  fire: Flame,
+  pray: Church,
 };
 
 const CHEER_LABELS: Record<CheerType, string> = {
@@ -63,7 +64,7 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
               }`}
               disabled={!canCheer}
             >
-              ❤️
+              <Heart size={15} strokeWidth={1.9} />
             </button>
 
             {/* 응원 팝오버 */}
@@ -76,16 +77,19 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
                   transition={{ type: 'spring', stiffness: 650, damping: 22 }}
                   className="absolute right-0 bottom-10 bg-white rounded-2xl shadow-xl border border-line-soft p-2 flex gap-2 z-10"
                 >
-                  {(['heart', 'fire', 'pray'] as CheerType[]).map(type => (
-                    <button
-                      key={type}
-                      onClick={() => handleCheer(type)}
-                      className="flex flex-col items-center gap-0.5 p-2 rounded-xl hover:bg-surface-alt transition-colors"
-                    >
-                      <span className="text-xl">{CHEER_ICONS[type]}</span>
-                      <span className="text-caption1 text-label-alt">{CHEER_LABELS[type]}</span>
-                    </button>
-                  ))}
+                  {(['heart', 'fire', 'pray'] as CheerType[]).map(type => {
+                    const Icon = CHEER_ICONS[type];
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => handleCheer(type)}
+                        className="flex flex-col items-center gap-0.5 p-2 rounded-xl hover:bg-surface-alt transition-colors"
+                      >
+                        <Icon size={20} strokeWidth={1.9} className="text-label" />
+                        <span className="text-caption1 text-label-alt">{CHEER_LABELS[type]}</span>
+                      </button>
+                    );
+                  })}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -100,18 +104,21 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
 
         {/* float 애니메이션 */}
         <AnimatePresence>
-          {floatingCheers.map(({ id, type }) => (
-            <motion.div
-              key={id}
-              initial={{ opacity: 1, y: 0, x: '50%' }}
-              animate={{ opacity: 0, y: -60 }}
-              exit={{}}
-              transition={{ duration: 1, ease: 'easeOut' }}
-              className="absolute right-12 bottom-8 text-2xl pointer-events-none"
-            >
-              {CHEER_ICONS[type]}
-            </motion.div>
-          ))}
+          {floatingCheers.map(({ id, type }) => {
+            const Icon = CHEER_ICONS[type];
+            return (
+              <motion.div
+                key={id}
+                initial={{ opacity: 1, y: 0, x: '50%' }}
+                animate={{ opacity: 0, y: -60 }}
+                exit={{}}
+                transition={{ duration: 1, ease: 'easeOut' }}
+                className="absolute right-12 bottom-8 text-pink-400 pointer-events-none"
+              >
+                <Icon size={24} strokeWidth={1.9} />
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </div>
 

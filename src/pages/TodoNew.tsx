@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTodoStore } from '../store/todoStore';
 import { today } from '../utils/date';
@@ -60,9 +60,9 @@ export default function TodoNew() {
         </div>
 
         {!isEdit && (
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-4">
+          <div className="bg-surface rounded-xl border border-line px-4 py-4">
             <div className="flex items-center gap-3">
-              <span className="text-xl">📅</span>
+              <Calendar size={20} strokeWidth={1.9} className="text-label-strong" />
               <div>
                 <p className="text-body2 font-semibold text-label-strong">오늘 날짜로 등록돼요</p>
                 <p className="text-caption1 text-label-alt mt-0.5">{todayStr}</p>

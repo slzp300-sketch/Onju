@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Timer, GripVertical } from 'lucide-react';
+import { ChevronLeft, Timer, GripVertical, Dumbbell, Flame, Clock } from 'lucide-react';
 import DurationPickerSheet from '../components/ui/DurationPickerSheet';
 import { fmtDuration } from '../utils/duration';
 import { format } from 'date-fns';
@@ -112,20 +112,20 @@ export default function PersonalRoutineNew() {
         {/* 월간 목표에서 루틴 가져오기 */}
         {!isEdit && activeGoalRoutines.length > 0 && (
           <div>
-            <p className="text-caption1 font-bold text-label-alt mb-2">💪 월간 목표 습관에서 가져오기</p>
+            <p className="text-caption1 font-bold text-label-alt mb-2 flex items-center gap-1.5"><Dumbbell size={14} strokeWidth={1.9} /> 월간 목표 습관에서 가져오기</p>
             <div className="flex flex-col gap-2">
               {activeGoalRoutines.map(r => (
                 <motion.button key={r.id}
                   whileTap={{ scale: 0.97 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
                   onClick={() => { setTitle(r.title); if (r.when) setWhen(r.when); }}
-                  className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
+                  className="w-full flex items-start gap-3 px-4 py-3 rounded-xl border border-line bg-surface text-left hover:border-primary hover:bg-primary-soft/20 transition-all">
                   <div className="flex-1 min-w-0">
                     <p className="text-body2 font-semibold text-label-strong truncate">{r.title}</p>
                     <p className="text-caption1 text-label-alt mt-0.5">
                       {[r.when, r.where].filter(Boolean).join(' · ')}
                     </p>
                     {r.miniRoutine && (
-                      <p className="text-caption1 text-amber-500 mt-0.5">🔥 미니: {r.miniRoutine}</p>
+                      <p className="text-caption1 text-amber-500 mt-0.5 flex items-center gap-1"><Flame size={13} strokeWidth={1.9} /> 미니: {r.miniRoutine}</p>
                     )}
                   </div>
                   <span className="text-caption2 text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0 mt-0.5">
@@ -149,10 +149,10 @@ export default function PersonalRoutineNew() {
         </div>
 
         {/* 언제 + 타이머 */}
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden">
           <div className="px-4 py-4 border-b border-line-soft">
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-xl">⏰</span>
+              <Clock size={20} strokeWidth={1.9} className="text-label-strong" />
               <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
             </div>
             <input type="text" value={when} onChange={e => setWhen(e.target.value)}
@@ -226,7 +226,7 @@ export default function PersonalRoutineNew() {
                   : null;
                 return (
                   <motion.button key={h.id} {...tap} onClick={() => toggle(h.id)}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-line bg-surface shadow-emphasize text-left hover:bg-fill transition-colors">
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-line bg-surface text-left hover:bg-fill transition-colors">
                     <div className="w-7 h-7 rounded-full border-2 border-line flex-shrink-0" />
                     <span className="text-2xl">{h.emoji}</span>
                     <div className="flex-1 min-w-0">
@@ -234,8 +234,8 @@ export default function PersonalRoutineNew() {
                       {h.when && <p className="text-caption1 text-label-alt truncate">{h.when}</p>}
                     </div>
                     {durLabel && (
-                      <span className="text-caption2 font-semibold text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0">
-                        ⏱ {durLabel}
+                      <span className="text-caption2 font-semibold text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0 inline-flex items-center gap-1">
+                        <Timer size={13} strokeWidth={1.9} /> {durLabel}
                       </span>
                     )}
                   </motion.button>
@@ -287,7 +287,7 @@ function SortableHabitCard({
   return (
     <>
       <div ref={setNodeRef} style={style}
-        className="rounded-xl border border-primary/30 bg-primary-soft/40 overflow-hidden shadow-emphasize">
+        className="rounded-xl border border-primary/30 bg-primary-soft/40 overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3.5">
           <button onClick={onToggle}
             className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-label1 font-bold">

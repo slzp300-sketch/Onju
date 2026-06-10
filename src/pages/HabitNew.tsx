@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Target, Bell, Calendar, Check, Zap, Lightbulb, Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 import { format } from 'date-fns';
@@ -154,10 +154,10 @@ export default function HabitNew() {
 
         {/* 월간 목표 연동 카드 */}
         {linkableGoals.length > 0 && (
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+          <div className="bg-surface rounded-xl border border-line overflow-hidden">
             <div className="px-4 py-4">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-xl">🎯</span>
+                <Target size={20} strokeWidth={1.9} className="text-label-strong" />
                 <div>
                   <p className="text-body2 font-semibold text-label-strong">월간 목표 연동</p>
                   <p className="text-caption1 text-label-alt">이 습관의 달성이 목표 달성률에 반영돼요</p>
@@ -185,7 +185,7 @@ export default function HabitNew() {
                       goalId === g.id ? 'text-primary' : 'text-label'
                     }`}>{g.title}</p>
                     {goalId === g.id && (
-                      <span className="text-caption2 text-primary font-bold flex-shrink-0">✓ 연동됨</span>
+                      <span className="text-caption2 text-primary font-bold flex-shrink-0 inline-flex items-center gap-0.5"><Check size={13} strokeWidth={1.9} /> 연동됨</span>
                     )}
                   </motion.button>
                 ))}
@@ -195,11 +195,11 @@ export default function HabitNew() {
         )}
 
         {/* 알림 카드 */}
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-xl">🔔</span>
+                <Bell size={20} strokeWidth={1.9} className="text-label-strong" />
                 <span className="text-body2 font-semibold text-label-strong">알림</span>
               </div>
               <button onClick={handleToggleNotif}
@@ -242,11 +242,11 @@ export default function HabitNew() {
         </div>
 
         {/* 반복 주기 카드 */}
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-xl">📅</span>
+                <Calendar size={20} strokeWidth={1.9} className="text-label-strong" />
                 <span className="text-body2 font-semibold text-label-strong">반복 주기</span>
               </div>
               <div className="flex items-center gap-1">
@@ -280,9 +280,9 @@ export default function HabitNew() {
         </div>
 
         {/* 언제 할래요? 카드 */}
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden px-4 py-4">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden px-4 py-4">
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-xl">✅</span>
+            <Check size={20} strokeWidth={1.9} className="text-label-strong" />
             <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
           </div>
           <input type="text" value={when} onChange={e => setWhen(e.target.value)}
@@ -292,7 +292,7 @@ export default function HabitNew() {
         </div>
 
         {/* 타이머 카드 */}
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -324,11 +324,11 @@ export default function HabitNew() {
         </div>
 
         {/* 2분 트리거 카드 */}
-        <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-xl">⚡</span>
+                <Zap size={20} strokeWidth={1.9} className="text-label-strong" />
                 <div>
                   <p className="text-body2 font-semibold text-label-strong">2분 트리거</p>
                   <p className="text-caption1 text-label-alt">습관 시작을 쉽게 만드는 작은 행동</p>
@@ -347,7 +347,7 @@ export default function HabitNew() {
                   <input type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
                     placeholder="예: 운동복 갈아입기, 러닝화 신기"
                     className="w-full bg-fill border border-emerald-200 rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 focus:bg-surface transition-all" />
-                  <p className="text-caption2 text-emerald-600 mt-1.5">💡 트리거 완료 후 자동으로 메인 습관으로 연결돼요</p>
+                  <p className="text-caption2 text-emerald-600 mt-1.5 flex items-center gap-1"><Lightbulb size={13} strokeWidth={1.9} /> 트리거 완료 후 자동으로 메인 습관으로 연결돼요</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -355,10 +355,10 @@ export default function HabitNew() {
         </div>
 
         {/* 대체 습관 카드 */}
-        <div className="bg-surface rounded-xl border border-amber-200/60 shadow-emphasize overflow-hidden">
+        <div className="bg-surface rounded-xl border border-amber-200/60 overflow-hidden">
           <div className="px-4 py-4 bg-amber-50/40">
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-xl">🔥</span>
+              <Flame size={20} strokeWidth={1.9} className="text-amber-700" />
               <div>
                 <p className="text-body2 font-semibold text-amber-700">대체 습관</p>
                 <p className="text-caption1 text-amber-600">하기 힘든 날의 더 쉬운 버전</p>
@@ -367,7 +367,7 @@ export default function HabitNew() {
             <input type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
               placeholder="예: 10분 스트레칭, 5분 걷기"
               className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300" />
-            <p className="text-caption2 text-amber-500 mt-1.5">💡 쉬운 버전을 만들어두면 포기하지 않을 수 있어요</p>
+            <p className="text-caption2 text-amber-500 mt-1.5 flex items-center gap-1"><Lightbulb size={13} strokeWidth={1.9} /> 쉬운 버전을 만들어두면 포기하지 않을 수 있어요</p>
           </div>
         </div>
 

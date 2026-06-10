@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Check, Timer } from 'lucide-react';
+import { ChevronLeft, Check, Timer, Church, Pencil, Bell, Calendar, Zap, Lightbulb, Target, Sunrise, Sun, Moon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 import DurationPickerSheet from '../components/ui/DurationPickerSheet';
 import { AlarmTimeSheet, AlarmTypeSheet } from '../components/ui/HabitAlarmSheet';
@@ -18,10 +19,10 @@ import { faithRoutineTemplates } from '../mocks/data/faithTemplates';
 const tap   = { whileTap: { scale: 0.96 }, transition: { type: 'spring' as const, stiffness: 600, damping: 20 } };
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 
-const TIME_SLOTS: { value: TimeSlot; label: string; emoji: string }[] = [
-  { value: 'morning', label: '아침', emoji: '🌅' },
-  { value: 'afternoon', label: '점심', emoji: '☀️' },
-  { value: 'evening', label: '저녁', emoji: '🌙' },
+const TIME_SLOTS: { value: TimeSlot; label: string; icon: LucideIcon }[] = [
+  { value: 'morning', label: '아침', icon: Sunrise },
+  { value: 'afternoon', label: '점심', icon: Sun },
+  { value: 'evening', label: '저녁', icon: Moon },
 ];
 
 const TEMPLATE_EMOJI: Record<string, string> = {
@@ -180,17 +181,17 @@ export default function FaithRoutineNew() {
         <div className="flex-1 px-4 py-8 flex flex-col gap-4">
           <p className="text-caption1 text-label-alt text-center mb-2">추가 방법을 선택해 주세요</p>
           <motion.button {...tap} onClick={() => setMode('template')}
-            className="bg-surface border border-line rounded-xl px-5 py-5 text-left shadow-emphasize hover:bg-fill transition-colors">
+            className="bg-surface border border-line rounded-xl px-5 py-5 text-left hover:bg-fill transition-colors">
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-2xl">📿</span>
+              <Church size={24} strokeWidth={1.9} className="text-label-strong" />
               <p className="text-body1 font-bold text-label-strong">템플릿 선택</p>
             </div>
             <p className="text-body2 text-label-alt">추천 신앙 루틴 중에서 골라보세요</p>
           </motion.button>
           <motion.button {...tap} onClick={() => setMode('custom')}
-            className="bg-surface border border-line rounded-xl px-5 py-5 text-left shadow-emphasize hover:bg-fill transition-colors">
+            className="bg-surface border border-line rounded-xl px-5 py-5 text-left hover:bg-fill transition-colors">
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-2xl">✏️</span>
+              <Pencil size={24} strokeWidth={1.9} className="text-label-strong" />
               <p className="text-body1 font-bold text-label-strong">직접 입력</p>
             </div>
             <p className="text-body2 text-label-alt">나만의 신앙 루틴을 직접 만들어요</p>
@@ -206,7 +207,7 @@ export default function FaithRoutineNew() {
             const already = !!faithRoutines.find(r => r.title === t.title);
             return (
               <motion.button key={t.id} {...tap} onClick={() => selectTemplate(t)} disabled={already}
-                className={`bg-surface border rounded-xl px-4 py-4 text-left shadow-emphasize transition-all ${already ? 'border-line opacity-40 cursor-not-allowed' : 'border-line hover:border-primary hover:bg-primary-soft/40'}`}>
+                className={`bg-surface border rounded-xl px-4 py-4 text-left transition-all ${already ? 'border-line opacity-40 cursor-not-allowed' : 'border-line hover:border-primary hover:bg-primary-soft/40'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{TEMPLATE_EMOJI[t.title] ?? '🙏'}</span>
@@ -243,11 +244,11 @@ export default function FaithRoutineNew() {
               </div>
 
               {/* 알림 카드 */}
-              <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+              <div className="bg-surface rounded-xl border border-line overflow-hidden">
                 <div className="px-4 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-xl">🔔</span>
+                      <Bell size={20} strokeWidth={1.9} className="text-label-strong" />
                       <span className="text-body2 font-semibold text-label-strong">알림</span>
                     </div>
                     <button onClick={handleToggleNotif}
@@ -288,10 +289,10 @@ export default function FaithRoutineNew() {
               </div>
 
               {/* 반복 주기 카드 */}
-              <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+              <div className="bg-surface rounded-xl border border-line overflow-hidden">
                 <div className="px-4 py-4">
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="text-xl">📅</span>
+                    <Calendar size={20} strokeWidth={1.9} className="text-label-strong" />
                     <span className="text-body2 font-semibold text-label-strong">반복 주기</span>
                   </div>
                   <div className="flex gap-2 flex-wrap">
@@ -321,9 +322,9 @@ export default function FaithRoutineNew() {
               </div>
 
               {/* 언제 할래요? 카드 */}
-              <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden px-4 py-4">
+              <div className="bg-surface rounded-xl border border-line overflow-hidden px-4 py-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-xl">✅</span>
+                  <Check size={20} strokeWidth={1.9} className="text-label-strong" />
                   <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
                 </div>
                 <input type="text" value={when} onChange={e => setWhen(e.target.value)}
@@ -332,14 +333,14 @@ export default function FaithRoutineNew() {
               </div>
 
               {/* 시간대 카드 */}
-              <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden px-4 py-4">
+              <div className="bg-surface rounded-xl border border-line overflow-hidden px-4 py-4">
                 <p className="text-caption1 font-bold text-label-alt mb-3">시간대 (선택)</p>
                 <div className="flex gap-2">
                   {TIME_SLOTS.map(ts => (
                     <motion.button key={ts.value} {...tap}
                       onClick={() => setTimeSlot(timeSlot === ts.value ? null : ts.value)}
-                      className={`flex-1 py-2.5 rounded-lg text-body2 font-medium border transition-all ${timeSlot === ts.value ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt'}`}>
-                      {ts.emoji} {ts.label}
+                      className={`flex-1 py-2.5 rounded-lg text-body2 font-medium border transition-all inline-flex items-center justify-center gap-1.5 ${timeSlot === ts.value ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt'}`}>
+                      <ts.icon size={15} strokeWidth={1.9} /> {ts.label}
                     </motion.button>
                   ))}
                 </div>
@@ -347,10 +348,10 @@ export default function FaithRoutineNew() {
 
               {/* 목표 연동 카드 */}
               {linkableFaithGoals.length > 0 && (
-                <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+                <div className="bg-surface rounded-xl border border-line overflow-hidden">
                   <div className="px-4 py-4">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-xl">🎯</span>
+                      <Target size={20} strokeWidth={1.9} className="text-label-strong" />
                       <div>
                         <p className="text-body2 font-semibold text-label-strong">월간 목표 연동</p>
                         <p className="text-caption1 text-label-alt">이 루틴의 달성이 목표 달성률에 반영돼요</p>
@@ -376,7 +377,7 @@ export default function FaithRoutineNew() {
                             goalId === g.id ? 'text-primary' : 'text-label'
                           }`}>{g.title}</p>
                           {goalId === g.id && (
-                            <span className="text-caption2 text-primary font-bold flex-shrink-0">✓ 연동됨</span>
+                            <span className="text-caption2 text-primary font-bold flex-shrink-0 inline-flex items-center gap-0.5"><Check size={13} strokeWidth={1.9} /> 연동됨</span>
                           )}
                         </motion.button>
                       ))}
@@ -386,11 +387,11 @@ export default function FaithRoutineNew() {
               )}
 
               {/* 2분 트리거 카드 */}
-              <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+              <div className="bg-surface rounded-xl border border-line overflow-hidden">
                 <div className="px-4 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-xl">⚡</span>
+                      <Zap size={20} strokeWidth={1.9} className="text-label-strong" />
                       <div>
                         <p className="text-body2 font-semibold text-label-strong">2분 트리거</p>
                         <p className="text-caption1 text-label-alt">루틴 시작을 쉽게 만드는 작은 행동</p>
@@ -409,7 +410,7 @@ export default function FaithRoutineNew() {
                         <input type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
                           placeholder="예: 성경책 펼치기, 묵상 앱 열기"
                           className="w-full bg-fill border border-emerald-200 rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 focus:bg-surface transition-all" />
-                        <p className="text-caption2 text-emerald-600 mt-1.5">💡 트리거 완료 후 자동으로 루틴으로 연결돼요</p>
+                        <p className="text-caption2 text-emerald-600 mt-1.5 flex items-center gap-1"><Lightbulb size={13} strokeWidth={1.9} /> 트리거 완료 후 자동으로 루틴으로 연결돼요</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -417,7 +418,7 @@ export default function FaithRoutineNew() {
               </div>
 
               {/* 타이머 카드 */}
-              <div className="bg-surface rounded-xl border border-line shadow-emphasize overflow-hidden">
+              <div className="bg-surface rounded-xl border border-line overflow-hidden">
                 <div className="px-4 py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

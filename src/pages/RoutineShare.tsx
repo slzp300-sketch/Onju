@@ -1,15 +1,25 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Share2, Heart, Bookmark } from 'lucide-react';
+import { Share2, Heart, Bookmark, Smile, Laugh, Sunrise, Dumbbell, Moon, BookOpen, FolderOpen } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useHabitStore } from '../store/habitStore';
 
 // 더미 공유 루틴 데이터
-const SHARED_ROUTINES = [
+const SHARED_ROUTINES: {
+  id: string;
+  userName: string;
+  userIcon: LucideIcon;
+  routineIcon: LucideIcon;
+  routineName: string;
+  when: string;
+  habits: string[];
+  likes: number;
+}[] = [
   {
     id: 'sr-1',
     userName: '김믿음',
-    userEmoji: '😊',
-    routineEmoji: '🌅',
+    userIcon: Smile,
+    routineIcon: Sunrise,
     routineName: '아침 모닝루틴',
     when: '기상 직후 30분',
     habits: ['스트레칭 5분', '성경 묵상', '감사 일기'],
@@ -18,8 +28,8 @@ const SHARED_ROUTINES = [
   {
     id: 'sr-2',
     userName: '이소망',
-    userEmoji: '🙂',
-    routineEmoji: '💪',
+    userIcon: Smile,
+    routineIcon: Dumbbell,
     routineName: '퇴근 후 리셋',
     when: '퇴근 후',
     habits: ['30분 산책', '기도', '독서 20분'],
@@ -28,8 +38,8 @@ const SHARED_ROUTINES = [
   {
     id: 'sr-3',
     userName: '박사랑',
-    userEmoji: '😄',
-    routineEmoji: '🌙',
+    userIcon: Laugh,
+    routineIcon: Moon,
     routineName: '저녁 마무리 루틴',
     when: '취침 1시간 전',
     habits: ['하루 되돌아보기', '내일 계획 작성', '저녁 기도'],
@@ -38,8 +48,8 @@ const SHARED_ROUTINES = [
   {
     id: 'sr-4',
     userName: '최인내',
-    userEmoji: '😌',
-    routineEmoji: '📖',
+    userIcon: Smile,
+    routineIcon: BookOpen,
     routineName: '말씀 묵상 루틴',
     when: '점심 시간',
     habits: ['오늘의 말씀 읽기', '묵상 메모', '적용 다짐'],
@@ -91,7 +101,7 @@ export default function RoutineShare() {
           </p>
           {personalRoutines.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 text-center">
-              <span className="text-4xl mb-3">🗂️</span>
+              <FolderOpen size={40} strokeWidth={1.9} className="text-label-assistive mb-3" />
               <p className="text-label1 font-semibold text-label">아직 만든 루틴이 없어요</p>
               <p className="text-caption1 text-label-alt mt-1">홈에서 루틴을 먼저 만들어 보세요</p>
             </div>
@@ -128,13 +138,15 @@ export default function RoutineShare() {
 function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
+  const UserIcon = data.userIcon;
+  const RoutineIcon = data.routineIcon;
 
   return (
     <div className="bg-white border border-line-soft rounded-2xl overflow-hidden">
       {/* 카드 헤더 */}
       <div className="flex items-center gap-2.5 px-4 py-3 border-b border-line-soft">
-        <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-lg flex-shrink-0">
-          {data.userEmoji}
+        <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-primary flex-shrink-0">
+          <UserIcon size={16} strokeWidth={1.9} />
         </div>
         <div className="flex-1">
           <p className="text-caption2 font-semibold text-label-strong">{data.userName}</p>
@@ -148,7 +160,7 @@ function SharedRoutineCard({ data }: { data: typeof SHARED_ROUTINES[0] }) {
       {/* 루틴 정보 */}
       <div className="px-4 pt-3 pb-2">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">{data.routineEmoji}</span>
+          <RoutineIcon size={18} strokeWidth={1.9} className="text-label-strong" />
           <div>
             <p className="text-label1 font-bold text-label-strong">{data.routineName}</p>
             <p className="text-caption1 text-label-alt">{data.when}</p>

@@ -124,13 +124,6 @@ function BottomNav() {
                 to={item.to}
                 className={`relative flex-1 flex flex-col items-center gap-1 py-3.5 text-[12px] font-medium transition-colors ${active ? 'text-primary' : 'text-label-assistive'}`}
               >
-                {active && (
-                  <motion.span
-                    layoutId="activeTabPill"
-                    className="absolute inset-x-2 top-2 bottom-2 bg-primary-soft rounded-2xl -z-10"
-                    transition={{ type: 'spring', stiffness: 650, damping: 28 }}
-                  />
-                )}
                 <motion.div whileTap={{ scale: 1.2 }} transition={{ duration: 0.08 }}>
                   <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
                 </motion.div>

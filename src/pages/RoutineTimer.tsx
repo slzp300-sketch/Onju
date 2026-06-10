@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pause, Play, SkipForward, Check } from 'lucide-react';
+import { X, Pause, Play, SkipForward, Check, Timer } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useHabitStore } from '../store/habitStore';
 import type { Habit } from '../types';
@@ -109,7 +109,7 @@ export default function RoutineTimer() {
 
           {/* 총 소요 시간 */}
           <div className="w-full bg-cool-25 rounded-xl px-5 py-4 text-center">
-            <p className="text-cool-60 text-body2">⏱️ 총 소요시간 <span className="text-white font-bold">{totalActual}초</span></p>
+            <p className="text-cool-60 text-body2 inline-flex items-center gap-1"><Timer size={14} strokeWidth={1.9} /> 총 소요시간 <span className="text-white font-bold">{totalActual}초</span></p>
           </div>
 
           {/* 습관별 결과 */}

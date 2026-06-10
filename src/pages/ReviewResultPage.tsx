@@ -1,13 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, Star } from 'lucide-react';
+import { ChevronLeft, Star, Smile, Frown } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { fetchReviewByWeek } from '../api/reviews';
 import Card from '../components/ui/Card';
 
-const MOOD_MAP = {
-  hard: { label: '힘들었어요', emoji: '😓' },
-  normal: { label: '보통이었어요', emoji: '😊' },
-  easy: { label: '여유로웠어요', emoji: '😌' },
+const MOOD_MAP: Record<string, { label: string; Icon: LucideIcon }> = {
+  hard: { label: '힘들었어요', Icon: Frown },
+  normal: { label: '보통이었어요', Icon: Smile },
+  easy: { label: '여유로웠어요', Icon: Smile },
 };
 
 export default function ReviewResultPage() {
@@ -90,7 +91,7 @@ export default function ReviewResultPage() {
       {mood && (
         <Card className="mx-4">
           <p className="text-caption2 font-semibold text-label-alt mb-2">이번 주 느낌</p>
-          <p className="text-lg">{mood.emoji} <span className="text-body2 text-label">{mood.label}</span></p>
+          <p className="text-lg flex items-center gap-1.5"><mood.Icon size={18} strokeWidth={1.9} className="text-label" /> <span className="text-body2 text-label">{mood.label}</span></p>
         </Card>
       )}
 

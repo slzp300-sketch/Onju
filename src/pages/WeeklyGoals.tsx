@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, TrendingUp, ChevronDown, ChevronLeft } from 'lucide-react';
+import { Plus, TrendingUp, ChevronDown, ChevronLeft, PartyPopper } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -69,7 +69,7 @@ export default function WeeklyGoals() {
           <div className="flex items-center gap-1.5">
             <TrendingUp size={13} />
             {shouldUnlock ? (
-              <span className="font-medium">지난 주 {currentRate}% 달성! 다음 주 목표 칸이 1개 늘어나요 🎉</span>
+              <span className="font-medium inline-flex items-center gap-1">지난 주 {currentRate}% 달성! 다음 주 목표 칸이 1개 늘어나요 <PartyPopper size={13} strokeWidth={1.9} /></span>
             ) : (
               <span>지난 주 달성률 {currentRate}% — 80% 이상 달성하면 목표를 더 세울 수 있어요</span>
             )}

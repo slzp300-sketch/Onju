@@ -15,7 +15,7 @@ export default function Card({ padding = 'md', className = '', children, ...prop
   return (
     <div
       {...props}
-      className={cn('bg-surface rounded-xl shadow-emphasize', paddingClasses[padding], className)}
+      className={cn('bg-surface rounded-xl border border-line', paddingClasses[padding], className)}
     >
       {children}
     </div>

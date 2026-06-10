@@ -1,68 +1,66 @@
-@import url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css");
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════
-   Wanted Design System — @theme tokens
+   Wireframe UI Kit — @theme tokens
 ══════════════════════════════════════════ */
 @theme {
   /* primary */
-  --color-primary: #0066ff;
-  --color-primary-strong: #005eeb;
-  --color-primary-heavy: #0054d1;
-  --color-primary-soft: #eaf2fe;
+  --color-primary: #1f6bff;
+  --color-primary-strong: #1a5be0;
+  --color-primary-heavy: #154fc4;
+  --color-primary-soft: #eaf1ff;
 
-  /* cool neutral ramp */
-  --color-cool-99: #f7f7f8;
-  --color-cool-98: #f4f4f5;
-  --color-cool-97: #eaebec;
-  --color-cool-95: #dbdcdf;
-  --color-cool-90: #c2c4c8;
-  --color-cool-70: #989ba2;
-  --color-cool-60: #878a93;
-  --color-cool-50: #70737c;
-  --color-cool-30: #46474c;
-  --color-cool-25: #37383c;
-  --color-cool-22: #2e2f33;
-  --color-cool-17: #212225;
-  --color-cool-12: #171719;
+  /* cool neutral ramp (grayscale) */
+  --color-cool-99: #fafafa;
+  --color-cool-98: #f5f5f5;
+  --color-cool-97: #eeeeee;
+  --color-cool-95: #e0e0e0;
+  --color-cool-90: #bdbdbd;
+  --color-cool-70: #9e9e9e;
+  --color-cool-60: #8a8a8a;
+  --color-cool-50: #757575;
+  --color-cool-30: #4a4a4a;
+  --color-cool-25: #424242;
+  --color-cool-22: #303030;
+  --color-cool-17: #262626;
+  --color-cool-12: #212121;
 
   /* text tokens */
-  --color-label: rgba(23,23,25,0.95);
-  --color-label-strong: #171719;
-  --color-label-alt: rgba(55,56,60,0.61);
-  --color-label-assistive: rgba(55,56,60,0.28);
+  --color-label: #212121;
+  --color-label-strong: #020202;
+  --color-label-alt: #757575;
+  --color-label-assistive: #9e9e9e;
 
   /* surfaces / lines / fills */
   --color-surface: #ffffff;
-  --color-surface-alt: #f7f7f8;
-  --color-line: rgba(112,115,124,0.22);
-  --color-line-soft: rgba(112,115,124,0.12);
-  --color-fill: rgba(112,115,124,0.08);
-  --color-fill-strong: rgba(112,115,124,0.16);
+  --color-surface-alt: #f5f5f5;
+  --color-line: #e0e0e0;
+  --color-line-soft: #eeeeee;
+  --color-fill: #f5f5f5;
+  --color-fill-strong: #e0e0e0;
 
   /* status */
-  --color-positive: #00bf40;
-  --color-cautionary: #ff9200;
-  --color-negative: #ff4242;
+  --color-positive: #1f8a4c;
+  --color-cautionary: #ff7a1a;
+  --color-negative: #e5484d;
 
   /* fonts */
-  --font-brand: "Wanted Sans", "Wanted Sans Variable", "Pretendard", system-ui, sans-serif;
-  --font-ui: "Pretendard", "Pretendard JP", "Wanted Sans", system-ui, sans-serif;
+  --font-brand: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
 
   /* border-radius */
   --radius: 8px;
   --radius-md: 10px;
   --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-xl: 14px;
   --radius-2xl: 24px;
   --radius-3xl: 32px;
 
   /* shadows */
-  --shadow-emphasize: 0px 4px 6px -1px rgba(23,23,23,0.06), 0px 2px 4px -2px rgba(23,23,23,0.06);
-  --shadow-strong: 0px 10px 15px -3px rgba(23,23,23,0.07), 0px 4px 6px -2px rgba(0,0,0,0.07);
-  --shadow-heavy: 0px 16px 24px -6px rgba(23,23,23,0.08), 0px 6px 10px -4px rgba(23,23,23,0.08);
-  --shadow-overlay: 0px 24px 38px -10px rgba(23,23,23,0.12), 0px 10px 15px -5px rgba(23,23,23,0.1);
+  --shadow-emphasize: 0px 1px 2px rgba(0,0,0,0.06);
+  --shadow-strong: 0px 6px 16px rgba(0,0,0,0.22);
+  --shadow-heavy: 0px 11px 24px rgba(0,0,0,0.20);
+  --shadow-overlay: 0px 11px 24px rgba(0,0,0,0.20);
 
   /* type scale */
   --text-display1: 56px;
@@ -126,7 +124,7 @@ body {
 
 .input-base:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(31, 107, 255, 0.15);
 }
 
 /* iOS safe area — 하단 네비게이션이 홈 바 위에 표시되도록 */
@@ -140,20 +138,20 @@ body {
    --color-primary : Wanted primary → 테마별 오버라이드
 ══════════════════════════════════════════ */
 
-/* 라이트 (기본) — Wanted 토큰 그대로 */
+/* 라이트 (기본) — 그레이스케일 플랫 토큰 */
 :root, [data-theme="light"] {
-  --t-bg: #f7f7f8;
+  --t-bg: #f5f5f5;
   --t-card: #ffffff;
-  --t-card2: #f4f4f5;
-  --t-border: rgba(112,115,124,0.22);
-  --t-border2: rgba(112,115,124,0.16);
-  --t-text1: #171719;
-  --t-text2: rgba(23,23,25,0.95);
-  --t-text3: rgba(55,56,60,0.61);
-  --t-text4: rgba(55,56,60,0.28);
-  --t-text5: rgba(55,56,60,0.16);
+  --t-card2: #f0f0f0;
+  --t-border: #e0e0e0;
+  --t-border2: #eeeeee;
+  --t-text1: #020202;
+  --t-text2: #212121;
+  --t-text3: #757575;
+  --t-text4: #9e9e9e;
+  --t-text5: #bdbdbd;
   --t-nav-bg: rgba(255,255,255,0.96);
-  --t-divide: rgba(112,115,124,0.12);
+  --t-divide: #eeeeee;
 }
 
 /* 다크 — 부드러운 다크 */
@@ -161,8 +159,8 @@ body {
   --t-bg: #1c1e26;
   --t-card: #252830;
   --t-card2: #2e3240;
-  --t-border: rgba(196,200,214,0.18);
-  --t-border2: rgba(196,200,214,0.28);
+  --t-border: rgba(196,200,214,0.24);
+  --t-border2: rgba(196,200,214,0.32);
   --t-text1: #e8eaf0;
   --t-text2: rgba(228,234,240,0.95);
   --t-text3: rgba(196,200,214,0.65);
@@ -182,8 +180,8 @@ body {
   --color-label: rgba(228,234,240,0.95);
   --color-label-alt: rgba(196,200,214,0.65);
   --color-label-assistive: rgba(139,144,164,0.45);
-  --color-line: rgba(196,200,214,0.18);
-  --color-line-soft: rgba(196,200,214,0.1);
+  --color-line: rgba(196,200,214,0.24);
+  --color-line-soft: rgba(196,200,214,0.14);
   --color-fill: rgba(196,200,214,0.08);
   --color-fill-strong: rgba(196,200,214,0.14);
 }
@@ -193,8 +191,8 @@ body {
   --t-bg: #fdf0f2;
   --t-card: #ffffff;
   --t-card2: #fce4e8;
-  --t-border: rgba(212,84,106,0.18);
-  --t-border2: rgba(212,84,106,0.28);
+  --t-border: rgba(212,84,106,0.26);
+  --t-border2: rgba(212,84,106,0.34);
   --t-text1: #2d1a1e;
   --t-text2: rgba(45,26,30,0.95);
   --t-text3: rgba(138,84,96,0.7);
@@ -216,8 +214,8 @@ body {
   --t-bg: #f2f5f0;
   --t-card: #fafcf9;
   --t-card2: #e6ede2;
-  --t-border: rgba(94,143,106,0.2);
-  --t-border2: rgba(94,143,106,0.3);
+  --t-border: rgba(94,143,106,0.28);
+  --t-border2: rgba(94,143,106,0.36);
   --t-text1: #1e2a1a;
   --t-text2: rgba(30,42,26,0.95);
   --t-text3: rgba(97,117,88,0.7);

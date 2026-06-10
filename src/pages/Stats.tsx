@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Target } from 'lucide-react';
+import { ChevronRight, Target, BookOpen, Dumbbell, Link2, Pin, BarChart3, Flame, FileText, Moon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, getDay } from 'date-fns';
@@ -152,7 +152,7 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
   return (
     <motion.button
       whileTap={{ scale: 0.99 }} onClick={onClick}
-      className="w-full text-left rounded-xl border shadow-emphasize overflow-hidden bg-surface border-line"
+      className="w-full text-left rounded-xl border overflow-hidden bg-surface border-line"
       style={goal.color ? { backgroundColor: `${goal.color}0a`, borderColor: `${goal.color}40` } : undefined}
     >
       {/* 헤더 */}
@@ -162,10 +162,12 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
             {format(new Date(goal.startDate + 'T12:00:00'), 'M/d')} ~ {format(new Date(goal.endDate + 'T12:00:00'), 'M/d')}
           </span>
           {goal.category && (
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
               goal.category === 'faith' ? 'bg-emerald-100 text-emerald-600' : 'bg-primary-soft text-primary'
             }`}>
-              {goal.category === 'faith' ? '🙏 신앙' : '💪 개인'}
+              {goal.category === 'faith'
+                ? <><BookOpen size={11} strokeWidth={1.9} /> 신앙</>
+                : <><Dumbbell size={11} strokeWidth={1.9} /> 개인</>}
             </span>
           )}
           <span className="text-caption2 text-label-assistive ml-auto">
@@ -193,12 +195,17 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
 
       {/* 연동 습관별 */}
       <div className="px-4 pb-4 flex flex-col gap-2.5">
-        <p className="text-caption1 font-bold text-label-strong">🔗 연동된 습관 {items.length > 0 && `(${items.length})`}</p>
+        <p className="text-caption1 font-bold text-label-strong flex items-center gap-1.5"><Link2 size={13} strokeWidth={1.9} className="text-label-strong" /> 연동된 습관 {items.length > 0 && `(${items.length})`}</p>
         {items.length > 0 ? items.map(item => (
           <div key={item.id}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-body2 text-label truncate flex-1 mr-2">
-                {item.emoji ?? (item.kind === 'faith' ? '🙏' : '📌')} {item.title}
+              <span className="text-body2 text-label truncate flex-1 mr-2 inline-flex items-center gap-1.5">
+                {item.emoji
+                  ? <span>{item.emoji}</span>
+                  : item.kind === 'faith'
+                    ? <BookOpen size={14} strokeWidth={1.9} className="text-label-assistive flex-shrink-0" />
+                    : <Pin size={14} strokeWidth={1.9} className="text-label-assistive flex-shrink-0" />}
+                <span className="truncate">{item.title}</span>
               </span>
               <span className="flex items-center gap-1.5 flex-shrink-0">
                 <span className="text-caption2 text-label-assistive">{item.doneCount}/{item.scheduledElapsed}일</span>
@@ -230,7 +237,9 @@ function HabitStatsTab() {
   if (habits.length === 0 && faithRoutines.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center mb-4 text-3xl">📊</div>
+        <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center mb-4">
+          <BarChart3 size={28} strokeWidth={1.9} className="text-primary" />
+        </div>
         <p className="text-body1 font-bold text-label-strong mb-1">아직 습관이 없어요</p>
         <p className="text-caption1 text-label-alt mb-5">습관을 추가하면 진행 통계를 볼 수 있어요</p>
         <motion.button whileTap={{ scale: 0.97 }}
@@ -246,7 +255,7 @@ function HabitStatsTab() {
     <div className="flex flex-col gap-4 px-4 py-4 pb-8">
       {habits.length > 0 && (
         <div className="flex flex-col gap-2.5">
-          <p className="text-caption1 font-bold text-label-alt">📌 개인 습관</p>
+          <p className="text-caption1 font-bold text-label-alt flex items-center gap-1.5"><Pin size={13} strokeWidth={1.9} className="text-label-alt" /> 개인 습관</p>
           {habits.map(h => (
             <HabitStatRow key={h.id}
               emoji={h.emoji} title={h.title} accent="var(--color-primary)"
@@ -259,7 +268,7 @@ function HabitStatsTab() {
 
       {faithRoutines.length > 0 && (
         <div className="flex flex-col gap-2.5">
-          <p className="text-caption1 font-bold text-label-alt">🙏 신앙 루틴</p>
+          <p className="text-caption1 font-bold text-label-alt flex items-center gap-1.5"><BookOpen size={13} strokeWidth={1.9} className="text-label-alt" /> 신앙 루틴</p>
           {faithRoutines.map(r => (
             <HabitStatRow key={r.id}
               emoji={r.emoji ?? '✝️'} title={r.title} accent="var(--color-positive)"
@@ -287,7 +296,7 @@ function HabitStatRow({ emoji, title, accent, stat }: {
   stat: ReturnType<typeof getHabitStat>;
 }) {
   return (
-    <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5">
+    <div className="bg-surface rounded-xl border border-line px-4 py-3.5">
       <div className="flex items-center gap-2.5 mb-3">
         <span className="text-xl">{emoji}</span>
         <span className="flex-1 text-body2 font-bold text-label-strong truncate">{title}</span>
@@ -304,7 +313,7 @@ function HabitStatRow({ emoji, title, accent, stat }: {
 
       {/* 지표 행 */}
       <div className="flex items-center gap-4 text-caption1">
-        <span className="text-label-alt">🔥 연속 <span className="font-bold text-label-strong">{stat.streak}일</span></span>
+        <span className="text-label-alt inline-flex items-center gap-1"><Flame size={13} strokeWidth={1.9} className="text-cautionary" /> 연속 <span className="font-bold text-label-strong">{stat.streak}일</span></span>
         <span className="text-label-alt">최고 <span className="font-bold text-label-strong">{stat.best}일</span></span>
         <span className="text-label-assistive ml-auto">최근 30일 {stat.done30}/{stat.sched30}일</span>
       </div>
@@ -419,7 +428,7 @@ function WeeklyTab() {
   return (
     <div className="flex flex-col gap-4 px-4 py-4 pb-8">
       {/* ── 이번 주 도장 캘린더 ── */}
-      <div className="bg-surface rounded-2xl border border-line shadow-emphasize px-4 py-4">
+      <div className="bg-surface rounded-2xl border border-line px-4 py-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-body2 font-bold text-label-strong">이번 주 달성</p>
           <p className="text-caption1 text-label-alt">{getWeekRangeText(new Date(), weekStartDay as 0 | 1)}</p>
@@ -454,7 +463,7 @@ function WeeklyTab() {
       {hasData && (
         <>
           {/* ── 이번 주 vs 지난주 ── */}
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5 flex flex-col gap-3">
+          <div className="bg-surface rounded-xl border border-line px-4 py-3.5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <p className="text-caption1 font-bold text-label-strong">이번 주 vs 지난주</p>
               <span className={`text-caption1 font-bold tabular-nums ${
@@ -468,14 +477,14 @@ function WeeklyTab() {
           </div>
 
           {/* ── 이번 주 개인·신앙 ── */}
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5 flex flex-col gap-3">
+          <div className="bg-surface rounded-xl border border-line px-4 py-3.5 flex flex-col gap-3">
             <p className="text-caption1 font-bold text-label-strong">이번 주 개인·신앙</p>
             <BarRow label="💪 개인" value={personalWeekRate} color="var(--color-primary)" highlight />
             <BarRow label="🙏 신앙" value={faithWeekRate} color="var(--color-positive)" highlight />
           </div>
 
           {/* ── 요일별 패턴 ── */}
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5">
+          <div className="bg-surface rounded-xl border border-line px-4 py-3.5">
             <p className="text-caption1 font-bold text-label-strong mb-3">
               요일별 패턴 <span className="text-caption2 text-label-assistive font-medium">· 최근 4주</span>
             </p>
@@ -566,7 +575,7 @@ function RecordsTab() {
 
       {/* ════ 일기 ════ */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-body2 font-bold text-label-strong flex items-center gap-1.5">📖 하루 일기</h2>
+        <h2 className="text-body2 font-bold text-label-strong flex items-center gap-1.5"><BookOpen size={15} strokeWidth={1.9} className="text-label-strong" /> 하루 일기</h2>
 
         {entries.length === 0 ? (
           <EmptyRecord
@@ -593,8 +602,10 @@ function RecordsTab() {
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04, duration: 0.12 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => navigate('/diary', { state: { date: d.date } })}
-                  className="w-full bg-surface rounded-xl p-3.5 border border-line shadow-emphasize text-left flex items-center gap-3 hover:bg-fill transition-colors">
-                  <span className="text-2xl flex-shrink-0">{d.mood ? DIARY_MOODS.find(m => m.key === d.mood)?.emoji : '📝'}</span>
+                  className="w-full bg-surface rounded-xl p-3.5 border border-line text-left flex items-center gap-3 hover:bg-fill transition-colors">
+                  <span className="text-2xl flex-shrink-0 flex items-center justify-center w-7">
+                    {d.mood ? DIARY_MOODS.find(m => m.key === d.mood)?.emoji : <FileText size={20} strokeWidth={1.9} className="text-label-assistive" />}
+                  </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-caption1 font-semibold text-label-strong">
                       {format(new Date(d.date + 'T12:00:00'), 'M월 d일 (EEE)', { locale: ko })}
@@ -611,7 +622,7 @@ function RecordsTab() {
 
       {/* ════ 주간 리뷰 ════ */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-body2 font-bold text-label-strong flex items-center gap-1.5">📝 주간 리뷰</h2>
+        <h2 className="text-body2 font-bold text-label-strong flex items-center gap-1.5"><FileText size={15} strokeWidth={1.9} className="text-label-strong" /> 주간 리뷰</h2>
 
         {completedReviews.length === 0 ? (
           <EmptyRecord
@@ -638,7 +649,7 @@ function RecordsTab() {
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04, duration: 0.12 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => navigate(`/review/result/${review.year}-${review.weekNumber}`)}
-                  className="w-full bg-surface rounded-xl p-3.5 border border-line shadow-emphasize text-left flex items-center gap-3 hover:bg-fill transition-colors">
+                  className="w-full bg-surface rounded-xl p-3.5 border border-line text-left flex items-center gap-3 hover:bg-fill transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-caption1 font-semibold text-label-strong">{review.year}년 {review.weekNumber}주차</p>
@@ -671,7 +682,7 @@ function MoodDistribution({ title, items, total, color }: {
   color: string;
 }) {
   return (
-    <div className="bg-surface rounded-xl border border-line shadow-emphasize px-4 py-3.5">
+    <div className="bg-surface rounded-xl border border-line px-4 py-3.5">
       <p className="text-caption1 font-bold text-label-strong mb-3">{title}</p>
       <div className="flex flex-col gap-2">
         {items.map(m => {
@@ -697,7 +708,7 @@ function EmptyRecord({ text, sub, ctaLabel, onCta }: {
   text: string; sub: string; ctaLabel: string; onCta: () => void;
 }) {
   return (
-    <div className="bg-surface rounded-xl border border-line shadow-emphasize flex flex-col items-center text-center px-6 py-8">
+    <div className="bg-surface rounded-xl border border-line flex flex-col items-center text-center px-6 py-8">
       <p className="text-body2 font-bold text-label-strong mb-1">{text}</p>
       <p className="text-caption1 text-label-alt mb-4">{sub}</p>
       <motion.button whileTap={{ scale: 0.97 }} onClick={onCta}
@@ -732,7 +743,7 @@ function SummaryStat({ label, value, sub, subColor }: {
   label: string; value: string; sub: string; subColor: string;
 }) {
   return (
-    <div className="rounded-xl border border-line bg-surface shadow-emphasize p-3">
+    <div className="rounded-xl border border-line bg-surface p-3">
       <p className="text-caption2 text-label-alt font-medium mb-1">{label}</p>
       <p className="text-title3 font-bold text-label-strong leading-none">{value}</p>
       <p className={`text-caption2 mt-1 truncate ${subColor}`}>{sub}</p>
@@ -767,7 +778,7 @@ function WeekStampCell({ info, isToday, delay }: { info: WeekDayInfo; isToday: b
         ) : info.state === 'missed' ? (
           <span className="text-label-assistive text-sm">·</span>
         ) : info.state === 'rest' ? (
-          <span className="text-label-assistive text-xs">😴</span>
+          <Moon size={14} strokeWidth={1.9} className="text-label-assistive" />
         ) : (
           <span className="text-label-assistive text-[10px]">{format(new Date(info.date + 'T12:00:00'), 'd')}</span>
         )}

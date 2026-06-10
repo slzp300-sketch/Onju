@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Trash2, Pencil, ChevronDown, ChevronUp, ChevronLeft } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Plus, Trash2, Pencil, ChevronDown, ChevronUp, ChevronLeft, Dumbbell, CheckCircle2, Pin, Clock, MapPin, Flame, Zap } from 'lucide-react';
 import { motion as m } from 'framer-motion';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -140,7 +141,7 @@ function GoalCard({ goal, past, isOpen, alreadyTracked, onToggle, onEdit, onDele
 
   return (
     <div
-      className={`rounded-xl border shadow-emphasize overflow-hidden ${
+      className={`rounded-xl border overflow-hidden ${
         goal.color ? '' : past ? 'bg-fill border-line' : 'bg-surface border-line'
       }`}
       style={goal.color ? { backgroundColor: cardBg, borderColor: cardBorder } : undefined}
@@ -191,9 +192,9 @@ function GoalCard({ goal, past, isOpen, alreadyTracked, onToggle, onEdit, onDele
                 <>
                   {/* 핵심 습관 */}
                   <div className="flex items-center justify-between">
-                    <p className="text-caption1 font-bold text-label-strong">💪 핵심 습관</p>
+                    <p className="text-caption1 font-bold text-label-strong flex items-center gap-1.5"><Dumbbell size={14} strokeWidth={1.9} /> 핵심 습관</p>
                     {alreadyTracked ? (
-                      <span className="text-caption2 font-bold text-positive">✓ 추적 중</span>
+                      <span className="text-caption2 font-bold text-positive flex items-center gap-1"><CheckCircle2 size={13} strokeWidth={1.9} /> 추적 중</span>
                     ) : !past && (
                       <motion.button
                         whileTap={{ scale: 0.88 }}
@@ -205,16 +206,16 @@ function GoalCard({ goal, past, isOpen, alreadyTracked, onToggle, onEdit, onDele
                       </motion.button>
                     )}
                   </div>
-                  <DetailRow icon="📌" label={habit.title} />
-                  {habit.when  && <DetailRow icon="⏰" label={habit.when} />}
-                  {habit.where && <DetailRow icon="📍" label={habit.where} />}
+                  <DetailRow icon={<Pin size={14} strokeWidth={1.9} />} label={habit.title} />
+                  {habit.when  && <DetailRow icon={<Clock size={14} strokeWidth={1.9} />} label={habit.when} />}
+                  {habit.where && <DetailRow icon={<MapPin size={14} strokeWidth={1.9} />} label={habit.where} />}
 
                   {/* 미니 / 2분 */}
                   {(habit.miniRoutine || habit.twoMinuteHabit) && (
                     <div className="h-px bg-line-soft mx-0.5" />
                   )}
-                  {habit.miniRoutine     && <DetailRow icon="🔥" label={`미니: ${habit.miniRoutine}`} color="text-amber-600" />}
-                  {habit.twoMinuteHabit && <DetailRow icon="⚡" label={`2분: ${habit.twoMinuteHabit}`} color="text-emerald-600" />}
+                  {habit.miniRoutine     && <DetailRow icon={<Flame size={14} strokeWidth={1.9} />} label={`미니: ${habit.miniRoutine}`} color="text-amber-600" />}
+                  {habit.twoMinuteHabit && <DetailRow icon={<Zap size={14} strokeWidth={1.9} />} label={`2분: ${habit.twoMinuteHabit}`} color="text-emerald-600" />}
                 </>
               ) : (
                 <p className="text-caption1 text-label-assistive">설정된 습관이 없어요</p>
@@ -247,10 +248,10 @@ function GoalCard({ goal, past, isOpen, alreadyTracked, onToggle, onEdit, onDele
   );
 }
 
-function DetailRow({ icon, label, color = 'text-label' }: { icon: string; label: string; color?: string }) {
+function DetailRow({ icon, label, color = 'text-label' }: { icon: ReactNode; label: string; color?: string }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-sm flex-shrink-0 leading-snug">{icon}</span>
+      <span className="flex-shrink-0 leading-snug mt-0.5 text-label-alt">{icon}</span>
       <span className={`text-body2 leading-snug ${color}`}>{label}</span>
     </div>
   );

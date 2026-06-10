@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, Trash2, ListTodo, BookOpen } from 'lucide-react';
+import { Target, Trash2, ListTodo, BookOpen, Flame, Dumbbell, Link2, Clock, Lock } from 'lucide-react';
 import FAB from '../components/ui/FAB';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -61,7 +61,7 @@ export default function Dashboard() {
     if (allDone && !prevCompleteRef.current) {
       const shownDate = localStorage.getItem(CONFETTI_KEY);
       if (shownDate !== todayStr) {
-        confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#00BF40', '#0066FF', '#7C7FF5'] });
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#1f8a4c', '#1f6bff', '#9e9e9e'] });
         localStorage.setItem(CONFETTI_KEY, todayStr);
       }
     }
@@ -144,17 +144,17 @@ export default function Dashboard() {
             transition={{ type: 'spring', stiffness: 600, damping: 22 }}
             onClick={() => navigate('/diary')}
             aria-label="하루 일기"
-            className="flex items-center justify-center w-9 h-9 rounded-2xl border border-line bg-surface shadow-emphasize text-label-alt hover:text-primary hover:border-primary/30 transition-colors"
+            className="flex items-center justify-center w-9 h-9 rounded-2xl border border-line bg-surface text-label-alt hover:text-primary hover:border-primary/30 transition-colors"
           >
             <BookOpen size={18} />
           </motion.button>
 
-          {/* 🔥 스트릭 칩 버튼 */}
+          {/* 스트릭 칩 버튼 */}
           <motion.button
             whileTap={{ scale: 0.92 }}
             transition={{ type: 'spring', stiffness: 600, damping: 22 }}
             onClick={() => navigate('/streak')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border shadow-emphasize transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border transition-colors ${
               streak > 0
                 ? 'bg-cautionary/10 border-cautionary/20'
                 : 'bg-surface border-line'
@@ -163,9 +163,9 @@ export default function Dashboard() {
             <motion.span
               animate={streak > 0 ? { scale: [1, 1.2, 1] } : {}}
               transition={{ repeat: Infinity, repeatDelay: 3, duration: 0.4 }}
-              className="text-base leading-none"
+              className="leading-none"
             >
-              🔥
+              <Flame size={16} className={streak > 0 ? 'text-cautionary' : 'text-label-assistive'} strokeWidth={1.9} />
             </motion.span>
             <span className={`text-label1 font-bold tabular-nums ${streak > 0 ? 'text-cautionary' : 'text-label-assistive'}`}>
               {streak}일
@@ -181,7 +181,7 @@ export default function Dashboard() {
             <motion.button
               whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
               onClick={() => navigate('/goals')}
-              className="w-full bg-surface border border-line rounded-xl px-4 py-3.5 text-left shadow-emphasize"
+              className="w-full bg-surface border border-line rounded-xl px-4 py-3.5 text-left"
             >
               <div className="flex items-center gap-1 mb-1">
                 <Target size={11} className="text-primary" />
@@ -205,7 +205,7 @@ export default function Dashboard() {
                   key={g.id}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => navigate('/goals')}
-                  className="flex-shrink-0 bg-surface border border-line rounded-xl px-3 py-3.5 text-left shadow-emphasize"
+                  className="flex-shrink-0 bg-surface border border-line rounded-xl px-3 py-3.5 text-left"
                   style={{
                     width: 'calc(33.33% - 6px)',
                     scrollSnapAlign: 'start',
@@ -215,11 +215,13 @@ export default function Dashboard() {
                 >
                   {/* 카테고리 + 연동 개수 */}
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px]">
-                      {g.category === 'faith' ? '🙏' : '💪'}
-                    </span>
+                    {g.category === 'faith'
+                      ? <BookOpen size={13} className="text-label-assistive" strokeWidth={1.9} />
+                      : <Dumbbell size={13} className="text-label-assistive" strokeWidth={1.9} />}
                     {linkedCount > 0 && (
-                      <span className="text-[9px] font-bold text-label-assistive">🔗{linkedCount}</span>
+                      <span className="flex items-center gap-0.5 text-[9px] font-bold text-label-assistive">
+                        <Link2 size={10} strokeWidth={1.9} />{linkedCount}
+                      </span>
                     )}
                   </div>
 
@@ -259,7 +261,7 @@ export default function Dashboard() {
       )}
 
       {/* 주간 스트립 + 탭 */}
-      <motion.div variants={itemV} className="flex-1 flex flex-col bg-surface border border-line rounded-t-3xl mx-3 overflow-hidden shadow-emphasize min-h-0">
+      <motion.div variants={itemV} className="flex-1 flex flex-col bg-surface border border-line rounded-t-3xl mx-3 overflow-hidden min-h-0">
 
         {/* 주간 날짜 스트립 */}
         <div className="flex-shrink-0 px-2 pt-3 pb-2">
@@ -383,8 +385,9 @@ export default function Dashboard() {
           {showGraceNudge && (
             <button onClick={() => setSelectedDay(yesterdayStr)}
               className="flex-shrink-0 w-full flex items-center justify-between gap-2 px-4 py-2 bg-primary-soft border-b border-line-soft">
-              <span className="text-caption1 font-medium text-primary">
-                ⏰ 어제({format(new Date(yesterdayStr + 'T12:00:00'), 'M월 d일')}) 기록을 오전 {graceEndHour}시까지 마저 체크할 수 있어요
+              <span className="flex items-center gap-1.5 text-caption1 font-medium text-primary">
+                <Clock size={13} className="flex-shrink-0" strokeWidth={1.9} />
+                어제({format(new Date(yesterdayStr + 'T12:00:00'), 'M월 d일')}) 기록을 오전 {graceEndHour}시까지 마저 체크할 수 있어요
               </span>
               <span className="text-caption1 font-bold text-primary whitespace-nowrap">어제 →</span>
             </button>
@@ -393,10 +396,18 @@ export default function Dashboard() {
           {/* 지난 날짜 조회 안내: 유예 중인 어제는 수정 가능, 그 외는 읽기 전용 */}
           {selectedDay !== todayStr && (
             <div className={`flex-shrink-0 flex items-center justify-between gap-2 px-4 py-2 border-b border-line-soft ${canEdit ? 'bg-primary-soft' : 'bg-fill'}`}>
-              <span className={`text-caption1 font-medium ${canEdit ? 'text-primary' : 'text-label-alt'}`}>
-                {canEdit
-                  ? `⏰ 어제(${format(new Date(selectedDay + 'T12:00:00'), 'M월 d일')}) 기록 · 오전 ${graceEndHour}시까지 체크 가능`
-                  : `🔒 ${format(new Date(selectedDay + 'T12:00:00'), 'M월 d일')} 기록 (읽기 전용)`}
+              <span className={`flex items-center gap-1.5 text-caption1 font-medium ${canEdit ? 'text-primary' : 'text-label-alt'}`}>
+                {canEdit ? (
+                  <>
+                    <Clock size={13} className="flex-shrink-0" strokeWidth={1.9} />
+                    어제({format(new Date(selectedDay + 'T12:00:00'), 'M월 d일')}) 기록 · 오전 {graceEndHour}시까지 체크 가능
+                  </>
+                ) : (
+                  <>
+                    <Lock size={13} className="flex-shrink-0" strokeWidth={1.9} />
+                    {format(new Date(selectedDay + 'T12:00:00'), 'M월 d일')} 기록 (읽기 전용)
+                  </>
+                )}
               </span>
               <button onClick={() => setSelectedDay(todayStr)}
                 className="text-caption1 font-bold text-primary whitespace-nowrap">오늘로</button>
@@ -522,7 +533,7 @@ export default function Dashboard() {
       show={showPerfectStamp}
       label="참 잘했어요"
       sublabel="오늘 100% 달성"
-      color="#0066ff"
+      color="#1f6bff"
       rotation={-8}
       onComplete={() => setShowPerfectStamp(false)}
     />

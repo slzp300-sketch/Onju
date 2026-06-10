@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Trash2, BookOpen, Play, Timer } from 'lucide-react';
+import { Trash2, BookOpen, Play, Timer, Church, Sunrise, Sun, Moon, Cloud, Zap } from 'lucide-react';
+import type { ReactNode } from 'react';
 import StampButton from '../ui/StampButton';
 import RowStamp from '../ui/RowStamp';
 import ConfirmModal from '../ui/ConfirmModal';
@@ -12,10 +13,10 @@ import type { DailyRoutine, TimeSlot } from '../../types';
 import FocusMode from '../routines/FocusMode';
 import TwoMinuteMode from '../routines/TwoMinuteMode';
 
-const TIME_SLOTS: { value: TimeSlot; label: string; time: string; emoji: string }[] = [
-  { value: 'morning', label: '아침', time: '07:00', emoji: '🌅' },
-  { value: 'afternoon', label: '점심', time: '12:00', emoji: '☀️' },
-  { value: 'evening', label: '저녁', time: '21:00', emoji: '🌙' },
+const TIME_SLOTS: { value: TimeSlot; label: string; time: string; icon: ReactNode }[] = [
+  { value: 'morning', label: '아침', time: '07:00', icon: <Sunrise size={15} strokeWidth={1.9} /> },
+  { value: 'afternoon', label: '점심', time: '12:00', icon: <Sun size={15} strokeWidth={1.9} /> },
+  { value: 'evening', label: '저녁', time: '21:00', icon: <Moon size={15} strokeWidth={1.9} /> },
 ];
 
 export default function FaithTab({ date, readOnly = false }: { date?: string; readOnly?: boolean } = {}) {
@@ -45,7 +46,7 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
     return (
       <div className="relative">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-4xl mb-5">🙏</div>
+          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-5"><Church size={36} strokeWidth={1.9} /></div>
           <p className="text-headline1 font-bold text-label mb-1">신앙으로 하루를 시작해 보세요</p>
           <p className="text-body2 text-label-alt leading-relaxed">
             말씀과 기도로 쌓아가는 하루가<br />직장 생활의 든든한 버팀목이 돼요
@@ -66,7 +67,7 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
           <div key={group.value}>
             <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
               <span className="text-caption2 font-bold text-label-alt w-10 flex-shrink-0">{group.time}</span>
-              <span className="text-body2">{group.emoji}</span>
+              <span className="text-label-alt">{group.icon}</span>
               <span className="flex-1 text-caption2 font-bold text-label">{group.label} 루틴</span>
               <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-emerald-100 text-emerald-600' : 'bg-fill text-label-alt'}`}>
                 {cnt}/{group.routines.length}
@@ -93,7 +94,7 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
         <div>
           {grouped.length > 0 && (
             <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
-              <span className="text-body2">🙏</span>
+              <Church size={15} className="text-label-alt" strokeWidth={1.9} />
               <span className="flex-1 text-caption2 font-bold text-label">기타 신앙 루틴</span>
               <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${
                 unslotted.filter(r => isDone(r.id)).length === unslotted.length
@@ -166,7 +167,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove 
         <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${
           done ? 'bg-emerald-50' : skipped ? 'bg-amber-50' : 'bg-fill'
         }`}>
-          {routine.emoji ?? (done ? '🙏' : '✝️')}
+          {routine.emoji ?? <Church size={18} strokeWidth={1.9} className="text-emerald-500" />}
         </div>
 
         {/* 텍스트 */}
@@ -179,7 +180,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove 
             {routine.title}
           </p>
           {skipped && (
-            <p className="text-[11px] text-amber-400 font-medium mt-0.5">오늘 쉬어가요 ☁️</p>
+            <p className="text-[11px] text-amber-400 font-medium mt-0.5 flex items-center gap-0.5">오늘 쉬어가요 <Cloud size={11} strokeWidth={1.9} /></p>
           )}
           {routine.durationSeconds && !done && !skipped && (
             <p className="text-[11px] text-emerald-500 font-medium mt-0.5 flex items-center gap-0.5">
@@ -217,7 +218,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove 
                         routine.twoMinuteHabit ? 'bg-amber-100 text-amber-500' : 'bg-emerald-50 text-emerald-500'
                       }`}
                     >
-                      {routine.twoMinuteHabit ? <span className="text-sm leading-none">⚡</span> : <Play size={11} fill="currentColor" />}
+                      {routine.twoMinuteHabit ? <Zap size={13} strokeWidth={1.9} /> : <Play size={11} fill="currentColor" />}
                     </motion.button>
                   )}
                   {!routine.twoMinuteHabit && !routine.durationSeconds && (

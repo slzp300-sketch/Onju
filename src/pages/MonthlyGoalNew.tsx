@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Check } from 'lucide-react';
+import { ChevronLeft, Check, Star, Lightbulb, Calendar, Dumbbell, Flame, Zap, Palette, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, addDays } from 'date-fns';
 import { useGoalStore } from '../store/goalStore';
@@ -108,13 +108,13 @@ export default function MonthlyGoalNew() {
         <div className="px-4 py-5 flex flex-col gap-5 pb-28">
 
           {/* ── 카테고리 선택 ── */}
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize">
+          <div className="bg-surface rounded-xl border border-line">
             <div className="px-4 py-4">
               <p className="text-body2 font-bold text-label-strong mb-3">목표 유형</p>
               <div className="flex gap-3">
                 {([
-                  { value: 'personal', label: '개인', emoji: '💪', desc: '개인 습관·루틴 목표' },
-                  { value: 'faith',    label: '신앙', emoji: '🙏', desc: '신앙 루틴 목표' },
+                  { value: 'personal', label: '개인', Icon: Dumbbell, desc: '개인 습관·루틴 목표' },
+                  { value: 'faith',    label: '신앙', Icon: BookOpen, desc: '신앙 루틴 목표' },
                 ] as const).map(opt => (
                   <motion.button
                     key={opt.value}
@@ -126,7 +126,7 @@ export default function MonthlyGoalNew() {
                         : 'border-line bg-fill'
                     }`}
                   >
-                    <span className="text-2xl">{opt.emoji}</span>
+                    <opt.Icon size={24} strokeWidth={1.9} className={category === opt.value ? 'text-primary' : 'text-label-alt'} />
                     <p className={`text-body2 font-bold ${category === opt.value ? 'text-primary' : 'text-label-alt'}`}>
                       {opt.label}
                     </p>
@@ -140,9 +140,9 @@ export default function MonthlyGoalNew() {
           </div>
 
           {/* ── To-Be 선언 ── */}
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize">
+          <div className="bg-surface rounded-xl border border-line">
             <div className="px-4 py-4 border-b border-line-soft">
-              <p className="text-body2 font-bold text-label-strong mb-0.5">🌟 나의 To-Be 선언</p>
+              <p className="text-body2 font-bold text-label-strong mb-0.5 flex items-center gap-1.5"><Star size={15} strokeWidth={1.9} /> 나의 To-Be 선언</p>
               <p className="text-caption1 text-label-alt">내가 되고 싶은 모습을 구체적인 문장으로</p>
             </div>
             <div className="px-4 py-4">
@@ -154,16 +154,16 @@ export default function MonthlyGoalNew() {
                 autoFocus
                 className="w-full bg-fill border border-line rounded-xl px-4 py-3 text-body2 font-medium focus:outline-none focus:border-primary focus:bg-surface resize-none transition-all placeholder:text-label-assistive leading-relaxed"
               />
-              <p className="text-caption2 text-label-assistive mt-1.5">
-                💡 내가 되고 싶은 모습을 구체적인 문장으로 적어주세요
+              <p className="text-caption2 text-label-assistive mt-1.5 flex items-center gap-1.5">
+                <Lightbulb size={13} strokeWidth={1.9} className="flex-shrink-0" /> 내가 되고 싶은 모습을 구체적인 문장으로 적어주세요
               </p>
             </div>
           </div>
 
           {/* ── 목표 기간 ── */}
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize">
+          <div className="bg-surface rounded-xl border border-line">
             <div className="px-4 py-4 border-b border-line-soft">
-              <p className="text-body2 font-bold text-label-strong">📅 목표 기간</p>
+              <p className="text-body2 font-bold text-label-strong flex items-center gap-1.5"><Calendar size={15} strokeWidth={1.9} /> 목표 기간</p>
             </div>
             <div className="px-4 py-4 flex items-center gap-3">
               <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
@@ -175,9 +175,9 @@ export default function MonthlyGoalNew() {
           </div>
 
           {/* ── 핵심 습관 ── */}
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize">
+          <div className="bg-surface rounded-xl border border-line">
             <div className="px-4 py-4 border-b border-line-soft">
-              <p className="text-body2 font-bold text-label-strong mb-0.5">💪 핵심 습관</p>
+              <p className="text-body2 font-bold text-label-strong mb-0.5 flex items-center gap-1.5"><Dumbbell size={15} strokeWidth={1.9} /> 핵심 습관</p>
               <p className="text-caption1 text-label-alt">무엇을, 언제, 어디서 할지 구체화해요</p>
             </div>
             <div className="px-4 py-4 flex flex-col gap-3">
@@ -194,36 +194,36 @@ export default function MonthlyGoalNew() {
 
             {/* 미니 습관 */}
             <div className="mx-4 mb-4 bg-amber-50 rounded-xl px-4 py-3.5 border border-amber-200/60">
-              <p className="text-caption1 font-bold text-amber-600 mb-2">🔥 미니 습관 (대체용)</p>
+              <p className="text-caption1 font-bold text-amber-600 mb-2 flex items-center gap-1.5"><Flame size={14} strokeWidth={1.9} /> 미니 습관 (대체용)</p>
               <input value={miniHabit} onChange={e => setMiniHabit(e.target.value)}
                 placeholder="하기 힘든 날의 대체 습관 (예: 10분 스트레칭)"
                 className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300" />
-              <p className="text-caption2 text-amber-500 mt-1.5">
-                💡 쉬운 버전을 만들어두면 포기하지 않을 수 있어요
+              <p className="text-caption2 text-amber-500 mt-1.5 flex items-center gap-1.5">
+                <Lightbulb size={13} strokeWidth={1.9} className="flex-shrink-0" /> 쉬운 버전을 만들어두면 포기하지 않을 수 있어요
               </p>
             </div>
 
             {/* 2분 습관 */}
             <div className="mx-4 mb-4 bg-emerald-50 rounded-xl px-4 py-3.5 border border-emerald-200/60">
-              <p className="text-caption1 font-bold text-emerald-600 mb-1">⚡ 2분 습관 (시작 트리거)</p>
+              <p className="text-caption1 font-bold text-emerald-600 mb-1 flex items-center gap-1.5"><Zap size={14} strokeWidth={1.9} /> 2분 습관 (시작 트리거)</p>
               <p className="text-caption2 text-emerald-500 mb-2">
                 시작을 쉽게 만드는 2분 이내의 작은 행동을 적어요
               </p>
               <input value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
                 placeholder="예: 운동복으로 갈아입기, 러닝화 신기"
                 className="w-full bg-white/80 border border-emerald-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 transition-all placeholder:text-emerald-300" />
-              <p className="text-caption2 text-emerald-500 mt-1.5">
-                💡 "일단 시작"하게 만드는 초소형 행동이에요
+              <p className="text-caption2 text-emerald-500 mt-1.5 flex items-center gap-1.5">
+                <Lightbulb size={13} strokeWidth={1.9} className="flex-shrink-0" /> "일단 시작"하게 만드는 초소형 행동이에요
               </p>
             </div>
           </div>{/* 핵심 습관 카드 닫기 */}
 
           {/* ── 색상 선택 ── */}
-          <div className="bg-surface rounded-xl border border-line shadow-emphasize">
+          <div className="bg-surface rounded-xl border border-line">
             {/* 토글 헤더 */}
             <div className="px-4 py-4 flex items-center justify-between">
               <div>
-                <p className="text-body2 font-bold text-label-strong">🎨 색상 선택</p>
+                <p className="text-body2 font-bold text-label-strong flex items-center gap-1.5"><Palette size={15} strokeWidth={1.9} /> 색상 선택</p>
                 <p className="text-caption1 text-label-alt mt-0.5">카드에 표시될 색상을 골라요</p>
               </div>
               <button

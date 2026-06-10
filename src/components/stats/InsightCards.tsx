@@ -1,8 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { AlertTriangle, Flame, TrendingDown, Lightbulb, TrendingUp, Sparkles, type LucideIcon } from 'lucide-react';
 import { useRoutineStore } from '../../store/routineStore';
 import { generateInsights, type Insight } from '../../utils/insights';
 import { today } from '../../utils/date';
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  '⚠️': AlertTriangle,
+  '🔥': Flame,
+  '📉': TrendingDown,
+  '💡': Lightbulb,
+  '📈': TrendingUp,
+};
 
 const COLOR_MAP = {
   indigo: { bg: 'bg-primary-soft', border: 'border-primary-soft', title: 'text-primary-heavy', body: 'text-primary', btn: 'bg-primary' },
@@ -38,7 +47,7 @@ function InsightCard({ insight, index, onAction }: { insight: Insight; index: nu
       className={`rounded-2xl border p-4 ${c.bg} ${c.border}`}
     >
       <div className="flex items-start gap-2">
-        <span className="text-lg leading-none mt-0.5">{insight.emoji}</span>
+        {(() => { const Icon = ICON_MAP[insight.emoji] ?? Sparkles; return <Icon size={18} strokeWidth={1.9} className={`mt-0.5 flex-shrink-0 ${c.title}`} />; })()}
         <div className="flex-1 min-w-0">
           <p className={`text-label1 font-semibold leading-snug ${c.title}`}>{insight.title}</p>
           <p className={`text-caption1 mt-1 leading-relaxed ${c.body} opacity-80`}>{insight.body}</p>

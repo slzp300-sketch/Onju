@@ -84,7 +84,7 @@ export default function Login() {
     <div className="min-h-dvh bg-surface flex flex-col px-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center pt-20 pb-10">
-        <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mb-4 shadow-strong">
+        <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mb-4 border border-line">
           <span className="text-white text-2xl font-bold font-brand">직</span>
         </div>
         <h1 className="text-heading2 font-bold text-label-strong font-brand">온주</h1>

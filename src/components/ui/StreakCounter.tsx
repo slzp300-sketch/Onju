@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Flame, Church } from 'lucide-react';
 
 const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
 
@@ -27,11 +27,11 @@ export default function StreakCounter({
     <>
       <button
         onClick={() => setShowDetail(true)}
-        className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3 border border-line-soft shadow-sm w-full"
+        className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3 border border-line w-full"
       >
-        <StreakPill icon="🔥" value={personalStreak} label="개인" color="text-orange-500" />
+        <StreakPill icon={<Flame size={18} className="text-orange-500" />} value={personalStreak} label="개인" color="text-orange-500" />
         <div className="w-px h-6 bg-fill" />
-        <StreakPill icon="✝" value={faithStreak} label="신앙" color="text-emerald-500" />
+        <StreakPill icon={<Church size={18} className="text-emerald-600" />} value={faithStreak} label="신앙" color="text-emerald-500" />
       </button>
 
       <AnimatePresence>
@@ -60,14 +60,14 @@ export default function StreakCounter({
 
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <DetailCard
-                  icon="🔥"
+                  icon={<Flame size={36} strokeWidth={1.9} className="text-orange-500" />}
                   label="개인 루틴"
                   streak={personalStreak}
                   best={personalBest}
                   color="orange"
                 />
                 <DetailCard
-                  icon="✝"
+                  icon={<Church size={36} strokeWidth={1.9} className="text-emerald-600" />}
                   label="신앙 루틴"
                   streak={faithStreak}
                   best={faithBest}
@@ -87,7 +87,7 @@ export default function StreakCounter({
 }
 
 function StreakPill({ icon, value, label, color }: {
-  icon: string;
+  icon: ReactNode;
   value: number;
   label: string;
   color: string;
@@ -104,7 +104,7 @@ function StreakPill({ icon, value, label, color }: {
 }
 
 function DetailCard({ icon, label, streak, best, color }: {
-  icon: string;
+  icon: ReactNode;
   label: string;
   streak: number;
   best: number;

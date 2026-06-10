@@ -100,7 +100,7 @@ export default function GroupNew() {
               transition={{ duration: 0.2 }} className="flex flex-col gap-6">
               {/* 커버 */}
               <div className="flex flex-col items-center gap-3">
-                <div className="w-20 h-20 rounded-3xl flex items-center justify-center text-4xl shadow-emphasize"
+                <div className="w-20 h-20 rounded-3xl flex items-center justify-center text-4xl border border-line"
                   style={{ backgroundColor: `${form.color}1a` }}>
                   {form.emoji}
                 </div>
