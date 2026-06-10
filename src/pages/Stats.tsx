@@ -765,7 +765,7 @@ function WeekStampCell({ info, isToday, delay }: { info: WeekDayInfo; isToday: b
         {info.state === 'perfect' ? (
           <motion.div initial={{ scale: 1.6, opacity: 0, rotate: -16 }} animate={{ scale: 1, opacity: 1, rotate: -10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 18, delay }}>
-            <StampSeal label="완료" color="#10b981" size={40} />
+            <StampSeal label="완료" color="#1f8a4c" size={40} />
           </motion.div>
         ) : info.state === 'partial' ? (
           <svg className="w-[60%] h-[60%] -rotate-90" viewBox="0 0 36 36">

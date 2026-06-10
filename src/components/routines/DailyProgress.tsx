@@ -10,7 +10,7 @@ export default function DailyProgress() {
   return (
     <div className="flex justify-around py-2">
       <ProgressRing rate={personal} color="#6366f1" label="개인 루틴" size={80} />
-      <ProgressRing rate={faith} color="#10b981" label="신앙 루틴" size={80} />
+      <ProgressRing rate={faith} color="#1f8a4c" label="신앙 루틴" size={80} />
     </div>
   );
 }

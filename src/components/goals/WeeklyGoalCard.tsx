@@ -38,7 +38,7 @@ export default function WeeklyGoalCard({ goal, monthlyTitle }: WeeklyGoalCardPro
             className="h-full rounded-full transition-all duration-500"
             style={{
               width: `${progress}%`,
-              backgroundColor: isPast ? '#9ca3af' : progress >= 80 ? '#10b981' : progress >= 50 ? '#6366f1' : '#f59e0b',
+              backgroundColor: isPast ? '#9ca3af' : progress >= 80 ? '#1f8a4c' : progress >= 50 ? '#6366f1' : '#f59e0b',
             }}
           />
         </div>

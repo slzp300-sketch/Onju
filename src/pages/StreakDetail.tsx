@@ -189,11 +189,11 @@ export default function StreakDetail() {
                             className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
                           >
                             <svg width="52" height="52" viewBox="0 0 100 100">
-                              <circle cx="50" cy="50" r="46" fill="#10b981" fillOpacity="0.2" stroke="white" strokeWidth="6" opacity="0.95"/>
+                              <circle cx="50" cy="50" r="46" fill="#1f8a4c" fillOpacity="0.2" stroke="white" strokeWidth="6" opacity="0.95"/>
                               <circle cx="50" cy="50" r="35" fill="none" stroke="white" strokeWidth="2.5" opacity="0.8"/>
                               <text x="50" y="54" textAnchor="middle" dominantBaseline="middle"
                                 fill="white" fontSize="18" fontWeight="900"
-                                style={{ fontFamily: 'Pretendard, sans-serif' }}>완료</text>
+                                style={{ fontFamily: 'system-ui, sans-serif' }}>완료</text>
                             </svg>
                           </motion.div>
                         )}

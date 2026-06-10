@@ -119,7 +119,7 @@ export default function Profile() {
           {THEMES.map(t => {
             const isActive = theme === t.id;
             const textColors: Record<string, { title: string; desc: string; border: string; check: string }> = {
-              light:  { title: '#171719', desc: 'rgba(55,56,60,0.61)', border: '#0066ff', check: '#0066ff' },
+              light:  { title: '#171719', desc: 'rgba(55,56,60,0.61)', border: '#1f6bff', check: '#1f6bff' },
               dark:   { title: '#e8eaf0', desc: '#8b90a4', border: '#7c7ff5', check: '#7c7ff5' },
               rose:   { title: '#2d1a1e', desc: '#8a5460', border: '#d4546a', check: '#d4546a' },
               forest: { title: '#1e2a1a', desc: '#617558', border: '#5e8f6a', check: '#5e8f6a' },

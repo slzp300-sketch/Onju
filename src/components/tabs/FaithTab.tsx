@@ -155,7 +155,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove 
       >
         {/* 미니 스탬프 */}
         <AnimatePresence>
-          {rowStamp && <RowStamp type={rowStamp} color={rowStamp === 'done' ? '#10b981' : '#f59e0b'} />}
+          {rowStamp && <RowStamp type={rowStamp} color={rowStamp === 'done' ? '#1f8a4c' : '#f59e0b'} />}
         </AnimatePresence>
 
         {/* 번호 */}

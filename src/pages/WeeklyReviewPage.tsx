@@ -341,7 +341,7 @@ function calcRoutineWeeklyRate(routine: DailyRoutine, routineLogs: RoutineLog[],
 
 function getGoalFeedback(rate: number | null) {
   if (rate === null) return { feedback: '아직 연동된 루틴이나 습관이 없어요.', Icon: null, suggestion: '목표 카드에서 "습관으로 만들기"를 눌러 시작해보세요.', accent: 'text-label-alt', bg: 'bg-surface-alt', bar: '#cbd5e1' };
-  if (rate >= 80)    return { feedback: '이번 주 목표 루틴을 잘 지켜냈어요!',       Icon: Dumbbell, suggestion: '지금 리듬을 유지하세요. 좋은 습관이 쌓이고 있어요.',                          accent: 'text-emerald-600', bg: 'bg-emerald-50', bar: '#10b981' };
+  if (rate >= 80)    return { feedback: '이번 주 목표 루틴을 잘 지켜냈어요!',       Icon: Dumbbell, suggestion: '지금 리듬을 유지하세요. 좋은 습관이 쌓이고 있어요.',                          accent: 'text-emerald-600', bg: 'bg-emerald-50', bar: '#1f8a4c' };
   if (rate >= 50)    return { feedback: '절반 이상 달성했어요. 일관성을 높여볼까요?', Icon: Smile, suggestion: '언제, 어디서 할지를 더 구체적으로 정해두면 도움이 돼요.',                        accent: 'text-amber-600',   bg: 'bg-amber-50',   bar: '#f59e0b' };
   if (rate > 0)      return { feedback: '이번 주 쉽지 않았네요. 같이 방법을 찾아봐요.', Icon: Sprout, suggestion: '루틴을 더 작게 쪼개거나 빈도를 줄여보는 건 어떨까요?',                       accent: 'text-red-500',     bg: 'bg-red-50',     bar: '#ef4444' };
   return               { feedback: '이번 주 관련 루틴이 진행되지 않았어요.',             Icon: null, suggestion: '2분 습관처럼 아주 작게 시작해보세요.',                                          accent: 'text-red-500',     bg: 'bg-red-50',     bar: '#ef4444' };
@@ -356,7 +356,7 @@ function RateBar({ rate, bar }: { rate: number; bar: string }) {
 }
 
 function MiniBar({ rate }: { rate: number }) {
-  const color = rate >= 80 ? '#10b981' : rate >= 50 ? '#f59e0b' : '#ef4444';
+  const color = rate >= 80 ? '#1f8a4c' : rate >= 50 ? '#f59e0b' : '#ef4444';
   return (
     <div className="flex items-center gap-1.5 flex-shrink-0">
       <div className="w-10 h-1.5 bg-fill-strong rounded-full overflow-hidden">

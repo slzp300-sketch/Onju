@@ -99,7 +99,7 @@ export default function MemberProgressCard({ member, canCheer = true, onCheer }:
         {/* 달성률 바 */}
         <div className="grid grid-cols-2 gap-2">
           <MiniBar label="개인" rate={member.todayPersonalRate} color="#6366f1" />
-          <MiniBar label="신앙" rate={member.todayFaithRate} color="#10b981" />
+          <MiniBar label="신앙" rate={member.todayFaithRate} color="#1f8a4c" />
         </div>
 
         {/* float 애니메이션 */}

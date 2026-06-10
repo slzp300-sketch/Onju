@@ -52,7 +52,7 @@ export default function RoutineTimer() {
 
     if (idx >= routineHabits.length - 1) {
       setStatus('done');
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.25 }, colors: ['#6366f1', '#10b981', '#f59e0b', '#ef4444'] });
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.25 }, colors: ['#6366f1', '#1f8a4c', '#f59e0b', '#ef4444'] });
     } else {
       const nextIdx = idx + 1;
       setIdx(nextIdx);

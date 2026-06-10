@@ -29,7 +29,7 @@ type Phase = 'timer' | 'done';
 export default function HabitFocusMode({ habit, onClose }: HabitFocusModeProps) {
   const { toggleHabitLog, isHabitCompleted } = useHabitStore();
   const totalSeconds = habit.durationSeconds ?? 0;
-  const color = '#0066ff';
+  const color = '#1f6bff';
 
   const [elapsed, setElapsed] = useState(0);
   const [phase, setPhase] = useState<Phase>('timer');
@@ -42,7 +42,7 @@ export default function HabitFocusMode({ habit, onClose }: HabitFocusModeProps) 
     if (!isHabitCompleted(habit.id, today())) toggleHabitLog(habit.id, today());
     setActualSecs(actual);
     setPhase('done');
-    confetti({ particleCount: 100, spread: 70, origin: { y: 0.3 }, colors: [color, '#10b981', '#f59e0b'] });
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.3 }, colors: [color, '#1f8a4c', '#f59e0b'] });
   }, [habit.id, isHabitCompleted, toggleHabitLog]);
 
   useEffect(() => {

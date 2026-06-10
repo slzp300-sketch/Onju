@@ -69,7 +69,7 @@ export default function Today() {
 
   useEffect(() => {
     if (allDone && !prevCompleteRef.current) {
-      confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#00BF40', '#0066FF', '#7C7FF5'] });
+      confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#1f8a4c', '#1f6bff', '#9e9e9e'] });
     }
     prevCompleteRef.current = allDone;
   }, [allDone]);

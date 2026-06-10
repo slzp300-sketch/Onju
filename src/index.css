@@ -135,7 +135,7 @@ body {
 /* ══════════════════════════════════════════
    테마 CSS 변수
    --t-* : 레거시 surface/text 토큰 (마이그레이션 중 유지)
-   --color-primary : Wanted primary → 테마별 오버라이드
+   --color-primary : 기본 primary → 테마별 오버라이드
 ══════════════════════════════════════════ */
 
 /* 라이트 (기본) — 그레이스케일 플랫 토큰 */
@@ -169,7 +169,7 @@ body {
   --t-nav-bg: rgba(28,30,38,0.97);
   --t-divide: rgba(196,200,214,0.1);
 
-  /* Wanted 토큰 오버라이드 — 다크에서 violet/indigo 계열 */
+  /* 토큰 오버라이드 — 다크에서 violet/indigo 계열 */
   --color-primary: #7c7ff5;
   --color-primary-strong: #6b6ef0;
   --color-primary-heavy: #5a5de0;
@@ -201,7 +201,7 @@ body {
   --t-nav-bg: rgba(255,255,255,0.97);
   --t-divide: rgba(252,228,232,0.8);
 
-  /* Wanted 토큰 오버라이드 — 로즈 */
+  /* 토큰 오버라이드 — 로즈 */
   --color-primary: #d4546a;
   --color-primary-strong: #b83a52;
   --color-primary-heavy: #9a2840;
@@ -224,7 +224,7 @@ body {
   --t-nav-bg: rgba(250,252,249,0.97);
   --t-divide: rgba(230,237,226,0.8);
 
-  /* Wanted 토큰 오버라이드 — 포레스트 */
+  /* 토큰 오버라이드 — 포레스트 */
   --color-primary: #5e8f6a;
   --color-primary-strong: #4a7356;
   --color-primary-heavy: #3a5e44;

@@ -67,10 +67,10 @@ export default function StampSeal({ label, sublabel, color, size = 200 }: StampS
           <>
             <text x="50" y={baseY} textAnchor="middle" dominantBaseline="middle"
               fill={color} fontSize={fs} fontWeight="900" letterSpacing="-0.3"
-              style={{ fontFamily: 'Pretendard, sans-serif' }} opacity="0.95">{line1}</text>
+              style={{ fontFamily: 'system-ui, sans-serif' }} opacity="0.95">{line1}</text>
             <text x="50" y={baseY + 17} textAnchor="middle" dominantBaseline="middle"
               fill={color} fontSize={fs} fontWeight="900" letterSpacing="-0.3"
-              style={{ fontFamily: 'Pretendard, sans-serif' }} opacity="0.95">{line2}</text>
+              style={{ fontFamily: 'system-ui, sans-serif' }} opacity="0.95">{line2}</text>
           </>
         );
       })() : (
@@ -83,7 +83,7 @@ export default function StampSeal({ label, sublabel, color, size = 200 }: StampS
           fontSize={label.length <= 3 ? '24' : '18'}
           fontWeight="900"
           letterSpacing="-0.5"
-          style={{ fontFamily: 'Pretendard, sans-serif' }}
+          style={{ fontFamily: 'system-ui, sans-serif' }}
           opacity="0.95"
         >
           {label}
@@ -101,7 +101,7 @@ export default function StampSeal({ label, sublabel, color, size = 200 }: StampS
           fontSize="9"
           fontWeight="700"
           letterSpacing="0.5"
-          style={{ fontFamily: 'Pretendard, sans-serif' }}
+          style={{ fontFamily: 'system-ui, sans-serif' }}
           opacity="0.85"
         >
           {sublabel}

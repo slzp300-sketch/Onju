@@ -29,7 +29,7 @@ type Phase = 'timer' | 'done';
 export default function FocusMode({ routine, onClose }: FocusModeProps) {
   const { toggleRoutineLog, isCompleted } = useRoutineStore();
   const totalSeconds = routine.durationSeconds ?? (routine.durationMinutes ?? 0) * 60;
-  const color = routine.type === 'faith' ? '#10b981' : '#6366f1';
+  const color = routine.type === 'faith' ? '#1f8a4c' : '#6366f1';
 
   const [elapsed, setElapsed] = useState(0);
   const [phase, setPhase] = useState<Phase>('timer');
