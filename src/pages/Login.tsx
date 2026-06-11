@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { loginWithGoogle, loginWithKakao } from '../lib/authActions';
 import BrandLogo from '../components/ui/BrandLogo';
+import ForestBackdrop from '../components/tree/ForestBackdrop';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -41,7 +42,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-dvh bg-surface flex flex-col px-6">
+    <div className="relative min-h-dvh bg-surface flex flex-col px-6">
+      <ForestBackdrop />
       {/* 헤더 */}
       <div className="flex flex-col items-center pt-20 pb-10">
         <div className="mb-4">

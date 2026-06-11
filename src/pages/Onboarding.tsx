@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { BookOpen, Dumbbell, BarChart3, Sunrise, Sparkles, PenLine, Flame, Moon, Church, FileText } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import BrandLogo from '../components/ui/BrandLogo';
+import ForestBackdrop from '../components/tree/ForestBackdrop';
 
 /* ── 고정 데이터 (render마다 값이 바뀌지 않도록) ── */
 const WEEK_DATA = [
@@ -264,7 +265,8 @@ export default function Onboarding() {
   const finish = () => { setOnboardingDone(); navigate('/'); };
 
   return (
-    <div className="min-h-dvh bg-surface flex flex-col select-none">
+    <div className="relative min-h-dvh bg-surface flex flex-col select-none">
+      <ForestBackdrop />
 
       {/* 상단 */}
       <div className="flex items-center justify-between px-5 pt-5 pb-2 flex-shrink-0">

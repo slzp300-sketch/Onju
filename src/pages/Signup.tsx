@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle, XCircle, AlertCircle, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import BrandLogo from '../components/ui/BrandLogo';
+import ForestBackdrop from '../components/tree/ForestBackdrop';
 
 const DOMAIN_OPTIONS = [
   { label: '도메인 선택', value: '' },
@@ -80,7 +81,8 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-dvh bg-surface flex flex-col px-6">
+    <div className="relative min-h-dvh bg-surface flex flex-col px-6">
+      <ForestBackdrop />
       <div className="flex flex-col items-center pt-16 pb-8">
         <div className="mb-4">
           <BrandLogo size={56} />

@@ -49,6 +49,20 @@ export default function TreeVisual({ stage, health, size = 110, animateGrowth = 
       <ellipse cx="100" cy="164" rx="72" ry="11" fill="#e2ebe0" />
       <ellipse cx="100" cy="162" rx="52" ry="7" fill="#d3e2cf" />
 
+      {/* 풀포기 — 나무 곁에 자라는 풀 */}
+      <g opacity={health === 'wilted' ? 0.5 : 0.85}>
+        <path d="M48 160 q1 -9 5 -12 q1 8 -2 13 Z" fill={c.leafC} />
+        <path d="M55 161 q-1 -7 -5 -9 q0 7 3 10 Z" fill={c.leafA} />
+        <path d="M148 159 q1 -8 5 -11 q1 8 -2 12 Z" fill={c.leafA} />
+        <path d="M155 160 q-1 -6 -4 -8 q0 6 2 9 Z" fill={c.leafC} />
+        {stage >= 2 && (
+          <>
+            <path d="M70 165 q1 -7 4 -9 q1 6 -1 10 Z" fill={c.leafB} />
+            <path d="M132 164 q1 -6 4 -8 q0 6 -2 9 Z" fill={c.leafB} />
+          </>
+        )}
+      </g>
+
       {/* 낙엽 (시듦 단계에서만) */}
       {health !== 'healthy' && stage >= 1 && (
         <g opacity={health === 'wilted' ? 0.9 : 0.45}>

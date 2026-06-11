@@ -10,6 +10,9 @@ import { calcStreak } from '../utils/completion';
 import { today, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
 import StampOverlay from '../components/ui/StampOverlay';
+import TreeVisual from '../components/tree/TreeVisual';
+import { useTreeGrowth } from '../hooks/useTreeGrowth';
+import { STAGE_NAMES } from '../utils/treeGrowth';
 import type { DailyRoutine, RoutineLog, Habit } from '../types';
 
 
@@ -91,7 +94,12 @@ export default function StreakDetail() {
           >
             <ChevronLeft size={24} />
           </motion.button>
-          <h1 className="text-heading2 font-bold text-label-strong font-brand">연속 달성</h1>
+          <h1 className="text-heading2 font-bold text-label-strong font-brand">나의 나무</h1>
+        </motion.div>
+
+        {/* 나의 나무 — 성장 현황 */}
+        <motion.div variants={itemV} className="mx-4 mb-4">
+          <MyTreeCard />
         </motion.div>
 
         {/* 히어로 — 스트릭 수 */}
@@ -326,10 +334,51 @@ export default function StreakDetail() {
         show={showStreakStamp}
         label={`${streak}일`}
         sublabel="연속 달성!"
-        color="#ef4444"
+        color="#e07b27"
         rotation={10}
         onComplete={() => setShowStreakStamp(false)}
       />
     </>
+  );
+}
+
+/** 나의 나무 카드 — 성장 포인트·단계·건강도 요약 */
+function MyTreeCard() {
+  const growth = useTreeGrowth();
+  const healthText =
+    growth.health === 'healthy' ? '나무가 싱싱하게 자라고 있어요 🌿'
+    : growth.health === 'dry' ? '나무가 목말라요 — 오늘 루틴으로 물을 줘요 💧'
+    : '나무가 시들고 있어요 — 다시 시작해봐요 🍂';
+
+  return (
+    <div
+      className="rounded-2xl border border-line px-5 pt-5 pb-4 flex flex-col items-center"
+      style={{ background: 'var(--gradient-hero)' }}
+    >
+      <TreeVisual stage={growth.stage} health={growth.health} size={150} />
+      <p className="text-heading2 font-bold text-label-strong mt-1">{growth.stageName}</p>
+      <p className="text-caption1 text-label-alt mt-0.5">{healthText}</p>
+
+      {/* 다음 단계 진행 */}
+      <div className="w-full mt-4">
+        <div className="flex justify-between mb-1.5">
+          <span className="text-caption1 font-semibold text-label-alt tabular-nums">{growth.points}pt</span>
+          <span className="text-caption1 text-label-assistive tabular-nums">
+            {growth.nextThreshold !== null
+              ? `다음 단계(${STAGE_NAMES[(growth.stage + 1) as 1 | 2 | 3 | 4]})까지 ${growth.nextThreshold - growth.points}pt`
+              : '최고 단계에 도달했어요!'}
+          </span>
+        </div>
+        <div className="h-2 rounded-full bg-fill-strong overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: 'var(--gradient-canopy)' }}
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.round(growth.progressToNext * 100)}%` }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+          />
+        </div>
+      </div>
+    </div>
   );
 }

@@ -333,12 +333,16 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  {/* 완료 상태 도트 */}
-                  <div className={`w-1.5 h-1.5 rounded-full mt-0.5 ${
-                    bothDone ? 'bg-faith'
-                    : anyDone ? 'bg-primary/40'
-                    : 'bg-transparent'
-                  }`} />
+                  {/* 완료 상태 — 둘 다 달성하면 잎이 돋는다 */}
+                  {bothDone ? (
+                    <svg width="9" height="9" viewBox="0 0 12 12" className="mt-0.5">
+                      <path d="M6 11 Q5.5 7 6 4" stroke="var(--color-primary)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+                      <path d="M6 6 Q2.5 5 2 1.5 Q5.5 2 6 5.5 Z" fill="var(--color-primary)" />
+                      <path d="M6 5 Q9.5 4 10 0.8 Q6.5 1.5 6 4.6 Z" fill="var(--color-faith)" />
+                    </svg>
+                  ) : (
+                    <div className={`w-1.5 h-1.5 rounded-full mt-0.5 ${anyDone ? 'bg-primary/40' : 'bg-transparent'}`} />
+                  )}
 
                   {/* 100% 달성 도장 인장 */}
                   {bothDone && (

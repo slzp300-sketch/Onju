@@ -1,7 +1,7 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BarChart2, Users, UserCircle, LayoutDashboard, Share2 } from 'lucide-react';
+import { BarChart2, Users, UserCircle, TreePine, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/authStore';
 import { useThemeStore, applyTheme } from './store/themeStore';
@@ -60,7 +60,7 @@ type NavItem = {
 const NAV_GROUPS: NavItem[][] = [
   // 그룹 1: 홈, 통계
   [
-    { to: '/', icon: LayoutDashboard, label: '홈', matchPaths: ['/today', '/goals', '/routines', '/review'] },
+    { to: '/', icon: TreePine, label: '홈', matchPaths: ['/today', '/goals', '/routines', '/review'] },
     { to: '/stats', icon: BarChart2, label: '통계' },
   ],
   // 그룹 2: 소모임, 루틴공유
