@@ -18,6 +18,7 @@ import {
   useSortable, arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { newId } from '../utils/id';
 
 const tap = { whileTap: { scale: 0.94 }, transition: { type: 'spring' as const, stiffness: 600, damping: 20 } };
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
@@ -88,7 +89,7 @@ export default function PersonalRoutineNew() {
     if (isEdit && existing) {
       updatePersonalRoutine(existing.id, data);
     } else {
-      addPersonalRoutine({ id: `pr-${Date.now()}`, userId: 'user-1', createdAt: new Date().toISOString(), ...data });
+      addPersonalRoutine({ id: newId(), userId: '', createdAt: new Date().toISOString(), ...data });
     }
     navigate(-1);
   };

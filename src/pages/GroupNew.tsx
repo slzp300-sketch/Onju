@@ -8,6 +8,7 @@ import { useAuthStore } from '../store/authStore';
 import Button from '../components/ui/Button';
 import { GROUP_CATEGORIES, COVER_ICONS, COVER_ICON_KEYS, GROUP_COLORS, GROUP_RULES } from '../utils/groupMeta';
 import type { SmallGroup, GroupCategory } from '../types';
+import { newId } from '../utils/id';
 
 interface FormState {
   coverIcon: string;
@@ -49,8 +50,8 @@ export default function GroupNew() {
     if (!step1Valid) return;
     const now = new Date();
     const group: SmallGroup = {
-      id: `grp-${Date.now()}`,
-      creatorId: user?.id ?? 'user-1',
+      id: newId(),
+      creatorId: user?.id ?? '',
       title: form.title.trim(),
       goal: form.goal.trim(),
       startDate: now.toISOString(),

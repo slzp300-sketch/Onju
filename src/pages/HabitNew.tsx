@@ -17,6 +17,7 @@ import { useHabitStore } from '../store/habitStore';
 import { useGoalStore } from '../store/goalStore';
 import type { HabitFrequency } from '../types';
 import { WEEKDAY_LABELS } from '../types';
+import { newId } from '../utils/id';
 
 const FREQ_OPTIONS: { value: HabitFrequency; label: string; desc: string }[] = [
   { value: 'daily', label: '매일', desc: '매일 반복' },
@@ -116,7 +117,7 @@ export default function HabitNew() {
     if (isEdit && existing) {
       updateHabit(existing.id, data);
     } else {
-      addHabit({ id: `h-${Date.now()}`, userId: 'user-1', createdAt: new Date().toISOString(), ...data });
+      addHabit({ id: newId(), userId: '', createdAt: new Date().toISOString(), ...data });
     }
     navigate(-1);
   };

@@ -1,5 +1,6 @@
 import type { RoutineChange, DailyRoutine } from '../types';
 import { getNextWeekApplyTime } from './date';
+import { newId } from './id';
 
 interface RoutineStoreActions {
   deactivateRoutine: (id: string) => void;
@@ -28,7 +29,7 @@ export function applyRoutineChanges(
         if (change.newRoutine) {
           store.addRoutine({
             ...change.newRoutine,
-            id: `pr-review-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            id: newId(),
             userId,
             createdAt: appliedAt,
           });

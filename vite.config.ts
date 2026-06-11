@@ -10,6 +10,9 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // 네이티브(Capacitor)에서는 SW가 구버전 번들을 캐시하는 문제가 있어
+      // main.tsx에서 웹 플랫폼일 때만 수동 등록한다
+      injectRegister: false,
       includeAssets: ['favicon.svg', 'apple-touch-icon.svg', 'masked-icon.svg'],
       manifest: {
         name: '온주',
@@ -27,32 +30,13 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^\/api\//,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
-            },
-          },
-        ],
+        // supabase.co 요청(인증·데이터)은 절대 SW 캐시하지 않는다
       },
     }),
   ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-    },
-  },
-  server: {
-    proxy: {
-      // 로컬 개발 시 /api 요청을 Vercel 배포로 포워딩
-      '/api': {
-        target: 'https://onju-seven.vercel.app',
-        changeOrigin: true,
-        secure: true,
-      },
     },
   },
 })

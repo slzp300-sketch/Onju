@@ -2,6 +2,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { DailyRoutine, RoutineLog } from '../types';
 import { today } from '../utils/date';
+import { newId } from '../utils/id';
+import {
+  upsertRoutine,
+  deleteRoutine,
+  upsertRoutineLog,
+  updateRoutineOrders,
+} from '../data/repos';
 
 const todayKey = () => today();
 
@@ -36,29 +43,26 @@ export const useRoutineStore = create<RoutineState>()(
           (l) => l.routineId === routineId && l.date === today
         );
 
+        let next: RoutineLog;
         if (existing) {
-          set({
-            logs: logs.map((l) =>
-              l.routineId === routineId && l.date === today
-                ? { ...l, completed: !l.completed, completedAt: !l.completed ? new Date().toISOString() : undefined }
-                : l
-            ),
-          });
+          next = {
+            ...existing,
+            completed: !existing.completed,
+            completedAt: !existing.completed ? new Date().toISOString() : undefined,
+          };
+          set({ logs: logs.map((l) => (l === existing ? next : l)) });
         } else {
-          set({
-            logs: [
-              ...logs,
-              {
-                id: `log-${Date.now()}`,
-                routineId,
-                userId: 'user-1',
-                date: today,
-                completed: true,
-                completedAt: new Date().toISOString(),
-              },
-            ],
-          });
+          next = {
+            id: newId(),
+            routineId,
+            userId: '',
+            date: today,
+            completed: true,
+            completedAt: new Date().toISOString(),
+          };
+          set({ logs: [...logs, next] });
         }
+        upsertRoutineLog(next);
       },
 
       reorderRoutines: (type, oldIndex, newIndex) => {
@@ -66,25 +70,27 @@ export const useRoutineStore = create<RoutineState>()(
         const routines = [...get()[key]];
         const [moved] = routines.splice(oldIndex, 1);
         routines.splice(newIndex, 0, moved);
-        set({ [key]: routines.map((r, i) => ({ ...r, order: i })) });
+        const reordered = routines.map((r, i) => ({ ...r, order: i }));
+        set({ [key]: reordered });
+        updateRoutineOrders(reordered);
       },
 
       skipRoutineLog: (routineId, date) => {
         const today = date ?? todayKey();
         const { logs } = get();
         const existing = logs.find(l => l.routineId === routineId && l.date === today);
+        let next: RoutineLog;
         if (existing) {
-          set({ logs: logs.map(l =>
-            l.routineId === routineId && l.date === today
-              ? { ...l, skipped: !l.skipped, completed: false, completedAt: undefined }
-              : l
-          )});
+          next = { ...existing, skipped: !existing.skipped, completed: false, completedAt: undefined };
+          set({ logs: logs.map(l => (l === existing ? next : l)) });
         } else {
-          set({ logs: [...logs, {
-            id: `log-${Date.now()}`, routineId, userId: 'user-1',
+          next = {
+            id: newId(), routineId, userId: '',
             date: today, completed: false, skipped: true,
-          }]});
+          };
+          set({ logs: [...logs, next] });
         }
+        upsertRoutineLog(next);
       },
 
       isCompleted: (routineId, date) => {
@@ -107,6 +113,7 @@ export const useRoutineStore = create<RoutineState>()(
         } else {
           set((s) => ({ faithRoutines: [...s.faithRoutines, routine] }));
         }
+        upsertRoutine(routine);
       },
 
       removeRoutine: (id) => {
@@ -114,6 +121,7 @@ export const useRoutineStore = create<RoutineState>()(
           personalRoutines: s.personalRoutines.filter(r => r.id !== id),
           faithRoutines: s.faithRoutines.filter(r => r.id !== id),
         }));
+        deleteRoutine(id);
       },
 
       deactivateRoutine: (id) => {
@@ -123,6 +131,8 @@ export const useRoutineStore = create<RoutineState>()(
           personalRoutines: patch(s.personalRoutines),
           faithRoutines: patch(s.faithRoutines),
         }));
+        const found = [...get().personalRoutines, ...get().faithRoutines].find(r => r.id === id);
+        if (found) upsertRoutine(found);
       },
 
       updateRoutine: (id, changes) => {
@@ -132,20 +142,25 @@ export const useRoutineStore = create<RoutineState>()(
           personalRoutines: patch(s.personalRoutines),
           faithRoutines: patch(s.faithRoutines),
         }));
+        const found = [...get().personalRoutines, ...get().faithRoutines].find(r => r.id === id);
+        if (found) upsertRoutine(found);
       },
 
       setRoutines: (personal, faith) => {
         set({ personalRoutines: personal, faithRoutines: faith });
+        for (const r of [...personal, ...faith]) upsertRoutine(r);
       },
 
       deduplicateFaithRoutines: () => {
         set((s) => {
           const seen = new Set<string>();
+          const removed: DailyRoutine[] = [];
           const deduped = s.faithRoutines.filter(r => {
-            if (seen.has(r.title)) return false;
+            if (seen.has(r.title)) { removed.push(r); return false; }
             seen.add(r.title);
             return true;
           });
+          for (const r of removed) deleteRoutine(r.id);
           return deduped.length === s.faithRoutines.length ? s : { faithRoutines: deduped };
         });
       },

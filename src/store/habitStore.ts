@@ -2,6 +2,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Habit, PersonalRoutine } from '../types';
 import { today } from '../utils/date';
+import {
+  upsertHabit,
+  deleteHabit,
+  upsertHabitLog,
+  upsertPersonalRoutine,
+  deletePersonalRoutine,
+} from '../data/repos';
 
 const todayKey = () => today();
 
@@ -41,65 +48,79 @@ export const useHabitStore = create<HabitState>()(
       personalRoutines: [],
       habitLogs: [],
 
-      addHabit: (habit) =>
-        set((s) => ({ habits: [...s.habits, habit] })),
-      removeHabit: (id) =>
-        set((s) => ({ habits: s.habits.filter((h) => h.id !== id) })),
-      updateHabit: (id, patch) =>
-        set((s) => ({ habits: s.habits.map((h) => (h.id === id ? { ...h, ...patch } : h)) })),
+      addHabit: (habit) => {
+        set((s) => ({ habits: [...s.habits, habit] }));
+        upsertHabit(habit);
+      },
+      removeHabit: (id) => {
+        set((s) => ({ habits: s.habits.filter((h) => h.id !== id) }));
+        deleteHabit(id);
+      },
+      updateHabit: (id, patch) => {
+        set((s) => ({ habits: s.habits.map((h) => (h.id === id ? { ...h, ...patch } : h)) }));
+        const found = get().habits.find((h) => h.id === id);
+        if (found) upsertHabit(found);
+      },
 
-      addPersonalRoutine: (routine) =>
-        set((s) => ({ personalRoutines: [...s.personalRoutines, routine] })),
-      removePersonalRoutine: (id) =>
-        set((s) => ({ personalRoutines: s.personalRoutines.filter((r) => r.id !== id) })),
-      updatePersonalRoutine: (id, patch) =>
+      addPersonalRoutine: (routine) => {
+        set((s) => ({ personalRoutines: [...s.personalRoutines, routine] }));
+        upsertPersonalRoutine(routine);
+      },
+      removePersonalRoutine: (id) => {
+        set((s) => ({ personalRoutines: s.personalRoutines.filter((r) => r.id !== id) }));
+        deletePersonalRoutine(id);
+      },
+      updatePersonalRoutine: (id, patch) => {
         set((s) => ({
           personalRoutines: s.personalRoutines.map((r) => (r.id === id ? { ...r, ...patch } : r)),
-        })),
+        }));
+        const found = get().personalRoutines.find((r) => r.id === id);
+        if (found) upsertPersonalRoutine(found);
+      },
 
       toggleHabitLog: (habitId, date) => {
         const d = date ?? todayKey();
         const { habitLogs } = get();
         const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
-        if (existing) {
-          set({ habitLogs: habitLogs.map(l =>
-            l.habitId === habitId && l.date === d
-              ? { ...l, completed: !l.completed, skipped: false }
-              : l
-          )});
-        } else {
-          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: true, skipped: false }] });
-        }
+        const next = existing
+          ? { ...existing, completed: !existing.completed, skipped: false }
+          : { habitId, date: d, completed: true, skipped: false };
+        set({
+          habitLogs: existing
+            ? habitLogs.map(l => (l === existing ? next : l))
+            : [...habitLogs, next],
+        });
+        upsertHabitLog(next);
       },
 
       skipHabitLog: (habitId, date) => {
         const d = date ?? todayKey();
         const { habitLogs } = get();
         const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
-        if (existing) {
-          set({ habitLogs: habitLogs.map(l =>
-            l.habitId === habitId && l.date === d
-              ? { ...l, skipped: !l.skipped, completed: false, substitute: false }
-              : l
-          )});
-        } else {
-          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: false, skipped: true, substitute: false }] });
-        }
+        const next = existing
+          ? { ...existing, skipped: !existing.skipped, completed: false, substitute: false }
+          : { habitId, date: d, completed: false, skipped: true, substitute: false };
+        set({
+          habitLogs: existing
+            ? habitLogs.map(l => (l === existing ? next : l))
+            : [...habitLogs, next],
+        });
+        upsertHabitLog(next);
       },
 
       substituteHabitLog: (habitId, date) => {
         const d = date ?? todayKey();
         const { habitLogs } = get();
         const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
-        if (existing) {
-          set({ habitLogs: habitLogs.map(l =>
-            l.habitId === habitId && l.date === d
-              ? { ...l, substitute: !l.substitute, completed: false, skipped: false }
-              : l
-          )});
-        } else {
-          set({ habitLogs: [...habitLogs, { habitId, date: d, completed: false, substitute: true, skipped: false }] });
-        }
+        const next = existing
+          ? { ...existing, substitute: !existing.substitute, completed: false, skipped: false }
+          : { habitId, date: d, completed: false, substitute: true, skipped: false };
+        set({
+          habitLogs: existing
+            ? habitLogs.map(l => (l === existing ? next : l))
+            : [...habitLogs, next],
+        });
+        upsertHabitLog(next);
       },
 
       isHabitCompleted: (habitId, date) => {

@@ -13,8 +13,8 @@ import { calcCompletionRate } from '../utils/completion';
 import { isScheduled } from '../utils/goalProgress';
 import { currentWeek, currentYear, getWeekRangeText, getCurrentWeekRange } from '../utils/date';
 import Button from '../components/ui/Button';
-import type { RoutineChange, HabitChange, DailyRoutine, MonthlyGoal, Habit, RoutineLog, HabitFrequency } from '../types';
-import { mockGroups } from '../mocks/data/seed';
+import type { RoutineChange, HabitChange, DailyRoutine, MonthlyGoal, Habit, RoutineLog, HabitFrequency, SmallGroup } from '../types';
+import { useGroupStore } from '../store/groupStore';
 import { format } from 'date-fns';
 
 // ── 상수 ──────────────────────────────────────────────
@@ -52,6 +52,7 @@ export default function WeeklyReviewPage() {
   const routineStore  = useRoutineStore();
   const { monthlyGoals } = useGoalStore();
   const { habits, habitLogs, removeHabit, updateHabit } = useHabitStore();
+  const myGroups = useGroupStore(s => s.groups);
 
   const [step, setStep] = useState(0);
   const [dir,  setDir]  = useState(1);
@@ -151,7 +152,7 @@ export default function WeeklyReviewPage() {
     />,
     <ReviewIntentionStep
       intention={intention} onIntentionChange={setIntention}
-      groups={mockGroups} shareToGroups={shareToGroups}
+      groups={myGroups} shareToGroups={shareToGroups}
       onToggleGroup={id =>
         setShareToGroups(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
       }
@@ -788,7 +789,7 @@ function ActionBtn({ active, onClick, label, icon, activeColor }: {
 // ── Step 4 ────────────────────────────────────────────
 function ReviewIntentionStep({ intention, onIntentionChange, groups, shareToGroups, onToggleGroup }: {
   intention: string; onIntentionChange: (v: string) => void;
-  groups: typeof mockGroups; shareToGroups: string[]; onToggleGroup: (id: string) => void;
+  groups: SmallGroup[]; shareToGroups: string[]; onToggleGroup: (id: string) => void;
 }) {
   return (
     <div className="flex flex-col px-6 pt-6 pb-4">

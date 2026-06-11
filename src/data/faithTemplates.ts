@@ -1,4 +1,4 @@
-import type { FaithRoutineTemplate } from '../../types';
+import type { FaithRoutineTemplate } from '../types';
 
 export const faithRoutineTemplates: FaithRoutineTemplate[] = [
   {

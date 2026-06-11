@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { format, addDays } from 'date-fns';
 import { useGoalStore } from '../store/goalStore';
 import type { GoalRoutineItem, MonthlyGoal } from '../types';
+import { newId } from '../utils/id';
 
 const tapSm = { whileTap: { scale: 0.92 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 
@@ -47,7 +48,7 @@ export default function MonthlyGoalNew() {
     const s = new Date(startDate);
 
     const habit: GoalRoutineItem | undefined = habitTitle.trim() ? {
-      id: existingHabit?.id ?? `gr-${Date.now()}`,
+      id: existingHabit?.id ?? newId(),
       title: habitTitle.trim(),
       when: habitWhen.trim() || undefined,
       where: habitWhere.trim() || undefined,
@@ -71,8 +72,8 @@ export default function MonthlyGoalNew() {
       });
     } else {
       const newGoal: MonthlyGoal = {
-        id: `mg-${Date.now()}`,
-        userId: 'user-1',
+        id: newId(),
+        userId: '',
         title: toBeStatement.trim(),
         month: s.getMonth() + 1,
         year: s.getFullYear(),

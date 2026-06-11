@@ -1,25 +1,19 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { GoogleOAuthProvider } from '@react-oauth/google'
+import { Capacitor } from '@capacitor/core'
 import './index.css'
 import App from './App.tsx'
 import ErrorBoundary from './components/ui/ErrorBoundary.tsx'
 
-async function startApp() {
-  if (import.meta.env.DEV) {
-    const { worker } = await import('./mocks/browser');
-    await worker.start({ onUnhandledRequest: 'bypass' });
-  }
-
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <ErrorBoundary>
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''}>
-          <App />
-        </GoogleOAuthProvider>
-      </ErrorBoundary>
-    </StrictMode>,
-  );
+// 네이티브 WebView에서는 SW가 구버전 번들을 캐시해 업데이트를 막는다 — 웹에서만 등록
+if (!Capacitor.isNativePlatform()) {
+  void import('virtual:pwa-register').then(({ registerSW }) => registerSW({ immediate: true }))
 }
 
-startApp();
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </StrictMode>,
+)

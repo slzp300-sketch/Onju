@@ -28,7 +28,7 @@ function getPasswordStrength(pw: string): { level: 0 | 1 | 2 | 3; label: string;
 
 export default function Signup() {
   const navigate = useNavigate();
-  const { signup, checkEmailDuplicate } = useAuthStore();
+  const { signup } = useAuthStore();
 
   const [name, setName] = useState('');
   const [emailLocal, setEmailLocal] = useState('');
@@ -40,8 +40,6 @@ export default function Signup() {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [emailChecked, setEmailChecked] = useState(false);
-  const [emailAvailable, setEmailAvailable] = useState(false);
 
   const isCustomDomain = emailDomain === 'custom';
   const resolvedDomain = isCustomDomain ? emailCustomDomain.trim() : emailDomain;
@@ -56,45 +54,22 @@ export default function Signup() {
   const canSubmit =
     isNameValid &&
     isEmailValid &&
-    emailChecked &&
-    emailAvailable &&
     isPasswordValid &&
     isPasswordMatch &&
     !loading;
 
-  function resetEmailCheck() {
-    setEmailChecked(false);
-    setEmailAvailable(false);
-  }
-
-  // blur 시 체크 — 포커스 이동 시점에는 state가 최신임
-  function handleEmailBlurCheck() {
-    if (!isEmailValid) return;
-    const isDuplicate = checkEmailDuplicate(fullEmail);
-    setEmailChecked(true);
-    setEmailAvailable(!isDuplicate);
-  }
-
-  // select onChange — 새 domain 값이 아직 state에 반영되기 전이므로 직접 계산
+  // 이메일 중복은 가입 시점에 서버가 판정한다
   function handleDomainChange(newDomain: string) {
     setEmailDomain(newDomain);
     setEmailCustomDomain('');
-    resetEmailCheck();
-    if (newDomain && newDomain !== 'custom' && emailLocal.trim()) {
-      const email = `${emailLocal.trim()}@${newDomain}`;
-      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setEmailChecked(true);
-        setEmailAvailable(!checkEmailDuplicate(email));
-      }
-    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
     setLoading(true);
     setError('');
-    const result = signup(name.trim(), fullEmail, password);
+    const result = await signup(name.trim(), fullEmail, password);
     setLoading(false);
     if (result.success) {
       navigate('/onboarding', { replace: true });
@@ -139,8 +114,7 @@ export default function Signup() {
             <input
               type="text"
               value={emailLocal}
-              onChange={e => { setEmailLocal(e.target.value); resetEmailCheck(); }}
-              onBlur={handleEmailBlurCheck}
+              onChange={e => setEmailLocal(e.target.value)}
               placeholder="이메일 앞자리"
               autoComplete="email"
               className="input-base flex-1 min-w-0"
@@ -172,26 +146,13 @@ export default function Signup() {
             <input
               type="text"
               value={emailCustomDomain}
-              onChange={e => { setEmailCustomDomain(e.target.value); resetEmailCheck(); }}
-              onBlur={handleEmailBlurCheck}
+              onChange={e => setEmailCustomDomain(e.target.value)}
               placeholder="도메인 직접 입력 (예: company.com)"
               autoComplete="off"
               className="input-base"
             />
           )}
 
-          {emailChecked && emailAvailable && (
-            <p className="text-caption1 text-positive px-1 flex items-center gap-1">
-              <CheckCircle size={12} />
-              사용 가능한 이메일이에요.
-            </p>
-          )}
-          {emailChecked && !emailAvailable && (
-            <p className="text-caption1 text-negative px-1 flex items-center gap-1">
-              <XCircle size={12} />
-              이미 사용 중인 이메일이에요.
-            </p>
-          )}
         </div>
 
         {/* 비밀번호 */}

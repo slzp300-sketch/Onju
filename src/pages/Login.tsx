@@ -1,26 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useGoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../store/authStore';
-import { isNativePlatform, nativeOAuthLogin } from '../lib/nativeAuth';
-
-interface KakaoStatic {
-  isInitialized: () => boolean;
-  init: (key: string) => void;
-  Auth: {
-    authorize: (options: { redirectUri: string }) => void;
-  };
-}
-
-declare global {
-  interface Window {
-    Kakao: KakaoStatic;
-  }
-}
+import { loginWithGoogle, loginWithKakao } from '../lib/authActions';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, socialLogin } = useAuthStore();
+  const { login, isAuthenticated } = useAuthStore();
 
   const [showEmail, setShowEmail] = useState(false);
   const [email, setEmail] = useState('');
@@ -28,66 +13,27 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // 소셜/이메일 어떤 경로든 세션이 생기면 홈으로 (웹 OAuth 리다이렉트 복귀 포함)
   useEffect(() => {
-    if (window.Kakao) return;
-    const script = document.createElement('script');
-    script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
-    script.crossOrigin = 'anonymous';
-    script.onload = () => {
-      if (window.Kakao && !window.Kakao.isInitialized()) {
-        window.Kakao.init(import.meta.env.VITE_KAKAO_JS_KEY);
-      }
-    };
-    document.head.appendChild(script);
-  }, []);
+    if (isAuthenticated) navigate('/', { replace: true });
+  }, [isAuthenticated, navigate]);
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password) return;
     setLoading(true);
     setError('');
-    const result = login(email.trim(), password);
+    const result = await login(email.trim(), password);
     setLoading(false);
-    if (result.success) {
-      navigate('/', { replace: true });
-    } else {
+    if (!result.success) {
       setError(result.error ?? '로그인에 실패했어요.');
     }
   };
 
-  const handleGoogle = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        });
-        const data = await res.json();
-        socialLogin('google', { id: data.sub, name: data.name, email: data.email });
-        navigate('/', { replace: true });
-      } catch {
-        setError('구글 로그인에 실패했어요.');
-      }
-    },
-    onError: () => setError('구글 로그인에 실패했어요.'),
-  });
-
-  const handleKakao = () => {
-    if (!window.Kakao?.isInitialized()) {
-      setError('카카오 SDK가 아직 로드되지 않았어요. 잠시 후 다시 시도해주세요.');
-      return;
-    }
-    window.Kakao.Auth.authorize({
-      redirectUri: `${window.location.origin}/auth/kakao/callback`,
-    });
-  };
-
-  // 네이티브(Capacitor): 시스템 브라우저 + onju:// 딥링크로 소셜 로그인
-  const handleSocialNative = async (provider: 'google' | 'kakao') => {
+  const handleSocial = async (provider: 'google' | 'kakao') => {
     setError('');
     try {
-      const profile = await nativeOAuthLogin(provider);
-      socialLogin(provider, profile);
-      navigate('/', { replace: true });
+      await (provider === 'google' ? loginWithGoogle() : loginWithKakao());
     } catch {
       setError(`${provider === 'kakao' ? '카카오' : '구글'} 로그인에 실패했어요.`);
     }
@@ -107,7 +53,7 @@ export default function Login() {
       {/* 소셜 로그인 */}
       <div className="flex flex-col gap-3">
         <button
-          onClick={() => (isNativePlatform() ? handleSocialNative('google') : handleGoogle())}
+          onClick={() => handleSocial('google')}
           className="w-full flex items-center justify-center gap-3 border border-line rounded-lg h-12 text-body2 font-medium text-label bg-surface hover:bg-fill transition-colors"
         >
           <svg width="18" height="18" viewBox="0 0 48 48">
@@ -120,7 +66,7 @@ export default function Login() {
         </button>
 
         <button
-          onClick={() => (isNativePlatform() ? handleSocialNative('kakao') : handleKakao())}
+          onClick={() => handleSocial('kakao')}
           className="w-full flex items-center justify-center gap-3 rounded-lg h-12 text-body2 font-medium text-[#3C1E1E] bg-[#FEE500] hover:bg-[#F5DC00] transition-colors"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E">

@@ -32,7 +32,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
-const KakaoCallback = lazy(() => import('./pages/KakaoCallback'));
+const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 const WeeklyReviewPage = lazy(() => import('./pages/WeeklyReviewPage'));
 const MonthlyGoalNew = lazy(() => import('./pages/MonthlyGoalNew'));
 const Goals = lazy(() => import('./pages/Goals'));
@@ -78,7 +78,7 @@ function BottomNav() {
   const hideNav =
     location.pathname === '/login' ||
     location.pathname === '/signup' ||
-    location.pathname === '/auth/kakao/callback' ||
+    location.pathname === '/auth/callback' ||
     location.pathname === '/onboarding' ||
     location.pathname === '/goals/monthly/new' ||
     location.pathname.startsWith('/goals/monthly/edit/') ||
@@ -138,7 +138,7 @@ function BottomNav() {
 }
 
 function AppRoutes() {
-  const { isAuthenticated, onboardingDone } = useAuthStore();
+  const { isAuthenticated, onboardingDone, authReady } = useAuthStore();
   const deduplicateFaithRoutines = useRoutineStore(s => s.deduplicateFaithRoutines);
   useNotificationScheduler();
   const location = useLocation();
@@ -147,6 +147,9 @@ function AppRoutes() {
     if (isAuthenticated) deduplicateFaithRoutines();
   }, [isAuthenticated, deduplicateFaithRoutines]);
 
+  // 초기 세션 복원 전에는 라우팅 판단을 보류 (새로고침 시 로그인 화면 플래시 방지)
+  if (!authReady) return <LoadingSpinner />;
+
   return (
     <ErrorBoundary>
     <AnimatePresence mode="wait">
@@ -154,7 +157,7 @@ function AppRoutes() {
         <Routes location={location} key={location.pathname}>
           <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
           <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
-          <Route path="/auth/kakao/callback" element={<PageTransition><KakaoCallback /></PageTransition>} />
+          <Route path="/auth/callback" element={<PageTransition><AuthCallback /></PageTransition>} />
           <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
 
           {!isAuthenticated ? (

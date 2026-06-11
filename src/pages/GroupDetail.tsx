@@ -317,7 +317,7 @@ function ShareCard({ share }: { share: GroupWeeklyShare }) {
         <div className="flex gap-2 border-t border-line-soft pt-3">
           {CHEERS.map(c => (
             <motion.button key={c.key} whileTap={{ scale: 0.88 }} transition={{ duration: 0.1 }}
-              onClick={() => toggleCheer(share.id, c.key)}
+              onClick={() => toggleCheer(share.id, c.key, share.groupId)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-caption1 font-bold transition-colors ${
                 isOn(c.key) ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt'
               }`}>

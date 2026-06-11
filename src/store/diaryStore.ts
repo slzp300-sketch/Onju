@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { DiaryEntry, DiaryMood } from '../types';
+import { upsertDiaryEntry, deleteDiaryEntry } from '../data/repos';
 
 interface DiaryState {
   entries: DiaryEntry[];
@@ -23,9 +24,13 @@ export const useDiaryStore = create<DiaryState>()(
             ? { entries: s.entries.map(e => e.date === date ? entry : e) }
             : { entries: [...s.entries, entry] }
         );
+        upsertDiaryEntry(entry);
       },
 
-      removeEntry: (date) => set(s => ({ entries: s.entries.filter(e => e.date !== date) })),
+      removeEntry: (date) => {
+        set(s => ({ entries: s.entries.filter(e => e.date !== date) }));
+        deleteDiaryEntry(date);
+      },
     }),
     { name: 'diary-store' }
   )

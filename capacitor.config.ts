@@ -4,12 +4,8 @@ const config: CapacitorConfig = {
   appId: 'com.onju.app',
   appName: '온주',
   webDir: 'dist',
-  plugins: {
-    // axios/XHR 요청을 네이티브 계층으로 보내 WebView CORS 우회
-    CapacitorHttp: {
-      enabled: true,
-    },
-  },
+  // CapacitorHttp 제거: supabase.co는 CORS 정상이고,
+  // fetch 패칭이 supabase-js 인증과 충돌하는 사례가 있어 사용하지 않는다
 };
 
 export default config;

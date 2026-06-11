@@ -6,6 +6,7 @@ import { useGoalStore } from '../../store/goalStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { currentWeek, currentYear, getWeekRangeFor } from '../../utils/date';
 import type { WeeklyGoal } from '../../types';
+import { newId } from '../../utils/id';
 
 interface GoalCreateModalProps {
   isOpen: boolean;
@@ -27,8 +28,8 @@ export default function GoalCreateModal({ isOpen, onClose }: GoalCreateModalProp
   const handleSubmit = () => {
     if (!title.trim()) return;
     const newGoal: WeeklyGoal = {
-      id: `wg-${Date.now()}`,
-      userId: 'user-1',
+      id: newId(),
+      userId: '',
       title: title.trim(),
       monthlyGoalId: selectedMonthlyId || undefined,
       weekNumber: currentWeek(),

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Todo } from '../types';
+import { newId } from '../utils/id';
+import { upsertTodo, deleteTodo } from '../data/repos';
 
 interface TodoState {
   todos: Todo[];
@@ -18,8 +20,8 @@ export const useTodoStore = create<TodoState>()(
 
       addTodo: (title, date, emoji) => {
         const todo: Todo = {
-          id: `todo-${Date.now()}`,
-          userId: 'user-1',
+          id: newId(),
+          userId: '',
           title,
           ...(emoji ? { emoji } : {}),
           date,
@@ -27,10 +29,12 @@ export const useTodoStore = create<TodoState>()(
           createdAt: new Date().toISOString(),
         };
         set(s => ({ todos: [...s.todos, todo] }));
+        upsertTodo(todo);
       },
 
       removeTodo: (id) => {
         set(s => ({ todos: s.todos.filter(t => t.id !== id) }));
+        deleteTodo(id);
       },
 
       toggleTodo: (id) => {
@@ -41,10 +45,15 @@ export const useTodoStore = create<TodoState>()(
               : t
           ),
         }));
+        const found = get().todos.find(t => t.id === id);
+        if (found) upsertTodo(found);
       },
 
-      updateTodo: (id, title, emoji) =>
-        set(s => ({ todos: s.todos.map(t => t.id === id ? { ...t, title, ...(emoji !== undefined ? { emoji } : {}) } : t) })),
+      updateTodo: (id, title, emoji) => {
+        set(s => ({ todos: s.todos.map(t => t.id === id ? { ...t, title, ...(emoji !== undefined ? { emoji } : {}) } : t) }));
+        const found = get().todos.find(t => t.id === id);
+        if (found) upsertTodo(found);
+      },
 
       getTodayTodos: (date) => {
         return get().todos.filter(t => t.date === date);

@@ -14,7 +14,8 @@ import { useNotificationStore } from '../store/notificationStore';
 import { useGoalStore } from '../store/goalStore';
 import type { TimeSlot } from '../types';
 import { WEEKDAY_LABELS } from '../types';
-import { faithRoutineTemplates } from '../mocks/data/faithTemplates';
+import { faithRoutineTemplates } from '../data/faithTemplates';
+import { newId } from '../utils/id';
 
 const tap   = { whileTap: { scale: 0.96 }, transition: { type: 'spring' as const, stiffness: 600, damping: 20 } };
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
@@ -142,7 +143,7 @@ export default function FaithRoutineNew() {
       updateRoutine(existing.id, fields);
     } else {
       addRoutine({
-        id: `fr-${Date.now()}`, userId: 'user-1',
+        id: newId(), userId: '',
         type: 'faith', isActive: true,
         order: faithRoutines.length, createdAt: new Date().toISOString(),
         ...fields,
