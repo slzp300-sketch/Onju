@@ -6,6 +6,9 @@ import { useDiaryStore } from '../../store/diaryStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useStreakStore } from '../../store/streakStore';
 import { useNotificationStore } from '../../store/notificationStore';
+import { useThemeStore, applyTheme, type ThemeId } from '../../store/themeStore';
+import { useTreeStore } from '../../store/treeStore';
+import { useUIStore } from '../../store/uiStore';
 import { useGroupStore } from '../../store/groupStore';
 import { useCheerStore } from '../../store/cheerStore';
 import * as repos from '../../data/repos';
@@ -90,7 +93,18 @@ export async function hydrateUserData(userId: string): Promise<void> {
     if (settingsRow) {
       const { settings, streak, notifications } = settingsRow;
       if (settings && Object.keys(settings).length > 0) {
-        useSettingsStore.setState(settings as Partial<ReturnType<typeof useSettingsStore.getState>>);
+        const { theme, lastCelebratedStage, ...rest } =
+          settings as { theme?: ThemeId; lastCelebratedStage?: number } & Record<string, unknown>;
+        if (theme) {
+          useThemeStore.setState({ theme });
+          applyTheme(theme);
+        }
+        if (typeof lastCelebratedStage === 'number') {
+          useTreeStore.setState({ lastCelebratedStage });
+        }
+        if (Object.keys(rest).length > 0) {
+          useSettingsStore.setState(rest as Partial<ReturnType<typeof useSettingsStore.getState>>);
+        }
       }
       if (streak && Object.keys(streak).length > 0) {
         useStreakStore.setState(streak as Partial<ReturnType<typeof useStreakStore.getState>>);
@@ -117,6 +131,7 @@ export async function hydrateUserData(userId: string): Promise<void> {
     registerSettingsSync(userId);
   } finally {
     hydrating = false;
+    useUIStore.getState().setDataHydrated();
   }
 }
 
@@ -139,7 +154,11 @@ function registerSettingsSync(userId: string) {
 
   const pushSettings = debounce(() => {
     const { weekStartDay, graceEndHour } = useSettingsStore.getState();
-    repos.upsertUserSettings(userId, { settings: { weekStartDay, graceEndHour } });
+    const { theme } = useThemeStore.getState();
+    const { lastCelebratedStage } = useTreeStore.getState();
+    repos.upsertUserSettings(userId, {
+      settings: { weekStartDay, graceEndHour, theme, lastCelebratedStage },
+    });
   });
   const pushStreak = debounce(() => {
     const { shields, lastCheckedStreak } = useStreakStore.getState();
@@ -154,6 +173,8 @@ function registerSettingsSync(userId: string) {
   });
 
   useSettingsStore.subscribe(() => { if (!hydrating) pushSettings(); });
+  useThemeStore.subscribe(() => { if (!hydrating) pushSettings(); });
+  useTreeStore.subscribe(() => { if (!hydrating) pushSettings(); });
   useStreakStore.subscribe(() => { if (!hydrating) pushStreak(); });
   useNotificationStore.subscribe(() => { if (!hydrating) pushNotifications(); });
 }

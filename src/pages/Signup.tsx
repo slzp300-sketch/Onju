@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle, XCircle, AlertCircle, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import BrandLogo from '../components/ui/BrandLogo';
 
 const DOMAIN_OPTIONS = [
   { label: '도메인 선택', value: '' },
@@ -81,8 +82,8 @@ export default function Signup() {
   return (
     <div className="min-h-dvh bg-surface flex flex-col px-6">
       <div className="flex flex-col items-center pt-16 pb-8">
-        <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mb-4 border border-line">
-          <span className="text-white text-2xl font-bold font-brand">직</span>
+        <div className="mb-4">
+          <BrandLogo size={56} />
         </div>
         <h1 className="text-heading2 font-bold text-label-strong font-brand">회원가입</h1>
         <p className="text-label2 text-label-alt mt-1">함께 루틴을 만들어가요</p>

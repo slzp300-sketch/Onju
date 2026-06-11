@@ -10,6 +10,8 @@ import { useNotificationScheduler } from './hooks/useNotificationScheduler';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import PageTransition from './components/ui/PageTransition';
 import SlotUnlockModal from './components/ui/SlotUnlockModal';
+import StageUpModal from './components/tree/StageUpModal';
+import { useTreeStageWatcher } from './hooks/useTreeStageWatcher';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -203,6 +205,12 @@ function AppRoutes() {
   );
 }
 
+/** 나무 단계 워처 — 훅을 컴포넌트로 감싸 BrowserRouter/QueryClient 안에서 실행 */
+function TreeStageWatcher() {
+  useTreeStageWatcher();
+  return null;
+}
+
 export default function App() {
   const { theme } = useThemeStore();
   // 앱 마운트 시 저장된 테마 즉시 적용
@@ -215,6 +223,8 @@ export default function App() {
           <AppRoutes />
           <BottomNav />
           <SlotUnlockModal />
+          <StageUpModal />
+          <TreeStageWatcher />
         </div>
       </BrowserRouter>
     </QueryClientProvider>

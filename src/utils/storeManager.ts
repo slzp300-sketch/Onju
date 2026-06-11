@@ -8,6 +8,8 @@ import { useStreakStore } from '../store/streakStore';
 import { useTodoStore } from '../store/todoStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { useNotificationStore } from '../store/notificationStore';
+import { useTreeStore } from '../store/treeStore';
+import { useUIStore } from '../store/uiStore';
 
 /**
  * 로그아웃 시 전체 사용자 데이터 초기화.
@@ -31,10 +33,13 @@ export function clearStores() {
     eveningTime: '21:00',
     reviewEnabled: true,
   });
+  useTreeStore.setState({ lastCelebratedStage: null });
+  useUIStore.setState({ dataHydrated: false, pendingStageUp: null });
 
   const keys = [
     'routine-store', 'goal-store', 'group-store', 'diary-store', 'cheer-store',
     'habit-store', 'streak-store', 'todo-store', 'settings-store', 'notification-store',
+    'tree-store',
   ];
   for (const key of keys) localStorage.removeItem(key);
   // 구버전(계정별 키) 잔재 제거

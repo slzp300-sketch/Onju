@@ -29,7 +29,7 @@ type Phase = 'timer' | 'done';
 export default function HabitFocusMode({ habit, onClose }: HabitFocusModeProps) {
   const { toggleHabitLog, isHabitCompleted } = useHabitStore();
   const totalSeconds = habit.durationSeconds ?? 0;
-  const color = '#1f6bff';
+  const color = '#2f9e60'; // `${color}50` 알파 결합에 쓰이므로 리터럴 hex
 
   const [elapsed, setElapsed] = useState(0);
   const [phase, setPhase] = useState<Phase>('timer');

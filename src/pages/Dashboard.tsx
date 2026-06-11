@@ -22,6 +22,8 @@ import ReviewBanner from '../components/review/ReviewBanner';
 import { fetchReviews } from '../api/reviews';
 import PersonalTab from '../components/tabs/PersonalTab';
 import FaithTab from '../components/tabs/FaithTab';
+import TreeHero from '../components/tree/TreeHero';
+import { CONFETTI_FOREST } from '../components/tree/treePalette';
 
 const HOME_SUB_PATHS = ['/today', '/goals', '/routines', '/stats', '/review'];
 export { HOME_SUB_PATHS };
@@ -61,7 +63,7 @@ export default function Dashboard() {
     if (allDone && !prevCompleteRef.current) {
       const shownDate = localStorage.getItem(CONFETTI_KEY);
       if (shownDate !== todayStr) {
-        confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#1f8a4c', '#1f6bff', '#9e9e9e'] });
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: CONFETTI_FOREST });
         localStorage.setItem(CONFETTI_KEY, todayStr);
       }
     }
@@ -174,6 +176,11 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
+      {/* 나의 나무 — 성장 히어로 */}
+      <motion.div variants={itemV} className="flex-shrink-0 mb-3">
+        <TreeHero />
+      </motion.div>
+
       {/* 목표 카드 — 3개 나란히 가로 스크롤 */}
       <motion.div variants={itemV} className="flex-shrink-0 mb-4">
         {activeGoals.length === 0 ? (
@@ -282,7 +289,7 @@ export default function Dashboard() {
                     isSelected
                       ? 'border-primary bg-primary-soft'
                       : bothDone
-                      ? 'border-positive/30 bg-positive/5'
+                      ? 'border-faith/30 bg-faith/5'
                       : 'border-transparent'
                   }`}>
 
@@ -318,7 +325,7 @@ export default function Dashboard() {
                   <div className="w-full h-2 bg-fill-strong rounded-full overflow-hidden">
                     {!isFuture && fRate >= 0 && (
                       <motion.div
-                        className="h-full bg-positive rounded-full"
+                        className="h-full bg-faith rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${fRate}%` }}
                         transition={{ duration: 0.5, delay: i * 0.04 + 0.1 }}
@@ -328,7 +335,7 @@ export default function Dashboard() {
 
                   {/* 완료 상태 도트 */}
                   <div className={`w-1.5 h-1.5 rounded-full mt-0.5 ${
-                    bothDone ? 'bg-positive'
+                    bothDone ? 'bg-faith'
                     : anyDone ? 'bg-primary/40'
                     : 'bg-transparent'
                   }`} />
@@ -358,7 +365,7 @@ export default function Dashboard() {
           {/* 범례 */}
           <div className="flex items-center gap-3 mt-2 px-1">
             <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-primary" /><span className="text-caption2 text-label-assistive">개인</span></div>
-            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-positive" /><span className="text-caption2 text-label-assistive">신앙</span></div>
+            <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-faith" /><span className="text-caption2 text-label-assistive">신앙</span></div>
           </div>
         </div>
 
@@ -533,7 +540,7 @@ export default function Dashboard() {
       show={showPerfectStamp}
       label="참 잘했어요"
       sublabel="오늘 100% 달성"
-      color="#1f6bff"
+      color="#2f9e60"
       rotation={-8}
       onComplete={() => setShowPerfectStamp(false)}
     />

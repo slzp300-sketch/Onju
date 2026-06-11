@@ -71,8 +71,8 @@ export default function GroupDetail() {
         <div className="flex items-start gap-3 mb-2">
           {group.coverIcon && COVER_ICONS[group.coverIcon] && (
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: `${group.color ?? '#1f6bff'}1a` }}>
-              {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={24} strokeWidth={1.9} style={{ color: group.color ?? '#1f6bff' }} />; })()}
+              style={{ backgroundColor: `${group.color ?? '#2f9e60'}1a` }}>
+              {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={24} strokeWidth={1.9} style={{ color: group.color ?? '#2f9e60' }} />; })()}
             </div>
           )}
           <div className="flex items-center gap-2 flex-wrap">

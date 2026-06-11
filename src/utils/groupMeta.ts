@@ -35,7 +35,8 @@ export const COVER_ICONS: Record<string, LucideIcon> = {
   sun: Sun, flame: Flame, sprout: Sprout, cross: Cross, target: Target,
 };
 export const COVER_ICON_KEYS = Object.keys(COVER_ICONS);
-export const GROUP_COLORS = ['#1f6bff', '#7C7FF5', '#00BF40', '#FF6B6B', '#F59E0B', '#06B6D4'];
+// DB에 저장되고 `${color}1a` 알파 결합에 쓰이므로 반드시 리터럴 hex
+export const GROUP_COLORS = ['#2f9e60', '#7C7FF5', '#d9971e', '#FF6B6B', '#F59E0B', '#06B6D4'];
 
 // 약속(규칙) 프리셋
 export const GROUP_RULES = [

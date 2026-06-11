@@ -1,46 +1,60 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type ThemeId = 'light' | 'dark' | 'rose' | 'forest';
+/**
+ * 숲 테마 티어 — 나무 성장 단계(treeGrowth stage)로 해금된다.
+ * '밤의 숲'(다크)은 추후 티어로 검토.
+ */
+export type ThemeId = 'grove' | 'sprout' | 'meadow' | 'deepforest' | 'autumn';
 
-export interface ThemeConfig {
+export interface ThemeTier {
   id: ThemeId;
   name: string;
-  emoji: string;
   description: string;
-  preview: { bg: string; card: string; accent: string };
+  /** 해금에 필요한 나무 성장 단계 (0=기본 제공) */
+  requiredStage: 0 | 1 | 2 | 3 | 4;
+  preview: { bg: string; accent: string; leaf: string };
 }
 
-export const THEMES: ThemeConfig[] = [
+export const THEME_TIERS: ThemeTier[] = [
   {
-    id: 'light',
-    name: '라이트',
-    emoji: '☀️',
-    description: '깔끔한 화이트 테마',
-    preview: { bg: '#f7f8fa', card: '#ffffff', accent: '#6366f1' },
+    id: 'grove',
+    name: '숲',
+    description: '온주의 기본 숲 테마',
+    requiredStage: 0,
+    preview: { bg: '#f3f7f1', accent: '#2f9e60', leaf: '#57b97c' },
   },
   {
-    id: 'dark',
-    name: '다크',
-    emoji: '🌙',
-    description: '눈이 편안한 다크 테마',
-    preview: { bg: '#1c1e26', card: '#252830', accent: '#7c7ff5' },
+    id: 'sprout',
+    name: '새싹',
+    description: '맑은 민트빛 — 새싹이 트면 열려요',
+    requiredStage: 1,
+    preview: { bg: '#f0f8f4', accent: '#3bb08f', leaf: '#7fd4b8' },
   },
   {
-    id: 'rose',
-    name: '로즈',
-    emoji: '🌸',
-    description: '부드러운 블러시 테마',
-    preview: { bg: '#fdf0f2', card: '#ffffff', accent: '#d4546a' },
+    id: 'meadow',
+    name: '풀잎',
+    description: '싱그러운 옐로그린 — 묘목이 되면 열려요',
+    requiredStage: 2,
+    preview: { bg: '#f5f8ec', accent: '#5da033', leaf: '#94c462' },
   },
   {
-    id: 'forest',
-    name: '포레스트',
-    emoji: '🌿',
-    description: '차분한 세이지 그린 테마',
-    preview: { bg: '#f2f5f0', card: '#fafcf9', accent: '#5e8f6a' },
+    id: 'deepforest',
+    name: '깊은숲',
+    description: '고요한 틸그린 — 어린나무가 되면 열려요',
+    requiredStage: 3,
+    preview: { bg: '#eef5f2', accent: '#1d7a68', leaf: '#4fa897' },
+  },
+  {
+    id: 'autumn',
+    name: '가을숲',
+    description: '따뜻한 앰버 — 큰나무가 되면 열려요',
+    requiredStage: 4,
+    preview: { bg: '#faf5ed', accent: '#c4742a', leaf: '#dfa05c' },
   },
 ];
+
+const VALID_IDS = new Set<string>(THEME_TIERS.map(t => t.id));
 
 interface ThemeState {
   theme: ThemeId;
@@ -50,17 +64,24 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: 'light',
+      theme: 'grove',
       setTheme: (theme) => {
         set({ theme });
         applyTheme(theme);
       },
     }),
-    { name: 'theme-store' }
+    {
+      name: 'theme-store',
+      version: 1,
+      // 구 4테마(light/dark/rose/forest) 값은 grove로 흡수
+      migrate: (state) => {
+        const s = state as { theme?: string } | undefined;
+        return { theme: s?.theme && VALID_IDS.has(s.theme) ? (s.theme as ThemeId) : 'grove' };
+      },
+    }
   )
 );
 
 export function applyTheme(theme: ThemeId) {
-  const root = document.documentElement;
-  root.setAttribute('data-theme', theme);
+  document.documentElement.setAttribute('data-theme', VALID_IDS.has(theme) ? theme : 'grove');
 }

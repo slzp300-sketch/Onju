@@ -240,7 +240,7 @@ export default function FaithRoutineNew() {
                   <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
                   <input type="text" value={title} onChange={e => setTitle(e.target.value)}
                     placeholder="신앙 루틴 이름" autoFocus
-                    className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,102,255,0.15)] shadow-emphasize transition-all" />
+                    className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(47,158,96,0.16)] shadow-emphasize transition-all" />
                 </div>
               </div>
 

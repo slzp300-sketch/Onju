@@ -124,7 +124,7 @@ function DiaryEditor({ date, onClose }: { date: string; onClose: () => void }) {
             value={content}
             onChange={e => setContent(e.target.value)}
             placeholder="오늘 하루는 어땠나요? 자유롭게 기록해보세요."
-            className="flex-1 min-h-[200px] bg-surface border border-line rounded-xl p-4 text-body2 leading-relaxed text-label resize-none focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,102,255,0.15)] shadow-emphasize transition-all"
+            className="flex-1 min-h-[200px] bg-surface border border-line rounded-xl p-4 text-body2 leading-relaxed text-label resize-none focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(47,158,96,0.16)] shadow-emphasize transition-all"
           />
           {existing && (
             <button

@@ -11,7 +11,7 @@ export default function ProgressRing({
   rate,
   size = 80,
   strokeWidth = 8,
-  color = '#1f6bff',
+  color = 'var(--color-primary)',
   label,
   sublabel,
 }: ProgressRingProps) {

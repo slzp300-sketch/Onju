@@ -19,8 +19,8 @@ export default function GroupCard({ group }: { group: SmallGroup }) {
       <div className="flex items-start gap-3 mb-2">
         {group.coverIcon && COVER_ICONS[group.coverIcon] && (
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: `${group.color ?? '#1f6bff'}1a` }}>
-            {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={20} strokeWidth={1.9} style={{ color: group.color ?? '#1f6bff' }} />; })()}
+            style={{ backgroundColor: `${group.color ?? '#2f9e60'}1a` }}>
+            {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={20} strokeWidth={1.9} style={{ color: group.color ?? '#2f9e60' }} />; })()}
           </div>
         )}
         <div className="flex-1 min-w-0">

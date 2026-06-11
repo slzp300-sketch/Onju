@@ -217,7 +217,7 @@ function HabitRow({ habit, index, inRoutine = false, viewDate, readOnly = false 
           {(rowStamp === 'done' || rowStamp === 'sub') && (
             <RowStamp
               type="done"
-              color={rowStamp === 'sub' ? '#f97316' : '#1f6bff'}
+              color={rowStamp === 'sub' ? '#e07b27' : '#2f9e60'}
             />
           )}
         </AnimatePresence>

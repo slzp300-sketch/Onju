@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BookOpen, Dumbbell, BarChart3, Sunrise, Sparkles, PenLine, Flame, Moon, Church, FileText } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import BrandLogo from '../components/ui/BrandLogo';
 
 /* ── 고정 데이터 (render마다 값이 바뀌지 않도록) ── */
 const WEEK_DATA = [
@@ -29,9 +30,7 @@ const SLIDES = [
     description: '크리스천 직장인을 위한\n루틴 & 투두 관리 앱이에요.\n신앙과 일상을 함께 가꿔봐요.',
     visual: (
       <div className="flex flex-col items-center gap-3 w-full">
-        <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center shadow-strong">
-          <span className="text-4xl text-white font-bold font-brand">직</span>
-        </div>
+        <BrandLogo size={80} />
         <p className="text-caption2 font-bold text-primary tracking-widest">ONJU</p>
         <div className="flex gap-4 mt-1">
           {[

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { CONFETTI_FOREST } from '../components/tree/treePalette';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, Sunrise, Sun, Moon, CheckCircle2, Circle, PartyPopper } from 'lucide-react';
 import Card from '../components/ui/Card';
@@ -69,7 +70,7 @@ export default function Today() {
 
   useEffect(() => {
     if (allDone && !prevCompleteRef.current) {
-      confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: ['#1f8a4c', '#1f6bff', '#9e9e9e'] });
+      confetti({ particleCount: 80, spread: 60, origin: { y: 0.3 }, colors: CONFETTI_FOREST });
     }
     prevCompleteRef.current = allDone;
   }, [allDone]);
@@ -215,7 +216,7 @@ export default function Today() {
             onChange={e => setTodoInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAddTodo()}
             placeholder="할 일 빠르게 추가..."
-            className="flex-1 bg-surface border border-line rounded-lg px-3 h-11 text-body2 focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,102,255,0.15)] transition-all"
+            className="flex-1 bg-surface border border-line rounded-lg px-3 h-11 text-body2 focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(47,158,96,0.16)] transition-all"
           />
           <button
             onClick={handleAddTodo}
