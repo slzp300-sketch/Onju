@@ -11,6 +11,7 @@ import LoadingSpinner from './components/ui/LoadingSpinner';
 import PageTransition from './components/ui/PageTransition';
 import SlotUnlockModal from './components/ui/SlotUnlockModal';
 import StageUpModal from './components/tree/StageUpModal';
+import GlobalAmbience from './components/tree/ThemeAmbience';
 import { useTreeStageWatcher } from './hooks/useTreeStageWatcher';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 
@@ -30,6 +31,7 @@ const PersonalRoutineNew = lazy(() => import('./pages/PersonalRoutineNew'));
 const FaithRoutineNew = lazy(() => import('./pages/FaithRoutineNew'));
 const RoutineTimer = lazy(() => import('./pages/RoutineTimer'));
 const StreakDetail = lazy(() => import('./pages/StreakDetail'));
+const ThemeRewards = lazy(() => import('./pages/ThemeRewards'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Login = lazy(() => import('./pages/Login'));
@@ -89,6 +91,7 @@ function BottomNav() {
     location.pathname === '/notification-settings' ||
     location.pathname === '/diary' ||
     location.pathname === '/streak' ||
+    location.pathname === '/themes' ||
     location.pathname.startsWith('/routine-timer/') ||
     location.pathname.startsWith('/todos/') ||
     location.pathname.startsWith('/habits/') ||
@@ -191,6 +194,7 @@ function AppRoutes() {
               <Route path="/todos/edit/:id" element={<TodoNew />} />
               <Route path="/routine-timer/:id" element={<RoutineTimer />} />
               <Route path="/streak" element={<StreakDetail />} />
+              <Route path="/themes" element={<ThemeRewards />} />
               <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
               <Route path="/review" element={<PageTransition><WeeklyReviewPage /></PageTransition>} />
               <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />
@@ -221,6 +225,7 @@ export default function App() {
       <BrowserRouter>
         <div className="max-w-md mx-auto min-h-dvh bg-surface-alt relative" style={{ paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}>
           <AppRoutes />
+          <GlobalAmbience />
           <BottomNav />
           <SlotUnlockModal />
           <StageUpModal />

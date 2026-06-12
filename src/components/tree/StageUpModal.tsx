@@ -49,14 +49,21 @@ export default function StageUpModal() {
           </p>
 
           {unlockedTheme && (
-            <div className="flex items-center justify-center gap-2 bg-fill rounded-xl px-3 py-2.5 mb-4">
-              <span
-                className="w-4 h-4 rounded-full flex-shrink-0"
-                style={{ backgroundColor: unlockedTheme.preview.accent }}
-              />
-              <p className="text-caption1 text-label">
-                <span className="font-bold">'{unlockedTheme.name}'</span> 테마가 열렸어요 — 마이페이지에서 적용할 수 있어요
-              </p>
+            <div className="bg-fill rounded-xl px-3 py-2.5 mb-4">
+              <div className="flex items-center justify-center gap-2">
+                <span
+                  className="w-4 h-4 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: unlockedTheme.preview.accent }}
+                />
+                <p className="text-caption1 text-label">
+                  <span className="font-bold">'{unlockedTheme.name}'</span> 테마가 열렸어요 — 마이페이지 · 숲 테마에서 미리보고 적용할 수 있어요
+                </p>
+              </div>
+              {unlockedTheme.perks.length > 1 && (
+                <p className="text-caption2 font-bold text-primary mt-1.5">
+                  ✨ 새 효과: {unlockedTheme.perks.slice(1).join(' · ')}
+                </p>
+              )}
             </div>
           )}
 

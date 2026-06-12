@@ -88,6 +88,13 @@
 :root {
   --gradient-canopy: linear-gradient(135deg, #57b97c 0%, #2f9e60 100%);
   --gradient-hero: linear-gradient(180deg, #edf6ec 0%, #f9fbf7 100%);
+  /* CTA 광택 — 기본(들녘)은 플랫, 티어가 오를수록 그라데이션이 입혀진다 */
+  --gradient-cta: none;
+}
+
+/* 모든 주요 버튼·바(bg-primary)에 티어별 광택을 한 번에 입힌다 */
+.bg-primary {
+  background-image: var(--gradient-cta);
 }
 
 * {
@@ -158,8 +165,9 @@ body {
   --color-surface-alt: #f0f8f4;
   --color-fill: #ecf6f1;
   --color-line: #dcebe3;
-  --gradient-canopy: linear-gradient(135deg, #7fd4b8 0%, #3bb08f 100%);
-  --gradient-hero: linear-gradient(180deg, #e9f7f1 0%, #f8fcfa 100%);
+  --gradient-canopy: linear-gradient(135deg, #8fe0c4 0%, #3bb08f 55%, #2a8a70 100%);
+  --gradient-hero: linear-gradient(180deg, #dff5ec 0%, #f2fbf7 55%, #f8fdfb 100%);
+  --gradient-cta: linear-gradient(135deg, #4ec7a2 0%, #2f9478 100%);
 }
 
 /* 풀잎 — 싱그러운 옐로그린 (stage 2 해금) */
@@ -171,8 +179,9 @@ body {
   --color-surface-alt: #f5f8ec;
   --color-fill: #f1f5e6;
   --color-line: #e3ead2;
-  --gradient-canopy: linear-gradient(135deg, #94c462 0%, #5da033 100%);
-  --gradient-hero: linear-gradient(180deg, #f0f7e4 0%, #fafcf4 100%);
+  --gradient-canopy: linear-gradient(135deg, #b5d985 0%, #5da033 55%, #487f24 100%);
+  --gradient-hero: linear-gradient(180deg, #e9f5d3 0%, #f4f9e8 55%, #fbfdf4 100%);
+  --gradient-cta: linear-gradient(135deg, #79b94a 0%, #4a8526 100%);
 }
 
 /* 깊은숲 — 고요한 틸그린 (stage 3 해금) */
@@ -184,8 +193,9 @@ body {
   --color-surface-alt: #eef5f2;
   --color-fill: #e9f2ee;
   --color-line: #d8e6e0;
-  --gradient-canopy: linear-gradient(135deg, #4fa897 0%, #1d7a68 100%);
-  --gradient-hero: linear-gradient(180deg, #e6f2ee 0%, #f6faf8 100%);
+  --gradient-canopy: linear-gradient(135deg, #6fc0b0 0%, #1d7a68 55%, #14584b 100%);
+  --gradient-hero: linear-gradient(180deg, #d8ece6 0%, #e9f4f0 50%, #f4faf8 100%);
+  --gradient-cta: linear-gradient(135deg, #2f9a85 0%, #166253 100%);
 }
 
 /* 가을숲 — 따뜻한 앰버 (stage 4 해금) */
@@ -197,6 +207,7 @@ body {
   --color-surface-alt: #faf5ed;
   --color-fill: #f6f0e4;
   --color-line: #ece2d0;
-  --gradient-canopy: linear-gradient(135deg, #dfa05c 0%, #c4742a 100%);
-  --gradient-hero: linear-gradient(180deg, #f8efe0 0%, #fcf9f3 100%);
+  --gradient-canopy: linear-gradient(135deg, #ecb877 0%, #c4742a 55%, #a05a1b 100%);
+  --gradient-hero: linear-gradient(180deg, #fae9d2 0%, #f9f1e2 50%, #fdfaf4 100%);
+  --gradient-cta: linear-gradient(135deg, #e0954a 0%, #b2641f 100%);
 }
