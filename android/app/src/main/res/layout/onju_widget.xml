@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg"
+    android:padding="16dp">
+
+    <!-- 빈 상태 (스냅샷 없음) -->
+    <TextView
+        android:id="@+id/tv_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="13sp"
+        android:textColor="#7A807A"
+        android:text="온주를 열어\n오늘의 숲을 키워보세요 🌱" />
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- 헤더: 나무 + 단계/건강 + 스트릭 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_tree_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="34sp"
+                android:text="🌱" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_stage_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1F1A"
+                    android:text="씨앗" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="2dp">
+
+                    <TextView
+                        android:id="@+id/tv_health_dot"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:textColor="#2F9E60"
+                        android:text="●" />
+
+                    <TextView
+                        android:id="@+id/tv_health_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:textSize="11sp"
+                        android:textColor="#7A807A"
+                        android:text="건강" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_streak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#E8590C"
+                android:text="" />
+        </LinearLayout>
+
+        <!-- 개인 달성률 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="14dp">
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="#7A807A"
+                android:text="개인" />
+
+            <ProgressBar
+                android:id="@+id/pb_personal"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="7dp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:max="100"
+                android:progressTint="#2F9E60" />
+
+            <TextView
+                android:id="@+id/tv_personal_pct"
+                android:layout_width="36dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textSize="11sp"
+                android:textColor="#1A1F1A"
+                android:text="0%" />
+        </LinearLayout>
+
+        <!-- 신앙 달성률 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="#7A807A"
+                android:text="신앙" />
+
+            <ProgressBar
+                android:id="@+id/pb_faith"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="7dp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:max="100"
+                android:progressTint="#1F7A8C" />
+
+            <TextView
+                android:id="@+id/tv_faith_pct"
+                android:layout_width="36dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textSize="11sp"
+                android:textColor="#1A1F1A"
+                android:text="0%" />
+        </LinearLayout>
+
+        <!-- 오늘 미완료 체크 행 -->
+        <LinearLayout
+            android:id="@+id/ll_pending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="12dp">
+
+            <LinearLayout
+                android:id="@+id/row_0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="7dp"
+                android:paddingBottom="7dp"
+                android:visibility="gone">
+
+                <TextView android:id="@+id/check_0"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textSize="18sp" android:textColor="#B0B5B0" android:text="○" />
+                <TextView android:id="@+id/emoji_0"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp" android:textSize="14sp" android:text="" />
+                <TextView android:id="@+id/title_0"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginStart="8dp"
+                    android:maxLines="1" android:ellipsize="end"
+                    android:textSize="13sp" android:textColor="#1A1F1A" android:text="" />
+                <TextView android:id="@+id/play_0"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:paddingStart="12dp" android:paddingTop="2dp" android:paddingBottom="2dp"
+                    android:textSize="16sp" android:textColor="#2F9E60" android:text="▶"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="7dp"
+                android:paddingBottom="7dp"
+                android:visibility="gone">
+
+                <TextView android:id="@+id/check_1"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textSize="18sp" android:textColor="#B0B5B0" android:text="○" />
+                <TextView android:id="@+id/emoji_1"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp" android:textSize="14sp" android:text="" />
+                <TextView android:id="@+id/title_1"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginStart="8dp"
+                    android:maxLines="1" android:ellipsize="end"
+                    android:textSize="13sp" android:textColor="#1A1F1A" android:text="" />
+                <TextView android:id="@+id/play_1"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:paddingStart="12dp" android:paddingTop="2dp" android:paddingBottom="2dp"
+                    android:textSize="16sp" android:textColor="#2F9E60" android:text="▶"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="7dp"
+                android:paddingBottom="7dp"
+                android:visibility="gone">
+
+                <TextView android:id="@+id/check_2"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textSize="18sp" android:textColor="#B0B5B0" android:text="○" />
+                <TextView android:id="@+id/emoji_2"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp" android:textSize="14sp" android:text="" />
+                <TextView android:id="@+id/title_2"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginStart="8dp"
+                    android:maxLines="1" android:ellipsize="end"
+                    android:textSize="13sp" android:textColor="#1A1F1A" android:text="" />
+                <TextView android:id="@+id/play_2"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:paddingStart="12dp" android:paddingTop="2dp" android:paddingBottom="2dp"
+                    android:textSize="16sp" android:textColor="#2F9E60" android:text="▶"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

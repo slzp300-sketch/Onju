@@ -1,6 +1,7 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/queryClient';
 import { BarChart2, Users, UserCircle, TreePine, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/authStore';
@@ -14,6 +15,8 @@ import StageUpModal from './components/tree/StageUpModal';
 import GlobalAmbience from './components/tree/ThemeAmbience';
 import { useTreeStageWatcher } from './hooks/useTreeStageWatcher';
 import ErrorBoundary from './components/ui/ErrorBoundary';
+import WidgetSync from './components/WidgetSync';
+import DeepLinkHandler from './components/DeepLinkHandler';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Today = lazy(() => import('./pages/Today'));
@@ -30,6 +33,7 @@ const TodoNew = lazy(() => import('./pages/TodoNew'));
 const PersonalRoutineNew = lazy(() => import('./pages/PersonalRoutineNew'));
 const FaithRoutineNew = lazy(() => import('./pages/FaithRoutineNew'));
 const RoutineTimer = lazy(() => import('./pages/RoutineTimer'));
+const HabitTimer = lazy(() => import('./pages/HabitTimer'));
 const StreakDetail = lazy(() => import('./pages/StreakDetail'));
 const ThemeRewards = lazy(() => import('./pages/ThemeRewards'));
 const Profile = lazy(() => import('./pages/Profile'));
@@ -43,10 +47,6 @@ const Goals = lazy(() => import('./pages/Goals'));
 const ReviewResultPage = lazy(() => import('./pages/ReviewResultPage'));
 const NotificationSettings = lazy(() => import('./pages/NotificationSettings'));
 const Diary = lazy(() => import('./pages/Diary'));
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, staleTime: 1000 * 30 } },
-});
 
 /* ──────────────────────────────────────────
    하단 네비게이션 아이템 정의
@@ -193,6 +193,7 @@ function AppRoutes() {
               <Route path="/todos/new" element={<TodoNew />} />
               <Route path="/todos/edit/:id" element={<TodoNew />} />
               <Route path="/routine-timer/:id" element={<RoutineTimer />} />
+              <Route path="/habit-timer/:id" element={<HabitTimer />} />
               <Route path="/streak" element={<StreakDetail />} />
               <Route path="/themes" element={<ThemeRewards />} />
               <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
@@ -230,6 +231,8 @@ export default function App() {
           <SlotUnlockModal />
           <StageUpModal />
           <TreeStageWatcher />
+          <WidgetSync />
+          <DeepLinkHandler />
         </div>
       </BrowserRouter>
     </QueryClientProvider>

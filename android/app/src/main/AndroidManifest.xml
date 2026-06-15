@@ -28,6 +28,20 @@
             </intent-filter>
         </activity>
 
+        <!-- 홈 화면 위젯 (온주 — 오늘의 숲) -->
+        <receiver
+            android:name=".OnjuWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.onju.app.WIDGET_CHECK" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/onju_widget_info" />
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
