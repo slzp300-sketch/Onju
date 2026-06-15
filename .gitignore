@@ -26,3 +26,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 피치덱 빌드 산출물 (render_deck.cjs / build_*.cjs 로 재생성)
+docs/deck_slides/
+docs/*.pptx
