@@ -2,7 +2,7 @@ import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
-import { BarChart2, Users, UserCircle, TreePine, Share2 } from 'lucide-react';
+import { BarChart2, Users, UserCircle, TreePine } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/authStore';
 import { useThemeStore, applyTheme } from './store/themeStore';
@@ -66,10 +66,9 @@ const NAV_GROUPS: NavItem[][] = [
     { to: '/', icon: TreePine, label: '홈', matchPaths: ['/today', '/goals', '/routines', '/review'] },
     { to: '/stats', icon: BarChart2, label: '통계' },
   ],
-  // 그룹 2: 소모임, 루틴공유
+  // 그룹 2: 소모임 (루틴공유는 백엔드 연결 전까지 네비에서 숨김 — 경로는 유지)
   [
     { to: '/groups', icon: Users, label: '소모임' },
-    { to: '/share', icon: Share2, label: '루틴공유' },
   ],
   // 그룹 3: 마이페이지
   [
