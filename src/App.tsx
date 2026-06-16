@@ -17,6 +17,7 @@ import { useTreeStageWatcher } from './hooks/useTreeStageWatcher';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import WidgetSync from './components/WidgetSync';
 import DeepLinkHandler from './components/DeepLinkHandler';
+import ToastHost from './components/ui/Toast';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Today = lazy(() => import('./pages/Today'));
@@ -233,6 +234,7 @@ export default function App() {
           <TreeStageWatcher />
           <WidgetSync />
           <DeepLinkHandler />
+          <ToastHost />
         </div>
       </BrowserRouter>
     </QueryClientProvider>
