@@ -20,17 +20,18 @@ interface AuthState {
 interface ProfileRow {
   id: string;
   name: string;
-  email: string | null;
   profile_image: string | null;
   weekly_goal_slots: number;
   onboarding_done: boolean;
 }
 
-function toUser(p: ProfileRow): User {
+// email은 profiles에서 읽지 않는다 — 본인 외 노출 차단을 위해 컬럼 권한이 막혀 있고,
+// 본인 이메일은 인증 세션(session.user.email)에서 가져온다.
+function toUser(p: ProfileRow, email: string | undefined): User {
   return {
     id: p.id,
     name: p.name,
-    email: p.email ?? '',
+    email: email ?? '',
     profileImage: p.profile_image ?? undefined,
     weeklyGoalSlots: p.weekly_goal_slots,
   };
@@ -39,7 +40,7 @@ function toUser(p: ProfileRow): User {
 async function fetchProfile(userId: string): Promise<ProfileRow | null> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, name, profile_image, weekly_goal_slots, onboarding_done')
     .eq('id', userId)
     .single();
   if (error) {
@@ -121,7 +122,7 @@ supabase.auth.onAuthStateChange((event, session) => {
           const profile = await fetchProfile(session.user.id);
           if (profile) {
             useAuthStore.setState({
-              user: toUser(profile),
+              user: toUser(profile, session.user.email),
               isAuthenticated: true,
               onboardingDone: profile.onboarding_done,
               authReady: true,
