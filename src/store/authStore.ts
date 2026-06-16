@@ -3,6 +3,7 @@ import type { User } from '../types';
 import { supabase } from '../lib/supabase';
 import { clearStores } from '../utils/storeManager';
 import { hydrateUserData, resetHydration } from '../lib/sync/hydrate';
+import { flush as flushOutbox, clearOutbox } from '../lib/sync/outbox';
 
 interface AuthState {
   user: User | null;
@@ -90,6 +91,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     await supabase.auth.signOut();
     clearStores();
     resetHydration();
+    clearOutbox();
     set({ user: null, isAuthenticated: false, onboardingDone: false });
   },
 
@@ -117,6 +119,8 @@ supabase.auth.onAuthStateChange((event, session) => {
   setTimeout(() => {
     void (async () => {
       if (session?.user) {
+        // 세션이 살아있으면 오프라인 동안 쌓인 쓰기를 먼저 흘려보낸다
+        void flushOutbox();
         const current = useAuthStore.getState().user;
         if (current?.id !== session.user.id) {
           const profile = await fetchProfile(session.user.id);

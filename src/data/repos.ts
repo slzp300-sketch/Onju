@@ -10,14 +10,10 @@ import type {
   DiaryEntry,
 } from '../types';
 import * as m from './mappers';
+import { enqueue } from '../lib/sync/outbox';
 
 // write-through 리포지토리: 스토어 액션이 낙관적 set() 후 호출한다.
-// 실패는 콘솔 로깅 — 다음 hydrate에서 서버 상태가 우선한다 (P1 한계, 아웃박스는 후속 과제).
-function logError(op: string) {
-  return ({ error }: { error: { message: string } | null }) => {
-    if (error) console.error(`[sync] ${op} 실패:`, error.message);
-  };
-}
+// 쓰기는 아웃박스 큐를 통해 유실 없이 재시도된다. 읽기(list*/fetch*)는 직접 supabase.
 
 // ── 루틴 ──────────────────────────────────────────────
 export const listRoutines = async (): Promise<DailyRoutine[]> => {
@@ -33,24 +29,22 @@ export const listRoutineLogs = async (): Promise<RoutineLog[]> => {
 };
 
 export const upsertRoutine = (r: DailyRoutine) =>
-  void supabase.from('daily_routines').upsert(m.routineToRow(r)).then(logError('루틴 저장'));
+  enqueue({ type: 'upsert', table: 'daily_routines', values: m.routineToRow(r) });
 
 export const deleteRoutine = (id: string) =>
-  void supabase.from('daily_routines').delete().eq('id', id).then(logError('루틴 삭제'));
+  enqueue({ type: 'delete', table: 'daily_routines', match: { id } });
 
 export const upsertRoutineLog = (l: RoutineLog) =>
-  void supabase
-    .from('routine_logs')
-    .upsert(m.routineLogToRow(l), { onConflict: 'user_id,routine_id,date' })
-    .then(logError('루틴 기록 저장'));
+  enqueue({
+    type: 'upsert',
+    table: 'routine_logs',
+    values: m.routineLogToRow(l),
+    onConflict: 'user_id,routine_id,date',
+  });
 
 export const updateRoutineOrders = (routines: DailyRoutine[]) => {
   for (const r of routines) {
-    void supabase
-      .from('daily_routines')
-      .update({ sort_order: r.order })
-      .eq('id', r.id)
-      .then(logError('루틴 순서 저장'));
+    enqueue({ type: 'update', table: 'daily_routines', values: { sort_order: r.order }, match: { id: r.id } });
   }
 };
 
@@ -74,22 +68,24 @@ export const listPersonalRoutines = async (): Promise<PersonalRoutine[]> => {
 };
 
 export const upsertHabit = (h: Habit) =>
-  void supabase.from('habits').upsert(m.habitToRow(h)).then(logError('습관 저장'));
+  enqueue({ type: 'upsert', table: 'habits', values: m.habitToRow(h) });
 
 export const deleteHabit = (id: string) =>
-  void supabase.from('habits').delete().eq('id', id).then(logError('습관 삭제'));
+  enqueue({ type: 'delete', table: 'habits', match: { id } });
 
 export const upsertHabitLog = (l: m.HabitLogLocal) =>
-  void supabase
-    .from('habit_logs')
-    .upsert(m.habitLogToRow(l), { onConflict: 'user_id,habit_id,date' })
-    .then(logError('습관 기록 저장'));
+  enqueue({
+    type: 'upsert',
+    table: 'habit_logs',
+    values: m.habitLogToRow(l),
+    onConflict: 'user_id,habit_id,date',
+  });
 
 export const upsertPersonalRoutine = (r: PersonalRoutine) =>
-  void supabase.from('personal_routines').upsert(m.personalRoutineToRow(r)).then(logError('개인 루틴 저장'));
+  enqueue({ type: 'upsert', table: 'personal_routines', values: m.personalRoutineToRow(r) });
 
 export const deletePersonalRoutine = (id: string) =>
-  void supabase.from('personal_routines').delete().eq('id', id).then(logError('개인 루틴 삭제'));
+  enqueue({ type: 'delete', table: 'personal_routines', match: { id } });
 
 // ── 목표 ──────────────────────────────────────────────
 export const listMonthlyGoals = async (): Promise<MonthlyGoal[]> => {
@@ -105,19 +101,19 @@ export const listWeeklyGoals = async (): Promise<WeeklyGoal[]> => {
 };
 
 export const upsertMonthlyGoal = (g: MonthlyGoal) =>
-  void supabase.from('monthly_goals').upsert(m.monthlyGoalToRow(g)).then(logError('월간 목표 저장'));
+  enqueue({ type: 'upsert', table: 'monthly_goals', values: m.monthlyGoalToRow(g) });
 
 export const deleteMonthlyGoal = (id: string) =>
-  void supabase.from('monthly_goals').delete().eq('id', id).then(logError('월간 목표 삭제'));
+  enqueue({ type: 'delete', table: 'monthly_goals', match: { id } });
 
 export const upsertWeeklyGoal = (g: WeeklyGoal) =>
-  void supabase.from('weekly_goals').upsert(m.weeklyGoalToRow(g)).then(logError('주간 목표 저장'));
+  enqueue({ type: 'upsert', table: 'weekly_goals', values: m.weeklyGoalToRow(g) });
 
 export const deleteWeeklyGoal = (id: string) =>
-  void supabase.from('weekly_goals').delete().eq('id', id).then(logError('주간 목표 삭제'));
+  enqueue({ type: 'delete', table: 'weekly_goals', match: { id } });
 
 export const updateGoalSlots = (slots: number, userId: string) =>
-  void supabase.from('profiles').update({ goal_slots: slots }).eq('id', userId).then(logError('목표 슬롯 저장'));
+  enqueue({ type: 'update', table: 'profiles', values: { goal_slots: slots }, match: { id: userId } });
 
 // ── 할 일 ─────────────────────────────────────────────
 export const listTodos = async (): Promise<Todo[]> => {
@@ -127,10 +123,10 @@ export const listTodos = async (): Promise<Todo[]> => {
 };
 
 export const upsertTodo = (t: Todo) =>
-  void supabase.from('todos').upsert(m.todoToRow(t)).then(logError('할 일 저장'));
+  enqueue({ type: 'upsert', table: 'todos', values: m.todoToRow(t) });
 
 export const deleteTodo = (id: string) =>
-  void supabase.from('todos').delete().eq('id', id).then(logError('할 일 삭제'));
+  enqueue({ type: 'delete', table: 'todos', match: { id } });
 
 // ── 일기 ──────────────────────────────────────────────
 export const listDiaryEntries = async (): Promise<DiaryEntry[]> => {
@@ -140,13 +136,15 @@ export const listDiaryEntries = async (): Promise<DiaryEntry[]> => {
 };
 
 export const upsertDiaryEntry = (e: DiaryEntry) =>
-  void supabase
-    .from('diary_entries')
-    .upsert(m.diaryToRow(e), { onConflict: 'user_id,date' })
-    .then(logError('일기 저장'));
+  enqueue({
+    type: 'upsert',
+    table: 'diary_entries',
+    values: m.diaryToRow(e),
+    onConflict: 'user_id,date',
+  });
 
 export const deleteDiaryEntry = (date: string) =>
-  void supabase.from('diary_entries').delete().eq('date', date).then(logError('일기 삭제'));
+  enqueue({ type: 'delete', table: 'diary_entries', match: { date } });
 
 // ── 설정류 (jsonb 통째 upsert) ─────────────────────────
 export interface UserSettingsRow {
@@ -162,10 +160,12 @@ export const fetchUserSettings = async (): Promise<UserSettingsRow | null> => {
 };
 
 export const upsertUserSettings = (userId: string, patch: Partial<UserSettingsRow>) =>
-  void supabase
-    .from('user_settings')
-    .upsert({ user_id: userId, ...patch, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
-    .then(logError('설정 저장'));
+  enqueue({
+    type: 'upsert',
+    table: 'user_settings',
+    values: { user_id: userId, ...patch, updated_at: new Date().toISOString() },
+    onConflict: 'user_id',
+  });
 
 export const fetchGoalSlots = async (userId: string): Promise<number | null> => {
   const { data, error } = await supabase

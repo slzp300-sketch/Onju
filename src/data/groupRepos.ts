@@ -1,12 +1,7 @@
 import { supabase } from '../lib/supabase';
 import type { SmallGroup, GroupStatus, CheerType } from '../types';
 import { groupFromRow, groupToRow } from './mappers';
-
-function logError(op: string) {
-  return ({ error }: { error: { message: string } | null }) => {
-    if (error) console.error(`[sync] ${op} 실패:`, error.message);
-  };
-}
+import { enqueue } from '../lib/sync/outbox';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -34,54 +29,29 @@ export async function listMyCheers(userId: string): Promise<Record<string, boole
   return map;
 }
 
-/** 그룹 생성 + 생성자 멤버십 등록 */
+/** 그룹 생성 + 생성자 멤버십 등록. 아웃박스 FIFO가 그룹 → 멤버십 순서를 보장한다. */
 export function insertGroup(g: SmallGroup, creatorId: string) {
-  void supabase
-    .from('small_groups')
-    .insert({ ...groupToRow(g), creator_id: creatorId })
-    .then(({ error }) => {
-      if (error) {
-        console.error('[sync] 소모임 생성 실패:', error.message);
-        return;
-      }
-      void supabase
-        .from('group_members')
-        .insert({ group_id: g.id, user_id: creatorId, role: 'creator' })
-        .then(logError('소모임 생성자 멤버십'));
-    });
+  enqueue({ type: 'insert', table: 'small_groups', values: { ...groupToRow(g), creator_id: creatorId } });
+  enqueue({ type: 'insert', table: 'group_members', values: { group_id: g.id, user_id: creatorId, role: 'creator' } });
 }
 
 /** 그룹 가입 — 정원 체크는 서버 RPC가 원자적으로 수행 */
 export function joinGroupRemote(groupId: string) {
-  void supabase.rpc('join_group', { gid: groupId }).then(logError('소모임 가입'));
+  enqueue({ type: 'rpc', fn: 'join_group', args: { gid: groupId } });
 }
 
 export function leaveGroupRemote(groupId: string, userId: string) {
-  void supabase
-    .from('group_members')
-    .delete()
-    .eq('group_id', groupId)
-    .eq('user_id', userId)
-    .then(logError('소모임 탈퇴'));
+  enqueue({ type: 'delete', table: 'group_members', match: { group_id: groupId, user_id: userId } });
 }
 
 export function updateGroupStatus(groupId: string, status: GroupStatus) {
-  void supabase.from('small_groups').update({ status }).eq('id', groupId).then(logError('소모임 상태 변경'));
+  enqueue({ type: 'update', table: 'small_groups', values: { status }, match: { id: groupId } });
 }
 
 export function insertCheer(shareId: string, type: CheerType, groupId: string) {
-  void supabase
-    .from('cheers')
-    .insert({ share_id: shareId, type, group_id: groupId })
-    .then(logError('응원 추가'));
+  enqueue({ type: 'insert', table: 'cheers', values: { share_id: shareId, type, group_id: groupId } });
 }
 
 export function deleteCheer(shareId: string, type: CheerType, userId: string) {
-  void supabase
-    .from('cheers')
-    .delete()
-    .eq('share_id', shareId)
-    .eq('type', type)
-    .eq('from_user_id', userId)
-    .then(logError('응원 취소'));
+  enqueue({ type: 'delete', table: 'cheers', match: { share_id: shareId, type, from_user_id: userId } });
 }
