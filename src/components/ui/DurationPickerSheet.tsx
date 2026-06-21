@@ -37,12 +37,12 @@ function DrumCol({ items, selectedIdx, onChange }: DrumColProps) {
   return (
     <div className="relative flex-1" style={{ height: containerH }}>
       <div
-        className="absolute inset-x-0 bg-fill rounded-2xl pointer-events-none z-10"
+        className="absolute inset-x-0 bg-fill rounded-2xl pointer-events-none z-0"
         style={{ top: PAD * ITEM_H, height: ITEM_H }}
       />
       <div
         ref={ref}
-        className="h-full overflow-y-scroll"
+        className="relative z-10 h-full overflow-y-scroll"
         style={{ scrollSnapType: 'y mandatory', scrollbarWidth: 'none' } as React.CSSProperties}
         onScroll={onScroll}
       >
