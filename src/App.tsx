@@ -76,31 +76,35 @@ const NAV_GROUPS: NavItem[][] = [
   ],
 ];
 
+/** 하단 네비를 숨기는 경로 — 루트 하단 패딩(네비 자리)도 이 경로들에선 제거 */
+function isNavHidden(pathname: string): boolean {
+  return (
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/auth/callback' ||
+    pathname === '/onboarding' ||
+    pathname === '/goals/monthly/new' ||
+    pathname.startsWith('/goals/monthly/edit/') ||
+    pathname === '/groups/new' ||
+    pathname === '/review' ||
+    pathname === '/notification-settings' ||
+    pathname === '/diary' ||
+    pathname === '/streak' ||
+    pathname === '/themes' ||
+    pathname.startsWith('/routine-timer/') ||
+    pathname.startsWith('/todos/') ||
+    pathname.startsWith('/habits/') ||
+    pathname.startsWith('/personal-routines/') ||
+    pathname.startsWith('/faith-routines/') ||
+    pathname.startsWith('/review/result') ||
+    (pathname.startsWith('/groups/') && pathname !== '/groups')
+  );
+}
+
 function BottomNav() {
   const location = useLocation();
 
-  const hideNav =
-    location.pathname === '/login' ||
-    location.pathname === '/signup' ||
-    location.pathname === '/auth/callback' ||
-    location.pathname === '/onboarding' ||
-    location.pathname === '/goals/monthly/new' ||
-    location.pathname.startsWith('/goals/monthly/edit/') ||
-    location.pathname === '/groups/new' ||
-    location.pathname === '/review' ||
-    location.pathname === '/notification-settings' ||
-    location.pathname === '/diary' ||
-    location.pathname === '/streak' ||
-    location.pathname === '/themes' ||
-    location.pathname.startsWith('/routine-timer/') ||
-    location.pathname.startsWith('/todos/') ||
-    location.pathname.startsWith('/habits/') ||
-    location.pathname.startsWith('/personal-routines/') ||
-    location.pathname.startsWith('/faith-routines/') ||
-    location.pathname.startsWith('/review/result') ||
-    (location.pathname.startsWith('/groups/') && location.pathname !== '/groups');
-
-  if (hideNav) return null;
+  if (isNavHidden(location.pathname)) return null;
 
   const isActive = (item: NavItem) => {
     if (item.to === '/') {
@@ -216,6 +220,19 @@ function TreeStageWatcher() {
   return null;
 }
 
+/** 루트 셸 — 네비가 보이는 경로에서만 하단 패딩(네비 높이)을 적용 */
+function AppShell({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  return (
+    <div
+      className="max-w-md mx-auto min-h-dvh bg-surface-alt relative"
+      style={isNavHidden(pathname) ? undefined : { paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function App() {
   const { theme } = useThemeStore();
   // 앱 마운트 시 저장된 테마 즉시 적용
@@ -224,7 +241,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <div className="max-w-md mx-auto min-h-dvh bg-surface-alt relative" style={{ paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}>
+        <AppShell>
           <AppRoutes />
           <GlobalAmbience />
           <BottomNav />
@@ -234,7 +251,7 @@ export default function App() {
           <WidgetSync />
           <DeepLinkHandler />
           <ToastHost />
-        </div>
+        </AppShell>
       </BrowserRouter>
     </QueryClientProvider>
   );
