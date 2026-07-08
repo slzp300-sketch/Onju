@@ -19,6 +19,12 @@ dist-ssr
 # Supabase CLI 로컬 캐시
 supabase/.temp/
 
+# Android 릴리스 서명 (절대 커밋 금지 — 유출/분실 시 앱 업데이트 불가)
+android/key.properties
+android/keystore/
+*.jks
+*.keystore
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
