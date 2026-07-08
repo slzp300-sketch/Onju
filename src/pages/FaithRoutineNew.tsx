@@ -16,6 +16,7 @@ import type { TimeSlot } from '../types';
 import { WEEKDAY_LABELS } from '../types';
 import { faithRoutineTemplates } from '../data/faithTemplates';
 import { newId } from '../utils/id';
+import { requestNotifPermission } from '../lib/notifyPermission';
 
 const tap   = { whileTap: { scale: 0.96 }, transition: { type: 'spring' as const, stiffness: 600, damping: 20 } };
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
@@ -102,17 +103,13 @@ export default function FaithRoutineNew() {
   const [showTypePicker, setShowTypePicker] = useState(false);
 
   const handleToggleNotif = () => {
-    if (!notifEnabled) {
-      if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
-        void Notification.requestPermission().then(p => { setPermission(p); if (p === 'granted') setNotifEnabled(true); });
-        return;
-      }
-      if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
-        alert('알림 권한이 차단되어 있어요. 브라우저 설정에서 알림을 허용해주세요.');
-        return;
-      }
-    }
-    setNotifEnabled(v => !v);
+    if (notifEnabled) { setNotifEnabled(false); return; }
+    // 켤 때: 권한 요청 (네이티브/웹 공통 추상화)
+    void requestNotifPermission().then(perm => {
+      setPermission(perm);
+      if (perm === 'granted') setNotifEnabled(true);
+      else if (perm === 'denied') alert('알림 권한이 차단되어 있어요. 설정에서 알림을 허용해주세요.');
+    });
   };
 
   const handleBack = () => {

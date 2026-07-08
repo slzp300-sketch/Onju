@@ -30,6 +30,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Web Push 핸들러(push/notificationclick)를 SW에 주입 — public/push-sw.js
+        importScripts: ['push-sw.js'],
         // supabase.co 요청(인증·데이터)은 절대 SW 캐시하지 않는다
       },
     }),

@@ -18,6 +18,7 @@ import { useGoalStore } from '../store/goalStore';
 import type { HabitFrequency } from '../types';
 import { WEEKDAY_LABELS } from '../types';
 import { newId } from '../utils/id';
+import { requestNotifPermission } from '../lib/notifyPermission';
 
 const FREQ_OPTIONS: { value: HabitFrequency; label: string; desc: string }[] = [
   { value: 'daily', label: '매일', desc: '매일 반복' },
@@ -76,24 +77,11 @@ export default function HabitNew() {
       setNotifEnabled(false);
       return;
     }
-    // 켤 때: 권한 상태 확인
-    if (typeof Notification === 'undefined') {
-      setNotifEnabled(true);
-      return;
-    }
-    if (Notification.permission === 'granted') {
-      setNotifEnabled(true);
-      return;
-    }
-    if (Notification.permission === 'denied') {
-      // 차단됨 — 브라우저 설정에서 허용 필요
-      alert('알림 권한이 차단되어 있어요. 브라우저 설정에서 알림을 허용해주세요.');
-      return;
-    }
-    // default: 권한 요청 (비동기지만 별도 처리)
-    void Notification.requestPermission().then(perm => {
+    // 켤 때: 권한 요청 (네이티브/웹 공통 추상화)
+    void requestNotifPermission().then(perm => {
       setPermission(perm);
       if (perm === 'granted') setNotifEnabled(true);
+      else if (perm === 'denied') alert('알림 권한이 차단되어 있어요. 설정에서 알림을 허용해주세요.');
     });
   };
 

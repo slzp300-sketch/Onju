@@ -2,20 +2,23 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Bell, BellOff, Sunrise, Moon, ClipboardList } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Capacitor } from '@capacitor/core';
 import Card from '../components/ui/Card';
 import { useNotificationStore } from '../store/notificationStore';
+import { requestNotifPermission } from '../lib/notifyPermission';
 
 export default function NotificationSettings() {
   const navigate = useNavigate();
   const store = useNotificationStore();
   const [requesting, setRequesting] = useState(false);
+  const isNative = Capacitor.isNativePlatform();
 
   const canNotify = store.permission === 'granted';
   const denied = store.permission === 'denied';
 
   const requestPermission = async () => {
     setRequesting(true);
-    const result = await Notification.requestPermission();
+    const result = await requestNotifPermission();
     store.setPermission(result);
     setRequesting(false);
   };
@@ -40,7 +43,11 @@ export default function NotificationSettings() {
               {denied ? (
                 <>
                   <p className="text-body2 font-semibold text-label-strong">알림이 차단되어 있어요</p>
-                  <p className="text-caption1 text-label-alt mt-1">브라우저 설정에서 이 사이트의 알림을 허용해 주세요.</p>
+                  <p className="text-caption1 text-label-alt mt-1">
+                    {isNative
+                      ? '휴대폰 설정 > 앱 > 온주에서 알림을 허용해 주세요.'
+                      : '브라우저 설정에서 이 사이트의 알림을 허용해 주세요.'}
+                  </p>
                 </>
               ) : (
                 <>
@@ -130,7 +137,9 @@ export default function NotificationSettings() {
 
       {canNotify && (
         <p className="text-center text-caption1 text-label-assistive px-4">
-          알림은 앱이 열려 있는 동안 예약됩니다
+          {isNative
+            ? '앱을 닫아도 예약된 시간에 알림이 와요'
+            : '알림은 앱이 열려 있는 동안 예약됩니다'}
         </p>
       )}
     </div>

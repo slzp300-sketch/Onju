@@ -1,9 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { format } from 'date-fns';
+import { Capacitor } from '@capacitor/core';
 import { useRoutineStore } from '../store/routineStore';
 import { useNotificationStore } from '../store/notificationStore';
 import { useHabitStore } from '../store/habitStore';
 import { isSunday } from '../utils/date';
+import { currentNotifPermission } from '../lib/notifyPermission';
+import { syncNativeNotifications, cancelAllNativeNotifications } from '../lib/nativeNotifications';
+import { buildReminderSpecs, type ReminderInputs } from '../lib/reminderSpecs';
+import { isWebPushConfigured, subscribeWebPush } from '../lib/webPush';
+import { syncReminderSchedule } from '../lib/reminderSchedule';
 
 const STORAGE_KEY = 'onju_last_notif';
 
@@ -45,8 +51,53 @@ export function useNotificationScheduler() {
   const habits = useHabitStore(s => s.habits);
   const settings = useNotificationStore();
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const isNative = Capacitor.isNativePlatform();
 
+  const specInputs: ReminderInputs = {
+    morningEnabled: settings.morningEnabled,
+    morningTime: settings.morningTime,
+    eveningEnabled: settings.eveningEnabled,
+    eveningTime: settings.eveningTime,
+    reviewEnabled: settings.reviewEnabled,
+    personalCount: personalRoutines.length,
+    faithRoutines,
+    habits,
+  };
+
+  // ── 네이티브(안드로이드): OS 예약 알림 — 앱이 꺼져 있어도 발화 ──
   useEffect(() => {
+    if (!isNative) return;
+    let cancelled = false;
+    void (async () => {
+      const status = await currentNotifPermission();
+      if (cancelled) return;
+      if (status !== settings.permission) settings.setPermission(status);
+      if (status !== 'granted') { await cancelAllNativeNotifications(); return; }
+      if (!cancelled) await syncNativeNotifications(buildReminderSpecs(specInputs));
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNative, settings.permission, settings.morningEnabled, settings.morningTime, settings.eveningEnabled, settings.eveningTime, settings.reviewEnabled, personalRoutines.length, faithRoutines, habits]);
+
+  // ── 웹 Push: 구독 + reminder_schedule 동기화 — 서버(Edge Function)가 앱 닫혀도 발송 ──
+  useEffect(() => {
+    if (isNative) return;
+    if (!isWebPushConfigured()) return;
+    if (settings.permission !== 'granted') return;
+    let cancelled = false;
+    void (async () => {
+      const ok = await subscribeWebPush();
+      if (cancelled || !ok) return;
+      await syncReminderSchedule(buildReminderSpecs(specInputs));
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNative, settings.permission, settings.morningEnabled, settings.morningTime, settings.eveningEnabled, settings.eveningTime, settings.reviewEnabled, personalRoutines.length, faithRoutines, habits]);
+
+  // ── 웹 폴백: setTimeout 예약 (앱이 열려 있는 동안만) — Web Push 미구성 시 ──
+  useEffect(() => {
+    if (isNative) return;
+    if (isWebPushConfigured()) return; // 서버 Push가 대신 처리
     if (settings.permission !== 'granted') return;
 
     timers.current.forEach(clearTimeout);
@@ -173,7 +224,8 @@ export function useNotificationScheduler() {
       });
     });
 
-    return () => timers.current.forEach(clearTimeout);
+    const captured = timers.current;
+    return () => captured.forEach(clearTimeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.permission, settings.morningEnabled, settings.morningTime, settings.eveningEnabled, settings.eveningTime, settings.reviewEnabled, personalRoutines.length, faithRoutines.length, habits]);
+  }, [isNative, settings.permission, settings.morningEnabled, settings.morningTime, settings.eveningEnabled, settings.eveningTime, settings.reviewEnabled, personalRoutines.length, faithRoutines.length, habits]);
 }
