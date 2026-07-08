@@ -119,6 +119,16 @@ supabase.auth.onAuthStateChange((event, session) => {
   setTimeout(() => {
     void (async () => {
       if (session?.user) {
+        // 다른 계정으로 로그인했으면 이전 계정의 로컬 캐시/큐를 먼저 비운다.
+        // 같은 사용자 새로고침에서는 비우지 않아 오프라인 데이터 유실을 막는다.
+        const lastUid = localStorage.getItem('onju_last_uid');
+        if (lastUid !== null && lastUid !== session.user.id) {
+          clearStores();
+          resetHydration();
+          clearOutbox();
+        }
+        localStorage.setItem('onju_last_uid', session.user.id);
+
         // 세션이 살아있으면 오프라인 동안 쌓인 쓰기를 먼저 흘려보낸다
         void flushOutbox();
         const current = useAuthStore.getState().user;
@@ -138,6 +148,7 @@ supabase.auth.onAuthStateChange((event, session) => {
         }
         useAuthStore.setState({ authReady: true });
       } else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
+        localStorage.removeItem('onju_last_uid');
         useAuthStore.setState({
           user: null,
           isAuthenticated: false,

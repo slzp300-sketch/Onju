@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import Card from '../components/ui/Card';
 import { useNotificationStore } from '../store/notificationStore';
 import { requestNotifPermission } from '../lib/notifyPermission';
+import { isWebPushConfigured } from '../lib/webPush';
 
 export default function NotificationSettings() {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ export default function NotificationSettings() {
 
   const canNotify = store.permission === 'granted';
   const denied = store.permission === 'denied';
+  // 네이티브 예약 또는 웹 Push가 구성되면 앱을 닫아도 알림이 온다
+  const worksInBackground = isNative || isWebPushConfigured();
 
   const requestPermission = async () => {
     setRequesting(true);
@@ -137,7 +140,7 @@ export default function NotificationSettings() {
 
       {canNotify && (
         <p className="text-center text-caption1 text-label-assistive px-4">
-          {isNative
+          {worksInBackground
             ? '앱을 닫아도 예약된 시간에 알림이 와요'
             : '알림은 앱이 열려 있는 동안 예약됩니다'}
         </p>
