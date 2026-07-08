@@ -40,16 +40,16 @@ function DrumCol({ items, selectedIdx, onChange }: DrumColProps) {
 
   return (
     <div className="relative flex-1" style={{ height: containerH }}>
-      {/* 선택 하이라이트 */}
+      {/* 선택 하이라이트 (숫자 뒤에 깔린다) */}
       <div
-        className="absolute inset-x-1 bg-fill rounded-xl pointer-events-none z-10"
+        className="absolute inset-x-1 bg-fill rounded-xl pointer-events-none z-0"
         style={{ top: PAD * ITEM_H, height: ITEM_H }}
       />
 
-      {/* 스크롤 목록 */}
+      {/* 스크롤 목록 (하이라이트 위에 그려져 선택값이 보이도록) */}
       <div
         ref={ref}
-        className="h-full overflow-y-scroll"
+        className="relative z-10 h-full overflow-y-scroll"
         style={{
           scrollSnapType: 'y mandatory',
           scrollbarWidth: 'none',
@@ -144,14 +144,20 @@ export function AlarmTimeSheet({ isOpen, time, onChange, onDelete, onClose }: Al
               <DrumCol items={MINS}  selectedIdx={minuteIdx} onChange={i => onChange(to24h(ampmIdx, hourIdx, i))} />
             </div>
 
-            {/* 알림 삭제 */}
+            {/* 확인 / 알림 삭제 */}
             <div
-              className="px-5 pb-6"
+              className="px-5 pb-6 flex flex-col gap-3"
               style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
             >
               <button
+                onClick={onClose}
+                className="w-full h-12 rounded-xl bg-primary text-white font-bold text-body1 hover:bg-primary-strong transition-colors"
+              >
+                확인
+              </button>
+              <button
                 onClick={() => { onDelete(); onClose(); }}
-                className="text-negative text-body2 font-medium"
+                className="text-negative text-body2 font-medium self-center"
               >
                 알림 삭제
               </button>
