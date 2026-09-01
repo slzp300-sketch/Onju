@@ -111,7 +111,7 @@ export default function WeeklyReviewPage() {
         shareToGroups, routineChanges,
         completedAt: new Date().toISOString(),
       });
-      applyRoutineChanges(routineChanges, routineStore, 'user-1');
+      applyRoutineChanges(routineChanges, routineStore);
       applyHabitChanges(habitChanges, { removeHabit, updateHabit });
       for (const groupId of shareToGroups) {
         await createWeeklyShare(groupId, { personalRate, faithRate, comment, intention });
