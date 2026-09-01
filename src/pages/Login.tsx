@@ -129,6 +129,14 @@ export default function Login() {
           회원가입
         </Link>
       </p>
+
+      <p className="text-caption2 text-label-assistive text-center mt-3 leading-relaxed">
+        계속하면{' '}
+        <a href="/terms.html" target="_blank" rel="noopener" className="underline underline-offset-2">이용약관</a>
+        {' '}및{' '}
+        <a href="/privacy.html" target="_blank" rel="noopener" className="underline underline-offset-2">개인정보처리방침</a>
+        에 동의하는 것으로 간주돼요.
+      </p>
     </div>
   );
 }

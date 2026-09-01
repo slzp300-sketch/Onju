@@ -249,6 +249,14 @@ export default function Signup() {
         >
           가입하기
         </button>
+
+        <p className="text-caption2 text-label-assistive text-center leading-relaxed">
+          가입하면{' '}
+          <a href="/terms.html" target="_blank" rel="noopener" className="underline underline-offset-2">이용약관</a>
+          {' '}및{' '}
+          <a href="/privacy.html" target="_blank" rel="noopener" className="underline underline-offset-2">개인정보처리방침</a>
+          에 동의하는 것으로 간주돼요.
+        </p>
       </form>
 
       <p className="text-body2 text-label-alt text-center mt-6 pb-8">
