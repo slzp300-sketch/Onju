@@ -1,5 +1,6 @@
 import { supabase } from '../supabase';
 import { newId } from '../../utils/id';
+import { toast } from '../../store/toastStore';
 
 /**
  * 아웃박스 큐 — 서버 쓰기를 유실 없이 보장한다.
@@ -156,6 +157,7 @@ export async function flush(): Promise<void> {
       item.attempts += 1;
       if (item.attempts >= MAX_ATTEMPTS) {
         console.error(`[outbox] ${describe(item.op)} ${MAX_ATTEMPTS}회 실패 — 폐기:`, item.lastError);
+        toast.error('일부 변경사항을 서버에 저장하지 못했어요.');
         queue.shift();
         save();
         continue; // poison 항목은 버리고 다음으로
