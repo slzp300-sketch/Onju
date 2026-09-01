@@ -114,7 +114,7 @@ export default function FaithNotes() {
         <div className="px-4 pt-8">
           <EmptyState
             title="아직 남긴 기록이 없어요"
-            description={'신앙 루틴을 완료하면\n말씀·기도 기록을 남길 수 있어요'}
+            description="신앙 루틴을 완료하면 말씀·기도 기록을 남길 수 있어요"
           />
         </div>
       ) : (

@@ -2,14 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronDown } from 'lucide-react';
 import Button from '../ui/Button';
-
-interface BibleInputData {
-  type: 'bible';
-  book: string;
-  chapter: number;
-  verse: number;
-  reflection: string;
-}
+import { parseFaithMemo, type BibleMemoData } from '../../utils/faithMemo';
 
 interface BibleInputProps {
   isOpen: boolean;
@@ -43,7 +36,11 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
   const [reflection, setReflection] = useState(existing?.reflection ?? '');
 
   const handleSave = () => {
-    const data: BibleInputData = { type: 'bible', book, chapter, verse, reflection };
+    // 숫자 입력을 비우면 NaN이 되어 'null:null'로 저장되는 것을 방지
+    const clamp = (n: number) => (Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1);
+    const data: BibleMemoData = {
+      type: 'bible', book, chapter: clamp(chapter), verse: clamp(verse), reflection,
+    };
     onSave(JSON.stringify(data));
     onClose();
   };
@@ -131,12 +128,7 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
   );
 }
 
-function tryParse(memo: string): BibleInputData | null {
-  try {
-    const parsed = JSON.parse(memo);
-    if (parsed?.type === 'bible') return parsed as BibleInputData;
-    return null;
-  } catch {
-    return null;
-  }
+function tryParse(memo: string): BibleMemoData | null {
+  const parsed = parseFaithMemo(memo);
+  return parsed?.type === 'bible' ? parsed : null;
 }

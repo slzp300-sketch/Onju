@@ -2,15 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import Button from '../ui/Button';
-
-type PrayerCategory = '개인' | '직장' | '가족' | '중보';
-
-interface PrayerMemoData {
-  type: 'prayer';
-  category: PrayerCategory;
-  content: string;
-  answered: boolean;
-}
+import { parseFaithMemo, type PrayerCategory, type PrayerMemoData } from '../../utils/faithMemo';
 
 interface PrayerMemoProps {
   isOpen: boolean;
@@ -95,11 +87,6 @@ export default function PrayerMemo({ isOpen, onClose, onSave, initialMemo }: Pra
 }
 
 function tryParse(memo: string): PrayerMemoData | null {
-  try {
-    const parsed = JSON.parse(memo);
-    if (parsed?.type === 'prayer') return parsed as PrayerMemoData;
-    return null;
-  } catch {
-    return null;
-  }
+  const parsed = parseFaithMemo(memo);
+  return parsed?.type === 'prayer' ? parsed : null;
 }

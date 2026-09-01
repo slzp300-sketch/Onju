@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Trash2, BookOpen, Play, Timer, Church, Sunrise, Sun, Moon, Cloud, Zap, Feather, ChevronRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import StampButton from '../ui/StampButton';
@@ -28,22 +28,38 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
   const navigate = useNavigate();
   const isDone = (id: string) => isCompleted(id, viewDate) || isSkipped(id, viewDate);
 
-  // 기록 시트 대상 — 완료 직후 유도 또는 요약/칩 탭으로 열린다
+  // 기록 시트 대상 — 완료 직후 유도 또는 요약/칩 탭으로 열린다.
+  // 닫을 때는 open만 끄고 대상은 유지해 시트의 exit 애니메이션이 살아 있게 한다.
   const [record, setRecord] = useState<{ routine: DailyRoutine; kind: 'bible' | 'prayer' } | null>(null);
+  const [recordOpen, setRecordOpen] = useState(false);
+  const memoOf = (routineId: string) =>
+    useRoutineStore.getState().logs.find(l => l.routineId === routineId && l.date === viewDate)?.memo;
   const openRecord = (routine: DailyRoutine) => {
-    const kind = inferFaithKind(routine.title);
-    if (kind) setRecord({ routine, kind });
+    // 기존 기록이 있으면 그 유형의 에디터로 — 제목이 바뀌어도 기록을 덮어쓰지 않는다
+    const kind = parseFaithMemo(memoOf(routine.id))?.type ?? inferFaithKind(routine.title);
+    if (!kind) return;
+    setRecord({ routine, kind });
+    setRecordOpen(true);
   };
   const promptRecord = (routine: DailyRoutine) => {
-    // 스탬프 여운 뒤 부드럽게 제안 — 추론 불가한 루틴은 조용히 완료
-    if (inferFaithKind(routine.title)) setTimeout(() => openRecord(routine), 350);
+    // 스탬프 여운 뒤 부드럽게 제안 — 추론 불가한 루틴은 조용히 완료.
+    // 발화 시점에 여전히 완료 상태이고 아직 기록이 없을 때만 연다 (더블탭 취소·재완료 대응).
+    if (!inferFaithKind(routine.title)) return;
+    setTimeout(() => {
+      const log = useRoutineStore.getState().logs
+        .find(l => l.routineId === routine.id && l.date === viewDate);
+      if (log?.completed && !parseFaithMemo(log.memo)) openRecord(routine);
+    }, 350);
   };
   const recordMemo = record
     ? logs.find(l => l.routineId === record.routine.id && l.date === viewDate)?.memo
     : undefined;
 
   // 은혜 기록 요약 (전 기간)
-  const faithNoteCount = logs.filter(l => parseFaithMemo(l.memo)).length;
+  const faithNoteCount = useMemo(
+    () => logs.filter(l => parseFaithMemo(l.memo)).length,
+    [logs],
+  );
 
   const fabOptions = [
     {
@@ -162,21 +178,21 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
 
       {!readOnly && <FAB options={fabOptions} />}
 
-      {/* 기록 시트 — key로 대상별 상태 리셋 */}
+      {/* 기록 시트 — key로 대상별 상태 리셋, isOpen 토글로 exit 애니메이션 유지 */}
       {record?.kind === 'bible' && (
         <BibleInput
-          key={`${record.routine.id}:${viewDate}`}
-          isOpen
-          onClose={() => setRecord(null)}
+          key={`${record.routine.id}:${viewDate}:${recordMemo ?? ''}`}
+          isOpen={recordOpen}
+          onClose={() => setRecordOpen(false)}
           initialMemo={recordMemo}
           onSave={memo => updateLogMemo(record.routine.id, viewDate, memo)}
         />
       )}
       {record?.kind === 'prayer' && (
         <PrayerMemo
-          key={`${record.routine.id}:${viewDate}`}
-          isOpen
-          onClose={() => setRecord(null)}
+          key={`${record.routine.id}:${viewDate}:${recordMemo ?? ''}`}
+          isOpen={recordOpen}
+          onClose={() => setRecordOpen(false)}
           initialMemo={recordMemo}
           onSave={memo => updateLogMemo(record.routine.id, viewDate, memo)}
         />
