@@ -46,6 +46,7 @@ const Goals = lazy(() => import('./pages/Goals'));
 const ReviewResultPage = lazy(() => import('./pages/ReviewResultPage'));
 const NotificationSettings = lazy(() => import('./pages/NotificationSettings'));
 const Diary = lazy(() => import('./pages/Diary'));
+const FaithNotes = lazy(() => import('./pages/FaithNotes'));
 
 /* ──────────────────────────────────────────
    하단 네비게이션 아이템 정의
@@ -61,7 +62,7 @@ type NavItem = {
 const NAV_GROUPS: NavItem[][] = [
   // 그룹 1: 홈, 통계
   [
-    { to: '/', icon: TreePine, label: '홈', matchPaths: ['/goals', '/review'] },
+    { to: '/', icon: TreePine, label: '홈', matchPaths: ['/goals', '/review', '/faith-notes'] },
     { to: '/stats', icon: BarChart2, label: '통계' },
   ],
   // 그룹 2: 소모임 (루틴공유는 백엔드 연결 전까지 네비에서 숨김 — 경로는 유지)
@@ -87,6 +88,7 @@ function isNavHidden(pathname: string): boolean {
     pathname === '/review' ||
     pathname === '/notification-settings' ||
     pathname === '/diary' ||
+    pathname === '/faith-notes' ||
     pathname === '/streak' ||
     pathname === '/themes' ||
     pathname.startsWith('/routine-timer/') ||
@@ -200,6 +202,7 @@ function AppRoutes() {
               <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />
               <Route path="/notification-settings" element={<PageTransition><NotificationSettings /></PageTransition>} />
               <Route path="/diary" element={<PageTransition><Diary /></PageTransition>} />
+              <Route path="/faith-notes" element={<PageTransition><FaithNotes /></PageTransition>} />
             </>
           )}
         </Routes>

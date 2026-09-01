@@ -25,7 +25,7 @@ import FaithTab from '../components/tabs/FaithTab';
 import TreeHero from '../components/tree/TreeHero';
 import { CONFETTI_FOREST } from '../components/tree/treePalette';
 
-const HOME_SUB_PATHS = ['/goals', '/stats', '/review'];
+const HOME_SUB_PATHS = ['/goals', '/stats', '/review', '/faith-notes'];
 export { HOME_SUB_PATHS };
 
 type TabType = 'personal' | 'faith' | 'todo';

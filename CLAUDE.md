@@ -38,7 +38,7 @@ src/
 - Bottom nav has 4 tabs: 홈, 통계, 소모임, 마이페이지. (신앙루틴은 홈 내부 탭)
 - Animations via framer-motion. Keep transitions under 300ms for premium feel.
 - 도달 불가 라우트/컴포넌트를 남기지 말 것 — `npm run gc`(eslint+knip)로 검사.
-  현재 knip이 보고하는 미사용 파일들(신앙 Track A/B, HeatMap, MonthlyCalendar,
+  현재 knip이 보고하는 미사용 파일들(HeatMap, MonthlyCalendar,
   MemberProgressCard, routineRecommendation)은 스펙 기능 후보로 의도적 보존.
 
 ## Dev

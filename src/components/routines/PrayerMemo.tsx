@@ -27,7 +27,8 @@ export default function PrayerMemo({ isOpen, onClose, onSave, initialMemo }: Pra
   const [content, setContent] = useState(existing?.content ?? '');
 
   const handleSave = () => {
-    const data: PrayerMemoData = { type: 'prayer', category, content, answered: false };
+    // 수정 시 기존 응답 상태를 보존한다
+    const data: PrayerMemoData = { type: 'prayer', category, content, answered: existing?.answered ?? false };
     onSave(JSON.stringify(data));
     onClose();
   };
@@ -80,6 +81,12 @@ export default function PrayerMemo({ isOpen, onClose, onSave, initialMemo }: Pra
             />
 
             <Button fullWidth onClick={handleSave}>저장</Button>
+            <button
+              onClick={onClose}
+              className="w-full text-center text-caption1 font-semibold text-label-assistive pt-3"
+            >
+              오늘은 기록 없이 넘어갈게요
+            </button>
           </motion.div>
         </motion.div>
       )}

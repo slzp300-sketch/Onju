@@ -118,6 +118,12 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
             />
 
             <Button fullWidth onClick={handleSave}>저장</Button>
+            <button
+              onClick={onClose}
+              className="w-full text-center text-caption1 font-semibold text-label-assistive pt-3"
+            >
+              오늘은 기록 없이 넘어갈게요
+            </button>
           </motion.div>
         </motion.div>
       )}

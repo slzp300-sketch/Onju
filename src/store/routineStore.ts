@@ -18,6 +18,8 @@ interface RoutineState {
   logs: RoutineLog[];
   toggleRoutineLog: (routineId: string, date?: string) => void;
   skipRoutineLog: (routineId: string, date?: string) => void;
+  /** 체크 로그에 기록(말씀·기도 JSON)을 남긴다 — 해당 날짜 로그가 있을 때만 */
+  updateLogMemo: (routineId: string, date: string, memo: string) => void;
   reorderRoutines: (type: 'personal' | 'faith', oldIndex: number, newIndex: number) => void;
   isCompleted: (routineId: string, date?: string) => boolean;
   isSkipped: (routineId: string, date?: string) => boolean;
@@ -62,6 +64,15 @@ export const useRoutineStore = create<RoutineState>()(
           };
           set({ logs: [...logs, next] });
         }
+        upsertRoutineLog(next);
+      },
+
+      updateLogMemo: (routineId, date, memo) => {
+        const { logs } = get();
+        const existing = logs.find(l => l.routineId === routineId && l.date === date);
+        if (!existing) return;
+        const next = { ...existing, memo: memo || undefined };
+        set({ logs: logs.map(l => (l === existing ? next : l)) });
         upsertRoutineLog(next);
       },
 
