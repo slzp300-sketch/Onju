@@ -163,11 +163,11 @@ function registerSettingsSync(userId: string) {
 
   const pushSettings = debounce(() => {
     if (!settingsSyncUserId) return;
-    const { weekStartDay, graceEndHour } = useSettingsStore.getState();
+    const { weekStartDay, graceEndHour, lastSlotUnlockWeek } = useSettingsStore.getState();
     const { theme } = useThemeStore.getState();
     const { lastCelebratedStage } = useTreeStore.getState();
     repos.upsertUserSettings(settingsSyncUserId, {
-      settings: { weekStartDay, graceEndHour, theme, lastCelebratedStage },
+      settings: { weekStartDay, graceEndHour, lastSlotUnlockWeek, theme, lastCelebratedStage },
     });
   });
   const pushStreak = debounce(() => {

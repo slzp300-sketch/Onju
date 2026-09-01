@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGoalStore } from '../store/goalStore';
 import { useHabitStore } from '../store/habitStore';
 import { useRoutineStore } from '../store/routineStore';
+import WeeklyGoalsSection from '../components/goals/WeeklyGoalsSection';
 import type { MonthlyGoal } from '../types';
 import { elapsedDays } from '../utils/date';
 import { getLinkedItems, rateFromItems, adherenceFromItems, type LinkedItem } from '../utils/goalProgress';
@@ -133,6 +134,13 @@ export default function Goals() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 이번 주 목표 — 습관·루틴 연동 횟수 목표 */}
+      <div className="px-4">
+        <WeeklyGoalsSection />
+      </div>
+
+      <p className="text-caption1 font-semibold text-label-alt px-4 -mb-1">이달의 목표</p>
 
       {/* 목표 목록 */}
       <div className="px-4 flex flex-col gap-2.5">

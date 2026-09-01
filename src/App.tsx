@@ -11,6 +11,8 @@ import { useNotificationScheduler } from './hooks/useNotificationScheduler';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import PageTransition from './components/ui/PageTransition';
 import StageUpModal from './components/tree/StageUpModal';
+import SlotUnlockModal from './components/ui/SlotUnlockModal';
+import SlotUnlockWatcher from './components/SlotUnlockWatcher';
 import GlobalAmbience from './components/tree/ThemeAmbience';
 import { useTreeStageWatcher } from './hooks/useTreeStageWatcher';
 import ErrorBoundary from './components/ui/ErrorBoundary';
@@ -239,6 +241,8 @@ export default function App() {
           <GlobalAmbience />
           <BottomNav />
           <StageUpModal />
+          <SlotUnlockModal />
+          <SlotUnlockWatcher />
           <TreeStageWatcher />
           <WidgetSync />
           <DeepLinkHandler />

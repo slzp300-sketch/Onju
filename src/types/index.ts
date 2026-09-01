@@ -39,18 +39,27 @@ export interface MonthlyGoal {
   category?: 'personal' | 'faith'; // 개인 / 신앙
 }
 
+/**
+ * 주간 목표 — "이번 주 몇 번". 습관·루틴 1개를 연동한 횟수 목표.
+ * 주중 진행률은 체크 로그에서 자동 계산하고(utils/weeklyGoalProgress),
+ * completionRate는 주간 리뷰 완료 시점에 확정 기록된다.
+ */
 export interface WeeklyGoal {
   id: string;
   userId: string;
   monthlyGoalId?: string;
   title: string;
+  emoji?: string;
   weekNumber: number;
   year: number;
   startDate: string; // YYYY-MM-DD
   endDate: string;   // YYYY-MM-DD
   status: GoalStatus;
-  completionRate: number; // 0-100
-  linkedRoutineIds: string[];
+  completionRate: number; // 0-100 (리뷰 시 확정)
+  targetCount: number;    // 주간 목표 횟수 (1~7)
+  linkedKind?: 'habit' | 'routine';
+  linkedId?: string;
+  linkedRoutineIds: string[]; // legacy
   createdAt: string;
 }
 

@@ -16,6 +16,7 @@ interface AuthState {
   logout: () => Promise<void>;
   deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   setOnboardingDone: () => void;
+  updateWeeklySlots: (slots: number) => void;
 }
 
 interface ProfileRow {
@@ -120,6 +121,14 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       void supabase.from('profiles').update({ onboarding_done: true }).eq('id', user.id)
         .then(({ error }) => { if (error) console.error('온보딩 상태 저장 실패:', error.message); });
     }
+  },
+
+  updateWeeklySlots: (slots) => {
+    const { user } = get();
+    if (!user) return;
+    set({ user: { ...user, weeklyGoalSlots: slots } });
+    void supabase.from('profiles').update({ weekly_goal_slots: slots }).eq('id', user.id)
+      .then(({ error }) => { if (error) console.error('슬롯 저장 실패:', error.message); });
   },
 }));
 
