@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 interface UIState {
+  /** 주간 슬롯 해금 축하 모달 */
   pendingUnlockCelebration: boolean;
   newSlotCount: number;
   setPendingUnlock: (count: number) => void;

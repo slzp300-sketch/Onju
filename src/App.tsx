@@ -10,8 +10,9 @@ import { useRoutineStore } from './store/routineStore';
 import { useNotificationScheduler } from './hooks/useNotificationScheduler';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import PageTransition from './components/ui/PageTransition';
-import SlotUnlockModal from './components/ui/SlotUnlockModal';
 import StageUpModal from './components/tree/StageUpModal';
+import SlotUnlockModal from './components/ui/SlotUnlockModal';
+import SlotUnlockWatcher from './components/SlotUnlockWatcher';
 import GlobalAmbience from './components/tree/ThemeAmbience';
 import { useTreeStageWatcher } from './hooks/useTreeStageWatcher';
 import ErrorBoundary from './components/ui/ErrorBoundary';
@@ -20,11 +21,8 @@ import DeepLinkHandler from './components/DeepLinkHandler';
 import ToastHost from './components/ui/Toast';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Today = lazy(() => import('./pages/Today'));
 const Stats = lazy(() => import('./pages/Stats'));
-const WeeklyGoals = lazy(() => import('./pages/WeeklyGoals'));
 const MonthlyGoals = lazy(() => import('./pages/MonthlyGoals'));
-const Routines = lazy(() => import('./pages/Routines'));
 const Groups = lazy(() => import('./pages/Groups'));
 const GroupNew = lazy(() => import('./pages/GroupNew'));
 const GroupDetail = lazy(() => import('./pages/GroupDetail'));
@@ -48,6 +46,7 @@ const Goals = lazy(() => import('./pages/Goals'));
 const ReviewResultPage = lazy(() => import('./pages/ReviewResultPage'));
 const NotificationSettings = lazy(() => import('./pages/NotificationSettings'));
 const Diary = lazy(() => import('./pages/Diary'));
+const FaithNotes = lazy(() => import('./pages/FaithNotes'));
 
 /* ──────────────────────────────────────────
    하단 네비게이션 아이템 정의
@@ -63,7 +62,7 @@ type NavItem = {
 const NAV_GROUPS: NavItem[][] = [
   // 그룹 1: 홈, 통계
   [
-    { to: '/', icon: TreePine, label: '홈', matchPaths: ['/today', '/goals', '/routines', '/review'] },
+    { to: '/', icon: TreePine, label: '홈', matchPaths: ['/goals', '/review', '/faith-notes'] },
     { to: '/stats', icon: BarChart2, label: '통계' },
   ],
   // 그룹 2: 소모임 (루틴공유는 백엔드 연결 전까지 네비에서 숨김 — 경로는 유지)
@@ -89,6 +88,7 @@ function isNavHidden(pathname: string): boolean {
     pathname === '/review' ||
     pathname === '/notification-settings' ||
     pathname === '/diary' ||
+    pathname === '/faith-notes' ||
     pathname === '/streak' ||
     pathname === '/themes' ||
     pathname.startsWith('/routine-timer/') ||
@@ -176,14 +176,11 @@ function AppRoutes() {
           ) : (
             <>
               <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
-              <Route path="/today" element={<PageTransition><Today /></PageTransition>} />
               <Route path="/stats" element={<PageTransition><Stats /></PageTransition>} />
               <Route path="/goals" element={<PageTransition><Goals /></PageTransition>} />
               <Route path="/goals/monthly" element={<PageTransition><MonthlyGoals /></PageTransition>} />
               <Route path="/goals/monthly/new" element={<PageTransition><MonthlyGoalNew /></PageTransition>} />
               <Route path="/goals/monthly/edit/:id" element={<PageTransition><MonthlyGoalNew /></PageTransition>} />
-              <Route path="/goals/weekly" element={<PageTransition><WeeklyGoals /></PageTransition>} />
-              <Route path="/routines" element={<PageTransition><Routines /></PageTransition>} />
               <Route path="/groups" element={<PageTransition><Groups /></PageTransition>} />
               <Route path="/groups/new" element={<PageTransition><GroupNew /></PageTransition>} />
               <Route path="/groups/:id" element={<PageTransition><GroupDetail /></PageTransition>} />
@@ -205,6 +202,7 @@ function AppRoutes() {
               <Route path="/review/result/:week" element={<PageTransition><ReviewResultPage /></PageTransition>} />
               <Route path="/notification-settings" element={<PageTransition><NotificationSettings /></PageTransition>} />
               <Route path="/diary" element={<PageTransition><Diary /></PageTransition>} />
+              <Route path="/faith-notes" element={<PageTransition><FaithNotes /></PageTransition>} />
             </>
           )}
         </Routes>
@@ -245,8 +243,9 @@ export default function App() {
           <AppRoutes />
           <GlobalAmbience />
           <BottomNav />
-          <SlotUnlockModal />
           <StageUpModal />
+          <SlotUnlockModal />
+          <SlotUnlockWatcher />
           <TreeStageWatcher />
           <WidgetSync />
           <DeepLinkHandler />

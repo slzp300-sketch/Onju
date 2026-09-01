@@ -1,24 +1,34 @@
+import { useState } from 'react';
 import { User, Bell, ChevronRight, LogOut, CalendarDays, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
-import SlotBadge from '../components/ui/SlotBadge';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import { useAuthStore } from '../store/authStore';
-import { useGoalStore } from '../store/goalStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { useThemeStore, THEME_TIERS } from '../store/themeStore';
 import { useTreeGrowth } from '../hooks/useTreeGrowth';
-import { currentWeek, currentYear } from '../utils/date';
+import { toast } from '../store/toastStore';
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
-  const { weeklyGoals } = useGoalStore();
+  const { user, logout, deleteAccount } = useAuthStore();
   const { weekStartDay, setWeekStartDay, graceEndHour, setGraceEndHour } = useSettingsStore();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const thisWeekGoalCount = weeklyGoals.filter(
-    g => g.weekNumber === currentWeek() && g.year === currentYear()
-  ).length;
+  const handleDeleteAccount = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    const result = await deleteAccount();
+    setDeleting(false);
+    if (result.success) {
+      setDeleteOpen(false);
+      navigate('/login', { replace: true });
+    } else {
+      toast.error(result.error ?? '계정 삭제에 실패했어요.');
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4 pb-4">
@@ -36,12 +46,6 @@ export default function Profile() {
             <p className="text-caption1 text-label-alt">{user!.email}</p>
           </div>
         </div>
-      </Card>
-
-      <Card className="mx-4">
-        <p className="text-caption1 font-semibold text-label-alt mb-2">주간 목표 슬롯</p>
-        <SlotBadge total={user!.weeklyGoalSlots} used={thisWeekGoalCount} />
-        <p className="text-caption1 text-label-assistive mt-2">지난 주 달성률 80% 이상 시 슬롯이 늘어납니다 (최대 5개)</p>
       </Card>
 
       <Card className="mx-4" padding="none">
@@ -111,6 +115,24 @@ export default function Profile() {
 
       {/* 숲 테마 — 보상 트랙으로 이동 */}
       <ThemeEntryCard />
+
+      {/* 계정 삭제 — 스토어 정책상 앱 내 제공 필수 */}
+      <button
+        onClick={() => setDeleteOpen(true)}
+        className="mx-4 mb-2 py-2 text-caption1 text-label-assistive underline underline-offset-2 self-center"
+      >
+        계정 삭제
+      </button>
+
+      <ConfirmModal
+        isOpen={deleteOpen}
+        title="계정을 삭제할까요?"
+        message="모든 루틴·목표·기록이 영구적으로 삭제되며 복구할 수 없어요. 참여 중인 소모임에서 나가고, 내가 만든 소모임은 함께 삭제돼요."
+        confirmLabel={deleting ? '삭제 중…' : '영구 삭제'}
+        cancelLabel="취소"
+        onConfirm={() => void handleDeleteAccount()}
+        onCancel={() => { if (!deleting) setDeleteOpen(false); }}
+      />
     </div>
   );
 }

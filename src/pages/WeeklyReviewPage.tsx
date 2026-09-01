@@ -10,10 +10,11 @@ import { createReview, createWeeklyShare } from '../api/reviews';
 import { applyRoutineChanges } from '../utils/applyRoutineChanges';
 import { applyHabitChanges } from '../utils/applyHabitChanges';
 import { calcCompletionRate } from '../utils/completion';
+import { countWeeklyGoalDone, weeklyGoalRate } from '../utils/weeklyGoalProgress';
 import { isScheduled } from '../utils/goalProgress';
 import { currentWeek, currentYear, getWeekRangeText, getCurrentWeekRange } from '../utils/date';
 import Button from '../components/ui/Button';
-import type { RoutineChange, HabitChange, DailyRoutine, MonthlyGoal, Habit, RoutineLog, HabitFrequency, SmallGroup } from '../types';
+import type { RoutineChange, HabitChange, DailyRoutine, MonthlyGoal, WeeklyGoal, Habit, RoutineLog, HabitFrequency, SmallGroup } from '../types';
 import { useGroupStore } from '../store/groupStore';
 import { format } from 'date-fns';
 
@@ -50,7 +51,7 @@ export default function WeeklyReviewPage() {
   const location      = useLocation();
   const queryClient   = useQueryClient();
   const routineStore  = useRoutineStore();
-  const { monthlyGoals } = useGoalStore();
+  const { monthlyGoals, weeklyGoals, updateWeeklyGoal } = useGoalStore();
   const { habits, habitLogs, removeHabit, updateHabit } = useHabitStore();
   const myGroups = useGroupStore(s => s.groups);
 
@@ -70,6 +71,14 @@ export default function WeeklyReviewPage() {
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   const activeMonthlyGoals = monthlyGoals.filter(g => g.endDate >= todayIso);
   const activeGoalIds      = new Set(activeMonthlyGoals.map(g => g.id));
+
+  // 리뷰 대상 주의 주간 목표 결산 — 체크 로그에서 자동 계산
+  const weeklyGoalResults = weeklyGoals
+    .filter(g => g.startDate <= weekEndStr && g.endDate >= weekStartStr)
+    .map(g => {
+      const done = countWeeklyGoalDone(g, habitLogs, routineStore.logs);
+      return { goal: g, done, rate: weeklyGoalRate(g, done) };
+    });
 
   const personalRate = calcCompletionRate(
     routineStore.personalRoutines.filter(r => r.isActive), routineStore.logs, start, end
@@ -111,8 +120,15 @@ export default function WeeklyReviewPage() {
         shareToGroups, routineChanges,
         completedAt: new Date().toISOString(),
       });
-      applyRoutineChanges(routineChanges, routineStore, 'user-1');
+      applyRoutineChanges(routineChanges, routineStore);
       applyHabitChanges(habitChanges, { removeHabit, updateHabit });
+      // 주간 목표 달성률 확정 — 이력과 슬롯 해금 판정의 근거
+      for (const { goal, rate } of weeklyGoalResults) {
+        updateWeeklyGoal(goal.id, {
+          completionRate: rate,
+          status: rate >= 100 ? 'completed' : 'active',
+        });
+      }
       for (const groupId of shareToGroups) {
         await createWeeklyShare(groupId, { personalRate, faithRate, comment, intention });
       }
@@ -137,6 +153,7 @@ export default function WeeklyReviewPage() {
       weekRangeText={getWeekRangeText(start)}
       personalRate={personalRate} faithRate={faithRate}
       activeMonthlyGoals={activeMonthlyGoals}
+      weeklyGoalResults={weeklyGoalResults}
     />,
     <ReviewFeedbackStep
       mood={mood} onMoodChange={setMood}
@@ -205,9 +222,13 @@ export default function WeeklyReviewPage() {
 }
 
 // ── Step 1 ────────────────────────────────────────────
-function ReviewSummaryStep({ weekRangeText, personalRate, faithRate, activeMonthlyGoals }: {
+function ReviewSummaryStep({ weekRangeText, personalRate, faithRate, activeMonthlyGoals, weeklyGoalResults }: {
   weekRangeText: string; personalRate: number; faithRate: number; activeMonthlyGoals: MonthlyGoal[];
+  weeklyGoalResults: { goal: WeeklyGoal; done: number; rate: number }[];
 }) {
+  const weeklyAvg = weeklyGoalResults.length
+    ? Math.round(weeklyGoalResults.reduce((s, r) => s + r.rate, 0) / weeklyGoalResults.length)
+    : 0;
   const overallRate    = Math.round((personalRate + faithRate) / 2);
   const encouragement  =
     overallRate >= 80 ? { Icon: PartyPopper, text: '이번 주 정말 잘했어요!' }
@@ -239,6 +260,35 @@ function ReviewSummaryStep({ weekRangeText, personalRate, faithRate, activeMonth
         </div>
         <p className="text-3xl font-bold text-label-strong">{overallRate}%</p>
       </div>
+
+      {weeklyGoalResults.length > 0 && (
+        <>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-body2 font-semibold text-label">이번 주 목표 결산</p>
+            <p className={`text-caption1 font-bold ${weeklyAvg >= 80 ? 'text-positive' : 'text-label-alt'}`}>
+              평균 {weeklyAvg}%
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 mb-6">
+            {weeklyGoalResults.map(({ goal, done, rate }) => (
+              <div key={goal.id} className="bg-surface-alt rounded-xl px-4 py-3 flex items-center gap-3">
+                <span className="text-lg">{goal.emoji ?? '🎯'}</span>
+                <p className="flex-1 text-body2 font-semibold text-label-strong truncate">
+                  {goal.title} 주 {goal.targetCount}회
+                </p>
+                <p className={`text-body2 font-bold tabular-nums ${rate >= 100 ? 'text-positive' : 'text-cautionary'}`}>
+                  {done}/{goal.targetCount} · {rate}%
+                </p>
+              </div>
+            ))}
+            <p className="text-caption1 text-label-assistive px-1">
+              {weeklyAvg >= 80
+                ? '80%를 넘었어요 — 다음 주 목표 칸이 늘어나요 🎉'
+                : '평균 80% 이상이면 다음 주 목표 칸이 늘어나요'}
+            </p>
+          </div>
+        </>
+      )}
 
       <div className="flex items-center justify-between mb-3">
         <p className="text-body2 font-semibold text-label">이달의 목표</p>

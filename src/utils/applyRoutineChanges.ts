@@ -10,8 +10,7 @@ interface RoutineStoreActions {
 
 export function applyRoutineChanges(
   changes: RoutineChange[],
-  store: RoutineStoreActions,
-  userId: string
+  store: RoutineStoreActions
 ) {
   const appliedAt = getNextWeekApplyTime();
 
@@ -30,7 +29,8 @@ export function applyRoutineChanges(
           store.addRoutine({
             ...change.newRoutine,
             id: newId(),
-            userId,
+            // 서버가 auth.uid()로 채운다 — 로컬 상태의 userId는 쓰이지 않는다
+            userId: '',
             createdAt: appliedAt,
           });
         }

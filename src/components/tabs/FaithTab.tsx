@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Trash2, BookOpen, Play, Timer, Church, Sunrise, Sun, Moon, Cloud, Zap } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Trash2, BookOpen, Play, Timer, Church, Sunrise, Sun, Moon, Cloud, Zap, Feather, ChevronRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import StampButton from '../ui/StampButton';
 import RowStamp from '../ui/RowStamp';
@@ -12,6 +12,9 @@ import { today } from '../../utils/date';
 import type { DailyRoutine, TimeSlot } from '../../types';
 import FocusMode from '../routines/FocusMode';
 import TwoMinuteMode from '../routines/TwoMinuteMode';
+import BibleInput from '../routines/BibleInput';
+import PrayerMemo from '../routines/PrayerMemo';
+import { inferFaithKind, parseFaithMemo, faithMemoSummary } from '../../utils/faithMemo';
 
 const TIME_SLOTS: { value: TimeSlot; label: string; time: string; icon: ReactNode }[] = [
   { value: 'morning', label: '아침', time: '07:00', icon: <Sunrise size={15} strokeWidth={1.9} /> },
@@ -20,10 +23,43 @@ const TIME_SLOTS: { value: TimeSlot; label: string; time: string; icon: ReactNod
 ];
 
 export default function FaithTab({ date, readOnly = false }: { date?: string; readOnly?: boolean } = {}) {
-  const { faithRoutines, removeRoutine, isCompleted, isSkipped } = useRoutineStore();
+  const { faithRoutines, removeRoutine, isCompleted, isSkipped, logs, updateLogMemo } = useRoutineStore();
   const viewDate = date ?? today();
   const navigate = useNavigate();
   const isDone = (id: string) => isCompleted(id, viewDate) || isSkipped(id, viewDate);
+
+  // 기록 시트 대상 — 완료 직후 유도 또는 요약/칩 탭으로 열린다.
+  // 닫을 때는 open만 끄고 대상은 유지해 시트의 exit 애니메이션이 살아 있게 한다.
+  const [record, setRecord] = useState<{ routine: DailyRoutine; kind: 'bible' | 'prayer' } | null>(null);
+  const [recordOpen, setRecordOpen] = useState(false);
+  const memoOf = (routineId: string) =>
+    useRoutineStore.getState().logs.find(l => l.routineId === routineId && l.date === viewDate)?.memo;
+  const openRecord = (routine: DailyRoutine) => {
+    // 기존 기록이 있으면 그 유형의 에디터로 — 제목이 바뀌어도 기록을 덮어쓰지 않는다
+    const kind = parseFaithMemo(memoOf(routine.id))?.type ?? inferFaithKind(routine.title);
+    if (!kind) return;
+    setRecord({ routine, kind });
+    setRecordOpen(true);
+  };
+  const promptRecord = (routine: DailyRoutine) => {
+    // 스탬프 여운 뒤 부드럽게 제안 — 추론 불가한 루틴은 조용히 완료.
+    // 발화 시점에 여전히 완료 상태이고 아직 기록이 없을 때만 연다 (더블탭 취소·재완료 대응).
+    if (!inferFaithKind(routine.title)) return;
+    setTimeout(() => {
+      const log = useRoutineStore.getState().logs
+        .find(l => l.routineId === routine.id && l.date === viewDate);
+      if (log?.completed && !parseFaithMemo(log.memo)) openRecord(routine);
+    }, 350);
+  };
+  const recordMemo = record
+    ? logs.find(l => l.routineId === record.routine.id && l.date === viewDate)?.memo
+    : undefined;
+
+  // 은혜 기록 요약 (전 기간)
+  const faithNoteCount = useMemo(
+    () => logs.filter(l => parseFaithMemo(l.memo)).length,
+    [logs],
+  );
 
   const fabOptions = [
     {
@@ -59,6 +95,23 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
 
   return (
     <div className="relative flex flex-col pb-24">
+      {/* 은혜 기록 진입 */}
+      {!readOnly && (
+        <button
+          onClick={() => navigate('/faith-notes')}
+          className="mx-4 mb-2 flex items-center gap-2.5 bg-faith-soft border border-faith/20 rounded-2xl px-4 py-3 text-left hover:bg-faith-soft/70 transition-colors"
+        >
+          <Feather size={16} className="text-faith flex-shrink-0" strokeWidth={1.9} />
+          <span className="flex-1 text-body2 font-bold text-label-strong">
+            은혜 기록
+            {faithNoteCount > 0 && (
+              <span className="text-caption1 font-semibold text-label-alt ml-1.5">말씀·기도 {faithNoteCount}개</span>
+            )}
+          </span>
+          <ChevronRight size={15} className="text-label-assistive flex-shrink-0" />
+        </button>
+      )}
+
       {/* 시간대별 그룹 */}
       {grouped.map(group => {
         const cnt = group.routines.filter(r => isDone(r.id)).length;
@@ -82,6 +135,8 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
                   viewDate={viewDate}
                   readOnly={readOnly}
                   onRemove={() => removeRoutine(r.id)}
+                  onCompleted={promptRecord}
+                  onRecord={openRecord}
                 />
               ))}
             </div>
@@ -113,6 +168,8 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
                 viewDate={viewDate}
                 readOnly={readOnly}
                 onRemove={() => removeRoutine(r.id)}
+                onCompleted={promptRecord}
+                onRecord={openRecord}
               />
             ))}
           </div>
@@ -120,19 +177,41 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
       )}
 
       {!readOnly && <FAB options={fabOptions} />}
+
+      {/* 기록 시트 — key로 대상별 상태 리셋, isOpen 토글로 exit 애니메이션 유지 */}
+      {record?.kind === 'bible' && (
+        <BibleInput
+          key={`${record.routine.id}:${viewDate}:${recordMemo ?? ''}`}
+          isOpen={recordOpen}
+          onClose={() => setRecordOpen(false)}
+          initialMemo={recordMemo}
+          onSave={memo => updateLogMemo(record.routine.id, viewDate, memo)}
+        />
+      )}
+      {record?.kind === 'prayer' && (
+        <PrayerMemo
+          key={`${record.routine.id}:${viewDate}:${recordMemo ?? ''}`}
+          isOpen={recordOpen}
+          onClose={() => setRecordOpen(false)}
+          initialMemo={recordMemo}
+          onSave={memo => updateLogMemo(record.routine.id, viewDate, memo)}
+        />
+      )}
     </div>
   );
 }
 
 /* ── 신앙 루틴 행 ── */
-function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove }: {
+function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove, onCompleted, onRecord }: {
   routine: DailyRoutine;
   index: number;
   viewDate: string;
   readOnly?: boolean;
   onRemove: () => void;
+  onCompleted: (routine: DailyRoutine) => void;
+  onRecord: (routine: DailyRoutine) => void;
 }) {
-  const { toggleRoutineLog, skipRoutineLog, isCompleted, isSkipped } = useRoutineStore();
+  const { toggleRoutineLog, skipRoutineLog, isCompleted, isSkipped, logs } = useRoutineStore();
   const navigate = useNavigate();
   const [focusOpen, setFocusOpen] = useState(false);
   const [twoMinOpen, setTwoMinOpen] = useState(false);
@@ -140,6 +219,8 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove 
   const [rowStamp, setRowStamp] = useState<'done' | 'rest' | null>(null);
   const done = isCompleted(routine.id, viewDate);
   const skipped = isSkipped(routine.id, viewDate);
+  const memo = parseFaithMemo(logs.find(l => l.routineId === routine.id && l.date === viewDate)?.memo);
+  const recordKind = inferFaithKind(routine.title);
 
   const fireStamp = (type: 'done' | 'rest') => {
     setRowStamp(type);
@@ -181,6 +262,28 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove 
           </p>
           {skipped && (
             <p className="text-[11px] text-amber-400 font-medium mt-0.5 flex items-center gap-0.5">오늘 쉬어가요 <Cloud size={11} strokeWidth={1.9} /></p>
+          )}
+          {/* 남긴 기록 요약 — 탭하면 수정 */}
+          {done && memo && (
+            <button
+              onClick={e => { e.stopPropagation(); if (!readOnly) onRecord(routine); }}
+              className={`block max-w-full text-left text-[11px] font-medium mt-0.5 truncate ${
+                memo.type === 'bible' ? 'text-faith' : 'text-emerald-600'
+              }`}
+            >
+              {memo.type === 'bible' ? '📖 ' : '🙏 '}{faithMemoSummary(memo)}
+            </button>
+          )}
+          {/* 완료했지만 기록이 없는 말씀·기도 루틴 — 부담 없는 유도 칩 */}
+          {done && !memo && recordKind && !readOnly && (
+            <button
+              onClick={e => { e.stopPropagation(); onRecord(routine); }}
+              className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full mt-1 ${
+                recordKind === 'bible' ? 'text-faith bg-faith-soft' : 'text-emerald-600 bg-emerald-50'
+              }`}
+            >
+              ✍️ {recordKind === 'bible' ? '말씀 한 줄 남기기' : '기도 제목 남기기'}
+            </button>
           )}
           {routine.durationSeconds && !done && !skipped && (
             <p className="text-[11px] text-emerald-500 font-medium mt-0.5 flex items-center gap-0.5">
@@ -247,7 +350,11 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove 
               {!skipped && (
                 <StampButton label="완료" active={done}
                   activeColor="bg-emerald-500 border-emerald-500" inkColor="text-white" dryColor="text-emerald-600" rotation={-10}
-                  onClick={e => { e.stopPropagation(); if (!done) fireStamp('done'); toggleRoutineLog(routine.id, viewDate); }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    if (!done) { fireStamp('done'); onCompleted(routine); }
+                    toggleRoutineLog(routine.id, viewDate);
+                  }}
                 />
               )}
             </>

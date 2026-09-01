@@ -13,6 +13,7 @@ import { useGroupStore } from '../../store/groupStore';
 import { useCheerStore } from '../../store/cheerStore';
 import * as repos from '../../data/repos';
 import { listMyGroups, listMyCheers } from '../../data/groupRepos';
+import { toast } from '../../store/toastStore';
 
 /** hydrate로 인한 setState가 설정 동기화 구독을 다시 트리거하지 않도록 막는 플래그 */
 let hydrating = false;
@@ -22,6 +23,8 @@ let hydratedFor: string | null = null;
 /** 로그아웃 시 호출 — 다음 로그인에서 hydrate가 다시 돌도록 리셋 */
 export function resetHydration() {
   hydratedFor = null;
+  // 대기 중인 디바운스가 로그아웃/계정 전환 이후에 발화해도 이전 계정으로 쓰지 않도록
+  settingsSyncUserId = null;
 }
 
 /**
@@ -54,6 +57,9 @@ export async function hydrateUserData(userId: string): Promise<void> {
     results.forEach((r, i) => {
       if (r.status === 'rejected') console.error(`[sync] hydrate(${i}) 실패:`, r.reason?.message ?? r.reason);
     });
+    if (results.some(r => r.status === 'rejected')) {
+      toast.error('일부 데이터를 불러오지 못했어요. 네트워크를 확인해주세요.');
+    }
 
     const routines = ok<Awaited<ReturnType<typeof repos.listRoutines>>>(0);
     const routineLogs = ok<Awaited<ReturnType<typeof repos.listRoutineLogs>>>(1);
@@ -140,7 +146,10 @@ export async function hydrateUserData(userId: string): Promise<void> {
  * user_settings jsonb 컬럼에 통째 upsert 한다.
  */
 let settingsSyncRegistered = false;
+/** 구독 클로저가 아니라 이 변수를 읽는다 — 계정 전환 시에도 항상 현재 사용자로 쓴다 */
+let settingsSyncUserId: string | null = null;
 function registerSettingsSync(userId: string) {
+  settingsSyncUserId = userId;
   if (settingsSyncRegistered) return;
   settingsSyncRegistered = true;
 
@@ -153,21 +162,24 @@ function registerSettingsSync(userId: string) {
   };
 
   const pushSettings = debounce(() => {
-    const { weekStartDay, graceEndHour } = useSettingsStore.getState();
+    if (!settingsSyncUserId) return;
+    const { weekStartDay, graceEndHour, lastSlotUnlockWeek } = useSettingsStore.getState();
     const { theme } = useThemeStore.getState();
     const { lastCelebratedStage } = useTreeStore.getState();
-    repos.upsertUserSettings(userId, {
-      settings: { weekStartDay, graceEndHour, theme, lastCelebratedStage },
+    repos.upsertUserSettings(settingsSyncUserId, {
+      settings: { weekStartDay, graceEndHour, lastSlotUnlockWeek, theme, lastCelebratedStage },
     });
   });
   const pushStreak = debounce(() => {
+    if (!settingsSyncUserId) return;
     const { shields, lastCheckedStreak } = useStreakStore.getState();
-    repos.upsertUserSettings(userId, { streak: { shields, lastCheckedStreak } });
+    repos.upsertUserSettings(settingsSyncUserId, { streak: { shields, lastCheckedStreak } });
   });
   const pushNotifications = debounce(() => {
+    if (!settingsSyncUserId) return;
     const { morningEnabled, morningTime, eveningEnabled, eveningTime, reviewEnabled } =
       useNotificationStore.getState();
-    repos.upsertUserSettings(userId, {
+    repos.upsertUserSettings(settingsSyncUserId, {
       notifications: { morningEnabled, morningTime, eveningEnabled, eveningTime, reviewEnabled },
     });
   });

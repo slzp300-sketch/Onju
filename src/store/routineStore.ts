@@ -7,7 +7,6 @@ import {
   upsertRoutine,
   deleteRoutine,
   upsertRoutineLog,
-  updateRoutineOrders,
 } from '../data/repos';
 
 const todayKey = () => today();
@@ -18,7 +17,8 @@ interface RoutineState {
   logs: RoutineLog[];
   toggleRoutineLog: (routineId: string, date?: string) => void;
   skipRoutineLog: (routineId: string, date?: string) => void;
-  reorderRoutines: (type: 'personal' | 'faith', oldIndex: number, newIndex: number) => void;
+  /** 체크 로그에 기록(말씀·기도 JSON)을 남긴다 — 해당 날짜 로그가 있을 때만 */
+  updateLogMemo: (routineId: string, date: string, memo: string) => void;
   isCompleted: (routineId: string, date?: string) => boolean;
   isSkipped: (routineId: string, date?: string) => boolean;
   addRoutine: (routine: DailyRoutine) => void;
@@ -65,14 +65,13 @@ export const useRoutineStore = create<RoutineState>()(
         upsertRoutineLog(next);
       },
 
-      reorderRoutines: (type, oldIndex, newIndex) => {
-        const key = type === 'personal' ? 'personalRoutines' : 'faithRoutines';
-        const routines = [...get()[key]];
-        const [moved] = routines.splice(oldIndex, 1);
-        routines.splice(newIndex, 0, moved);
-        const reordered = routines.map((r, i) => ({ ...r, order: i }));
-        set({ [key]: reordered });
-        updateRoutineOrders(reordered);
+      updateLogMemo: (routineId, date, memo) => {
+        const { logs } = get();
+        const existing = logs.find(l => l.routineId === routineId && l.date === date);
+        if (!existing) return;
+        const next = { ...existing, memo: memo || undefined };
+        set({ logs: logs.map(l => (l === existing ? next : l)) });
+        upsertRoutineLog(next);
       },
 
       skipRoutineLog: (routineId, date) => {

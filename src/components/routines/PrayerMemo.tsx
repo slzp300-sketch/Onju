@@ -2,15 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import Button from '../ui/Button';
-
-type PrayerCategory = '개인' | '직장' | '가족' | '중보';
-
-interface PrayerMemoData {
-  type: 'prayer';
-  category: PrayerCategory;
-  content: string;
-  answered: boolean;
-}
+import { parseFaithMemo, type PrayerCategory, type PrayerMemoData } from '../../utils/faithMemo';
 
 interface PrayerMemoProps {
   isOpen: boolean;
@@ -27,7 +19,8 @@ export default function PrayerMemo({ isOpen, onClose, onSave, initialMemo }: Pra
   const [content, setContent] = useState(existing?.content ?? '');
 
   const handleSave = () => {
-    const data: PrayerMemoData = { type: 'prayer', category, content, answered: false };
+    // 수정 시 기존 응답 상태를 보존한다
+    const data: PrayerMemoData = { type: 'prayer', category, content, answered: existing?.answered ?? false };
     onSave(JSON.stringify(data));
     onClose();
   };
@@ -80,6 +73,12 @@ export default function PrayerMemo({ isOpen, onClose, onSave, initialMemo }: Pra
             />
 
             <Button fullWidth onClick={handleSave}>저장</Button>
+            <button
+              onClick={onClose}
+              className="w-full text-center text-caption1 font-semibold text-label-assistive pt-3"
+            >
+              오늘은 기록 없이 넘어갈게요
+            </button>
           </motion.div>
         </motion.div>
       )}
@@ -88,11 +87,6 @@ export default function PrayerMemo({ isOpen, onClose, onSave, initialMemo }: Pra
 }
 
 function tryParse(memo: string): PrayerMemoData | null {
-  try {
-    const parsed = JSON.parse(memo);
-    if (parsed?.type === 'prayer') return parsed as PrayerMemoData;
-    return null;
-  } catch {
-    return null;
-  }
+  const parsed = parseFaithMemo(memo);
+  return parsed?.type === 'prayer' ? parsed : null;
 }

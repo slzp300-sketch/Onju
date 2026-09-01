@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { PartyPopper, Check } from 'lucide-react';
 import { useUIStore } from '../../store/uiStore';
 
+/** 주간 목표 슬롯 해금 축하 — 지난 주 평균 달성률 80% 이상 시 SlotUnlockWatcher가 띄운다 */
 export default function SlotUnlockModal() {
   const { pendingUnlockCelebration, newSlotCount, clearPendingUnlock } = useUIStore();
 
@@ -13,7 +14,7 @@ export default function SlotUnlockModal() {
       particleCount: 100,
       spread: 70,
       origin: { y: 0.4 },
-      colors: ['#7F77DD', '#EF9F27', '#1D9E75'],
+      colors: ['#2f9e60', '#d9971e', '#1f8a4c'],
     });
     if ('vibrate' in navigator) {
       navigator.vibrate([50, 30, 50, 30, 100]);
@@ -35,7 +36,7 @@ export default function SlotUnlockModal() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-            className="bg-white rounded-3xl p-8 w-full max-w-xs text-center shadow-2xl"
+            className="bg-surface rounded-3xl p-8 w-full max-w-xs text-center shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex justify-center mb-3"><PartyPopper size={40} strokeWidth={1.9} className="text-primary" /></div>
@@ -44,7 +45,6 @@ export default function SlotUnlockModal() {
               지난 주 달성률이 80%를 넘었어요.<br />이제 주간 목표를 하나 더 세울 수 있어요!
             </p>
 
-            {/* 목표 칸 표시 */}
             <div className="flex justify-center gap-2 mb-6">
               {Array.from({ length: 5 }).map((_, i) => (
                 <motion.div
@@ -53,9 +53,7 @@ export default function SlotUnlockModal() {
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: i * 0.1, type: 'spring', stiffness: 500, damping: 25 }}
                   className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-body2 ${
-                    i < newSlotCount
-                      ? 'bg-primary text-white'
-                      : 'bg-fill text-label-assistive'
+                    i < newSlotCount ? 'bg-primary text-white' : 'bg-fill text-label-assistive'
                   }`}
                 >
                   {i < newSlotCount ? <Check size={16} strokeWidth={2.5} /> : ''}

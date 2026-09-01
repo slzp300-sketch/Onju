@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Camera, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import GroupCard from '../components/groups/GroupCard';
 import Button from '../components/ui/Button';
@@ -35,6 +35,23 @@ export default function Groups() {
           <Plus size={15} /> 만들기
         </Button>
       </div>
+
+      {/* 루틴 공유·인증 보드 진입 */}
+      {groups.length > 0 && (
+        <button
+          onClick={() => navigate('/share')}
+          className="mx-4 flex items-center gap-3 bg-primary-soft border border-primary/15 rounded-2xl px-4 py-3.5 text-left hover:bg-primary-soft/70 transition-colors"
+        >
+          <span className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center flex-shrink-0">
+            <Camera size={16} />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-body2 font-bold text-label-strong">오늘 인증 · 루틴 공유</span>
+            <span className="block text-caption1 text-label-alt mt-0.5">모임원들의 인증샷과 루틴을 만나보세요</span>
+          </span>
+          <ChevronRight size={16} className="text-label-assistive flex-shrink-0" />
+        </button>
+      )}
 
       {/* 탭 */}
       <div className="px-4 flex gap-2">

@@ -39,18 +39,27 @@ export interface MonthlyGoal {
   category?: 'personal' | 'faith'; // 개인 / 신앙
 }
 
+/**
+ * 주간 목표 — "이번 주 몇 번". 습관·루틴 1개를 연동한 횟수 목표.
+ * 주중 진행률은 체크 로그에서 자동 계산하고(utils/weeklyGoalProgress),
+ * completionRate는 주간 리뷰 완료 시점에 확정 기록된다.
+ */
 export interface WeeklyGoal {
   id: string;
   userId: string;
   monthlyGoalId?: string;
   title: string;
+  emoji?: string;
   weekNumber: number;
   year: number;
   startDate: string; // YYYY-MM-DD
   endDate: string;   // YYYY-MM-DD
   status: GoalStatus;
-  completionRate: number; // 0-100
-  linkedRoutineIds: string[];
+  completionRate: number; // 0-100 (리뷰 시 확정)
+  targetCount: number;    // 주간 목표 횟수 (1~7)
+  linkedKind?: 'habit' | 'routine';
+  linkedId?: string;
+  linkedRoutineIds: string[]; // legacy
   createdAt: string;
 }
 
@@ -287,6 +296,45 @@ export interface WeeklyReview {
   routineChanges: RoutineChange[];
   completedAt: string | null;
   createdAt: string;
+}
+
+// 루틴 공유 — 모임 스코프, 공유 시점 스냅샷 (원본과 분리)
+export interface SharedRoutine {
+  id: string;
+  groupId: string;
+  userId: string;
+  userName: string;
+  sourceRoutineId?: string;
+  title: string;
+  emoji?: string;
+  when: string;
+  kind: RoutineType;
+  steps: string[];        // 스텝 제목 스냅샷
+  adoptCount: number;
+  cheerCount: number;
+  cheeredByMe: boolean;
+  weeklyProofCount: number; // 최근 7일 이 루틴 인증 횟수 (✓⁺ 신뢰 지표)
+  createdAt: string;
+}
+
+// 루틴 인증 — 체크 직후 10분 안의 즉석 무보정 사진 1장
+export type ProofReaction = 'heart' | 'fire' | 'clap';
+
+export interface RoutineProof {
+  id: string;
+  groupId: string;
+  userId: string;
+  userName: string;
+  routineId?: string;
+  routineTitle: string;
+  routineEmoji?: string;
+  photoPath: string;
+  photoUrl?: string;      // 서명 URL (조회 시 발급)
+  note: string;
+  proofDate: string;      // YYYY-MM-DD
+  createdAt: string;
+  reactions: Record<ProofReaction, number>;
+  myReactions: Record<ProofReaction, boolean>;
 }
 
 // 소모임 주간 나눔

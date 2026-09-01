@@ -42,12 +42,6 @@ export const upsertRoutineLog = (l: RoutineLog) =>
     onConflict: 'user_id,routine_id,date',
   });
 
-export const updateRoutineOrders = (routines: DailyRoutine[]) => {
-  for (const r of routines) {
-    enqueue({ type: 'update', table: 'daily_routines', values: { sort_order: r.order }, match: { id: r.id } });
-  }
-};
-
 // ── 습관 ──────────────────────────────────────────────
 export const listHabits = async (): Promise<Habit[]> => {
   const { data, error } = await supabase.from('habits').select('*').order('created_at');

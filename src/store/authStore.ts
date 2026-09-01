@@ -14,6 +14,7 @@ interface AuthState {
   signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   setOnboardingDone: () => void;
   updateWeeklySlots: (slots: number) => void;
 }
@@ -93,6 +94,24 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     resetHydration();
     clearOutbox();
     set({ user: null, isAuthenticated: false, onboardingDone: false });
+  },
+
+  deleteAccount: async () => {
+    const { error } = await supabase.rpc('delete_account');
+    if (error) {
+      console.error('계정 삭제 실패:', error.message);
+      return { success: false, error: '계정 삭제에 실패했어요. 잠시 후 다시 시도해주세요.' };
+    }
+    // 서버 계정은 이미 삭제됨 — 세션 정리는 실패해도 로컬 정리를 막지 않는다
+    try {
+      await supabase.auth.signOut();
+    } catch { /* 이미 삭제된 계정의 세션 해지 실패는 무시 */ }
+    clearStores();
+    resetHydration();
+    clearOutbox();
+    localStorage.removeItem('onju_last_uid');
+    set({ user: null, isAuthenticated: false, onboardingDone: false });
+    return { success: true };
   },
 
   setOnboardingDone: () => {
