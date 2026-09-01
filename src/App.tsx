@@ -10,7 +10,6 @@ import { useRoutineStore } from './store/routineStore';
 import { useNotificationScheduler } from './hooks/useNotificationScheduler';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import PageTransition from './components/ui/PageTransition';
-import SlotUnlockModal from './components/ui/SlotUnlockModal';
 import StageUpModal from './components/tree/StageUpModal';
 import GlobalAmbience from './components/tree/ThemeAmbience';
 import { useTreeStageWatcher } from './hooks/useTreeStageWatcher';
@@ -20,11 +19,8 @@ import DeepLinkHandler from './components/DeepLinkHandler';
 import ToastHost from './components/ui/Toast';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Today = lazy(() => import('./pages/Today'));
 const Stats = lazy(() => import('./pages/Stats'));
-const WeeklyGoals = lazy(() => import('./pages/WeeklyGoals'));
 const MonthlyGoals = lazy(() => import('./pages/MonthlyGoals'));
-const Routines = lazy(() => import('./pages/Routines'));
 const Groups = lazy(() => import('./pages/Groups'));
 const GroupNew = lazy(() => import('./pages/GroupNew'));
 const GroupDetail = lazy(() => import('./pages/GroupDetail'));
@@ -63,7 +59,7 @@ type NavItem = {
 const NAV_GROUPS: NavItem[][] = [
   // 그룹 1: 홈, 통계
   [
-    { to: '/', icon: TreePine, label: '홈', matchPaths: ['/today', '/goals', '/routines', '/review'] },
+    { to: '/', icon: TreePine, label: '홈', matchPaths: ['/goals', '/review'] },
     { to: '/stats', icon: BarChart2, label: '통계' },
   ],
   // 그룹 2: 소모임 (루틴공유는 백엔드 연결 전까지 네비에서 숨김 — 경로는 유지)
@@ -176,14 +172,11 @@ function AppRoutes() {
           ) : (
             <>
               <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
-              <Route path="/today" element={<PageTransition><Today /></PageTransition>} />
               <Route path="/stats" element={<PageTransition><Stats /></PageTransition>} />
               <Route path="/goals" element={<PageTransition><Goals /></PageTransition>} />
               <Route path="/goals/monthly" element={<PageTransition><MonthlyGoals /></PageTransition>} />
               <Route path="/goals/monthly/new" element={<PageTransition><MonthlyGoalNew /></PageTransition>} />
               <Route path="/goals/monthly/edit/:id" element={<PageTransition><MonthlyGoalNew /></PageTransition>} />
-              <Route path="/goals/weekly" element={<PageTransition><WeeklyGoals /></PageTransition>} />
-              <Route path="/routines" element={<PageTransition><Routines /></PageTransition>} />
               <Route path="/groups" element={<PageTransition><Groups /></PageTransition>} />
               <Route path="/groups/new" element={<PageTransition><GroupNew /></PageTransition>} />
               <Route path="/groups/:id" element={<PageTransition><GroupDetail /></PageTransition>} />
@@ -245,7 +238,6 @@ export default function App() {
           <AppRoutes />
           <GlobalAmbience />
           <BottomNav />
-          <SlotUnlockModal />
           <StageUpModal />
           <TreeStageWatcher />
           <WidgetSync />

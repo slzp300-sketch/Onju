@@ -3,20 +3,16 @@ import { User, Bell, ChevronRight, LogOut, CalendarDays, Clock } from 'lucide-re
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
-import SlotBadge from '../components/ui/SlotBadge';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import { useAuthStore } from '../store/authStore';
-import { useGoalStore } from '../store/goalStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { useThemeStore, THEME_TIERS } from '../store/themeStore';
 import { useTreeGrowth } from '../hooks/useTreeGrowth';
 import { toast } from '../store/toastStore';
-import { currentWeek, currentYear } from '../utils/date';
 
 export default function Profile() {
   const navigate = useNavigate();
   const { user, logout, deleteAccount } = useAuthStore();
-  const { weeklyGoals } = useGoalStore();
   const { weekStartDay, setWeekStartDay, graceEndHour, setGraceEndHour } = useSettingsStore();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -34,10 +30,6 @@ export default function Profile() {
     }
   };
 
-  const thisWeekGoalCount = weeklyGoals.filter(
-    g => g.weekNumber === currentWeek() && g.year === currentYear()
-  ).length;
-
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="px-4 pt-5">
@@ -54,12 +46,6 @@ export default function Profile() {
             <p className="text-caption1 text-label-alt">{user!.email}</p>
           </div>
         </div>
-      </Card>
-
-      <Card className="mx-4">
-        <p className="text-caption1 font-semibold text-label-alt mb-2">주간 목표 슬롯</p>
-        <SlotBadge total={user!.weeklyGoalSlots} used={thisWeekGoalCount} />
-        <p className="text-caption1 text-label-assistive mt-2">지난 주 달성률 80% 이상 시 슬롯이 늘어납니다 (최대 5개)</p>
       </Card>
 
       <Card className="mx-4" padding="none">
