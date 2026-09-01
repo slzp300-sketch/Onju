@@ -289,6 +289,45 @@ export interface WeeklyReview {
   createdAt: string;
 }
 
+// 루틴 공유 — 모임 스코프, 공유 시점 스냅샷 (원본과 분리)
+export interface SharedRoutine {
+  id: string;
+  groupId: string;
+  userId: string;
+  userName: string;
+  sourceRoutineId?: string;
+  title: string;
+  emoji?: string;
+  when: string;
+  kind: RoutineType;
+  steps: string[];        // 스텝 제목 스냅샷
+  adoptCount: number;
+  cheerCount: number;
+  cheeredByMe: boolean;
+  weeklyProofCount: number; // 최근 7일 이 루틴 인증 횟수 (✓⁺ 신뢰 지표)
+  createdAt: string;
+}
+
+// 루틴 인증 — 체크 직후 10분 안의 즉석 무보정 사진 1장
+export type ProofReaction = 'heart' | 'fire' | 'clap';
+
+export interface RoutineProof {
+  id: string;
+  groupId: string;
+  userId: string;
+  userName: string;
+  routineId?: string;
+  routineTitle: string;
+  routineEmoji?: string;
+  photoPath: string;
+  photoUrl?: string;      // 서명 URL (조회 시 발급)
+  note: string;
+  proofDate: string;      // YYYY-MM-DD
+  createdAt: string;
+  reactions: Record<ProofReaction, number>;
+  myReactions: Record<ProofReaction, boolean>;
+}
+
 // 소모임 주간 나눔
 export interface GroupWeeklyShare {
   id: string;
