@@ -53,6 +53,12 @@ export default function TreeVisual({ stage, health, size = 110, animateGrowth = 
         </filter>
       </defs>
       <g filter="url(#tree-crayon)">
+      {/* 나이테 링 — 브랜드 시그니처, 나무 뒤에 은은하게 */}
+      <g stroke="#d9c8a6" fill="none" opacity="0.35">
+        <circle cx="100" cy="104" r="46" strokeWidth="2.2" />
+        <circle cx="100" cy="104" r="66" strokeWidth="1.8" opacity="0.7" />
+        <circle cx="100" cy="104" r="86" strokeWidth="1.5" opacity="0.45" />
+      </g>
       {/* 땅 — 종이 캔버스에 맞춘 웜 톤 */}
       <ellipse cx="100" cy="164" rx="72" ry="11" fill="#e6dfc6" />
       <ellipse cx="100" cy="162" rx="52" ry="7" fill="#d9d0b2" />
