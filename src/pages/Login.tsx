@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { loginWithGoogle, loginWithKakao } from '../lib/authActions';
+import { loginWithGoogle, loginWithKakao, requestPasswordReset } from '../lib/authActions';
 import BrandLogo from '../components/ui/BrandLogo';
 import ForestBackdrop from '../components/tree/ForestBackdrop';
 
@@ -13,6 +13,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
 
   // 소셜/이메일 어떤 경로든 세션이 생기면 홈으로 (웹 OAuth 리다이렉트 복귀 포함)
@@ -29,6 +30,22 @@ export default function Login() {
     setLoading(false);
     if (!result.success) {
       setError(result.error ?? '로그인에 실패했어요.');
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setInfo('');
+      setError('가입한 이메일을 먼저 입력해주세요.');
+      return;
+    }
+    setError('');
+    try {
+      await requestPasswordReset(email.trim());
+      setInfo('재설정 메일을 보냈어요. 메일함을 확인해주세요.');
+    } catch {
+      setInfo('');
+      setError('재설정 메일 발송에 실패했어요. 잠시 후 다시 시도해주세요.');
     }
   };
 
@@ -117,9 +134,17 @@ export default function Login() {
             >
               로그인
             </button>
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-caption1 text-label-alt underline underline-offset-2 self-center py-1"
+            >
+              비밀번호를 잊으셨나요?
+            </button>
           </form>
         )}
 
+        {info && <p className="text-caption1 text-primary px-1 text-center">{info}</p>}
         {error && <p className="text-caption1 text-negative px-1 text-center">{error}</p>}
       </div>
 

@@ -40,6 +40,7 @@ const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const WeeklyReviewPage = lazy(() => import('./pages/WeeklyReviewPage'));
 const MonthlyGoalNew = lazy(() => import('./pages/MonthlyGoalNew'));
 const Goals = lazy(() => import('./pages/Goals'));
@@ -81,6 +82,7 @@ function isNavHidden(pathname: string): boolean {
     pathname === '/login' ||
     pathname === '/signup' ||
     pathname === '/auth/callback' ||
+    pathname === '/reset-password' ||
     pathname === '/onboarding' ||
     pathname === '/goals/monthly/new' ||
     pathname.startsWith('/goals/monthly/edit/') ||
@@ -167,6 +169,7 @@ function AppRoutes() {
           <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
           <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
           <Route path="/auth/callback" element={<PageTransition><AuthCallback /></PageTransition>} />
+          <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
           <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
 
           {!isAuthenticated ? (
