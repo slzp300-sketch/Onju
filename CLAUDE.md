@@ -38,8 +38,10 @@ src/
 - Bottom nav has 4 tabs: 홈, 통계, 소모임, 마이페이지. (신앙루틴은 홈 내부 탭)
 - Animations via framer-motion. Keep transitions under 300ms for premium feel.
 - 도달 불가 라우트/컴포넌트를 남기지 말 것 — `npm run gc`(eslint+knip)로 검사.
-  현재 knip이 보고하는 미사용 파일들(HeatMap, MonthlyCalendar,
-  MemberProgressCard, routineRecommendation)은 스펙 기능 후보로 의도적 보존.
+  gc는 exit 0이 정상이며, 뭐라도 보고되면 회귀다. 스펙 기능 후보로 의도적 보존 중인
+  파일들(HeatMap, MonthlyCalendar, MemberProgressCard, routineRecommendation)은
+  `knip.config.ts`의 ignore 목록에 등재돼 있고, 보존 파일만 쓰는 export는
+  `@preserved` JSDoc 태그로 보고에서 제외한다. 도달 코드가 되면 둘 다 해제할 것.
 
 ## Dev
 ```

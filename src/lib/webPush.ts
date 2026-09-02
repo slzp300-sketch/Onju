@@ -53,17 +53,3 @@ export async function subscribeWebPush(): Promise<boolean> {
     return false;
   }
 }
-
-/** 구독 해제 + Supabase에서 제거 */
-export async function unsubscribeWebPush(): Promise<void> {
-  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
-  try {
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.getSubscription();
-    if (!sub) return;
-    await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
-    await sub.unsubscribe();
-  } catch (e) {
-    console.error('[webPush] 구독 해제 실패', e);
-  }
-}

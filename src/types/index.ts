@@ -1,7 +1,6 @@
-export type GoalStatus = 'active' | 'completed' | 'failed';
-export type RoutineType = 'personal' | 'faith';
+type GoalStatus = 'active' | 'completed' | 'failed';
+type RoutineType = 'personal' | 'faith';
 export type GroupStatus = 'recruiting' | 'active' | 'completed';
-export type GroupRole = 'creator' | 'member';
 export type GroupCategory = 'faith' | 'growth' | 'work' | 'health' | 'etc';
 
 export interface User {
@@ -125,17 +124,6 @@ export interface SmallGroup {
   rules?: string[];     // 약속 목록
 }
 
-export interface GroupMembership {
-  id: string;
-  groupId: string;
-  userId: string;
-  user: Pick<User, 'id' | 'name' | 'profileImage'>;
-  role: GroupRole;
-  joinedAt: string;
-  sharedGoalIds: string[];
-  sharedRoutineIds: string[];
-}
-
 export interface MemberGroupProgress {
   userId: string;
   userName: string;
@@ -146,52 +134,13 @@ export interface MemberGroupProgress {
   streak: number;
 }
 
-export interface SlotUnlockHistory {
-  userId: string;
-  weekNumber: number;
-  year: number;
-  completionRate: number;
-  unlockedAt: string;
-  newSlotCount: number;
-}
-
 export type CheerType = 'heart' | 'fire' | 'pray';
-
-export interface Cheer {
-  id: string;
-  fromUserId: string;
-  toUserId: string;
-  groupId: string;
-  type: CheerType;
-  date: string; // YYYY-MM-DD
-  createdAt: string;
-}
-
-export type BadgeType =
-  | 'streak_3' | 'streak_7' | 'streak_14' | 'streak_30'
-  | 'faith_streak_7'
-  | 'slot_max'
-  | 'perfect_week'
-  | 'group_complete';
-
-export interface UserBadge {
-  type: BadgeType;
-  earnedAt: string;
-}
-
-export interface BibleVerse {
-  book: string;
-  chapter: number;
-  verse: number;
-  text: string;
-  reflection?: string;
-}
 
 // 습관 반복 주기
 export type HabitFrequency = 'daily' | 'weekdays' | 'weekends' | 'custom';
 export const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
-export interface HabitNotification {
+interface HabitNotification {
   enabled: boolean;
   type: 'push' | 'sound';
   times: string[]; // ["HH:mm", ...] 복수 알림 시간

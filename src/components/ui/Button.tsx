@@ -19,7 +19,7 @@ const SIZES: Record<Size, string> = {
   sm: 'h-8 rounded px-3.5 text-label1',
 };
 
-export interface ButtonProps extends HTMLMotionProps<'button'> {
+interface ButtonProps extends HTMLMotionProps<'button'> {
   variant?: Variant;
   size?: Size;
   fullWidth?: boolean;

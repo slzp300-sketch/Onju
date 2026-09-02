@@ -3,7 +3,7 @@ import { newId } from '../utils/id';
 
 export type ToastType = 'error' | 'success' | 'info';
 
-export interface ToastItem {
+interface ToastItem {
   id: string;
   message: string;
   type: ToastType;

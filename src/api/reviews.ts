@@ -55,22 +55,6 @@ export const createReview = async (data: Partial<WeeklyReview>): Promise<WeeklyR
   return review;
 };
 
-export const completeReview = async (
-  id: string,
-  data: Partial<WeeklyReview>,
-): Promise<WeeklyReview> => {
-  const { data: existing, error: fetchError } = await supabase
-    .from('weekly_reviews')
-    .select('*')
-    .eq('id', id)
-    .single();
-  if (fetchError) throw fetchError;
-  const merged = { ...reviewFromRow(existing), ...data };
-  const { error } = await supabase.from('weekly_reviews').update(reviewToRow(merged)).eq('id', id);
-  if (error) throw error;
-  return merged;
-};
-
 export const fetchWeeklyShares = async (
   groupId: string,
   weekNumber?: number,

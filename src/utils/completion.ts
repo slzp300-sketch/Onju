@@ -1,5 +1,5 @@
 import type { RoutineLog, DailyRoutine } from '../types';
-import { eachDayOfInterval, format, subDays, getDay, startOfMonth, endOfMonth } from 'date-fns';
+import { eachDayOfInterval, format, subDays } from 'date-fns';
 
 export function calcCompletionRate(
   routines: DailyRoutine[],
@@ -23,71 +23,6 @@ export function calcCompletionRate(
   });
 
   return total === 0 ? 0 : Math.round((completed / total) * 100);
-}
-
-export function calcRoutineRate(
-  routine: DailyRoutine,
-  logs: RoutineLog[],
-  startDate: Date,
-  endDate: Date
-): number {
-  const days = eachDayOfInterval({ start: startDate, end: endDate });
-  let total = 0;
-  let completed = 0;
-  days.forEach((day) => {
-    total++;
-    const dateStr = format(day, 'yyyy-MM-dd');
-    const log = logs.find(l => l.routineId === routine.id && l.date === dateStr);
-    if (log?.completed) completed++;
-  });
-  return total === 0 ? 0 : Math.round((completed / total) * 100);
-}
-
-export function getRoutineStats(
-  routines: DailyRoutine[],
-  logs: RoutineLog[],
-  startDate: Date,
-  endDate: Date
-): { routine: DailyRoutine; rate: number }[] {
-  return routines
-    .map(r => ({ routine: r, rate: calcRoutineRate(r, logs, startDate, endDate) }))
-    .sort((a, b) => b.rate - a.rate);
-}
-
-export function getWeekdayStats(
-  routines: DailyRoutine[],
-  logs: RoutineLog[],
-  month: number,
-  year: number
-): Record<number, { personal: number; faith: number }> {
-  const start = startOfMonth(new Date(year, month - 1));
-  const end = endOfMonth(start);
-  const days = eachDayOfInterval({ start, end });
-
-  const byWeekday: Record<number, { personalRates: number[]; faithRates: number[] }> = {};
-  for (let i = 0; i < 7; i++) byWeekday[i] = { personalRates: [], faithRates: [] };
-
-  const personal = routines.filter(r => r.type === 'personal');
-  const faith = routines.filter(r => r.type === 'faith');
-
-  days.forEach((day) => {
-    const dateStr = format(day, 'yyyy-MM-dd');
-    const dayLogs = logs.filter(l => l.date === dateStr);
-    const { personal: pRate, faith: fRate } = getTodayRates(personal, faith, dayLogs, dateStr);
-    const weekday = getDay(day);
-    byWeekday[weekday].personalRates.push(pRate);
-    byWeekday[weekday].faithRates.push(fRate);
-  });
-
-  const avg = (arr: number[]) => arr.length === 0 ? 0 : Math.round(arr.reduce((s, v) => s + v, 0) / arr.length);
-  const result: Record<number, { personal: number; faith: number }> = {};
-  for (let i = 0; i < 7; i++) {
-    result[i] = {
-      personal: avg(byWeekday[i].personalRates),
-      faith: avg(byWeekday[i].faithRates),
-    };
-  }
-  return result;
 }
 
 export function calcStreak(
@@ -120,6 +55,7 @@ export function calcStreak(
   return { current, best };
 }
 
+/** @preserved 보존 중인 통계 스펙 후보(HeatMap·MonthlyCalendar)가 사용 */
 export function getTodayRates(
   personalRoutines: DailyRoutine[],
   faithRoutines: DailyRoutine[],

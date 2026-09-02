@@ -154,19 +154,3 @@ export function getGoalRate(
   const sum = items.reduce((acc, it) => acc + it.rate, 0);
   return Math.round(sum / items.length);
 }
-
-/** 목표 수행률 = 연동 항목 수행률(경과 기준)의 평균 — "지키고 있나" */
-export function getGoalAdherence(
-  goal: MonthlyGoal,
-  habits: Habit[],
-  habitLogs: HabitLog[],
-  faithRoutines: DailyRoutine[],
-  routineLogs: RoutineLog[],
-  todayIso: string,
-): number {
-  const items = getLinkedItems(goal, habits, habitLogs, faithRoutines, routineLogs, todayIso)
-    .filter(it => it.scheduledElapsed > 0);
-  if (items.length === 0) return 0;
-  const sum = items.reduce((acc, it) => acc + it.adherence, 0);
-  return Math.round(sum / items.length);
-}

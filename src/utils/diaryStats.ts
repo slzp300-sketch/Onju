@@ -10,9 +10,6 @@ export const DIARY_MOODS: { key: DiaryMood; emoji: string; label: string }[] = [
   { key: 'bad', emoji: '😢', label: '힘듦' },
 ];
 
-export const DIARY_MOOD_EMOJI: Record<DiaryMood, string> =
-  Object.fromEntries(DIARY_MOODS.map(m => [m.key, m.emoji])) as Record<DiaryMood, string>;
-
 /**
  * 일기 연속 작성 일수.
  * - 오늘 작성했으면 오늘부터, 안 했으면 어제부터(유예) 거슬러 연속 일수를 셈

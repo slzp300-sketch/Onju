@@ -12,7 +12,7 @@ import { queryClient } from '../queryClient';
 import { WidgetBridge } from '../../plugins/widget-bridge';
 
 /** 홈 위젯에 그릴 한입 요약. 네이티브가 이 JSON을 읽어 렌더한다. */
-export interface WidgetSnapshot {
+interface WidgetSnapshot {
   v: 1;
   updatedAt: string;
   tree: {
@@ -46,7 +46,7 @@ export interface WidgetSnapshot {
  * 스토어 + 캐시에서 위젯 스냅샷을 만든다(순수).
  * 홈 Dashboard와 동일 소스: 개인=habitStore.habits, 신앙=routineStore.faithRoutines.
  */
-export function buildSnapshot(): WidgetSnapshot {
+function buildSnapshot(): WidgetSnapshot {
   const todayStr = today();
   const { faithRoutines, logs } = useRoutineStore.getState();
   const { habits, habitLogs, personalRoutines } = useHabitStore.getState();

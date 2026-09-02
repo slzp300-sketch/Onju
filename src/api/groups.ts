@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { SmallGroup, MemberGroupProgress } from '../types';
-import { groupFromRow, groupToRow } from '../data/mappers';
-import { newId } from '../utils/id';
+import { groupFromRow } from '../data/mappers';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -48,38 +47,6 @@ export const fetchGroupById = async (id: string): Promise<SmallGroup> => {
     .single();
   if (error) throw error;
   return groupFromRow(data, (data as any).group_members?.[0]?.count ?? 0);
-};
-
-export const createGroup = async (data: Partial<SmallGroup>): Promise<SmallGroup> => {
-  const id = data.id ?? newId();
-  const now = new Date().toISOString();
-  const group: SmallGroup = {
-    id,
-    creatorId: '',
-    title: '',
-    goal: '',
-    startDate: now,
-    endDate: now,
-    maxMembers: 10,
-    currentMemberCount: 1,
-    status: 'recruiting',
-    isPublic: true,
-    createdAt: now,
-    ...data,
-  };
-  const { error } = await supabase.from('small_groups').insert(groupToRow(group));
-  if (error) throw error;
-  const { error: memberError } = await supabase
-    .from('group_members')
-    .insert({ group_id: id, role: 'creator' });
-  if (memberError) throw memberError;
-  return group;
-};
-
-/** 가입 — 정원 체크는 서버 RPC가 원자적으로 수행 */
-export const joinGroup = async (id: string): Promise<void> => {
-  const { error } = await supabase.rpc('join_group', { gid: id });
-  if (error) throw error;
 };
 
 /** 멤버별 진행도 — 서버 RPC가 집계 (타인 로그 비공개 유지) */

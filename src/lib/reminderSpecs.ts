@@ -15,7 +15,7 @@ export interface ReminderSpec {
 }
 
 /** 앱 빈도값 → weekday 배열 (undefined = 매일) */
-export function freqToWeekdays(
+function freqToWeekdays(
   frequency: 'daily' | 'weekdays' | 'weekends' | 'custom' | number[],
   customDays?: number[],
 ): number[] | undefined {

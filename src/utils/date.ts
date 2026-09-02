@@ -8,7 +8,7 @@ const WEEK_OPTIONS = { weekStartsOn: 1 } as const;
 export const ALL_DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
 // weekStartDay 기반 date-fns 옵션
-export function weekOpts(weekStartDay: 0 | 1 = 1) {
+function weekOpts(weekStartDay: 0 | 1 = 1) {
   return { weekStartsOn: weekStartDay as 0 | 1 | 2 | 3 | 4 | 5 | 6 };
 }
 
@@ -44,8 +44,7 @@ export function elapsedDays(startDate: string, endDate: string): { elapsed: numb
   return { elapsed: Math.min(elapsed, total), total };
 }
 
-export const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
-export const formatDisplay = (date: Date) => format(date, 'M월 d일 (E)', { locale: ko });
+const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 export const today = () => formatDate(new Date());
 
 // 어제 날짜 (YYYY-MM-DD)
@@ -77,16 +76,6 @@ export const isEditableDay = (dateIso: string, graceEndHour: number): boolean =>
 export const currentWeek = () => getISOWeek(new Date());
 export const currentYear = () => getYear(new Date());
 
-export const thisWeekRange = () => ({
-  start: startOfWeek(new Date(), WEEK_OPTIONS),
-  end: endOfWeek(new Date(), WEEK_OPTIONS),
-});
-
-export const lastWeekRange = () => ({
-  start: startOfWeek(subWeeks(new Date(), 1), WEEK_OPTIONS),
-  end: endOfWeek(subWeeks(new Date(), 1), WEEK_OPTIONS),
-});
-
 // 오늘이 일요일인지 (getDay === 0)
 export const isSunday = (date: Date = new Date()): boolean => getDay(date) === 0;
 
@@ -97,7 +86,7 @@ export const getCurrentWeekRange = (date: Date = new Date()) => ({
 });
 
 // 다음 주 첫날 (월요일)
-export const getNextWeekMonday = (date: Date = new Date()): Date =>
+const getNextWeekMonday = (date: Date = new Date()): Date =>
   addWeeks(startOfWeek(date, WEEK_OPTIONS), 1);
 
 // 루틴 변경 적용 시각 (다음 주 월요일 00:00)

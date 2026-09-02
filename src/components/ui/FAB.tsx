@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export interface FABOption {
+interface FABOption {
   icon: React.ReactNode;
   label: string;
   sub?: string;
