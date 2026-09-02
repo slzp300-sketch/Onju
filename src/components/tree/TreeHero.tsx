@@ -23,7 +23,7 @@ export default function TreeHero() {
     if (override) {
       const [s, h] = override.split(',');
       const sNum = Number(s);
-      if (sNum >= 0 && sNum <= 4) stage = sNum as TreeStage;
+      if (sNum >= 0 && sNum <= 5) stage = sNum as TreeStage;
       if (h === 'healthy' || h === 'dry' || h === 'wilted') health = h;
     }
   }

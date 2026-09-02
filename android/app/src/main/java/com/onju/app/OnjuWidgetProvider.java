@@ -23,7 +23,7 @@ import java.util.Set;
 public class OnjuWidgetProvider extends AppWidgetProvider {
 
     private static final String ACTION_CHECK = "com.onju.app.WIDGET_CHECK";
-    private static final String[] TREE_EMOJI = { "🌰", "🌱", "🌿", "🪴", "🌳" };
+    private static final String[] TREE_EMOJI = { "🌱", "🌿", "🪴", "🌳", "🌳", "🌳" };
 
     private static final int[] ROW_IDS = { R.id.row_0, R.id.row_1, R.id.row_2 };
     private static final int[] CHECK_IDS = { R.id.check_0, R.id.check_1, R.id.check_2 };
@@ -76,8 +76,8 @@ public class OnjuWidgetProvider extends AppWidgetProvider {
 
         // ── 나무 ──
         int stage = tree.optInt("stage", 0);
-        v.setTextViewText(R.id.tv_tree_emoji, TREE_EMOJI[Math.max(0, Math.min(4, stage))]);
-        v.setTextViewText(R.id.tv_stage_name, tree.optString("stageName", "씨앗"));
+        v.setTextViewText(R.id.tv_tree_emoji, TREE_EMOJI[Math.max(0, Math.min(5, stage))]);
+        v.setTextViewText(R.id.tv_stage_name, tree.optString("stageName", "새싹의 시작"));
         String health = tree.optString("health", "healthy");
         v.setTextColor(R.id.tv_health_dot, healthColor(health));
         v.setTextViewText(R.id.tv_health_label, healthLabel(health));

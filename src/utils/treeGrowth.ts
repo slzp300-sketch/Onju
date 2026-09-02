@@ -18,10 +18,17 @@ interface HabitLogLite {
 }
 
 export type TreeHealth = 'healthy' | 'dry' | 'wilted';
-export type TreeStage = 0 | 1 | 2 | 3 | 4;
+export type TreeStage = 0 | 1 | 2 | 3 | 4 | 5;
 
-export const STAGE_THRESHOLDS = [0, 30, 150, 400, 900] as const;
-export const STAGE_NAMES = ['씨앗', '새싹', '묘목', '어린나무', '큰나무'] as const;
+export const STAGE_THRESHOLDS = [0, 30, 150, 400, 900, 1800] as const;
+export const STAGE_NAMES = [
+  '새싹의 시작',
+  '싹이 자라다',
+  '가지가 뻗어나다',
+  '나무가 되다',
+  '풍성한 나무',
+  '나무와 함께 걷다',
+] as const;
 
 /** 계산 범위 상한 (일) */
 const MAX_DAYS = 730;
@@ -156,7 +163,7 @@ export function calcTreeGrowth(
   for (let i = STAGE_THRESHOLDS.length - 1; i >= 0; i--) {
     if (points >= STAGE_THRESHOLDS[i]) { stage = i as TreeStage; break; }
   }
-  const nextThreshold = stage < 4 ? STAGE_THRESHOLDS[stage + 1] : null;
+  const nextThreshold = stage < STAGE_THRESHOLDS.length - 1 ? STAGE_THRESHOLDS[stage + 1] : null;
   const progressToNext = nextThreshold === null
     ? 1
     : Math.min(1, (points - STAGE_THRESHOLDS[stage]) / (nextThreshold - STAGE_THRESHOLDS[stage]));
