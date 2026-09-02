@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import EmptyState from '../components/ui/EmptyState';
+import SegmentedControl from '../components/ui/SegmentedControl';
 import { useAuthStore } from '../store/authStore';
 import { useGroupStore } from '../store/groupStore';
 import { useRoutineStore } from '../store/routineStore';
@@ -180,7 +181,7 @@ export default function RoutineShare() {
   // 소모임이 없으면 인증/공유 대상이 없다
   if (groups.length === 0) {
     return (
-      <div className="flex flex-col min-h-full">
+      <div className="share-paper flex flex-col min-h-full">
         <Header />
         <div className="px-4 pt-10">
           <EmptyState
@@ -199,7 +200,7 @@ export default function RoutineShare() {
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="share-paper flex flex-col min-h-full">
       <Header />
 
       {/* 그룹 필터 칩 */}
@@ -222,21 +223,18 @@ export default function RoutineShare() {
       )}
 
       {/* 탭 */}
-      <div className="flex border-b border-line-soft px-4 mt-2">
-        {([
-          { key: 'proof' as Tab, label: '오늘 인증' },
-          { key: 'discover' as Tab, label: '루틴 발견' },
-          { key: 'mine' as Tab, label: '내 공유' },
-        ]).map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)}
-            className={`relative pb-2.5 mr-5 text-label1 font-bold transition-colors ${tab === t.key ? 'text-label-strong' : 'text-label-alt'}`}>
-            {t.label}
-            {tab === t.key && (
-              <motion.div layoutId="shareTabLine" className="absolute bottom-0 left-0 right-0 h-0.5 bg-label-strong rounded-full" />
-            )}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        value={tab}
+        onChange={setTab}
+        label="루틴 공유 항목"
+        variant="underline"
+        className="px-4 mt-2"
+        items={[
+          { value: 'proof', label: '오늘 인증' },
+          { value: 'discover', label: '루틴 발견' },
+          { value: 'mine', label: '내 공유' },
+        ]}
+      />
 
       {/* ── 오늘 인증 ── */}
       {tab === 'proof' && (

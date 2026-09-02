@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { useRoutineStore } from '../store/routineStore';
 import { useNotificationStore } from '../store/notificationStore';
 import { useGoalStore } from '../store/goalStore';
+import Switch from '../components/ui/Switch';
 import type { TimeSlot } from '../types';
 import { WEEKDAY_LABELS } from '../types';
 import { faithRoutineTemplates } from '../data/faithTemplates';
@@ -164,10 +165,10 @@ export default function FaithRoutineNew() {
     : '신앙 루틴 추가';
 
   return (
-    <div className="min-h-dvh bg-surface-alt flex flex-col">
+    <div className="form-paper min-h-dvh flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center px-4 pt-5 pb-3 bg-surface border-b border-line-soft flex-shrink-0">
-        <motion.button {...tapSm} onClick={handleBack} className="p-1 -ml-1 text-label-alt">
+      <div className="form-paper-header flex items-center px-4 pt-5 pb-3 flex-shrink-0">
+        <motion.button {...tapSm} onClick={handleBack} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">{pageTitle}</h1>
@@ -237,7 +238,7 @@ export default function FaithRoutineNew() {
                   <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
                   <input type="text" value={title} onChange={e => setTitle(e.target.value)}
                     placeholder="신앙 루틴 이름" autoFocus
-                    className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(47,158,96,0.16)] shadow-emphasize transition-all" />
+                    className="form-paper-input flex-1 text-body2 font-medium" />
                 </div>
               </div>
 
@@ -249,11 +250,8 @@ export default function FaithRoutineNew() {
                       <Bell size={20} strokeWidth={1.9} className="text-label-strong" />
                       <span className="text-body2 font-semibold text-label-strong">알림</span>
                     </div>
-                    <button onClick={handleToggleNotif}
-                      className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${notifEnabled ? 'bg-positive' : 'bg-fill-strong'}`}>
-                      <motion.div animate={{ x: notifEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                        className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm pointer-events-none" />
-                    </button>
+                    <Switch checked={notifEnabled} onCheckedChange={() => handleToggleNotif()}
+                      label="신앙 루틴 알림" tone="positive" size="md" />
                   </div>
                   <AnimatePresence>
                     {notifEnabled && (
@@ -395,11 +393,8 @@ export default function FaithRoutineNew() {
                         <p className="text-caption1 text-label-alt">루틴 시작을 쉽게 만드는 작은 행동</p>
                       </div>
                     </div>
-                    <button onClick={() => setTwoMinEnabled(v => !v)}
-                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${twoMinEnabled ? 'bg-emerald-500' : 'bg-fill-strong'}`}>
-                      <motion.div animate={{ x: twoMinEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                        className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none" />
-                    </button>
+                    <Switch checked={twoMinEnabled} onCheckedChange={setTwoMinEnabled}
+                      label="2분 트리거" tone="positive" />
                   </div>
                   <AnimatePresence>
                     {twoMinEnabled && (
@@ -426,11 +421,7 @@ export default function FaithRoutineNew() {
                         <p className="text-caption1 text-label-alt">이 루틴 실행 시 카운트다운</p>
                       </div>
                     </div>
-                    <button onClick={() => setTimerEnabled(v => !v)}
-                      className={`relative w-11 h-6 rounded-full transition-colors ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}>
-                      <motion.div animate={{ x: timerEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                        className="absolute top-1 w-4 h-4 rounded-full bg-white shadow pointer-events-none" />
-                    </button>
+                    <Switch checked={timerEnabled} onCheckedChange={setTimerEnabled} label="타이머" />
                   </div>
                   <AnimatePresence>
                     {timerEnabled && (
@@ -454,7 +445,7 @@ export default function FaithRoutineNew() {
           </div>
 
           {/* 하단 저장 버튼 */}
-          <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
+          <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
             style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
             <motion.button whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
               onClick={handleSave} disabled={!title.trim()}

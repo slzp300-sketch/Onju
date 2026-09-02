@@ -59,7 +59,7 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-dvh bg-surface flex flex-col px-6">
+    <div className="auth-paper relative min-h-dvh flex flex-col px-6">
       <ForestBackdrop />
       {/* 헤더 */}
       <div className="flex flex-col items-center pt-20 pb-10">
@@ -71,7 +71,7 @@ export default function Login() {
       </div>
 
       {/* 소셜 로그인 */}
-      <div className="flex flex-col gap-3">
+      <div className="auth-paper-panel flex flex-col gap-3">
         <button
           onClick={() => handleSocial('google')}
           className="w-full flex items-center justify-center gap-3 border border-line rounded-lg h-12 text-body2 font-medium text-label bg-surface hover:bg-fill transition-colors"

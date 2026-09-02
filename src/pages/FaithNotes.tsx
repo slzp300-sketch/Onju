@@ -80,11 +80,11 @@ export default function FaithNotes() {
   };
 
   return (
-    <div className="flex flex-col gap-4 pb-8">
+    <div className="records-paper flex min-h-full flex-col gap-4 pb-8">
       <div className="px-4 pt-5 flex items-center gap-2">
         <motion.button
           whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-          onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt flex-shrink-0">
+          onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <div>
@@ -95,15 +95,15 @@ export default function FaithNotes() {
 
       {/* 통계 */}
       <div className="px-4 grid grid-cols-3 gap-2">
-        <div className="bg-surface border border-line-soft rounded-2xl py-3 text-center">
+        <div className="records-summary-card py-3 text-center">
           <p className="text-headline1 font-bold text-label-strong tabular-nums">{thisWeekCount}<span className="text-caption1 text-label-alt font-semibold">개</span></p>
           <p className="text-caption2 font-semibold text-label-assistive mt-0.5">이번 주 기록</p>
         </div>
-        <div className="bg-surface border border-line-soft rounded-2xl py-3 text-center">
+        <div className="records-summary-card py-3 text-center">
           <p className="text-headline1 font-bold text-faith tabular-nums">{answeredCount}<span className="text-caption1 text-label-alt font-semibold">개</span></p>
           <p className="text-caption2 font-semibold text-label-assistive mt-0.5">응답받은 기도</p>
         </div>
-        <div className="bg-surface border border-line-soft rounded-2xl py-3 text-center">
+        <div className="records-summary-card py-3 text-center">
           <p className="text-headline1 font-bold text-label-strong tabular-nums">{streak}<span className="text-caption1 text-label-alt font-semibold">일</span></p>
           <p className="text-caption2 font-semibold text-label-assistive mt-0.5">연속 기록</p>
         </div>
@@ -125,7 +125,7 @@ export default function FaithNotes() {
               <div className="flex flex-col gap-2">
                 {dayNotes.map((n, i) => (
                   <div key={`${n.routineId}:${i}`}
-                    className={`bg-surface border border-line-soft rounded-2xl px-4 py-3.5 border-l-[3px] ${
+                    className={`records-entry-card px-4 py-3.5 border-l-[3px] ${
                       n.memo.type === 'bible' ? 'border-l-faith' : 'border-l-emerald-500'
                     }`}
                   >

@@ -1,0 +1,125 @@
+/*
+ * Onju design tokens
+ *
+ * Primitive colors and Tailwind namespaces live in index.css @theme.
+ * This file defines semantic aliases shared by components and themes.
+ */
+:root {
+  /* Brand palette from the hand-drawn design boards */
+  --onju-forest: #2f3e2e;
+  --onju-sage: #6b7f6b;
+  --onju-sage-soft: #dfe8d7;
+  --onju-paper: #fbf7ec;
+  --onju-paper-deep: #f4edda;
+  --onju-ink: #2a2f27;
+  --onju-ink-muted: #71776a;
+  --onju-butter: #f4c98a;
+  --onju-butter-soft: #fbf0d5;
+  --onju-peach: #f7a48f;
+  --onju-peach-soft: #fbe3dc;
+  --onju-sky: #a7c7e7;
+  --onju-sky-soft: #e5f0f7;
+
+  /* Semantic colors: theme-aware aliases */
+  --ui-bg-canvas: var(--color-surface-alt);
+  --ui-bg-surface: var(--color-surface);
+  --ui-bg-subtle: var(--color-fill);
+  --ui-bg-strong: var(--color-fill-strong);
+  --ui-text: var(--color-label);
+  --ui-text-strong: var(--color-label-strong);
+  --ui-text-muted: var(--color-label-alt);
+  --ui-text-disabled: var(--color-label-assistive);
+  --ui-border: var(--color-line);
+  --ui-border-subtle: var(--color-line-soft);
+  --ui-action: var(--color-primary);
+  --ui-action-hover: var(--color-primary-strong);
+  --ui-action-pressed: var(--color-primary-heavy);
+  --ui-action-soft: var(--color-primary-soft);
+  --ui-success: var(--color-positive);
+  --ui-warning: var(--color-cautionary);
+  --ui-danger: var(--color-negative);
+  --ui-faith: var(--color-faith);
+
+  /* Data visualization — never communicate state by color alone */
+  --data-personal: var(--color-primary);
+  --data-faith: var(--color-faith);
+  --data-positive: #6b8f63;
+  --data-caution: #d5a03f;
+  --data-negative: #cf7164;
+  --data-neutral: #9aa597;
+  --data-sky: var(--onju-sky);
+
+  /* 4px spacing grid */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Layout */
+  --layout-mobile: 390px;
+  --layout-content-max: 512px;
+  --layout-page-gutter: 20px;
+  --layout-section-gap: 24px;
+  --layout-card-gap: 12px;
+  --layout-bottom-nav: 68px;
+
+  /* Control dimensions — 44px minimum touch target */
+  --control-height-sm: 36px;
+  --control-height-md: 44px;
+  --control-height-lg: 48px;
+  --control-icon-sm: 16px;
+  --control-icon-md: 20px;
+  --control-icon-lg: 24px;
+  --control-hit-min: 44px;
+
+  /* Border and hand-drawn line weight */
+  --line-hairline: 1px;
+  --line-emphasis: 1.5px;
+  --line-selected: 2px;
+  --icon-stroke: 1.9;
+  --icon-stroke-active: 2.4;
+
+  /* Focus, disabled and overlays */
+  --focus-ring-color: color-mix(in srgb, var(--color-primary) 28%, transparent);
+  --focus-ring: 0 0 0 3px var(--focus-ring-color);
+  --disabled-opacity: 0.38;
+  --scrim: rgb(35 39 32 / 42%);
+  --paper-texture-opacity: 0.035;
+  --crayon-texture-opacity: 0.1;
+
+  /* Motion: most UI remains under 300ms */
+  --motion-instant: 80ms;
+  --motion-fast: 140ms;
+  --motion-base: 200ms;
+  --motion-slow: 280ms;
+  --motion-celebrate: 520ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.22, 1.35, 0.5, 1);
+
+  /* Layering */
+  --z-content: 1;
+  --z-sticky: 20;
+  --z-bottom-nav: 30;
+  --z-scrim: 40;
+  --z-sheet: 50;
+  --z-toast: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 1ms;
+    --motion-base: 1ms;
+    --motion-slow: 1ms;
+    --motion-celebrate: 1ms;
+  }
+}
+

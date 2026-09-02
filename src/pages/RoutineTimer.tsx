@@ -5,6 +5,7 @@ import { X, Pause, Play, SkipForward, Check, Timer } from '../icons';
 import confetti from 'canvas-confetti';
 import { useHabitStore } from '../store/habitStore';
 import type { Habit } from '../types';
+import OnjuIcon from '../components/ui/OnjuIcon';
 
 const DEFAULT_SECS = 60;
 
@@ -93,7 +94,7 @@ export default function RoutineTimer() {
   if (status === 'done') {
     const totalActual = Object.values(elapsed).reduce((s, v) => s + v, 0);
     return (
-      <div className="fixed inset-0 bg-cool-22 z-50 flex flex-col items-center justify-between px-6"
+      <div className="focus-paper fixed inset-0 z-50 flex flex-col items-center justify-between px-6"
         style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))', paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
 
         <div className="flex-1 flex flex-col items-center justify-center gap-6 w-full">
@@ -123,7 +124,7 @@ export default function RoutineTimer() {
                   initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + i * 0.07 }}
                   className="flex items-center justify-between">
-                  <span className="text-white text-body2">{h.emoji} {h.title}</span>
+                  <span className="text-white text-body2 flex items-center gap-1.5"><OnjuIcon emoji={h.emoji} size={22} /> {h.title}</span>
                   <div className="text-right">
                     <span className="text-white text-body2 font-semibold">{actual}초</span>
                     <span className={`text-caption1 ml-1.5 ${diff <= 0 ? 'text-positive' : 'text-negative'}`}>
@@ -154,14 +155,14 @@ export default function RoutineTimer() {
 
   /* ── 타이머 실행 화면 ── */
   return (
-    <div className="fixed inset-0 bg-cool-22 z-50 flex flex-col"
+    <div className="focus-paper fixed inset-0 z-50 flex flex-col"
       style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
 
       {/* 헤더 */}
       <div className="flex items-center justify-between px-5 pt-10 pb-4">
         <div className="w-8" />
-        <p className="text-cool-60 text-body2 font-medium">{routine.emoji} {routine.title}</p>
-        <motion.button whileTap={{ scale: 0.88 }} onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-cool-25 flex items-center justify-center">
+        <p className="text-cool-60 text-body2 font-medium flex items-center gap-1.5"><OnjuIcon emoji={routine.emoji} size={22} /> {routine.title}</p>
+        <motion.button whileTap={{ scale: 0.88 }} onClick={() => navigate(-1)} aria-label="타이머 닫기" className="focus-close-button flex items-center justify-center">
           <X size={16} className="text-cool-60" />
         </motion.button>
       </div>
@@ -179,7 +180,7 @@ export default function RoutineTimer() {
           <motion.div key={idx} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
             className="flex flex-col items-center gap-4">
             {/* 이모지 */}
-            <span className="text-6xl">{current?.emoji}</span>
+            <OnjuIcon emoji={current?.emoji} size={76} />
             {/* 이름 */}
             <h2 className="text-title3 font-bold text-white text-center">{current?.title}</h2>
           </motion.div>
@@ -188,7 +189,7 @@ export default function RoutineTimer() {
         {/* 카운트다운 */}
         <motion.p
           key={`${idx}-${timeLeft > 0}`}
-          className="text-7xl font-bold text-white tabular-nums tracking-tight"
+          className="focus-timer-number text-7xl font-bold text-white tabular-nums tracking-tight"
           animate={{ scale: timeLeft <= 5 && timeLeft > 0 ? [1, 1.05, 1] : 1 }}
           transition={{ duration: 0.3 }}
         >
@@ -204,7 +205,7 @@ export default function RoutineTimer() {
 
         {/* 다음 습관 */}
         {next ? (
-          <p className="text-cool-50 text-body2">다음: {next.emoji} {next.title}</p>
+          <p className="text-cool-50 text-body2 flex items-center gap-1.5">다음: <OnjuIcon emoji={next.emoji} size={22} /> {next.title}</p>
         ) : (
           <p className="text-cool-50 text-body2">마지막 습관이에요</p>
         )}

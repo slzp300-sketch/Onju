@@ -6,13 +6,14 @@ import { format, addDays } from 'date-fns';
 import { useGoalStore } from '../store/goalStore';
 import type { GoalRoutineItem, MonthlyGoal } from '../types';
 import { newId } from '../utils/id';
+import Switch from '../components/ui/Switch';
 
 const tapSm = { whileTap: { scale: 0.92 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 
 const todayStr   = () => format(new Date(), 'yyyy-MM-dd');
 const defaultEnd = () => format(addDays(new Date(), 29), 'yyyy-MM-dd');
 
-const inputCls = 'w-full bg-fill border border-line rounded-xl px-4 py-3 text-body2 font-medium focus:outline-none focus:border-primary focus:bg-surface transition-all placeholder:text-label-assistive';
+const inputCls = 'form-paper-field w-full px-4 py-3 text-body2 font-medium placeholder:text-label-assistive';
 
 const COLORS = [
   '#6366f1', '#ef4444', '#f59e0b', '#10b981',
@@ -92,10 +93,10 @@ export default function MonthlyGoalNew() {
   };
 
   return (
-    <div className="min-h-dvh bg-surface-alt flex flex-col">
+    <div className="form-paper min-h-dvh flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center px-4 pt-5 pb-3 bg-surface border-b border-line-soft flex-shrink-0">
-        <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt">
+      <div className="form-paper-header flex items-center px-4 pt-5 pb-3 flex-shrink-0">
+        <motion.button {...tapSm} onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">
@@ -153,7 +154,7 @@ export default function MonthlyGoalNew() {
                 placeholder="두 발로 꾸준히 달리며 체력과 의지를 쌓아가는 사람"
                 rows={3}
                 autoFocus
-                className="w-full bg-fill border border-line rounded-xl px-4 py-3 text-body2 font-medium focus:outline-none focus:border-primary focus:bg-surface resize-none transition-all placeholder:text-label-assistive leading-relaxed"
+                className="form-paper-field w-full px-4 py-3 text-body2 font-medium resize-none placeholder:text-label-assistive leading-relaxed"
               />
               <p className="text-caption2 text-label-assistive mt-1.5 flex items-center gap-1.5">
                 <Lightbulb size={13} strokeWidth={1.9} className="flex-shrink-0" /> 내가 되고 싶은 모습을 구체적인 문장으로 적어주세요
@@ -227,16 +228,8 @@ export default function MonthlyGoalNew() {
                 <p className="text-body2 font-bold text-label-strong flex items-center gap-1.5"><Palette size={15} strokeWidth={1.9} /> 색상 선택</p>
                 <p className="text-caption1 text-label-alt mt-0.5">카드에 표시될 색상을 골라요</p>
               </div>
-              <button
-                onClick={() => { setColorEnabled(v => !v); if (colorEnabled) setSelectedColor(''); }}
-                className={`relative w-11 h-6 rounded-full transition-colors ${colorEnabled ? 'bg-primary' : 'bg-fill-strong'}`}
-              >
-                <motion.div
-                  animate={{ x: colorEnabled ? 20 : 2 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none"
-                />
-              </button>
+              <Switch checked={colorEnabled} label="목표 카드 색상"
+                onCheckedChange={enabled => { setColorEnabled(enabled); if (!enabled) setSelectedColor(''); }} />
             </div>
 
             {/* 색상 그리드 — 항상 표시, 비활성 시 채도 낮음 */}
@@ -272,7 +265,7 @@ export default function MonthlyGoalNew() {
       </div>
 
       {/* 하단 고정 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
+      <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         <motion.button
           whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}

@@ -10,6 +10,7 @@ import DurationPickerSheet from '../components/ui/DurationPickerSheet';
 import { fmtDuration } from '../utils/duration';
 import { Timer } from '../icons';
 import { useNotificationStore } from '../store/notificationStore';
+import Switch from '../components/ui/Switch';
 
 const tap = { whileTap: { scale: 0.98 }, transition: { duration: 0.12 } };
 const tapSm = { whileTap: { scale: 0.92 }, transition: { duration: 0.1 } };
@@ -111,10 +112,10 @@ export default function HabitNew() {
   };
 
   return (
-    <div className="min-h-dvh bg-surface-alt flex flex-col">
+    <div className="form-paper min-h-dvh flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center px-4 pt-5 pb-3 bg-surface border-b border-line-soft">
-        <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt">
+      <div className="form-paper-header flex items-center px-4 pt-5 pb-3">
+        <motion.button {...tapSm} onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">
@@ -135,7 +136,7 @@ export default function HabitNew() {
             <input
               type="text" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="습관 이름을 입력하세요"
-              className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(47,158,96,0.16)] shadow-emphasize transition-all"
+              className="form-paper-input flex-1 text-body2 font-medium"
               autoFocus
             />
           </div>
@@ -143,7 +144,7 @@ export default function HabitNew() {
 
         {/* 월간 목표 연동 카드 */}
         {linkableGoals.length > 0 && (
-          <div className="bg-surface rounded-xl border border-line overflow-hidden">
+          <div className="form-paper-card overflow-hidden">
             <div className="px-4 py-4">
               <div className="flex items-center gap-3 mb-3">
                 <Target size={20} strokeWidth={1.9} className="text-label-strong" />
@@ -184,18 +185,15 @@ export default function HabitNew() {
         )}
 
         {/* 알림 카드 */}
-        <div className="bg-surface rounded-xl border border-line overflow-hidden">
+        <div className="form-paper-card overflow-hidden">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Bell size={20} strokeWidth={1.9} className="text-label-strong" />
                 <span className="text-body2 font-semibold text-label-strong">알림</span>
               </div>
-              <button onClick={handleToggleNotif}
-                className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${notifEnabled ? 'bg-positive' : 'bg-fill-strong'}`}>
-                <motion.div animate={{ x: notifEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm pointer-events-none" />
-              </button>
+              <Switch checked={notifEnabled} onCheckedChange={() => handleToggleNotif()}
+                label="습관 알림" tone="positive" size="md" />
             </div>
             <AnimatePresence>
               {notifEnabled && (
@@ -231,7 +229,7 @@ export default function HabitNew() {
         </div>
 
         {/* 반복 주기 카드 */}
-        <div className="bg-surface rounded-xl border border-line overflow-hidden">
+        <div className="form-paper-card overflow-hidden">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -269,7 +267,7 @@ export default function HabitNew() {
         </div>
 
         {/* 언제 할래요? 카드 */}
-        <div className="bg-surface rounded-xl border border-line overflow-hidden px-4 py-4">
+        <div className="form-paper-card overflow-hidden px-4 py-4">
           <div className="flex items-center gap-3 mb-3">
             <Check size={20} strokeWidth={1.9} className="text-label-strong" />
             <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
@@ -281,7 +279,7 @@ export default function HabitNew() {
         </div>
 
         {/* 타이머 카드 */}
-        <div className="bg-surface rounded-xl border border-line overflow-hidden">
+        <div className="form-paper-card overflow-hidden">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -291,11 +289,7 @@ export default function HabitNew() {
                   <p className="text-caption1 text-label-alt">루틴 생성 시 자동으로 적용돼요</p>
                 </div>
               </div>
-              <button onClick={() => setTimerEnabled(v => !v)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}>
-                <motion.div animate={{ x: timerEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none" />
-              </button>
+              <Switch checked={timerEnabled} onCheckedChange={setTimerEnabled} label="타이머" />
             </div>
             <AnimatePresence>
               {timerEnabled && (
@@ -313,7 +307,7 @@ export default function HabitNew() {
         </div>
 
         {/* 2분 트리거 카드 */}
-        <div className="bg-surface rounded-xl border border-line overflow-hidden">
+        <div className="form-paper-card overflow-hidden">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -323,11 +317,7 @@ export default function HabitNew() {
                   <p className="text-caption1 text-label-alt">습관 시작을 쉽게 만드는 작은 행동</p>
                 </div>
               </div>
-              <button onClick={() => setTwoMinEnabled(v => !v)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${twoMinEnabled ? 'bg-emerald-500' : 'bg-fill-strong'}`}>
-                <motion.div animate={{ x: twoMinEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm pointer-events-none" />
-              </button>
+              <Switch checked={twoMinEnabled} onCheckedChange={setTwoMinEnabled} label="2분 트리거" tone="positive" />
             </div>
             <AnimatePresence>
               {twoMinEnabled && (
@@ -392,7 +382,7 @@ export default function HabitNew() {
       />
 
       {/* 하단 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
+      <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         <motion.button
           whileTap={{ scale: 0.98 }}

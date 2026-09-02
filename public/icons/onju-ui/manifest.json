@@ -1,0 +1,458 @@
+[
+  {
+    "key": "ChevronLeft",
+    "name": "뒤로가기",
+    "group": "common",
+    "src": "/icons/onju-ui/chevron-left.webp"
+  },
+  {
+    "key": "ChevronRight",
+    "name": "다음",
+    "group": "common",
+    "src": "/icons/onju-ui/chevron-right.webp"
+  },
+  {
+    "key": "ChevronDown",
+    "name": "펼치기",
+    "group": "common",
+    "src": "/icons/onju-ui/chevron-down.webp"
+  },
+  {
+    "key": "ChevronUp",
+    "name": "접기",
+    "group": "common",
+    "src": "/icons/onju-ui/chevron-up.webp"
+  },
+  {
+    "key": "Plus",
+    "name": "추가",
+    "group": "common",
+    "src": "/icons/onju-ui/plus.webp"
+  },
+  {
+    "key": "X",
+    "name": "닫기",
+    "group": "common",
+    "src": "/icons/onju-ui/x.webp"
+  },
+  {
+    "key": "Check",
+    "name": "확인",
+    "group": "common",
+    "src": "/icons/onju-ui/check.webp"
+  },
+  {
+    "key": "Trash2",
+    "name": "삭제",
+    "group": "common",
+    "src": "/icons/onju-ui/trash2.webp"
+  },
+  {
+    "key": "Pencil",
+    "name": "편집",
+    "group": "common",
+    "src": "/icons/onju-ui/pencil.webp"
+  },
+  {
+    "key": "Play",
+    "name": "재생",
+    "group": "common",
+    "src": "/icons/onju-ui/play.webp"
+  },
+  {
+    "key": "Pause",
+    "name": "일시정지",
+    "group": "common",
+    "src": "/icons/onju-ui/pause.webp"
+  },
+  {
+    "key": "SkipForward",
+    "name": "건너뛰기",
+    "group": "common",
+    "src": "/icons/onju-ui/skip-forward.webp"
+  },
+  {
+    "key": "Timer",
+    "name": "타이머",
+    "group": "common",
+    "src": "/icons/onju-ui/timer.webp"
+  },
+  {
+    "key": "Clock",
+    "name": "시계",
+    "group": "common",
+    "src": "/icons/onju-ui/clock.webp"
+  },
+  {
+    "key": "Bell",
+    "name": "알림",
+    "group": "common",
+    "src": "/icons/onju-ui/bell.webp"
+  },
+  {
+    "key": "Lock",
+    "name": "잠금",
+    "group": "common",
+    "src": "/icons/onju-ui/lock.webp"
+  },
+  {
+    "key": "Eye",
+    "name": "보기",
+    "group": "common",
+    "src": "/icons/onju-ui/eye.webp"
+  },
+  {
+    "key": "EyeOff",
+    "name": "숨기기",
+    "group": "common",
+    "src": "/icons/onju-ui/eye-off.webp"
+  },
+  {
+    "key": "Calendar",
+    "name": "달력",
+    "group": "common",
+    "src": "/icons/onju-ui/calendar.webp"
+  },
+  {
+    "key": "Share2",
+    "name": "공유",
+    "group": "common",
+    "src": "/icons/onju-ui/share2.webp"
+  },
+  {
+    "key": "Camera",
+    "name": "카메라",
+    "group": "common",
+    "src": "/icons/onju-ui/camera.webp"
+  },
+  {
+    "key": "CheckCircle2",
+    "name": "완료 상태",
+    "group": "common",
+    "aliases": [
+      "CheckCircle"
+    ],
+    "src": "/icons/onju-ui/check-circle2.webp"
+  },
+  {
+    "key": "CheckSquare",
+    "name": "체크박스",
+    "group": "common",
+    "src": "/icons/onju-ui/check-square.webp"
+  },
+  {
+    "key": "AlertCircle",
+    "name": "주의",
+    "group": "common",
+    "src": "/icons/onju-ui/alert-circle.webp"
+  },
+  {
+    "key": "Info",
+    "name": "정보",
+    "group": "common",
+    "src": "/icons/onju-ui/info.webp"
+  },
+  {
+    "key": "NavTree",
+    "name": "홈",
+    "group": "brand",
+    "src": "/icons/onju-ui/nav-tree.webp"
+  },
+  {
+    "key": "NavBars",
+    "name": "통계",
+    "group": "brand",
+    "src": "/icons/onju-ui/nav-bars.webp"
+  },
+  {
+    "key": "NavPeople",
+    "name": "소모임",
+    "group": "brand",
+    "src": "/icons/onju-ui/nav-people.webp"
+  },
+  {
+    "key": "NavProfile",
+    "name": "마이페이지",
+    "group": "brand",
+    "aliases": [
+      "User"
+    ],
+    "src": "/icons/onju-ui/nav-profile.webp"
+  },
+  {
+    "key": "Sprout",
+    "name": "새싹",
+    "group": "brand",
+    "src": "/icons/onju-ui/sprout.webp"
+  },
+  {
+    "key": "Target",
+    "name": "목표",
+    "group": "brand",
+    "src": "/icons/onju-ui/target.webp"
+  },
+  {
+    "key": "Flame",
+    "name": "연속 달성",
+    "group": "brand",
+    "src": "/icons/onju-ui/flame.webp"
+  },
+  {
+    "key": "Church",
+    "name": "신앙",
+    "group": "brand",
+    "src": "/icons/onju-ui/church.webp"
+  },
+  {
+    "key": "Dumbbell",
+    "name": "운동·건강",
+    "group": "brand",
+    "src": "/icons/onju-ui/dumbbell.webp"
+  },
+  {
+    "key": "BookOpen",
+    "name": "말씀·기록",
+    "group": "brand",
+    "src": "/icons/onju-ui/book-open.webp"
+  },
+  {
+    "key": "BarChart3",
+    "name": "성장 통계",
+    "group": "brand",
+    "src": "/icons/onju-ui/bar-chart3.webp"
+  },
+  {
+    "key": "Sparkles",
+    "name": "반짝임",
+    "group": "brand",
+    "src": "/icons/onju-ui/sparkles.webp"
+  },
+  {
+    "key": "Heart",
+    "name": "응원",
+    "group": "brand",
+    "src": "/icons/onju-ui/heart.webp"
+  },
+  {
+    "key": "Star",
+    "name": "별",
+    "group": "brand",
+    "src": "/icons/onju-ui/star.webp"
+  },
+  {
+    "key": "Sunrise",
+    "name": "아침",
+    "group": "brand",
+    "src": "/icons/onju-ui/sunrise.webp"
+  },
+  {
+    "key": "Sun",
+    "name": "낮",
+    "group": "brand",
+    "src": "/icons/onju-ui/sun.webp"
+  },
+  {
+    "key": "Moon",
+    "name": "밤",
+    "group": "brand",
+    "src": "/icons/onju-ui/moon.webp"
+  },
+  {
+    "key": "Zap",
+    "name": "빠른 실행",
+    "group": "brand",
+    "src": "/icons/onju-ui/zap.webp"
+  },
+  {
+    "key": "PartyPopper",
+    "name": "축하",
+    "group": "brand",
+    "src": "/icons/onju-ui/party-popper.webp"
+  },
+  {
+    "key": "Smile",
+    "name": "만족",
+    "group": "brand",
+    "src": "/icons/onju-ui/smile.webp"
+  },
+  {
+    "key": "Frown",
+    "name": "아쉬움",
+    "group": "brand",
+    "src": "/icons/onju-ui/frown.webp"
+  },
+  {
+    "key": "Cloud",
+    "name": "흐림",
+    "group": "brand",
+    "src": "/icons/onju-ui/cloud.webp"
+  },
+  {
+    "key": "Feather",
+    "name": "묵상 기록",
+    "group": "brand",
+    "src": "/icons/onju-ui/feather.webp"
+  },
+  {
+    "key": "Lightbulb",
+    "name": "아이디어",
+    "group": "brand",
+    "src": "/icons/onju-ui/lightbulb.webp"
+  },
+  {
+    "key": "FitnessLeaf",
+    "name": "운동 대안",
+    "group": "brand",
+    "src": "/icons/onju-ui/fitness-leaf.webp"
+  },
+  {
+    "key": "Users",
+    "name": "사용자 그룹",
+    "group": "specific",
+    "src": "/icons/onju-ui/users.webp"
+  },
+  {
+    "key": "Briefcase",
+    "name": "직장",
+    "group": "specific",
+    "src": "/icons/onju-ui/briefcase.webp"
+  },
+  {
+    "key": "Footprints",
+    "name": "걷기",
+    "group": "specific",
+    "src": "/icons/onju-ui/footprints.webp"
+  },
+  {
+    "key": "Cross",
+    "name": "십자가",
+    "group": "specific",
+    "src": "/icons/onju-ui/cross.webp"
+  },
+  {
+    "key": "ListTodo",
+    "name": "할 일",
+    "group": "specific",
+    "src": "/icons/onju-ui/list-todo.webp"
+  },
+  {
+    "key": "ClipboardList",
+    "name": "체크리스트",
+    "group": "specific",
+    "src": "/icons/onju-ui/clipboard-list.webp"
+  },
+  {
+    "key": "FileText",
+    "name": "문서",
+    "group": "specific",
+    "src": "/icons/onju-ui/file-text.webp"
+  },
+  {
+    "key": "MapPin",
+    "name": "위치",
+    "group": "specific",
+    "src": "/icons/onju-ui/map-pin.webp"
+  },
+  {
+    "key": "Pin",
+    "name": "고정",
+    "group": "specific",
+    "src": "/icons/onju-ui/pin.webp"
+  },
+  {
+    "key": "Flag",
+    "name": "신고·목표 지점",
+    "group": "specific",
+    "src": "/icons/onju-ui/flag.webp"
+  },
+  {
+    "key": "Shield",
+    "name": "보호",
+    "group": "specific",
+    "src": "/icons/onju-ui/shield.webp"
+  },
+  {
+    "key": "Palette",
+    "name": "팔레트",
+    "group": "specific",
+    "src": "/icons/onju-ui/palette.webp"
+  },
+  {
+    "key": "MagicWand",
+    "name": "꾸미기",
+    "group": "specific",
+    "src": "/icons/onju-ui/magic-wand.webp"
+  },
+  {
+    "key": "TreePine",
+    "name": "나무 보상",
+    "group": "specific",
+    "src": "/icons/onju-ui/tree-pine.webp"
+  },
+  {
+    "key": "UserCircle",
+    "name": "사용자",
+    "group": "specific",
+    "src": "/icons/onju-ui/user-circle.webp"
+  },
+  {
+    "key": "CalendarDays",
+    "name": "날짜 기록",
+    "group": "specific",
+    "src": "/icons/onju-ui/calendar-days.webp"
+  },
+  {
+    "key": "LogOut",
+    "name": "로그아웃",
+    "group": "specific",
+    "src": "/icons/onju-ui/log-out.webp"
+  },
+  {
+    "key": "GripVertical",
+    "name": "순서 변경",
+    "group": "specific",
+    "src": "/icons/onju-ui/grip-vertical.webp"
+  },
+  {
+    "key": "LayoutList",
+    "name": "목록 보기",
+    "group": "specific",
+    "src": "/icons/onju-ui/layout-list.webp"
+  },
+  {
+    "key": "Link2",
+    "name": "연결",
+    "group": "specific",
+    "src": "/icons/onju-ui/link2.webp"
+  },
+  {
+    "key": "BellRing",
+    "name": "알림 켜짐",
+    "group": "specific",
+    "src": "/icons/onju-ui/bell-ring.webp"
+  },
+  {
+    "key": "BellOff",
+    "name": "알림 꺼짐",
+    "group": "specific",
+    "src": "/icons/onju-ui/bell-off.webp"
+  },
+  {
+    "key": "XCircle",
+    "name": "오류",
+    "group": "specific",
+    "src": "/icons/onju-ui/xcircle.webp"
+  },
+  {
+    "key": "AlarmClock",
+    "name": "알람 시계",
+    "group": "specific",
+    "src": "/icons/onju-ui/alarm-clock.webp"
+  },
+  {
+    "key": "PlaceholderLeaf",
+    "name": "예비 잎",
+    "group": "specific",
+    "src": "/icons/onju-ui/placeholder-leaf.webp"
+  }
+]

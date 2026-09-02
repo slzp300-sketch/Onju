@@ -27,12 +27,12 @@ export default function Diary() {
   };
 
   return (
-    <div className="min-h-dvh bg-surface-alt flex flex-col">
+    <div className="records-paper min-h-dvh flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center px-4 pt-5 pb-3 bg-surface border-b border-line-soft">
+      <div className="records-paper-header flex items-center px-4 pt-5 pb-3">
         <motion.button
           whileTap={{ scale: 0.92 }} transition={{ duration: 0.1 }}
-          onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt">
+          onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">하루 일기</h1>
@@ -40,10 +40,10 @@ export default function Diary() {
       </div>
 
       {/* 날짜 네비게이션 */}
-      <div className="flex items-center justify-center gap-4 px-4 py-4 bg-surface border-b border-line-soft">
+      <div className="diary-date-strip flex items-center justify-center gap-4 px-4 py-4">
         <motion.button
           whileTap={{ scale: 0.9 }} transition={{ duration: 0.1 }}
-          onClick={() => shiftDate(-1)} className="p-1 text-label-alt">
+          onClick={() => shiftDate(-1)} aria-label="이전 날짜" className="min-w-11 min-h-11 grid place-items-center text-label-alt">
           <ChevronLeft size={20} />
         </motion.button>
         <div className="text-center min-w-[140px]">
@@ -55,7 +55,7 @@ export default function Diary() {
         <motion.button
           whileTap={{ scale: 0.9 }} transition={{ duration: 0.1 }}
           onClick={() => shiftDate(1)} disabled={isToday}
-          className="p-1 text-label-alt disabled:opacity-25">
+          aria-label="다음 날짜" className="min-w-11 min-h-11 grid place-items-center text-label-alt disabled:opacity-25">
           <ChevronRight size={20} />
         </motion.button>
       </div>
@@ -124,7 +124,7 @@ function DiaryEditor({ date, onClose }: { date: string; onClose: () => void }) {
             value={content}
             onChange={e => setContent(e.target.value)}
             placeholder="오늘 하루는 어땠나요? 자유롭게 기록해보세요."
-            className="flex-1 min-h-[200px] bg-surface border border-line rounded-xl p-4 text-body2 leading-relaxed text-label resize-none focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(47,158,96,0.16)] shadow-emphasize transition-all"
+            className="records-paper-editor flex-1 min-h-[200px] p-4 text-body2 leading-relaxed text-label resize-none"
           />
           {existing && (
             <button
@@ -138,7 +138,7 @@ function DiaryEditor({ date, onClose }: { date: string; onClose: () => void }) {
       </div>
 
       {/* 저장 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
+      <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         <motion.button
           whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}

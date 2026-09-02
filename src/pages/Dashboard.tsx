@@ -24,6 +24,7 @@ import PersonalTab from '../components/tabs/PersonalTab';
 import FaithTab from '../components/tabs/FaithTab';
 import TreeHero from '../components/tree/TreeHero';
 import { CONFETTI_FOREST } from '../components/tree/treePalette';
+import OnjuIcon from '../components/ui/OnjuIcon';
 
 type TabType = 'personal' | 'faith' | 'todo';
 const TABS: { key: TabType; label: string }[] = [
@@ -125,15 +126,17 @@ export default function Dashboard() {
     <>
     <motion.div
       variants={container} initial="hidden" animate="show"
-      className="flex flex-col overflow-hidden"
-      style={{ height: '100dvh' }}
+      className="home-paper flex flex-col overflow-hidden"
+      style={{ height: 'calc(100dvh - 5.5rem - env(safe-area-inset-bottom, 0px))' }}
     >
 
       {/* 헤더 — 🔥 스트릭 버튼을 우측 상단에 배치 */}
-      <motion.div variants={itemV} className="flex-shrink-0 px-4 pt-5 pb-3 flex items-start justify-between">
+      <motion.header variants={itemV} className="flex-shrink-0 px-5 pt-4 pb-2 flex items-start justify-between">
         <div>
-          <p className="text-caption1 text-label-alt font-medium">{format(new Date(), 'yyyy년 M월', { locale: ko })}</p>
-          <h1 className="text-heading2 font-bold text-label-strong font-brand mt-0.5">안녕하세요, {user?.name}님</h1>
+          <p className="text-caption1 text-label-alt font-medium tracking-wide">{format(new Date(), 'yyyy년 M월', { locale: ko })}</p>
+          <h1 className="max-w-[190px] truncate text-heading2 font-bold text-label-strong font-brand mt-0.5" title={`${user?.name ?? ''}님, 반가워요`}>
+            {user?.name}님, 반가워요
+          </h1>
         </div>
 
         <div className="flex items-center gap-2">
@@ -143,7 +146,7 @@ export default function Dashboard() {
             transition={{ type: 'spring', stiffness: 600, damping: 22 }}
             onClick={() => navigate('/diary')}
             aria-label="하루 일기"
-            className="flex items-center justify-center w-9 h-9 rounded-2xl border border-line bg-surface text-label-alt hover:text-primary hover:border-primary/30 transition-colors"
+            className="paper-control flex items-center justify-center text-label-alt hover:text-primary hover:border-primary/30 transition-colors"
           >
             <BookOpen size={18} />
           </motion.button>
@@ -153,7 +156,8 @@ export default function Dashboard() {
             whileTap={{ scale: 0.92 }}
             transition={{ type: 'spring', stiffness: 600, damping: 22 }}
             onClick={() => navigate('/streak')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border transition-colors ${
+            aria-label={`연속 실천 ${streak}일`}
+            className={`paper-control flex items-center gap-1.5 px-3 border transition-colors ${
               streak > 0
                 ? 'bg-cautionary/10 border-cautionary/20'
                 : 'bg-surface border-line'
@@ -171,21 +175,21 @@ export default function Dashboard() {
             </span>
           </motion.button>
         </div>
-      </motion.div>
+      </motion.header>
 
       {/* 나의 나무 — 성장 히어로 */}
-      <motion.div variants={itemV} className="flex-shrink-0 mb-3">
+      <motion.div variants={itemV} className="flex-shrink-0 mb-2">
         <TreeHero />
       </motion.div>
 
       {/* 목표 카드 — 3개 나란히 가로 스크롤 */}
-      <motion.div variants={itemV} className="flex-shrink-0 mb-4">
+      <motion.div variants={itemV} className="flex-shrink-0 mb-3">
         {activeGoals.length === 0 ? (
           <div className="px-4">
             <motion.button
               whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
               onClick={() => navigate('/goals')}
-              className="w-full bg-surface border border-line rounded-xl px-4 py-3.5 text-left"
+              className="paper-card w-full px-4 py-3.5 text-left"
             >
               <div className="flex items-center gap-1 mb-1">
                 <Target size={11} className="text-primary" />
@@ -209,9 +213,9 @@ export default function Dashboard() {
                   key={g.id}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => navigate('/goals')}
-                  className="flex-shrink-0 bg-surface border border-line rounded-xl px-3 py-3.5 text-left"
+                  className="paper-card flex-shrink-0 px-3 py-3.5 text-left"
                   style={{
-                    width: 'calc(33.33% - 6px)',
+                    width: 'clamp(142px, 42vw, 172px)',
                     scrollSnapAlign: 'start',
                     borderColor: g.color ? `${g.color}40` : undefined,
                     backgroundColor: g.color ? `${g.color}0a` : undefined,
@@ -265,10 +269,10 @@ export default function Dashboard() {
       )}
 
       {/* 주간 스트립 + 탭 */}
-      <motion.div variants={itemV} className="flex-1 flex flex-col bg-surface border border-line rounded-t-3xl mx-3 overflow-hidden min-h-0">
+      <motion.section variants={itemV} aria-label="이번 주 루틴" className="home-routine-sheet flex-1 flex flex-col mx-3 overflow-hidden min-h-0">
 
         {/* 주간 날짜 스트립 */}
-        <div className="flex-shrink-0 px-2 pt-3 pb-2">
+        <div className="flex-shrink-0 px-3 pt-3 pb-3">
           <div className="flex gap-1">
             {weekDays.map((d, i) => {
               const ds = format(d, 'yyyy-MM-dd');
@@ -282,12 +286,14 @@ export default function Dashboard() {
 
               return (
                 <button key={ds} disabled={isFuture} onClick={() => !isFuture && setSelectedDay(ds)}
-                  className={`relative flex-1 flex flex-col items-center gap-1 rounded-xl py-2 px-0.5 border-2 transition-all overflow-hidden ${isFuture ? 'cursor-default' : ''} ${
+                  aria-label={`${format(d, 'M월 d일')} ${isFuture ? '선택 불가' : isSelected ? '선택됨' : '기록 보기'}`}
+                  aria-pressed={isSelected}
+                  className={`week-day-card relative flex-1 flex flex-col items-center gap-1.5 py-2 px-1 transition-all ${isFuture ? 'cursor-default opacity-45' : ''} ${
                     isSelected
-                      ? 'border-primary bg-primary-soft'
+                      ? 'is-selected'
                       : bothDone
-                      ? 'border-faith/30 bg-faith/5'
-                      : 'border-transparent'
+                      ? 'is-complete'
+                      : ''
                   }`}>
 
                   {/* 요일 */}
@@ -307,7 +313,7 @@ export default function Dashboard() {
                   </span>
 
                   {/* 개인 루틴 바 */}
-                  <div className="w-full h-2 bg-fill-strong rounded-full overflow-hidden">
+                  <div className="w-full h-1 bg-fill-strong rounded-full overflow-hidden" aria-hidden="true">
                     {!isFuture && pRate >= 0 && (
                       <motion.div
                         className="h-full bg-primary rounded-full"
@@ -319,7 +325,7 @@ export default function Dashboard() {
                   </div>
 
                   {/* 신앙 루틴 바 */}
-                  <div className="w-full h-2 bg-fill-strong rounded-full overflow-hidden">
+                  <div className="w-full h-1 bg-fill-strong rounded-full overflow-hidden" aria-hidden="true">
                     {!isFuture && fRate >= 0 && (
                       <motion.div
                         className="h-full bg-faith rounded-full"
@@ -332,7 +338,7 @@ export default function Dashboard() {
 
                   {/* 완료 상태 — 둘 다 달성하면 잎이 돋는다 */}
                   {bothDone ? (
-                    <svg width="9" height="9" viewBox="0 0 12 12" className="mt-0.5">
+                    <svg width="12" height="12" viewBox="0 0 12 12" className="mt-0.5" aria-hidden="true">
                       <path d="M6 11 Q5.5 7 6 4" stroke="var(--color-primary)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
                       <path d="M6 6 Q2.5 5 2 1.5 Q5.5 2 6 5.5 Z" fill="var(--color-primary)" />
                       <path d="M6 5 Q9.5 4 10 0.8 Q6.5 1.5 6 4.6 Z" fill="var(--color-faith)" />
@@ -341,30 +347,13 @@ export default function Dashboard() {
                     <div className={`w-1.5 h-1.5 rounded-full mt-0.5 ${anyDone ? 'bg-primary/40' : 'bg-transparent'}`} />
                   )}
 
-                  {/* 100% 달성 도장 인장 */}
-                  {bothDone && (
-                    <motion.div
-                      initial={{ scale: 1.6, opacity: 0, rotate: -14 }}
-                      animate={{ scale: 1, opacity: 1, rotate: -12 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.3 + i * 0.05 }}
-                      className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                    >
-                      <svg width="54" height="54" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="46" fill="none" stroke="#1f8a4c" strokeWidth="5"/>
-                        <circle cx="50" cy="50" r="36" fill="none" stroke="#1f8a4c" strokeWidth="2"/>
-                        <text x="50" y="54" textAnchor="middle" dominantBaseline="middle"
-                          fill="#1f8a4c" fontSize="22" fontWeight="900"
-                          style={{ fontFamily: 'system-ui, sans-serif' }}>완료</text>
-                      </svg>
-                    </motion.div>
-                  )}
                 </button>
               );
             })}
           </div>
 
           {/* 범례 */}
-          <div className="flex items-center gap-3 mt-2 px-1">
+          <div className="flex items-center justify-end gap-3 mt-2 px-1">
             <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-primary" /><span className="text-caption2 text-label-assistive">개인</span></div>
             <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-faith" /><span className="text-caption2 text-label-assistive">신앙</span></div>
           </div>
@@ -372,18 +361,15 @@ export default function Dashboard() {
 
         {/* 루틴 3탭 */}
         <div className="flex-1 flex flex-col border-t border-line-soft min-h-0">
-          <div className="flex-shrink-0 flex border-b border-line-soft bg-surface">
+          <div className="mx-3 mb-2 flex-shrink-0 flex rounded-xl bg-fill p-1" role="tablist" aria-label="홈 기록 종류">
             {TABS.map(tab => (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                className={`relative flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 text-caption1 font-bold transition-colors ${activeTab === tab.key ? 'text-label-strong' : 'text-label-assistive'}`}>
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)} role="tab" aria-selected={activeTab === tab.key}
+                className={`relative min-h-9 flex-1 flex items-center justify-center gap-1.5 rounded-lg px-2 text-caption1 font-bold transition-colors ${activeTab === tab.key ? 'bg-surface text-primary shadow-emphasize' : 'text-label-alt'}`}>
                 <span>{tab.label}</span>
                 {badges[tab.key] && (
                   <span className={`text-caption2 font-bold px-1.5 py-0.5 rounded ${activeTab === tab.key ? 'bg-primary-soft text-primary' : 'bg-fill text-label-assistive'}`}>
                     {badges[tab.key]}
                   </span>
-                )}
-                {activeTab === tab.key && (
-                  <motion.div layoutId="tab3Line" className="absolute bottom-0 left-3 right-3 h-0.5 bg-label-strong rounded-full" />
                 )}
               </button>
             ))}
@@ -422,7 +408,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}>
+          <div className="home-record-scroll flex-1 overflow-y-auto overscroll-contain pb-5">
           <AnimatePresence mode="wait">
             {activeTab === 'personal' && (
               <motion.div key="p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
@@ -457,25 +443,27 @@ export default function Dashboard() {
                     <p className="text-caption1 text-label-alt leading-relaxed">하나씩 체크할 때마다<br />성취감이 쌓여가요</p>
                   </div>
                 ) : (
-                  <div className="bg-surface divide-y divide-line-soft">
+                  <div className="routine-paper-group mx-3 overflow-hidden divide-y divide-line-soft">
                     {todayTodos.filter(t => !t.completed).map((todo, idx) => (
                       <motion.div key={todo.id} layout
                         onClick={() => navigate(`/todos/edit/${todo.id}`)}
-                        className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-fill transition-colors">
-                        <span className="text-caption2 font-bold w-5 text-center text-label-assistive flex-shrink-0">{idx + 1}</span>
-                        <div className="w-9 h-9 rounded-xl bg-fill flex items-center justify-center text-lg flex-shrink-0">
-                          {todo.emoji ?? '📝'}
+                        className="habit-paper-row flex min-h-[68px] items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-fill transition-colors">
+                        <span aria-hidden="true" className="text-caption2 font-bold w-4 text-center text-label-assistive flex-shrink-0">{idx + 1}</span>
+                        <div className="w-11 h-11 rounded-xl bg-fill flex items-center justify-center flex-shrink-0">
+                          <OnjuIcon emoji={todo.emoji} fallback="📝" size={34} />
                         </div>
-                        <span className="flex-1 text-body2 font-semibold text-label">{todo.title}</span>
+                        <span className="flex-1 text-body2 font-bold text-label-strong">{todo.title}</span>
                         {canEdit ? (
                           <div className="flex items-center gap-1.5 flex-shrink-0">
                             <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
-                              onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
+                              onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} aria-label={`${todo.title} 투두 삭제`}
+                              className="flex h-9 w-8 items-center justify-center text-label-assistive hover:text-negative transition-colors">
                               <Trash2 size={13} />
                             </motion.button>
                             <motion.button whileTap={{ scale: 0.82 }} transition={{ duration: 0.08 }}
                               onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
-                              className="w-7 h-7 rounded-full border-2 border-line hover:border-primary flex items-center justify-center transition-colors">
+                              aria-label={`${todo.title} 완료로 표시`}
+                              className="w-9 h-9 rounded-xl border-2 border-line hover:border-primary flex items-center justify-center transition-colors">
                             </motion.button>
                           </div>
                         ) : (
@@ -486,29 +474,31 @@ export default function Dashboard() {
 
                     {todayTodos.filter(t => t.completed).length > 0 && (
                       <>
-                        <div className="px-4 py-2 bg-surface-alt">
-                          <span className="text-caption2 font-bold text-label-assistive">완료 {doneTodos}개</span>
+                        <div className="px-4 py-2.5 bg-surface-alt">
+                          <span className="text-caption2 font-bold text-label-alt">오늘 심은 체크 {doneTodos}개</span>
                         </div>
                         {todayTodos.filter(t => t.completed).map((todo, idx) => (
                           <motion.div key={todo.id} layout
                             onClick={() => navigate(`/todos/edit/${todo.id}`)}
-                            className="flex items-center gap-3 px-4 py-3 opacity-60 cursor-pointer hover:bg-fill transition-colors">
-                            <span className="text-caption2 font-bold w-5 text-center text-label-assistive flex-shrink-0">
+                            className="habit-paper-row flex min-h-[68px] items-center gap-3 px-3 py-2.5 opacity-60 cursor-pointer hover:bg-fill transition-colors">
+                            <span aria-hidden="true" className="text-caption2 font-bold w-4 text-center text-label-assistive flex-shrink-0">
                               {todayTodos.filter(t => !t.completed).length + idx + 1}
                             </span>
-                            <div className="w-9 h-9 rounded-xl bg-primary-soft flex items-center justify-center text-lg flex-shrink-0">
-                              {todo.emoji ?? '📝'}
+                            <div className="w-11 h-11 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
+                              <OnjuIcon emoji={todo.emoji} fallback="📝" size={34} />
                             </div>
                             <span className="flex-1 text-body2 font-semibold line-through text-label-assistive">{todo.title}</span>
                             {canEdit ? (
                               <div className="flex items-center gap-1.5 flex-shrink-0">
                                 <motion.button whileTap={{ scale: 0.85 }} transition={{ duration: 0.08 }}
-                                  onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} className="text-label-assistive hover:text-negative transition-colors p-1">
+                                  onClick={e => { e.stopPropagation(); removeTodo(todo.id); }} aria-label={`${todo.title} 투두 삭제`}
+                                  className="flex h-9 w-8 items-center justify-center text-label-assistive hover:text-negative transition-colors">
                                   <Trash2 size={13} />
                                 </motion.button>
                                 <motion.button whileTap={{ scale: 0.82 }} transition={{ duration: 0.08 }}
                                   onClick={e => { e.stopPropagation(); toggleTodo(todo.id); }}
-                                  className="w-7 h-7 rounded-full bg-primary border-2 border-primary flex items-center justify-center">
+                                  aria-label={`${todo.title} 완료 취소`}
+                                  className="w-9 h-9 rounded-xl bg-primary border-2 border-primary flex items-center justify-center">
                                   <AnimatePresence mode="wait" initial={false}>
                                     <motion.svg key="chk" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                                       exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.15 }}
@@ -533,7 +523,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-      </motion.div>
+      </motion.section>
     </motion.div>
 
     {/* 오늘 100% 달성 스탬프 */}

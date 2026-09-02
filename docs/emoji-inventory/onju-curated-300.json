@@ -1,0 +1,4036 @@
+[
+  {
+    "index": 0,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🙏",
+    "unicode": "1F64F",
+    "name": "두 손 모아 기도하는 사람",
+    "keywords": [
+      "기도",
+      "합장",
+      "기도하는 사람",
+      "두 손 모아 기도하는 사람"
+    ]
+  },
+  {
+    "index": 1,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "📖",
+    "unicode": "1F4D6",
+    "name": "펼쳐진 책",
+    "keywords": [
+      "책",
+      "펼쳐진 책"
+    ]
+  },
+  {
+    "index": 2,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "⛪",
+    "unicode": "26EA",
+    "name": "크리스찬",
+    "keywords": [
+      "교회",
+      "건물",
+      "빌딩",
+      "크리스찬"
+    ]
+  },
+  {
+    "index": 3,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "✝️",
+    "unicode": "271D-FE0F",
+    "name": "라틴 십자가",
+    "keywords": [
+      "종교",
+      "기독교",
+      "십자가",
+      "라틴 십자가"
+    ]
+  },
+  {
+    "index": 4,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🕊️",
+    "unicode": "1F54A-FE0F",
+    "name": "비둘기",
+    "keywords": [
+      "새",
+      "평화",
+      "비둘기"
+    ]
+  },
+  {
+    "index": 5,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🕯️",
+    "unicode": "1F56F-FE0F",
+    "name": "캔들",
+    "keywords": [
+      "양초",
+      "캔들"
+    ]
+  },
+  {
+    "index": 6,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "📝",
+    "unicode": "1F4DD",
+    "name": "메모지",
+    "keywords": [
+      "메모",
+      "메모장",
+      "메모지"
+    ]
+  },
+  {
+    "index": 7,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🤍",
+    "unicode": "1F90D",
+    "name": "흰색 하트",
+    "keywords": [
+      "하트",
+      "흰색",
+      "흰색 하트"
+    ]
+  },
+  {
+    "index": 8,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "💛",
+    "unicode": "1F49B",
+    "name": "노란색 하트",
+    "keywords": [
+      "사랑",
+      "하트",
+      "노란 하트",
+      "노란색 하트"
+    ]
+  },
+  {
+    "index": 9,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "💖",
+    "unicode": "1F496",
+    "name": "기쁨으로 가득찬 마음",
+    "keywords": [
+      "사랑",
+      "설렘",
+      "두근거림",
+      "빛나는 하트",
+      "사랑의 기쁨",
+      "기쁨으로 가득찬 마음"
+    ]
+  },
+  {
+    "index": 10,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "📿",
+    "unicode": "1F4FF",
+    "name": "예배",
+    "keywords": [
+      "묵주",
+      "기도",
+      "예배"
+    ]
+  },
+  {
+    "index": 11,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🤲",
+    "unicode": "1F932",
+    "name": "내민 두 손",
+    "keywords": [
+      "기도",
+      "내민 두 손"
+    ]
+  },
+  {
+    "index": 12,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🫰",
+    "unicode": "1FAF0",
+    "name": "엄지와 중지를 교차한 손",
+    "keywords": [
+      "돈",
+      "딱딱",
+      "사랑",
+      "하트",
+      "너무 비싼",
+      "엄지와 중지를 교차한 손"
+    ]
+  },
+  {
+    "index": 13,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🫶",
+    "unicode": "1FAF6",
+    "name": "손 하트",
+    "keywords": [
+      "사랑",
+      "손 하트"
+    ]
+  },
+  {
+    "index": 14,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "⛑️",
+    "unicode": "26D1-FE0F",
+    "name": "흰 십자가가 있는 헬멧",
+    "keywords": [
+      "도움",
+      "모자",
+      "헬멧",
+      "안전요원",
+      "흰 십자가가 있는 헬멧"
+    ]
+  },
+  {
+    "index": 15,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "☦️",
+    "unicode": "2626-FE0F",
+    "name": "전통적인 십자가",
+    "keywords": [
+      "종교",
+      "기독교",
+      "십자가",
+      "전통적인 십자가"
+    ]
+  },
+  {
+    "index": 16,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🛐",
+    "unicode": "1F6D0",
+    "name": "예배공간",
+    "keywords": [
+      "기도",
+      "사원",
+      "예배",
+      "예배공간"
+    ]
+  },
+  {
+    "index": 17,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "☮️",
+    "unicode": "262E-FE0F",
+    "name": "평화 기호",
+    "keywords": [
+      "평화",
+      "평화 기호"
+    ]
+  },
+  {
+    "index": 18,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🩵",
+    "unicode": "1FA75",
+    "name": "밝은 파란색 하트",
+    "keywords": [
+      "푸른",
+      "하트",
+      "청록색",
+      "밝은 파란색",
+      "밝은 파란색 하트"
+    ]
+  },
+  {
+    "index": 19,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🥰",
+    "unicode": "1F970",
+    "name": "하트와 함께 웃는 얼굴",
+    "keywords": [
+      "반한",
+      "사랑하는",
+      "사랑에 빠진",
+      "하트와 함께 웃는 얼굴"
+    ]
+  },
+  {
+    "index": 20,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "😍",
+    "unicode": "1F60D",
+    "name": "하트 뿅뿅 얼굴",
+    "keywords": [
+      "사랑",
+      "얼굴",
+      "하트",
+      "하트 눈 얼굴",
+      "하트 뿅뿅 얼굴"
+    ]
+  },
+  {
+    "index": 21,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "😻",
+    "unicode": "1F63B",
+    "name": "하트 눈 고양이 얼굴",
+    "keywords": [
+      "고양이",
+      "사랑에 빠진 고양이",
+      "하트 눈 고양이 얼굴"
+    ]
+  },
+  {
+    "index": 22,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "💌",
+    "unicode": "1F48C",
+    "name": "연애 편지",
+    "keywords": [
+      "러브레터",
+      "사랑 고백",
+      "연애 편지"
+    ]
+  },
+  {
+    "index": 23,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "💕",
+    "unicode": "1F495",
+    "name": "하트 두 개",
+    "keywords": [
+      "사랑",
+      "연인",
+      "하트 두 개"
+    ]
+  },
+  {
+    "index": 24,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "🩷",
+    "unicode": "1FA77",
+    "name": "분홍색 하트",
+    "keywords": [
+      "하트",
+      "귀여움",
+      "분홍색",
+      "사랑해",
+      "좋아해",
+      "분홍색 하트"
+    ]
+  },
+  {
+    "index": 25,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "💑",
+    "unicode": "1F491",
+    "name": "연애 중",
+    "keywords": [
+      "연인",
+      "사랑",
+      "연애",
+      "연애 중"
+    ]
+  },
+  {
+    "index": 26,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "👼",
+    "unicode": "1F47C",
+    "name": "아기 천사",
+    "keywords": [
+      "천사",
+      "아기 천사"
+    ]
+  },
+  {
+    "index": 27,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "✨",
+    "unicode": "2728",
+    "name": "반짝반짝",
+    "keywords": [
+      "블링블링",
+      "반짝거림",
+      "반짝반짝"
+    ]
+  },
+  {
+    "index": 28,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "📔",
+    "unicode": "1F4D4",
+    "name": "표지가 있는 노트",
+    "keywords": [
+      "공책",
+      "노트",
+      "표지가 있는 노트"
+    ]
+  },
+  {
+    "index": 29,
+    "group": "faith_reflection",
+    "groupName": "신앙과 묵상",
+    "emoji": "📕",
+    "unicode": "1F4D5",
+    "name": "펼치지 않은 책",
+    "keywords": [
+      "책",
+      "도서",
+      "펼치지 않은 책"
+    ]
+  },
+  {
+    "index": 30,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "💼",
+    "unicode": "1F4BC",
+    "name": "서류 가방",
+    "keywords": [
+      "가방",
+      "서류 가방"
+    ]
+  },
+  {
+    "index": 31,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "💻",
+    "unicode": "1F4BB",
+    "name": "노트북",
+    "keywords": [
+      "pc",
+      "랩탑",
+      "노트북"
+    ]
+  },
+  {
+    "index": 32,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📚",
+    "unicode": "1F4DA",
+    "name": "책 여러 권",
+    "keywords": [
+      "책",
+      "책 여러 권"
+    ]
+  },
+  {
+    "index": 33,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📓",
+    "unicode": "1F4D3",
+    "name": "노트",
+    "keywords": [
+      "공책",
+      "노트"
+    ]
+  },
+  {
+    "index": 34,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "✏️",
+    "unicode": "270F-FE0F",
+    "name": "필기도구",
+    "keywords": [
+      "연필",
+      "필기도구"
+    ]
+  },
+  {
+    "index": 35,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📅",
+    "unicode": "1F4C5",
+    "name": "캘린더",
+    "keywords": [
+      "달력",
+      "일정",
+      "캘린더"
+    ]
+  },
+  {
+    "index": 36,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🎯",
+    "unicode": "1F3AF",
+    "name": "과녁 명중",
+    "keywords": [
+      "과녁",
+      "명중",
+      "양궁",
+      "화살",
+      "과녁 명중"
+    ]
+  },
+  {
+    "index": 37,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "💡",
+    "unicode": "1F4A1",
+    "name": "기발한 생각",
+    "keywords": [
+      "전구",
+      "아하",
+      "아이디어",
+      "기발한 생각"
+    ]
+  },
+  {
+    "index": 38,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📊",
+    "unicode": "1F4CA",
+    "name": "막대 그래프",
+    "keywords": [
+      "그래프",
+      "막대그래프",
+      "막대 그래프"
+    ]
+  },
+  {
+    "index": 39,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📂",
+    "unicode": "1F4C2",
+    "name": "열린 폴더",
+    "keywords": [
+      "열기",
+      "파일",
+      "폴더",
+      "폴더 열기",
+      "열린 폴더"
+    ]
+  },
+  {
+    "index": 40,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🛜",
+    "unicode": "1F6DC",
+    "name": "네트워크",
+    "keywords": [
+      "무선",
+      "인터넷",
+      "컴퓨터",
+      "네트워크"
+    ]
+  },
+  {
+    "index": 41,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "⌨️",
+    "unicode": "2328-FE0F",
+    "name": "키보드",
+    "keywords": [
+      "키보드"
+    ]
+  },
+  {
+    "index": 42,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🖥️",
+    "unicode": "1F5A5-FE0F",
+    "name": "데스크톱 컴퓨터",
+    "keywords": [
+      "컴퓨터",
+      "데스크톱",
+      "데스크톱 컴퓨터"
+    ]
+  },
+  {
+    "index": 43,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🖱️",
+    "unicode": "1F5B1-FE0F",
+    "name": "컴퓨터 마우스",
+    "keywords": [
+      "마우스",
+      "컴퓨터",
+      "컴퓨터 마우스"
+    ]
+  },
+  {
+    "index": 44,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🖲️",
+    "unicode": "1F5B2-FE0F",
+    "name": "컴퓨터",
+    "keywords": [
+      "트랙볼",
+      "마우스",
+      "컴퓨터"
+    ]
+  },
+  {
+    "index": 45,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📗",
+    "unicode": "1F4D7",
+    "name": "초록색 책",
+    "keywords": [
+      "책",
+      "녹색 책",
+      "초록색 책"
+    ]
+  },
+  {
+    "index": 46,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📘",
+    "unicode": "1F4D8",
+    "name": "파란색 책",
+    "keywords": [
+      "책",
+      "파란 책",
+      "파란색 책"
+    ]
+  },
+  {
+    "index": 47,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📙",
+    "unicode": "1F4D9",
+    "name": "오렌지색 책",
+    "keywords": [
+      "책",
+      "주황색 책",
+      "오렌지색 책"
+    ]
+  },
+  {
+    "index": 48,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📒",
+    "unicode": "1F4D2",
+    "name": "원장",
+    "keywords": [
+      "노트",
+      "공책",
+      "원장"
+    ]
+  },
+  {
+    "index": 49,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🔖",
+    "unicode": "1F516",
+    "name": "책갈피",
+    "keywords": [
+      "마크",
+      "표시",
+      "북마크",
+      "책갈피"
+    ]
+  },
+  {
+    "index": 50,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📆",
+    "unicode": "1F4C6",
+    "name": "뜯어진 달력",
+    "keywords": [
+      "달력",
+      "일정",
+      "캘린더",
+      "뜯어진 달력"
+    ]
+  },
+  {
+    "index": 51,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🗓️",
+    "unicode": "1F5D3-FE0F",
+    "name": "벽걸이 달력",
+    "keywords": [
+      "달력",
+      "스프링 달력",
+      "벽걸이 달력"
+    ]
+  },
+  {
+    "index": 52,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📁",
+    "unicode": "1F4C1",
+    "name": "파일",
+    "keywords": [
+      "폴더",
+      "파일"
+    ]
+  },
+  {
+    "index": 53,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🎹",
+    "unicode": "1F3B9",
+    "name": "피아노",
+    "keywords": [
+      "건반",
+      "악기",
+      "연주",
+      "음악",
+      "피아노"
+    ]
+  },
+  {
+    "index": 54,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🖨️",
+    "unicode": "1F5A8-FE0F",
+    "name": "인쇄기",
+    "keywords": [
+      "프린터",
+      "인쇄기"
+    ]
+  },
+  {
+    "index": 55,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "💽",
+    "unicode": "1F4BD",
+    "name": "미니 디스크",
+    "keywords": [
+      "엠디",
+      "md",
+      "디스크",
+      "미니 디스크"
+    ]
+  },
+  {
+    "index": 56,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "💾",
+    "unicode": "1F4BE",
+    "name": "플로피 디스크",
+    "keywords": [
+      "디스켓",
+      "플로피 디스크"
+    ]
+  },
+  {
+    "index": 57,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "💿",
+    "unicode": "1F4BF",
+    "name": "광학 디스크",
+    "keywords": [
+      "씨디",
+      "cd",
+      "dvd",
+      "디비디",
+      "블루레이",
+      "광학 디스크"
+    ]
+  },
+  {
+    "index": 58,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📀",
+    "unicode": "1F4C0",
+    "name": "dvd",
+    "keywords": [
+      "디비디",
+      "dvd"
+    ]
+  },
+  {
+    "index": 59,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "✍️",
+    "unicode": "270D-FE0F",
+    "name": "글을 쓰고 있는 손",
+    "keywords": [
+      "손",
+      "연필 쥔 손",
+      "글을 쓰고 있는 손"
+    ]
+  },
+  {
+    "index": 60,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📑",
+    "unicode": "1F4D1",
+    "name": "북마크 탭",
+    "keywords": [
+      "마커",
+      "포스트잇",
+      "북마크 탭"
+    ]
+  },
+  {
+    "index": 61,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🧾",
+    "unicode": "1F9FE",
+    "name": "영수증",
+    "keywords": [
+      "기록",
+      "증빙",
+      "회계",
+      "영수증"
+    ]
+  },
+  {
+    "index": 62,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "✒️",
+    "unicode": "2712-FE0F",
+    "name": "검은색 펜촉",
+    "keywords": [
+      "펜",
+      "펜촉",
+      "검은색 펜촉"
+    ]
+  },
+  {
+    "index": 63,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🖊️",
+    "unicode": "1F58A-FE0F",
+    "name": "볼펜",
+    "keywords": [
+      "펜",
+      "볼펜"
+    ]
+  },
+  {
+    "index": 64,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🔓",
+    "unicode": "1F513",
+    "name": "열린 자물쇠",
+    "keywords": [
+      "락",
+      "자물쇠",
+      "잠금풀림",
+      "열린 자물쇠"
+    ]
+  },
+  {
+    "index": 65,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🔏",
+    "unicode": "1F50F",
+    "name": "자물쇠와 펜",
+    "keywords": [
+      "펜",
+      "사생활",
+      "자물쇠",
+      "프라이버시",
+      "자물쇠와 펜"
+    ]
+  },
+  {
+    "index": 66,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🪚",
+    "unicode": "1FA9A",
+    "name": "목공 톱",
+    "keywords": [
+      "톱",
+      "도구",
+      "목수",
+      "목재",
+      "목공 톱"
+    ]
+  },
+  {
+    "index": 67,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🪟",
+    "unicode": "1FA9F",
+    "name": "맑은 공기",
+    "keywords": [
+      "창문",
+      "전망",
+      "창틀",
+      "투명한",
+      "맑은 공기"
+    ]
+  },
+  {
+    "index": 68,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🎒",
+    "unicode": "1F392",
+    "name": "학생 가방",
+    "keywords": [
+      "가방",
+      "학교 가방",
+      "학생 가방"
+    ]
+  },
+  {
+    "index": 69,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🏫",
+    "unicode": "1F3EB",
+    "name": "스쿨",
+    "keywords": [
+      "학교",
+      "건물",
+      "공부",
+      "빌딩",
+      "스쿨"
+    ]
+  },
+  {
+    "index": 70,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "💹",
+    "unicode": "1F4B9",
+    "name": "엔화 관련 상승하는 그래프",
+    "keywords": [
+      "호황",
+      "시장 호황",
+      "엔화 관련 상승하는 그래프"
+    ]
+  },
+  {
+    "index": 71,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📈",
+    "unicode": "1F4C8",
+    "name": "상승하는 그래프",
+    "keywords": [
+      "상향",
+      "호황",
+      "그래프",
+      "상승하는 그래프"
+    ]
+  },
+  {
+    "index": 72,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📉",
+    "unicode": "1F4C9",
+    "name": "내려가는 그래프",
+    "keywords": [
+      "불황",
+      "하향",
+      "그래프",
+      "내려가는 그래프"
+    ]
+  },
+  {
+    "index": 73,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "📣",
+    "unicode": "1F4E3",
+    "name": "메가폰",
+    "keywords": [
+      "응원",
+      "메가폰"
+    ]
+  },
+  {
+    "index": 74,
+    "group": "work_study",
+    "groupName": "업무와 배움",
+    "emoji": "🎙️",
+    "unicode": "1F399-FE0F",
+    "name": "스튜디오 마이크",
+    "keywords": [
+      "마이크",
+      "사회자 마이크",
+      "스튜디오 마이크"
+    ]
+  },
+  {
+    "index": 75,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏃",
+    "unicode": "1F3C3",
+    "name": "뛰는 사람",
+    "keywords": [
+      "뛰기",
+      "런닝",
+      "달리기",
+      "마라톤",
+      "뛰는 사람"
+    ]
+  },
+  {
+    "index": 76,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🚶",
+    "unicode": "1F6B6",
+    "name": "걷는 사람",
+    "keywords": [
+      "보행자",
+      "보행자용",
+      "걷는 사람"
+    ]
+  },
+  {
+    "index": 77,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🧘",
+    "unicode": "1F9D8",
+    "name": "가부좌한 사람",
+    "keywords": [
+      "요가",
+      "가부좌",
+      "가부좌한 사람"
+    ]
+  },
+  {
+    "index": 78,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏋️",
+    "unicode": "1F3CB-FE0F",
+    "name": "역도 선수",
+    "keywords": [
+      "역도",
+      "역도선수",
+      "역도 선수"
+    ]
+  },
+  {
+    "index": 79,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🚴",
+    "unicode": "1F6B4",
+    "name": "자전거 타는 사람",
+    "keywords": [
+      "자전거 주행",
+      "자전거 타는 사람"
+    ]
+  },
+  {
+    "index": 80,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏊",
+    "unicode": "1F3CA",
+    "name": "수영하는 사람",
+    "keywords": [
+      "운동",
+      "수영장",
+      "스포츠",
+      "수영 선수",
+      "수영하는 사람"
+    ]
+  },
+  {
+    "index": 81,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🥾",
+    "unicode": "1F97E",
+    "name": "하이킹",
+    "keywords": [
+      "등산",
+      "부츠",
+      "캠핑",
+      "등산화",
+      "하이킹"
+    ]
+  },
+  {
+    "index": 82,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "💪",
+    "unicode": "1F4AA",
+    "name": "이두박근",
+    "keywords": [
+      "힘",
+      "알통",
+      "강함",
+      "근육",
+      "이두박근"
+    ]
+  },
+  {
+    "index": 83,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "😴",
+    "unicode": "1F634",
+    "name": "자고 있는 얼굴",
+    "keywords": [
+      "얼굴",
+      "졸고 있는 얼굴",
+      "자고 있는 얼굴"
+    ]
+  },
+  {
+    "index": 84,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🛌",
+    "unicode": "1F6CC",
+    "name": "침대에 누운 사람",
+    "keywords": [
+      "침대",
+      "호텔",
+      "침대에 누운 사람"
+    ]
+  },
+  {
+    "index": 85,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🎽",
+    "unicode": "1F3BD",
+    "name": "운동복 상의",
+    "keywords": [
+      "운동복",
+      "러닝 셔츠",
+      "민소매 상의",
+      "운동복 상의"
+    ]
+  },
+  {
+    "index": 86,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "👟",
+    "unicode": "1F45F",
+    "name": "스니커즈",
+    "keywords": [
+      "신발",
+      "운동화",
+      "스니커즈"
+    ]
+  },
+  {
+    "index": 87,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🎾",
+    "unicode": "1F3BE",
+    "name": "테니스 공",
+    "keywords": [
+      "운동",
+      "테니스",
+      "스포츠",
+      "테니스 공"
+    ]
+  },
+  {
+    "index": 88,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏀",
+    "unicode": "1F3C0",
+    "name": "스포츠",
+    "keywords": [
+      "농구",
+      "운동",
+      "농구공",
+      "스포츠"
+    ]
+  },
+  {
+    "index": 89,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🥽",
+    "unicode": "1F97D",
+    "name": "안구 보호 장비",
+    "keywords": [
+      "고글",
+      "수영",
+      "용접",
+      "물안경",
+      "수영 안경",
+      "안구 보호 장비"
+    ]
+  },
+  {
+    "index": 90,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "💨",
+    "unicode": "1F4A8",
+    "name": "달려나감",
+    "keywords": [
+      "슝",
+      "후다닥",
+      "달려나감"
+    ]
+  },
+  {
+    "index": 91,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🧟",
+    "unicode": "1F9DF",
+    "name": "워킹 데드",
+    "keywords": [
+      "좀비",
+      "언데드",
+      "워킹 데드"
+    ]
+  },
+  {
+    "index": 92,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🩱",
+    "unicode": "1FA71",
+    "name": "원피스 수영복",
+    "keywords": [
+      "수영복",
+      "원피스 수영복"
+    ]
+  },
+  {
+    "index": 93,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🩲",
+    "unicode": "1FA72",
+    "name": "삼각 수영복",
+    "keywords": [
+      "수영복",
+      "언더웨어",
+      "삼각 수영복"
+    ]
+  },
+  {
+    "index": 94,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🩺",
+    "unicode": "1FA7A",
+    "name": "심박수",
+    "keywords": [
+      "의사",
+      "청진기",
+      "심박수"
+    ]
+  },
+  {
+    "index": 95,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏓",
+    "unicode": "1F3D3",
+    "name": "탁구채",
+    "keywords": [
+      "탁구",
+      "탁구공",
+      "탁구채"
+    ]
+  },
+  {
+    "index": 96,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "⚽",
+    "unicode": "26BD",
+    "name": "축구공",
+    "keywords": [
+      "공",
+      "축구",
+      "축구공"
+    ]
+  },
+  {
+    "index": 97,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "⚾",
+    "unicode": "26BE",
+    "name": "야구공",
+    "keywords": [
+      "공",
+      "야구",
+      "야구공"
+    ]
+  },
+  {
+    "index": 98,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🪜",
+    "unicode": "1FA9C",
+    "name": "사다리",
+    "keywords": [
+      "계단",
+      "단계",
+      "상승",
+      "사다리"
+    ]
+  },
+  {
+    "index": 99,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏈",
+    "unicode": "1F3C8",
+    "name": "미식축구공",
+    "keywords": [
+      "운동",
+      "스포츠",
+      "미식축구",
+      "미식축구공"
+    ]
+  },
+  {
+    "index": 100,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏉",
+    "unicode": "1F3C9",
+    "name": "스포츠",
+    "keywords": [
+      "럭비",
+      "운동",
+      "럭비공",
+      "스포츠"
+    ]
+  },
+  {
+    "index": 101,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏏",
+    "unicode": "1F3CF",
+    "name": "크리켓",
+    "keywords": [
+      "공",
+      "운동",
+      "크리켓"
+    ]
+  },
+  {
+    "index": 102,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏌️",
+    "unicode": "1F3CC-FE0F",
+    "name": "골프치는 사람",
+    "keywords": [
+      "공",
+      "골프",
+      "필드",
+      "골프치는 사람"
+    ]
+  },
+  {
+    "index": 103,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏥",
+    "unicode": "1F3E5",
+    "name": "메디컬",
+    "keywords": [
+      "병원",
+      "건물",
+      "빌딩",
+      "의사",
+      "메디컬"
+    ]
+  },
+  {
+    "index": 104,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🚵",
+    "unicode": "1F6B5",
+    "name": "산악 자전거 타는 사람",
+    "keywords": [
+      "산악 자전거 주행",
+      "산악 자전거 타는 사람"
+    ]
+  },
+  {
+    "index": 105,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🧢",
+    "unicode": "1F9E2",
+    "name": "야구모자",
+    "keywords": [
+      "야구모자"
+    ]
+  },
+  {
+    "index": 106,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "😷",
+    "unicode": "1F637",
+    "name": "마스크 낀 얼굴",
+    "keywords": [
+      "감기",
+      "얼굴",
+      "황사",
+      "마스크",
+      "마스크 낀 얼굴"
+    ]
+  },
+  {
+    "index": 107,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "👙",
+    "unicode": "1F459",
+    "name": "수영복",
+    "keywords": [
+      "비키니",
+      "수영복"
+    ]
+  },
+  {
+    "index": 108,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🛏️",
+    "unicode": "1F6CF-FE0F",
+    "name": "호텔",
+    "keywords": [
+      "침대",
+      "호텔"
+    ]
+  },
+  {
+    "index": 109,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "💤",
+    "unicode": "1F4A4",
+    "name": "자고 있음",
+    "keywords": [
+      "졸림",
+      "수면",
+      "쿨쿨",
+      "자고 있음"
+    ]
+  },
+  {
+    "index": 110,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "💊",
+    "unicode": "1F48A",
+    "name": "알약",
+    "keywords": [
+      "약",
+      "알약"
+    ]
+  },
+  {
+    "index": 111,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🩻",
+    "unicode": "1FA7B",
+    "name": "엑스레이",
+    "keywords": [
+      "뼈",
+      "의료",
+      "의사",
+      "해골",
+      "엑스레이"
+    ]
+  },
+  {
+    "index": 112,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏅",
+    "unicode": "1F3C5",
+    "name": "스포츠 메달",
+    "keywords": [
+      "경기",
+      "메달",
+      "스포츠",
+      "스포츠 메달"
+    ]
+  },
+  {
+    "index": 113,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🪥",
+    "unicode": "1FAA5",
+    "name": "깨끗한",
+    "keywords": [
+      "솔",
+      "이",
+      "칫솔",
+      "욕실",
+      "위생",
+      "깨끗한"
+    ]
+  },
+  {
+    "index": 114,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🎈",
+    "unicode": "1F388",
+    "name": "파티",
+    "keywords": [
+      "풍선",
+      "축하",
+      "파티"
+    ]
+  },
+  {
+    "index": 115,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🎊",
+    "unicode": "1F38A",
+    "name": "박 터트리기",
+    "keywords": [
+      "기념",
+      "축하",
+      "박 터트리기"
+    ]
+  },
+  {
+    "index": 116,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🩳",
+    "unicode": "1FA73",
+    "name": "수영복",
+    "keywords": [
+      "반바지",
+      "수영복"
+    ]
+  },
+  {
+    "index": 117,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🥎",
+    "unicode": "1F94E",
+    "name": "소프트볼",
+    "keywords": [
+      "공",
+      "야구공",
+      "소프트볼"
+    ]
+  },
+  {
+    "index": 118,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏐",
+    "unicode": "1F3D0",
+    "name": "배구공",
+    "keywords": [
+      "배구",
+      "배구공"
+    ]
+  },
+  {
+    "index": 119,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🎳",
+    "unicode": "1F3B3",
+    "name": "볼링 게임",
+    "keywords": [
+      "볼링",
+      "볼링공",
+      "볼링핀",
+      "볼링 게임"
+    ]
+  },
+  {
+    "index": 120,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🏑",
+    "unicode": "1F3D1",
+    "name": "하키 스틱",
+    "keywords": [
+      "필드 하키",
+      "하키 스틱"
+    ]
+  },
+  {
+    "index": 121,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🥍",
+    "unicode": "1F94D",
+    "name": "라크로스",
+    "keywords": [
+      "골",
+      "스틱",
+      "그물채",
+      "라크로스"
+    ]
+  },
+  {
+    "index": 122,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🎱",
+    "unicode": "1F3B1",
+    "name": "당구 게임",
+    "keywords": [
+      "당구",
+      "당구공",
+      "당구 게임"
+    ]
+  },
+  {
+    "index": 123,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🔮",
+    "unicode": "1F52E",
+    "name": "수정 구슬",
+    "keywords": [
+      "구슬",
+      "수정",
+      "예언",
+      "운세",
+      "수정 구슬"
+    ]
+  },
+  {
+    "index": 124,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🧶",
+    "unicode": "1F9F6",
+    "name": "코바늘",
+    "keywords": [
+      "니트",
+      "실뭉치",
+      "코바늘"
+    ]
+  },
+  {
+    "index": 125,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🤸",
+    "unicode": "1F938",
+    "name": "옆돌기하는 사람",
+    "keywords": [
+      "체조",
+      "옆돌기",
+      "풍차돌리기",
+      "옆돌기하는 사람"
+    ]
+  },
+  {
+    "index": 126,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🚲",
+    "unicode": "1F6B2",
+    "name": "교통수단",
+    "keywords": [
+      "자전거",
+      "바이크",
+      "교통수단"
+    ]
+  },
+  {
+    "index": 127,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "♥️",
+    "unicode": "2665-FE0F",
+    "name": "카드 게임",
+    "keywords": [
+      "하트",
+      "카드 게임"
+    ]
+  },
+  {
+    "index": 128,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "⚕️",
+    "unicode": "2695-FE0F",
+    "name": "의술의 신",
+    "keywords": [
+      "의학",
+      "의학 기호",
+      "의술의 신"
+    ]
+  },
+  {
+    "index": 129,
+    "group": "health_exercise",
+    "groupName": "건강과 운동",
+    "emoji": "🧗",
+    "unicode": "1F9D7",
+    "name": "클라이밍하는 사람",
+    "keywords": [
+      "클라이밍",
+      "클라이밍하는 사람"
+    ]
+  },
+  {
+    "index": 130,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🏠",
+    "unicode": "1F3E0",
+    "name": "주택",
+    "keywords": [
+      "집",
+      "건물",
+      "주택"
+    ]
+  },
+  {
+    "index": 131,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🧹",
+    "unicode": "1F9F9",
+    "name": "빗자루",
+    "keywords": [
+      "마녀",
+      "비질",
+      "빗자루"
+    ]
+  },
+  {
+    "index": 132,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🧺",
+    "unicode": "1F9FA",
+    "name": "빨래바구니",
+    "keywords": [
+      "바구니",
+      "빨래바구니"
+    ]
+  },
+  {
+    "index": 133,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🚿",
+    "unicode": "1F6BF",
+    "name": "샤워",
+    "keywords": [
+      "물",
+      "샤워"
+    ]
+  },
+  {
+    "index": 134,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🛒",
+    "unicode": "1F6D2",
+    "name": "쇼핑카트",
+    "keywords": [
+      "카트",
+      "장보기",
+      "쇼핑카트"
+    ]
+  },
+  {
+    "index": 135,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🐕",
+    "unicode": "1F415",
+    "name": "멍멍이",
+    "keywords": [
+      "개",
+      "동물",
+      "강아지",
+      "개새끼",
+      "멍멍이"
+    ]
+  },
+  {
+    "index": 136,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🐈",
+    "unicode": "1F408",
+    "name": "냐옹이 동물",
+    "keywords": [
+      "괭이",
+      "집사",
+      "고양이",
+      "야옹이",
+      "냐옹이 동물"
+    ]
+  },
+  {
+    "index": 137,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "✅",
+    "unicode": "2705",
+    "name": "체크 표시",
+    "keywords": [
+      "체크",
+      "체크 표시"
+    ]
+  },
+  {
+    "index": 138,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "⏰",
+    "unicode": "23F0",
+    "name": "알람 시계",
+    "keywords": [
+      "시계",
+      "알람",
+      "알람 시계"
+    ]
+  },
+  {
+    "index": 139,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🧼",
+    "unicode": "1F9FC",
+    "name": "비누 그릇",
+    "keywords": [
+      "비누",
+      "목욕",
+      "클렌징",
+      "비누 거품",
+      "비누 그릇"
+    ]
+  },
+  {
+    "index": 140,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🧽",
+    "unicode": "1F9FD",
+    "name": "스펀지",
+    "keywords": [
+      "청소",
+      "흡수",
+      "스펀지"
+    ]
+  },
+  {
+    "index": 141,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🛍️",
+    "unicode": "1F6CD-FE0F",
+    "name": "쇼핑가방",
+    "keywords": [
+      "쇼핑백",
+      "쇼핑가방"
+    ]
+  },
+  {
+    "index": 142,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🪴",
+    "unicode": "1FAB4",
+    "name": "키우다",
+    "keywords": [
+      "집",
+      "분재",
+      "식물",
+      "자라다",
+      "지루한",
+      "키우다"
+    ]
+  },
+  {
+    "index": 143,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🏡",
+    "unicode": "1F3E1",
+    "name": "정원이 있는 주택",
+    "keywords": [
+      "정원이 있는 집",
+      "정원이 있는 주택"
+    ]
+  },
+  {
+    "index": 144,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🔪",
+    "unicode": "1F52A",
+    "name": "요리용 칼",
+    "keywords": [
+      "식칼",
+      "요리용 칼"
+    ]
+  },
+  {
+    "index": 145,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "💰",
+    "unicode": "1F4B0",
+    "name": "돈주머니",
+    "keywords": [
+      "돈가방",
+      "주머니",
+      "돈주머니"
+    ]
+  },
+  {
+    "index": 146,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🫧",
+    "unicode": "1FAE7",
+    "name": "물 속",
+    "keywords": [
+      "거품",
+      "비누",
+      "청소",
+      "트림",
+      "물 속"
+    ]
+  },
+  {
+    "index": 147,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🐶",
+    "unicode": "1F436",
+    "name": "강아지 얼굴",
+    "keywords": [
+      "개",
+      "개띠",
+      "동물",
+      "강아지",
+      "강아지 얼굴"
+    ]
+  },
+  {
+    "index": 148,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🐱",
+    "unicode": "1F431",
+    "name": "고양이 얼굴",
+    "keywords": [
+      "동물",
+      "고양이",
+      "고양이 얼굴"
+    ]
+  },
+  {
+    "index": 149,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "👪",
+    "unicode": "1F46A",
+    "name": "사람들",
+    "keywords": [
+      "가족",
+      "아빠",
+      "아이",
+      "엄마",
+      "사람들"
+    ]
+  },
+  {
+    "index": 150,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🍳",
+    "unicode": "1F373",
+    "name": "계란 프라이",
+    "keywords": [
+      "요리",
+      "프라이팬",
+      "계란 프라이"
+    ]
+  },
+  {
+    "index": 151,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🍽️",
+    "unicode": "1F37D-FE0F",
+    "name": "포크와 나이프가 있는 접시",
+    "keywords": [
+      "접시",
+      "포크",
+      "나이프",
+      "포크와 나이프가 있는 접시"
+    ]
+  },
+  {
+    "index": 152,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🍴",
+    "unicode": "1F374",
+    "name": "포크와 나이프",
+    "keywords": [
+      "식당",
+      "포크",
+      "나이프",
+      "포크와 나이프"
+    ]
+  },
+  {
+    "index": 153,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🛖",
+    "unicode": "1F6D6",
+    "name": "유르트",
+    "keywords": [
+      "집",
+      "원실",
+      "오두막",
+      "유르트"
+    ]
+  },
+  {
+    "index": 154,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "👜",
+    "unicode": "1F45C",
+    "name": "핸드백",
+    "keywords": [
+      "백",
+      "가방",
+      "핸드백"
+    ]
+  },
+  {
+    "index": 155,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "👝",
+    "unicode": "1F45D",
+    "name": "파우치",
+    "keywords": [
+      "가방",
+      "파우치"
+    ]
+  },
+  {
+    "index": 156,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🪙",
+    "unicode": "1FA99",
+    "name": "보물",
+    "keywords": [
+      "금",
+      "돈",
+      "은",
+      "동전",
+      "금속",
+      "보물"
+    ]
+  },
+  {
+    "index": 157,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "💴",
+    "unicode": "1F4B4",
+    "name": "일본 화폐",
+    "keywords": [
+      "엔",
+      "엔화",
+      "일본 돈",
+      "일본 화폐"
+    ]
+  },
+  {
+    "index": 158,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "💵",
+    "unicode": "1F4B5",
+    "name": "미국 화폐",
+    "keywords": [
+      "달러",
+      "달러화",
+      "미국 돈",
+      "미국 화폐"
+    ]
+  },
+  {
+    "index": 159,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "💶",
+    "unicode": "1F4B6",
+    "name": "유럽 화폐",
+    "keywords": [
+      "유로",
+      "유로화",
+      "유럽 돈",
+      "유럽 화폐"
+    ]
+  },
+  {
+    "index": 160,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "💷",
+    "unicode": "1F4B7",
+    "name": "영국 화폐",
+    "keywords": [
+      "파운드",
+      "영국 돈",
+      "파운드화",
+      "영국 화폐"
+    ]
+  },
+  {
+    "index": 161,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "💸",
+    "unicode": "1F4B8",
+    "name": "날개 달린 돈",
+    "keywords": [
+      "돈",
+      "손해",
+      "지폐",
+      "돈 날림",
+      "날아가는 돈",
+      "날개 달린 돈"
+    ]
+  },
+  {
+    "index": 162,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "💳",
+    "unicode": "1F4B3",
+    "name": "신용카드",
+    "keywords": [
+      "카드",
+      "신용카드"
+    ]
+  },
+  {
+    "index": 163,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🎺",
+    "unicode": "1F3BA",
+    "name": "트럼펫",
+    "keywords": [
+      "악기",
+      "연주",
+      "음악",
+      "트럼펫"
+    ]
+  },
+  {
+    "index": 164,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🪝",
+    "unicode": "1FA9D",
+    "name": "걸리게 하다",
+    "keywords": [
+      "고리",
+      "곡선",
+      "갈고리",
+      "팔리는",
+      "걸리게 하다"
+    ]
+  },
+  {
+    "index": 165,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🧫",
+    "unicode": "1F9EB",
+    "name": "페트리 접시",
+    "keywords": [
+      "미생물",
+      "생물학",
+      "실험실",
+      "박테리아",
+      "페트리 접시"
+    ]
+  },
+  {
+    "index": 166,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🪪",
+    "unicode": "1FAAA",
+    "name": "허가증",
+    "keywords": [
+      "id",
+      "보안",
+      "신분증",
+      "자격증",
+      "허가증"
+    ]
+  },
+  {
+    "index": 167,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🛀",
+    "unicode": "1F6C0",
+    "name": "목욕하는 사람",
+    "keywords": [
+      "욕조",
+      "목욕하는 사람"
+    ]
+  },
+  {
+    "index": 168,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "👚",
+    "unicode": "1F45A",
+    "name": "블라우스",
+    "keywords": [
+      "여성복",
+      "블라우스"
+    ]
+  },
+  {
+    "index": 169,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🔍",
+    "unicode": "1F50D",
+    "name": "왼쪽으로 향한 돋보기",
+    "keywords": [
+      "검색",
+      "검색하기",
+      "왼쪽으로 향한 돋보기"
+    ]
+  },
+  {
+    "index": 170,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🔎",
+    "unicode": "1F50E",
+    "name": "오른쪽으로 향한 돋보기",
+    "keywords": [
+      "검색",
+      "검색하기",
+      "오른쪽으로 향한 돋보기"
+    ]
+  },
+  {
+    "index": 171,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🔦",
+    "unicode": "1F526",
+    "name": "손전등",
+    "keywords": [
+      "전등",
+      "손전등"
+    ]
+  },
+  {
+    "index": 172,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "✂️",
+    "unicode": "2702-FE0F",
+    "name": "도구",
+    "keywords": [
+      "가위",
+      "기구",
+      "도구"
+    ]
+  },
+  {
+    "index": 173,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "🔨",
+    "unicode": "1F528",
+    "name": "해머",
+    "keywords": [
+      "망치",
+      "도구",
+      "해머"
+    ]
+  },
+  {
+    "index": 174,
+    "group": "daily_life",
+    "groupName": "생활과 돌봄",
+    "emoji": "⛏️",
+    "unicode": "26CF-FE0F",
+    "name": "곡괭이",
+    "keywords": [
+      "광산",
+      "곡괭이"
+    ]
+  },
+  {
+    "index": 175,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "💧",
+    "unicode": "1F4A7",
+    "name": "물방울",
+    "keywords": [
+      "땀",
+      "물방울"
+    ]
+  },
+  {
+    "index": 176,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥛",
+    "unicode": "1F95B",
+    "name": "우유 한잔",
+    "keywords": [
+      "밀크",
+      "우유",
+      "한잔",
+      "글라스",
+      "우유 한잔"
+    ]
+  },
+  {
+    "index": 177,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "☕",
+    "unicode": "2615",
+    "name": "뜨거운 음료",
+    "keywords": [
+      "차",
+      "음료",
+      "커피",
+      "뜨거운 음료"
+    ]
+  },
+  {
+    "index": 178,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🫖",
+    "unicode": "1FAD6",
+    "name": "찻주전자",
+    "keywords": [
+      "차",
+      "냄비",
+      "음료",
+      "찻주전자"
+    ]
+  },
+  {
+    "index": 179,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍎",
+    "unicode": "1F34E",
+    "name": "빨간 사과",
+    "keywords": [
+      "과일",
+      "빨간 사과"
+    ]
+  },
+  {
+    "index": 180,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍌",
+    "unicode": "1F34C",
+    "name": "바나나",
+    "keywords": [
+      "과일",
+      "바나나"
+    ]
+  },
+  {
+    "index": 181,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥗",
+    "unicode": "1F957",
+    "name": "야채샐러드",
+    "keywords": [
+      "건강",
+      "야채",
+      "채소",
+      "샐러드",
+      "야채샐러드"
+    ]
+  },
+  {
+    "index": 182,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍚",
+    "unicode": "1F35A",
+    "name": "밥공기",
+    "keywords": [
+      "밥",
+      "밥공기"
+    ]
+  },
+  {
+    "index": 183,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍞",
+    "unicode": "1F35E",
+    "name": "식빵",
+    "keywords": [
+      "빵",
+      "식빵"
+    ]
+  },
+  {
+    "index": 184,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥚",
+    "unicode": "1F95A",
+    "name": "식품",
+    "keywords": [
+      "달걀",
+      "계란",
+      "식품"
+    ]
+  },
+  {
+    "index": 185,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍵",
+    "unicode": "1F375",
+    "name": "찻집",
+    "keywords": [
+      "차",
+      "찻잔",
+      "찻집"
+    ]
+  },
+  {
+    "index": 186,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥕",
+    "unicode": "1F955",
+    "name": "채소",
+    "keywords": [
+      "당근",
+      "식품",
+      "채소"
+    ]
+  },
+  {
+    "index": 187,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥐",
+    "unicode": "1F950",
+    "name": "크루아상",
+    "keywords": [
+      "빵",
+      "식품",
+      "프랑스",
+      "크루아상"
+    ]
+  },
+  {
+    "index": 188,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🧋",
+    "unicode": "1F9CB",
+    "name": "버블티",
+    "keywords": [
+      "차",
+      "펄",
+      "버블",
+      "우유",
+      "버블티"
+    ]
+  },
+  {
+    "index": 189,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍉",
+    "unicode": "1F349",
+    "name": "과일",
+    "keywords": [
+      "수박",
+      "과일"
+    ]
+  },
+  {
+    "index": 190,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥑",
+    "unicode": "1F951",
+    "name": "아보카드",
+    "keywords": [
+      "과일",
+      "식품",
+      "열매",
+      "아보카도",
+      "아보카드"
+    ]
+  },
+  {
+    "index": 191,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍅",
+    "unicode": "1F345",
+    "name": "토마토",
+    "keywords": [
+      "채소",
+      "토마토"
+    ]
+  },
+  {
+    "index": 192,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥔",
+    "unicode": "1F954",
+    "name": "포테이토",
+    "keywords": [
+      "감자",
+      "식품",
+      "채소",
+      "포테이토"
+    ]
+  },
+  {
+    "index": 193,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥒",
+    "unicode": "1F952",
+    "name": "피클",
+    "keywords": [
+      "오이",
+      "식품",
+      "채소",
+      "피클"
+    ]
+  },
+  {
+    "index": 194,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥣",
+    "unicode": "1F963",
+    "name": "스푼과 사발",
+    "keywords": [
+      "아침",
+      "콘지",
+      "시리얼",
+      "스푼과 사발"
+    ]
+  },
+  {
+    "index": 195,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🧉",
+    "unicode": "1F9C9",
+    "name": "마테차",
+    "keywords": [
+      "차",
+      "음료",
+      "마테차"
+    ]
+  },
+  {
+    "index": 196,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍍",
+    "unicode": "1F34D",
+    "name": "파인애플",
+    "keywords": [
+      "과일",
+      "파인애플"
+    ]
+  },
+  {
+    "index": 197,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍏",
+    "unicode": "1F34F",
+    "name": "파란 사과",
+    "keywords": [
+      "과일",
+      "초록 사과",
+      "파란 사과"
+    ]
+  },
+  {
+    "index": 198,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍆",
+    "unicode": "1F346",
+    "name": "채소",
+    "keywords": [
+      "가지",
+      "야채",
+      "채소"
+    ]
+  },
+  {
+    "index": 199,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍈",
+    "unicode": "1F348",
+    "name": "채소",
+    "keywords": [
+      "멜론",
+      "과일",
+      "야채",
+      "채소"
+    ]
+  },
+  {
+    "index": 200,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🚱",
+    "unicode": "1F6B1",
+    "name": "마실 수 없는 물",
+    "keywords": [
+      "섭취 금지",
+      "마시지 마시오",
+      "마실 수 없는 물"
+    ]
+  },
+  {
+    "index": 201,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍼",
+    "unicode": "1F37C",
+    "name": "아기 젖병",
+    "keywords": [
+      "젖병",
+      "우유",
+      "아기 젖병"
+    ]
+  },
+  {
+    "index": 202,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥞",
+    "unicode": "1F95E",
+    "name": "핫케이크",
+    "keywords": [
+      "식품",
+      "크레페",
+      "팬케이크",
+      "핫케이크"
+    ]
+  },
+  {
+    "index": 203,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥓",
+    "unicode": "1F953",
+    "name": "돼지고기",
+    "keywords": [
+      "고기",
+      "식품",
+      "베이컨",
+      "돼지고기"
+    ]
+  },
+  {
+    "index": 204,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥜",
+    "unicode": "1F95C",
+    "name": "견과류",
+    "keywords": [
+      "땅콩",
+      "넛츠",
+      "식품",
+      "견과류"
+    ]
+  },
+  {
+    "index": 205,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍜",
+    "unicode": "1F35C",
+    "name": "라면",
+    "keywords": [
+      "면",
+      "국수",
+      "라면"
+    ]
+  },
+  {
+    "index": 206,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🍶",
+    "unicode": "1F376",
+    "name": "병과 술잔",
+    "keywords": [
+      "술",
+      "사케",
+      "병과 술잔"
+    ]
+  },
+  {
+    "index": 207,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥖",
+    "unicode": "1F956",
+    "name": "프랑스",
+    "keywords": [
+      "빵",
+      "식품",
+      "바게트",
+      "프랑스"
+    ]
+  },
+  {
+    "index": 208,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥙",
+    "unicode": "1F959",
+    "name": "밀전병에 싼 요리",
+    "keywords": [
+      "부리또",
+      "밀전병에 싼 요리"
+    ]
+  },
+  {
+    "index": 209,
+    "group": "food_drink",
+    "groupName": "식사와 수분",
+    "emoji": "🥤",
+    "unicode": "1F964",
+    "name": "빨대와 컵",
+    "keywords": [
+      "소다",
+      "주스",
+      "빨대와 컵"
+    ]
+  },
+  {
+    "index": 210,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌱",
+    "unicode": "1F331",
+    "name": "싹이 돋다",
+    "keywords": [
+      "새싹",
+      "싹이 돋다"
+    ]
+  },
+  {
+    "index": 211,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌳",
+    "unicode": "1F333",
+    "name": "낙엽수",
+    "keywords": [
+      "나무",
+      "낙엽수"
+    ]
+  },
+  {
+    "index": 212,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌿",
+    "unicode": "1F33F",
+    "name": "잎사귀",
+    "keywords": [
+      "풀",
+      "잎",
+      "잎사귀"
+    ]
+  },
+  {
+    "index": 213,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🍃",
+    "unicode": "1F343",
+    "name": "바람에 흔들리는 나뭇잎",
+    "keywords": [
+      "가을 낙엽",
+      "바람에 떨어지는 잎",
+      "바람에 흔들리는 나뭇잎"
+    ]
+  },
+  {
+    "index": 214,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌻",
+    "unicode": "1F33B",
+    "name": "해바라기",
+    "keywords": [
+      "꽃",
+      "해바라기"
+    ]
+  },
+  {
+    "index": 215,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "☀️",
+    "unicode": "2600-FE0F",
+    "name": "맑음",
+    "keywords": [
+      "해",
+      "태양",
+      "더움",
+      "맑음"
+    ]
+  },
+  {
+    "index": 216,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌙",
+    "unicode": "1F319",
+    "name": "초승달",
+    "keywords": [
+      "달",
+      "초승달"
+    ]
+  },
+  {
+    "index": 217,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "⭐",
+    "unicode": "2B50",
+    "name": "별",
+    "keywords": [
+      "별"
+    ]
+  },
+  {
+    "index": 218,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌈",
+    "unicode": "1F308",
+    "name": "레인보우",
+    "keywords": [
+      "무지개",
+      "레인보우"
+    ]
+  },
+  {
+    "index": 219,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "⛰️",
+    "unicode": "26F0-FE0F",
+    "name": "산 정상",
+    "keywords": [
+      "산",
+      "산 정상"
+    ]
+  },
+  {
+    "index": 220,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌦️",
+    "unicode": "1F326-FE0F",
+    "name": "비구름 뒤의 태양",
+    "keywords": [
+      "비",
+      "해",
+      "구름",
+      "비구름 뒤의 태양"
+    ]
+  },
+  {
+    "index": 221,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "⛅",
+    "unicode": "26C5",
+    "name": "구름에 가린 해",
+    "keywords": [
+      "해",
+      "구름",
+      "구름 뒤의 해",
+      "구름에 가린 해"
+    ]
+  },
+  {
+    "index": 222,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌤️",
+    "unicode": "1F324-FE0F",
+    "name": "작은 구름 뒤의 태양",
+    "keywords": [
+      "해",
+      "구름",
+      "흐림",
+      "작은 구름 뒤의 태양"
+    ]
+  },
+  {
+    "index": 223,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌥️",
+    "unicode": "1F325-FE0F",
+    "name": "큰 구름 뒤의 태양",
+    "keywords": [
+      "해",
+      "구름",
+      "흐림",
+      "큰 구름 뒤의 태양"
+    ]
+  },
+  {
+    "index": 224,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "⛱️",
+    "unicode": "26F1-FE0F",
+    "name": "땅에 꽂힌 파라솔",
+    "keywords": [
+      "우산",
+      "파라솔",
+      "해변가",
+      "땅에 꽂힌 파라솔"
+    ]
+  },
+  {
+    "index": 225,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌄",
+    "unicode": "1F304",
+    "name": "산에서 떠오르는 해",
+    "keywords": [
+      "산",
+      "해",
+      "아침 해",
+      "해가 뜸",
+      "산에 해가 뜸",
+      "산에서 떠오르는 해"
+    ]
+  },
+  {
+    "index": 226,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌸",
+    "unicode": "1F338",
+    "name": "꽃송이",
+    "keywords": [
+      "꽃",
+      "벚꽃",
+      "꽃송이"
+    ]
+  },
+  {
+    "index": 227,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌼",
+    "unicode": "1F33C",
+    "name": "꽃송이",
+    "keywords": [
+      "꽃",
+      "꽃송이"
+    ]
+  },
+  {
+    "index": 228,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌵",
+    "unicode": "1F335",
+    "name": "선인장",
+    "keywords": [
+      "나무",
+      "식물",
+      "선인장"
+    ]
+  },
+  {
+    "index": 229,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "⛈️",
+    "unicode": "26C8-FE0F",
+    "name": "번개가 치는 비구름",
+    "keywords": [
+      "비",
+      "구름",
+      "번개",
+      "번개가 치는 비구름"
+    ]
+  },
+  {
+    "index": 230,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌧️",
+    "unicode": "1F327-FE0F",
+    "name": "비구름",
+    "keywords": [
+      "비",
+      "구름",
+      "비구름"
+    ]
+  },
+  {
+    "index": 231,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🎋",
+    "unicode": "1F38B",
+    "name": "소원 쪽지 매달기",
+    "keywords": [
+      "기원 쪽지",
+      "소원 빌기",
+      "소원 쪽지",
+      "소원을 건 나무",
+      "소원 쪽지 매달기"
+    ]
+  },
+  {
+    "index": 232,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌲",
+    "unicode": "1F332",
+    "name": "상록수",
+    "keywords": [
+      "나무",
+      "소나무",
+      "상록수"
+    ]
+  },
+  {
+    "index": 233,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🌴",
+    "unicode": "1F334",
+    "name": "열대 나무",
+    "keywords": [
+      "나무",
+      "야자수",
+      "열대 나무"
+    ]
+  },
+  {
+    "index": 234,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "☘️",
+    "unicode": "2618-FE0F",
+    "name": "토끼풀",
+    "keywords": [
+      "풀",
+      "세잎",
+      "토끼풀"
+    ]
+  },
+  {
+    "index": 235,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🏵️",
+    "unicode": "1F3F5-FE0F",
+    "name": "장미",
+    "keywords": [
+      "꽃",
+      "장미"
+    ]
+  },
+  {
+    "index": 236,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🍀",
+    "unicode": "1F340",
+    "name": "네잎클로버",
+    "keywords": [
+      "행운",
+      "클로버",
+      "네잎클로버"
+    ]
+  },
+  {
+    "index": 237,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "💐",
+    "unicode": "1F490",
+    "name": "꽃다발",
+    "keywords": [
+      "꽃",
+      "부케",
+      "꽃다발"
+    ]
+  },
+  {
+    "index": 238,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "💮",
+    "unicode": "1F4AE",
+    "name": "꽃 표시",
+    "keywords": [
+      "꽃",
+      "흰 꽃",
+      "꽃 도장",
+      "꽃 표시"
+    ]
+  },
+  {
+    "index": 239,
+    "group": "nature_growth",
+    "groupName": "자연과 성장",
+    "emoji": "🪷",
+    "unicode": "1FAB7",
+    "name": "힌두교",
+    "keywords": [
+      "꽃",
+      "연꽃",
+      "불교",
+      "순수",
+      "인도",
+      "베트남",
+      "힌두교"
+    ]
+  },
+  {
+    "index": 240,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "😊",
+    "unicode": "1F60A",
+    "name": "미소 짓는 눈으로 살짝 웃는 얼굴",
+    "keywords": [
+      "미소",
+      "얼굴",
+      "눈웃음",
+      "스마일",
+      "웃는 얼굴",
+      "미소 짓는 눈으로 살짝 웃는 얼굴"
+    ]
+  },
+  {
+    "index": 241,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "😄",
+    "unicode": "1F604",
+    "name": "미소 짓는 눈으로 활짝 웃는 얼굴",
+    "keywords": [
+      "미소",
+      "얼굴",
+      "스마일",
+      "입 벌리고 웃는 눈웃음 얼굴",
+      "미소 짓는 눈으로 활짝 웃는 얼굴"
+    ]
+  },
+  {
+    "index": 242,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "👍",
+    "unicode": "1F44D",
+    "name": "올린 엄지",
+    "keywords": [
+      "따봉",
+      "최고",
+      "좋아요",
+      "올린 엄지"
+    ]
+  },
+  {
+    "index": 243,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "👏",
+    "unicode": "1F44F",
+    "name": "손뼉 치기",
+    "keywords": [
+      "손뼉",
+      "박수",
+      "박수 치기",
+      "손뼉 치기"
+    ]
+  },
+  {
+    "index": 244,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎉",
+    "unicode": "1F389",
+    "name": "축하 파티",
+    "keywords": [
+      "파티",
+      "축하 파티"
+    ]
+  },
+  {
+    "index": 245,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🏆",
+    "unicode": "1F3C6",
+    "name": "트로피",
+    "keywords": [
+      "우승",
+      "트로피"
+    ]
+  },
+  {
+    "index": 246,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎁",
+    "unicode": "1F381",
+    "name": "선물 포장",
+    "keywords": [
+      "선물",
+      "축하",
+      "선물 포장"
+    ]
+  },
+  {
+    "index": 247,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "😆",
+    "unicode": "1F606",
+    "name": "눈 감고 웃는 얼굴",
+    "keywords": [
+      "얼굴",
+      "눈 감고 미소",
+      "눈웃음짓는 얼굴",
+      "입 벌리고 미소",
+      "눈 감고 웃는 얼굴"
+    ]
+  },
+  {
+    "index": 248,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "😂",
+    "unicode": "1F602",
+    "name": "기쁨의 눈물을 흘리는 얼굴",
+    "keywords": [
+      "기쁨",
+      "눈물",
+      "얼굴",
+      "스마일",
+      "기쁨의 눈물을 흘리는 얼굴"
+    ]
+  },
+  {
+    "index": 249,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🥳",
+    "unicode": "1F973",
+    "name": "파티하는 얼굴",
+    "keywords": [
+      "나팔",
+      "축하",
+      "파티",
+      "고깔모자",
+      "파티하는 얼굴"
+    ]
+  },
+  {
+    "index": 250,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "💗",
+    "unicode": "1F497",
+    "name": "깊어지는 사랑",
+    "keywords": [
+      "사랑",
+      "커지는 하트",
+      "커지는 마음",
+      "깊어지는 마음",
+      "깊어지는 사랑"
+    ]
+  },
+  {
+    "index": 251,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🪅",
+    "unicode": "1FA85",
+    "name": "피냐타",
+    "keywords": [
+      "축하",
+      "파티",
+      "피냐타"
+    ]
+  },
+  {
+    "index": 252,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎆",
+    "unicode": "1F386",
+    "name": "불꽃 축제",
+    "keywords": [
+      "축하",
+      "불꽃놀이",
+      "불꽃 축제"
+    ]
+  },
+  {
+    "index": 253,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎇",
+    "unicode": "1F387",
+    "name": "불꽃 축제",
+    "keywords": [
+      "불꽃",
+      "축하",
+      "폭죽",
+      "불꽃 축제"
+    ]
+  },
+  {
+    "index": 254,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎖️",
+    "unicode": "1F396-FE0F",
+    "name": "무공 훈장",
+    "keywords": [
+      "메달",
+      "훈장",
+      "무공 훈장"
+    ]
+  },
+  {
+    "index": 255,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "😁",
+    "unicode": "1F601",
+    "name": "미소 짓는 눈으로 웃는 얼굴",
+    "keywords": [
+      "미소",
+      "얼굴",
+      "눈웃음",
+      "스마일",
+      "미소 짓는 눈으로 웃는 얼굴"
+    ]
+  },
+  {
+    "index": 256,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "☺️",
+    "unicode": "263A-FE0F",
+    "name": "웃음 짓는 얼굴",
+    "keywords": [
+      "미소",
+      "웃음",
+      "스마일",
+      "웃는 얼굴",
+      "웃음 짓는 얼굴"
+    ]
+  },
+  {
+    "index": 257,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "😹",
+    "unicode": "1F639",
+    "name": "기쁨의 눈물을 흘리는 고양이 얼굴",
+    "keywords": [
+      "고양이",
+      "기쁨의 눈물",
+      "기뻐하면서 우는 고양이",
+      "기쁨의 눈물을 흘리는 고양이 얼굴"
+    ]
+  },
+  {
+    "index": 258,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "😼",
+    "unicode": "1F63C",
+    "name": "고소하다는 웃음 짓는 고양이",
+    "keywords": [
+      "쌤통",
+      "고양이",
+      "썩소 짓는 고양이",
+      "고소하다는 웃음 짓는 고양이"
+    ]
+  },
+  {
+    "index": 259,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🤣",
+    "unicode": "1F923",
+    "name": "바닥을 구르며 웃는 얼굴",
+    "keywords": [
+      "바닥",
+      "웃음",
+      "구르기",
+      "데굴데굴",
+      "바닥을 구르며 웃는 얼굴"
+    ]
+  },
+  {
+    "index": 260,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "💘",
+    "unicode": "1F498",
+    "name": "화살이 꽂힌 하트",
+    "keywords": [
+      "사랑",
+      "큐피드",
+      "화살이 꽂힌 하트"
+    ]
+  },
+  {
+    "index": 261,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "💝",
+    "unicode": "1F49D",
+    "name": "발렌타인 초콜렛 상자",
+    "keywords": [
+      "리본",
+      "사랑",
+      "하트",
+      "선물 상자",
+      "리본 달린 하트",
+      "발렌타인 초콜렛 상자"
+    ]
+  },
+  {
+    "index": 262,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "💓",
+    "unicode": "1F493",
+    "name": "두근거리는 마음",
+    "keywords": [
+      "사랑",
+      "두근두근",
+      "떨리는 마음",
+      "두근거리는 하트",
+      "두근거리는 마음"
+    ]
+  },
+  {
+    "index": 263,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "💞",
+    "unicode": "1F49E",
+    "name": "빙글빙글 하트",
+    "keywords": [
+      "사랑",
+      "하트",
+      "귀여움",
+      "사랑스러움",
+      "회전하는 하트",
+      "빙글빙글 하트"
+    ]
+  },
+  {
+    "index": 264,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "💚",
+    "unicode": "1F49A",
+    "name": "초록색 하트",
+    "keywords": [
+      "사랑",
+      "하트",
+      "녹색 하트",
+      "초록색 하트"
+    ]
+  },
+  {
+    "index": 265,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "💙",
+    "unicode": "1F499",
+    "name": "파란색 하트",
+    "keywords": [
+      "사랑",
+      "하트",
+      "파란 하트",
+      "파란색 하트"
+    ]
+  },
+  {
+    "index": 266,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "💜",
+    "unicode": "1F49C",
+    "name": "보라색 하트",
+    "keywords": [
+      "사랑",
+      "하트",
+      "보라색 하트"
+    ]
+  },
+  {
+    "index": 267,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🤟",
+    "unicode": "1F91F",
+    "name": "사랑을 표시하는 손",
+    "keywords": [
+      "사랑해",
+      "사랑 제스처",
+      "사랑을 표시하는 손"
+    ]
+  },
+  {
+    "index": 268,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🫂",
+    "unicode": "1FAC2",
+    "name": "포옹하는 사람",
+    "keywords": [
+      "안녕",
+      "포옹",
+      "고마워",
+      "잘 가",
+      "포옹하는 사람"
+    ]
+  },
+  {
+    "index": 269,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎐",
+    "unicode": "1F390",
+    "name": "풍경",
+    "keywords": [
+      "종",
+      "풍경"
+    ]
+  },
+  {
+    "index": 270,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎑",
+    "unicode": "1F391",
+    "name": "달맞이 행사",
+    "keywords": [
+      "달",
+      "달맞이",
+      "벼이삭",
+      "달맞이 행사"
+    ]
+  },
+  {
+    "index": 271,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎍",
+    "unicode": "1F38D",
+    "name": "일본 장식",
+    "keywords": [
+      "장식",
+      "축하",
+      "일본 장식"
+    ]
+  },
+  {
+    "index": 272,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🎀",
+    "unicode": "1F380",
+    "name": "축하",
+    "keywords": [
+      "리본",
+      "축하"
+    ]
+  },
+  {
+    "index": 273,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🥇",
+    "unicode": "1F947",
+    "name": "금메달",
+    "keywords": [
+      "골드",
+      "메달",
+      "일등",
+      "금메달"
+    ]
+  },
+  {
+    "index": 274,
+    "group": "emotion_reward",
+    "groupName": "감정과 격려",
+    "emoji": "🥈",
+    "unicode": "1F948",
+    "name": "은메달",
+    "keywords": [
+      "메달",
+      "실버",
+      "이등",
+      "은메달"
+    ]
+  },
+  {
+    "index": 275,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "⌚",
+    "unicode": "231A",
+    "name": "손목 시계",
+    "keywords": [
+      "시계",
+      "손목 시계"
+    ]
+  },
+  {
+    "index": 276,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🌅",
+    "unicode": "1F305",
+    "name": "해가 뜸",
+    "keywords": [
+      "해",
+      "일출",
+      "아침 해",
+      "해가 뜸"
+    ]
+  },
+  {
+    "index": 277,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🌇",
+    "unicode": "1F307",
+    "name": "도시에 해가 짐",
+    "keywords": [
+      "일몰",
+      "해질녘",
+      "해가 짐",
+      "도시에 해가 짐"
+    ]
+  },
+  {
+    "index": 278,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🗺️",
+    "unicode": "1F5FA-FE0F",
+    "name": "세계 지도",
+    "keywords": [
+      "세계",
+      "지도",
+      "세계 지도"
+    ]
+  },
+  {
+    "index": 279,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "📍",
+    "unicode": "1F4CD",
+    "name": "둥근 머리 압정",
+    "keywords": [
+      "핀",
+      "압정",
+      "둥근 머리 핀",
+      "둥근 머리 압정"
+    ]
+  },
+  {
+    "index": 280,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🚗",
+    "unicode": "1F697",
+    "name": "승용차",
+    "keywords": [
+      "차량",
+      "자동차",
+      "승용차"
+    ]
+  },
+  {
+    "index": 281,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🚆",
+    "unicode": "1F686",
+    "name": "철도",
+    "keywords": [
+      "기차",
+      "철도"
+    ]
+  },
+  {
+    "index": 282,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "⏲️",
+    "unicode": "23F2-FE0F",
+    "name": "타이머 시계",
+    "keywords": [
+      "시계",
+      "타이머",
+      "타이머 시계"
+    ]
+  },
+  {
+    "index": 283,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "⌛",
+    "unicode": "231B",
+    "name": "시간이 다 된 모래시계",
+    "keywords": [
+      "모래",
+      "타이머",
+      "시간이 다 된 모래시계"
+    ]
+  },
+  {
+    "index": 284,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "⏳",
+    "unicode": "23F3",
+    "name": "시간이 남은 모래시계",
+    "keywords": [
+      "타이머",
+      "시간이 남은 모래시계"
+    ]
+  },
+  {
+    "index": 285,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🚋",
+    "unicode": "1F68B",
+    "name": "전차 차량",
+    "keywords": [
+      "트램 차량",
+      "전차 차량"
+    ]
+  },
+  {
+    "index": 286,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "⏱️",
+    "unicode": "23F1-FE0F",
+    "name": "스톱워치",
+    "keywords": [
+      "시계",
+      "스톱워치"
+    ]
+  },
+  {
+    "index": 287,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕰️",
+    "unicode": "1F570-FE0F",
+    "name": "벽난로 선반 시계",
+    "keywords": [
+      "시계",
+      "벽난로",
+      "벽난로 선반 시계"
+    ]
+  },
+  {
+    "index": 288,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕧",
+    "unicode": "1F567",
+    "name": "12시 30분",
+    "keywords": [
+      "시계",
+      "12:30",
+      "열두 시 반",
+      "12시 30분"
+    ]
+  },
+  {
+    "index": 289,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕠",
+    "unicode": "1F560",
+    "name": "5시 30분",
+    "keywords": [
+      "시계",
+      "5:30",
+      "다섯 시 반",
+      "5시 30분"
+    ]
+  },
+  {
+    "index": 290,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕡",
+    "unicode": "1F561",
+    "name": "6시 30분",
+    "keywords": [
+      "시계",
+      "6:30",
+      "여섯 시 반",
+      "6시 30분"
+    ]
+  },
+  {
+    "index": 291,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕢",
+    "unicode": "1F562",
+    "name": "7시 30분",
+    "keywords": [
+      "시계",
+      "7:30",
+      "일곱 시 반",
+      "7시 30분"
+    ]
+  },
+  {
+    "index": 292,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕣",
+    "unicode": "1F563",
+    "name": "8시 30분",
+    "keywords": [
+      "시계",
+      "8:30",
+      "여덟 시 반",
+      "8시 30분"
+    ]
+  },
+  {
+    "index": 293,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕤",
+    "unicode": "1F564",
+    "name": "9시 30분",
+    "keywords": [
+      "시계",
+      "9:30",
+      "아홉 시 반",
+      "9시 30분"
+    ]
+  },
+  {
+    "index": 294,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕥",
+    "unicode": "1F565",
+    "name": "10시 30분",
+    "keywords": [
+      "시계",
+      "열 시 반",
+      "10:30",
+      "10시 30분"
+    ]
+  },
+  {
+    "index": 295,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🕦",
+    "unicode": "1F566",
+    "name": "11시 30분",
+    "keywords": [
+      "시계",
+      "11:30",
+      "열한 시 반",
+      "11시 30분"
+    ]
+  },
+  {
+    "index": 296,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🌃",
+    "unicode": "1F303",
+    "name": "밤하늘 별",
+    "keywords": [
+      "야경",
+      "밤하늘 별"
+    ]
+  },
+  {
+    "index": 297,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🌉",
+    "unicode": "1F309",
+    "name": "밤하늘을 배경으로 하는 다리",
+    "keywords": [
+      "밤",
+      "다리",
+      "달과 다리",
+      "밤의 다리",
+      "별과 다리",
+      "밤하늘을 배경으로 하는 다리"
+    ]
+  },
+  {
+    "index": 298,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🗾",
+    "unicode": "1F5FE",
+    "name": "일본 지도",
+    "keywords": [
+      "일본",
+      "지도",
+      "일본 지도"
+    ]
+  },
+  {
+    "index": 299,
+    "group": "time_places",
+    "groupName": "시간과 이동",
+    "emoji": "🚘",
+    "unicode": "1F698",
+    "name": "오고 있는 승용차",
+    "keywords": [
+      "오고 있는 자동차",
+      "오고 있는 승용차"
+    ]
+  }
+]

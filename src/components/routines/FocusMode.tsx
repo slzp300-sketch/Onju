@@ -5,6 +5,7 @@ import confetti from 'canvas-confetti';
 import type { DailyRoutine } from '../../types';
 import { useRoutineStore } from '../../store/routineStore';
 import { today } from '../../utils/date';
+import OnjuIcon from '../ui/OnjuIcon';
 
 interface FocusModeProps {
   routine: DailyRoutine;
@@ -72,7 +73,7 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0, y: 40 }}
-        className="fixed inset-0 z-50 bg-cool-22 flex flex-col items-center justify-between px-6"
+        className="focus-paper fixed inset-0 z-50 flex flex-col items-center justify-between px-6"
         style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))', paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
       >
         <div className="flex-1 flex flex-col items-center justify-center gap-6 w-full">
@@ -89,7 +90,7 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
             className="flex flex-col items-center gap-1">
             <p className="text-white text-title3 font-bold">완료했어요!</p>
-            <p className="text-cool-60 text-body2">{routine.emoji} {routine.title}</p>
+            <p className="text-cool-60 text-body2 flex items-center gap-1.5"><OnjuIcon emoji={routine.emoji} size={22} /> {routine.title}</p>
           </motion.div>
 
           {/* 통계 카드 */}
@@ -138,9 +139,9 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 40 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-950"
+      className="focus-paper fixed inset-0 z-50 flex flex-col items-center justify-center"
     >
-      <button onClick={onClose} className="absolute top-6 right-6 text-label hover:text-label-alt transition-colors">
+      <button onClick={onClose} aria-label="집중 모드 닫기" className="focus-close-button absolute top-6 right-6 text-label hover:text-label-alt transition-colors">
         <X size={24} />
       </button>
 

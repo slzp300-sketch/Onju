@@ -6,6 +6,7 @@ import { format, addDays } from 'date-fns';
 import { useGroupStore } from '../store/groupStore';
 import { useAuthStore } from '../store/authStore';
 import Button from '../components/ui/Button';
+import Switch from '../components/ui/Switch';
 import { GROUP_CATEGORIES, COVER_ICONS, COVER_ICON_KEYS, GROUP_COLORS, GROUP_RULES } from '../utils/groupMeta';
 import type { SmallGroup, GroupCategory } from '../types';
 import { newId } from '../utils/id';
@@ -71,12 +72,12 @@ export default function GroupNew() {
   };
 
   return (
-    <div className="min-h-dvh bg-surface-alt flex flex-col">
+    <div className="form-paper min-h-dvh flex flex-col">
       {/* 헤더 */}
-      <div className="px-4 pt-5 pb-3 bg-surface border-b border-line-soft">
+      <div className="form-paper-header px-4 pt-5 pb-3">
         <div className="flex items-center">
           <motion.button whileTap={{ scale: 0.92 }} transition={{ duration: 0.1 }}
-            onClick={() => (step === 1 ? navigate(-1) : setStep(1))} className="p-1 -ml-1 text-label-alt">
+            onClick={() => (step === 1 ? navigate(-1) : setStep(1))} aria-label={step === 1 ? '뒤로 가기' : '이전 단계'} className="paper-back-button text-label-alt">
             <ChevronLeft size={24} />
           </motion.button>
           <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">소모임 만들기</h1>
@@ -111,7 +112,8 @@ export default function GroupNew() {
                     const active = form.coverIcon === key;
                     return (
                       <motion.button key={key} whileTap={{ scale: 0.85 }} onClick={() => patch({ coverIcon: key })}
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                        aria-label={`커버 아이콘 ${key} 선택`} aria-pressed={active}
+                        className={`min-w-11 min-h-11 rounded-xl flex items-center justify-center transition-colors ${
                           active ? 'bg-primary-soft ring-2 ring-primary text-primary' : 'bg-surface border border-line text-label-alt'
                         }`}>
                         <Icon size={18} strokeWidth={1.9} />
@@ -122,7 +124,8 @@ export default function GroupNew() {
                 <div className="flex gap-2.5">
                   {GROUP_COLORS.map(c => (
                     <motion.button key={c} whileTap={{ scale: 0.85 }} onClick={() => patch({ color: c })}
-                      className="w-7 h-7 rounded-full flex items-center justify-center"
+                      aria-label={`소모임 색상 ${c} 선택`} aria-pressed={form.color === c}
+                      className="min-w-11 min-h-11 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: c }}>
                       {form.color === c && <Check size={14} className="text-white" strokeWidth={3} />}
                     </motion.button>
@@ -193,10 +196,8 @@ export default function GroupNew() {
                   <p className="text-body2 font-medium text-label-strong">공개 소모임</p>
                   <p className="text-caption1 text-label-alt">누구든 검색해서 참여할 수 있어요</p>
                 </div>
-                <button onClick={() => patch({ isPublic: !form.isPublic })}
-                  className={`w-11 h-6 rounded-full transition-colors flex-shrink-0 ${form.isPublic ? 'bg-primary' : 'bg-fill-strong'}`}>
-                  <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform mx-0.5 ${form.isPublic ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
+                <Switch checked={form.isPublic} onCheckedChange={isPublic => patch({ isPublic })}
+                  label="공개 소모임" />
               </div>
             </motion.div>
           )}
@@ -204,7 +205,7 @@ export default function GroupNew() {
       </div>
 
       {/* 푸터 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
+      <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {step === 1 ? (
           <Button fullWidth className="mt-3" disabled={!step1Valid} onClick={() => setStep(2)}>다음</Button>

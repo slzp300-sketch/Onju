@@ -48,10 +48,10 @@ export default function ReviewResultPage() {
   const mood = review.mood ? MOOD_MAP[review.mood] : null;
 
   return (
-    <div className="flex flex-col gap-4 pb-8">
+    <div className="review-paper flex min-h-full flex-col gap-4 pb-8">
       {/* 헤더 */}
       <div className="px-4 pt-4 flex items-center gap-2">
-        <button onClick={() => navigate(-1)} className="text-label-alt p-1">
+        <button onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={22} />
         </button>
         <div>
@@ -68,18 +68,18 @@ export default function ReviewResultPage() {
 
       {/* 달성률 요약 */}
       <div className="px-4 grid grid-cols-2 gap-3">
-        <Card className="!p-4 text-center">
+        <Card className="review-paper-card !p-4 text-center">
           <p className="text-caption1 text-primary font-medium mb-1">개인 루틴</p>
           <p className="text-title2 font-bold text-primary">{review.personalRate}%</p>
         </Card>
-        <Card className="!p-4 text-center">
+        <Card className="review-paper-card !p-4 text-center">
           <p className="text-caption1 text-emerald-400 font-medium mb-1">신앙 루틴</p>
           <p className="text-title2 font-bold text-emerald-600">{review.faithRate}%</p>
         </Card>
       </div>
 
       {/* 목표 달성 */}
-      <Card className="mx-4">
+      <Card className="review-paper-card mx-4">
         <p className="text-caption2 font-semibold text-label-alt mb-2">주간 목표</p>
         <p className="text-body2 text-label">
           {review.goalTotalCount}개 중{' '}

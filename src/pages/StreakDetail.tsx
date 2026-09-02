@@ -82,7 +82,7 @@ export default function StreakDetail() {
         variants={container}
         initial="hidden"
         animate="show"
-        className="flex flex-col pb-8"
+        className="review-paper flex min-h-full flex-col pb-8"
       >
         {/* 헤더 */}
         <motion.div variants={itemV} className="flex items-center px-4 pt-5 pb-3 gap-2">
@@ -90,7 +90,8 @@ export default function StreakDetail() {
             whileTap={{ scale: 0.92 }}
             transition={{ duration: 0.1 }}
             onClick={() => navigate(-1)}
-            className="p-1 -ml-1 text-label-alt"
+            aria-label="뒤로 가기"
+            className="paper-back-button text-label-alt"
           >
             <ChevronLeft size={24} />
           </motion.button>
@@ -104,7 +105,7 @@ export default function StreakDetail() {
 
         {/* 히어로 — 스트릭 수 */}
         <motion.div variants={itemV} className="mx-4 mb-4">
-          <div className="bg-surface rounded-xl border border-line px-6 py-8 flex flex-col items-center gap-3">
+          <div className="review-paper-card px-6 py-8 flex flex-col items-center gap-3">
             <motion.span
               animate={streak > 0 ? { scale: [1, 1.12, 1] } : {}}
               transition={{ repeat: Infinity, repeatDelay: 2.5, duration: 0.45 }}
@@ -137,7 +138,7 @@ export default function StreakDetail() {
 
         {/* 이번 주 캘린더 */}
         <motion.div variants={itemV} className="mx-4 mb-4">
-          <div className="bg-surface rounded-xl border border-line px-4 py-4">
+          <div className="review-paper-card px-4 py-4">
             <p className="text-label1 font-bold text-label-strong mb-4">이번 주 달성 현황</p>
 
             {/* 요일 + 날짜 타일 */}
@@ -224,7 +225,7 @@ export default function StreakDetail() {
         <motion.div variants={itemV} className="mx-4 mb-4">
           <button
             onClick={() => setShowShieldInfo(true)}
-            className="w-full bg-surface rounded-xl border border-line px-4 py-4 flex items-center gap-3 hover:bg-fill transition-colors text-left"
+            className="review-paper-card w-full px-4 py-4 flex items-center gap-3 hover:bg-fill transition-colors text-left"
           >
             <div className="w-11 h-11 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
               <Shield size={22} className="text-primary" />
@@ -252,7 +253,7 @@ export default function StreakDetail() {
 
         {/* 다음 방패까지 프로그레스 */}
         <motion.div variants={itemV} className="mx-4">
-          <div className="bg-surface rounded-xl border border-line px-4 py-4">
+          <div className="review-paper-card px-4 py-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Flame size={16} className="text-cautionary" />

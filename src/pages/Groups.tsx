@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import GroupCard from '../components/groups/GroupCard';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
+import SegmentedControl from '../components/ui/SegmentedControl';
 import { useGroupStore } from '../store/groupStore';
 import { fetchGroups } from '../api/groups';
 
@@ -28,19 +29,22 @@ export default function Groups() {
   ];
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
-      <div className="px-4 pt-5 flex items-center justify-between">
-        <h1 className="text-heading2 font-bold text-label-strong font-brand">소모임</h1>
+    <div className="groups-paper flex min-h-full flex-col gap-4 pb-4">
+      <header className="px-5 pt-5 flex items-end justify-between">
+        <div>
+          <p className="text-caption1 font-medium tracking-wide text-label-alt">함께 심고 함께 자라요</p>
+          <h1 className="mt-0.5 text-heading1 font-bold text-label-strong font-brand">온주의 작은 숲</h1>
+        </div>
         <Button size="sm" onClick={() => navigate('/groups/new')}>
           <Plus size={15} /> 만들기
         </Button>
-      </div>
+      </header>
 
       {/* 루틴 공유·인증 보드 진입 */}
       {groups.length > 0 && (
         <button
           onClick={() => navigate('/share')}
-          className="mx-4 flex items-center gap-3 bg-primary-soft border border-primary/15 rounded-2xl px-4 py-3.5 text-left hover:bg-primary-soft/70 transition-colors"
+          className="group-share-card mx-4 flex min-h-16 items-center gap-3 px-4 py-3.5 text-left hover:bg-primary-soft/70 transition-colors"
         >
           <span className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center flex-shrink-0">
             <Camera size={16} />
@@ -54,18 +58,9 @@ export default function Groups() {
       )}
 
       {/* 탭 */}
-      <div className="px-4 flex gap-2">
-        {tabs.map(t => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`px-3.5 py-1.5 rounded-lg text-label2 font-medium transition-colors ${
-              tab === t.key ? 'bg-primary text-white' : 'bg-fill text-label-alt'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="groups-tab-backdrop sticky top-0 z-sticky py-1">
+        <SegmentedControl value={tab} onChange={setTab} items={tabs.map(t => ({ value: t.key, label: t.label }))}
+          label="소모임 목록" variant="pills" className="px-4" />
       </div>
 
       {/* 내 소모임 */}

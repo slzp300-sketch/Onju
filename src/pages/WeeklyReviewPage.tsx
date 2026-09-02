@@ -16,7 +16,9 @@ import { currentWeek, currentYear, getWeekRangeText, getCurrentWeekRange } from 
 import Button from '../components/ui/Button';
 import type { RoutineChange, HabitChange, DailyRoutine, MonthlyGoal, WeeklyGoal, Habit, RoutineLog, HabitFrequency, SmallGroup } from '../types';
 import { useGroupStore } from '../store/groupStore';
+import Switch from '../components/ui/Switch';
 import { format } from 'date-fns';
+import OnjuIcon from '../components/ui/OnjuIcon';
 
 // ── 상수 ──────────────────────────────────────────────
 const slideVariants = {
@@ -177,10 +179,10 @@ export default function WeeklyReviewPage() {
   ];
 
   return (
-    <div className="min-h-dvh bg-surface flex flex-col">
+    <div className="review-paper min-h-dvh flex flex-col">
       {/* 헤더 */}
       <div className="flex items-center px-4 pt-4 pb-2 gap-3">
-        <button onClick={goBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-fill text-label-alt">
+        <button onClick={goBack} aria-label="뒤로 가기" className="paper-back-button hover:bg-fill text-label-alt">
           <ChevronLeft size={20} />
         </button>
         <span className="text-caption1 font-semibold text-primary ml-auto">{step + 1} / 4</span>
@@ -204,7 +206,7 @@ export default function WeeklyReviewPage() {
       </div>
 
       {/* 하단 버튼 */}
-      <div className="px-6 pb-8 pt-4 flex gap-3 border-t border-line-soft bg-surface">
+      <div className="review-paper-footer px-6 pb-8 pt-4 flex gap-3">
         {step > 0 && <Button variant="ghost" onClick={goBack}>뒤로</Button>}
         {isLastStep ? (
           <Button fullWidth disabled={!canProceed || submitMutation.isPending} onClick={() => submitMutation.mutate()}>
@@ -674,7 +676,7 @@ function RoutineEditCard({
   return (
     <div className={`rounded-xl border p-3 transition-all ${isDelete ? 'border-red-200 bg-red-50' : 'border-line-soft bg-surface'}`}>
       <div className="flex items-center gap-2 mb-2">
-        {emoji && <span className="text-base flex-shrink-0">{emoji}</span>}
+        {emoji && <OnjuIcon emoji={emoji} size={24} />}
         <p className={`text-body2 font-medium flex-1 truncate ${isDelete ? 'text-red-400 line-through' : 'text-label-strong'}`}>{label}</p>
         <MiniBar rate={weekRate} />
       </div>
@@ -747,7 +749,7 @@ function HabitEditCard({
   return (
     <div className={`rounded-xl border p-3 transition-all ${isDelete ? 'border-red-200 bg-red-50' : 'border-line-soft bg-surface'}`}>
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-base flex-shrink-0">{habit.emoji}</span>
+        <OnjuIcon emoji={habit.emoji} size={24} />
         <p className={`text-body2 font-medium flex-1 truncate ${isDelete ? 'text-red-400 line-through' : 'text-label-strong'}`}>
           {changes?.title ?? habit.title}
         </p>
@@ -858,12 +860,8 @@ function ReviewIntentionStep({ intention, onIntentionChange, groups, shareToGrou
           return (
             <div key={group.id} className="flex items-center gap-3 bg-surface-alt rounded-2xl px-4 py-3">
               <p className="text-body2 font-medium text-label-strong flex-1 truncate">{group.title}</p>
-              <button onClick={() => onToggleGroup(group.id)}
-                className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${on ? 'bg-primary' : 'bg-fill-strong'}`}>
-                <motion.div className="absolute top-0.5 w-5 h-5 bg-surface rounded-full shadow"
-                  animate={{ left: on ? '1.375rem' : '0.125rem' }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }} />
-              </button>
+              <Switch checked={on} onCheckedChange={() => onToggleGroup(group.id)}
+                label={`${group.title}에 회고 공유`} />
             </div>
           );
         })}

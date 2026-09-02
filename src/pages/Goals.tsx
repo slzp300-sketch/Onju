@@ -10,6 +10,7 @@ import WeeklyGoalsSection from '../components/goals/WeeklyGoalsSection';
 import type { MonthlyGoal } from '../types';
 import { elapsedDays } from '../utils/date';
 import { getLinkedItems, rateFromItems, adherenceFromItems, type LinkedItem } from '../utils/goalProgress';
+import OnjuIcon from '../components/ui/OnjuIcon';
 
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 const MAX_SLOTS = 5;
@@ -95,10 +96,10 @@ export default function Goals() {
   };
 
   return (
-    <div className="flex flex-col gap-4 pb-8">
+    <div className="records-paper flex min-h-full flex-col gap-4 pb-8">
       {/* 헤더 */}
       <div className="px-4 pt-5 flex items-center gap-2">
-        <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt flex-shrink-0">
+        <motion.button {...tapSm} onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <div className="flex-1">
@@ -203,7 +204,7 @@ function GoalCard({ goal, past = false, isOpen, adherence, rate, linkedItems, on
 
   return (
     <div
-      className={`rounded-xl border overflow-hidden ${
+      className={`monthly-goal-paper-card overflow-hidden ${
         goal.color ? '' : isPast ? 'bg-fill border-line' : 'bg-surface border-line'
       }`}
       style={goal.color ? { backgroundColor: cardBg, borderColor: cardBorder } : undefined}
@@ -266,9 +267,11 @@ function GoalCard({ goal, past = false, isOpen, adherence, rate, linkedItems, on
                   <div key={item.id}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-body2 text-label truncate flex-1 mr-2 inline-flex items-center gap-1.5">
-                        {item.emoji ?? (item.kind === 'faith'
-                          ? <BookOpen size={13} strokeWidth={1.9} className="flex-shrink-0" />
-                          : <Pin size={13} strokeWidth={1.9} className="flex-shrink-0" />)} {item.title}
+                        {item.emoji
+                          ? <OnjuIcon emoji={item.emoji} size={22} />
+                          : item.kind === 'faith'
+                            ? <BookOpen size={13} strokeWidth={1.9} className="flex-shrink-0" />
+                            : <Pin size={13} strokeWidth={1.9} className="flex-shrink-0" />} {item.title}
                       </span>
                       <span className="flex items-center gap-1.5 flex-shrink-0">
                         <span className="text-caption2 text-label-assistive">{item.doneCount}/{item.scheduledElapsed}일</span>

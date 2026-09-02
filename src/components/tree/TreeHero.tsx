@@ -33,11 +33,12 @@ export default function TreeHero() {
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.1 }}
       onClick={() => navigate('/streak')}
-      className="mx-4 flex items-center gap-3 rounded-2xl border border-line px-4 py-3 text-left flex-shrink-0"
+      aria-label={`${growth.stageName}, ${HEALTH_MESSAGES[health]}, 성장 기록 보기`}
+      className="tree-paper-card mx-4 flex min-h-20 items-center gap-3 px-4 py-2 text-left flex-shrink-0"
       style={{ background: 'var(--gradient-hero)' }}
     >
       <div className="flex-shrink-0 -my-1">
-        <TreeVisual stage={stage} health={health} size={92} />
+        <TreeVisual stage={stage} health={health} size={74} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
@@ -48,7 +49,7 @@ export default function TreeHero() {
           </p>
         </div>
         {/* 다음 단계 진행바 */}
-        <div className="mt-1.5 h-1.5 rounded-full bg-fill-strong overflow-hidden">
+        <div className="mt-1.5 h-1 rounded-full bg-fill-strong overflow-hidden">
           <motion.div
             className="h-full rounded-full"
             style={{ background: 'var(--gradient-canopy)' }}

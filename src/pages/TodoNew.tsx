@@ -29,15 +29,15 @@ export default function TodoNew() {
   };
 
   return (
-    <div className="min-h-dvh bg-surface-alt flex flex-col">
-      <div className="flex items-center px-4 pt-5 pb-3 bg-surface border-b border-line-soft">
+    <div className="form-paper min-h-dvh flex flex-col">
+      <div className="form-paper-header flex items-center px-4 pt-5 pb-3">
         <motion.button
           whileTap={{ scale: 0.92 }} transition={{ duration: 0.1 }}
-          onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt">
+          onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">
-          {isEdit ? '투두 수정하기' : '투두 추가하기'}
+          {isEdit ? '할 일 수정하기' : '할 일 추가하기'}
         </h1>
         <div className="w-8" />
       </div>
@@ -54,13 +54,13 @@ export default function TodoNew() {
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
               placeholder="오늘 해야 할 일을 입력하세요"
               autoFocus
-              className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(47,158,96,0.16)] shadow-emphasize transition-all"
+              className="form-paper-input flex-1 text-body2 font-medium"
             />
           </div>
         </div>
 
         {!isEdit && (
-          <div className="bg-surface rounded-xl border border-line px-4 py-4">
+          <div className="form-paper-card px-4 py-4">
             <div className="flex items-center gap-3">
               <Calendar size={20} strokeWidth={1.9} className="text-label-strong" />
               <div>
@@ -72,7 +72,7 @@ export default function TodoNew() {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
+      <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         <motion.button
           whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}

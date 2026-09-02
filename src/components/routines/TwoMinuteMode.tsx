@@ -57,7 +57,7 @@ export default function TwoMinuteMode({ habit, onClose }: TwoMinuteModeProps) {
     return (
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-[#1a1c24] flex flex-col items-center justify-center max-w-md mx-auto"
+        className="focus-paper fixed inset-0 z-50 flex flex-col items-center justify-center max-w-md mx-auto"
       >
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
@@ -93,9 +93,9 @@ export default function TwoMinuteMode({ habit, onClose }: TwoMinuteModeProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: '100%' }}
       transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-      className="fixed inset-0 z-50 bg-[#1a1c24] flex flex-col items-center justify-center max-w-md mx-auto"
+      className="focus-paper fixed inset-0 z-50 flex flex-col items-center justify-center max-w-md mx-auto"
     >
-      <button onClick={onClose} className="absolute top-6 right-6 p-2 text-cool-60 hover:text-white">
+      <button onClick={onClose} aria-label="2분 모드 닫기" className="focus-close-button absolute top-6 right-6 text-cool-60 hover:text-white">
         <X size={24} />
       </button>
 

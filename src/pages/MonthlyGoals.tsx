@@ -60,11 +60,11 @@ export default function MonthlyGoals() {
   const todayIso = format(new Date(), 'yyyy-MM-dd');
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
+    <div className="records-paper flex min-h-full flex-col gap-4 pb-4">
       <div className="px-4 pt-5 flex items-center gap-2">
         <m.button
           whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-          onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt flex-shrink-0">
+          onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </m.button>
         <div>
@@ -141,7 +141,7 @@ function GoalCard({ goal, past, isOpen, alreadyTracked, onToggle, onEdit, onDele
 
   return (
     <div
-      className={`rounded-xl border overflow-hidden ${
+      className={`monthly-goal-paper-card overflow-hidden ${
         goal.color ? '' : past ? 'bg-fill border-line' : 'bg-surface border-line'
       }`}
       style={goal.color ? { backgroundColor: cardBg, borderColor: cardBorder } : undefined}

@@ -8,6 +8,8 @@ import { ko } from 'date-fns/locale';
 import ReviewBanner from '../components/review/ReviewBanner';
 import StampSeal from '../components/ui/StampSeal';
 import { useRoutineStore } from '../store/routineStore';
+import OnjuIcon from '../components/ui/OnjuIcon';
+import SegmentedControl from '../components/ui/SegmentedControl';
 import { useHabitStore } from '../store/habitStore';
 import { useGoalStore } from '../store/goalStore';
 import { useDiaryStore } from '../store/diaryStore';
@@ -37,22 +39,24 @@ export default function Stats() {
   const [activeTab, setActiveTab] = useState<TabType>('goal');
 
   return (
-    <div className="flex flex-col min-h-full">
-      <div className="px-4 pt-5 pb-3">
-        <h1 className="text-heading2 font-bold text-label-strong font-brand">통계</h1>
-      </div>
+    <div className="stats-paper flex flex-col min-h-full">
+      <header className="px-5 pt-5 pb-3">
+        <p className="text-caption1 font-medium tracking-wide text-label-alt">차곡차곡 쌓인 기록</p>
+        <h1 className="mt-0.5 text-heading1 font-bold text-label-strong font-brand">나의 성장 기록</h1>
+      </header>
 
-      <div className="px-4 mb-1">
-        <div className="flex bg-fill rounded-xl p-1">
-          {([['goal', '목표'], ['habit', '습관'], ['weekly', '주간'], ['records', '기록']] as [TabType, string][]).map(([key, label]) => (
-            <motion.button key={key} whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.12 }}
-              onClick={() => setActiveTab(key)}
-              className={`relative flex-1 py-2 rounded-lg text-label1 font-semibold transition-colors ${activeTab === key ? 'bg-surface text-label-strong shadow-emphasize' : 'text-label-alt'}`}>
-              {label}
-            </motion.button>
-          ))}
-        </div>
+      <div className="stats-tab-backdrop sticky top-0 z-sticky px-4 pb-2">
+        <SegmentedControl
+          value={activeTab}
+          onChange={setActiveTab}
+          label="통계 항목"
+          items={[
+            { value: 'goal', label: '목표' },
+            { value: 'habit', label: '습관' },
+            { value: 'weekly', label: '주간' },
+            { value: 'records', label: '기록' },
+          ]}
+        />
       </div>
 
       <AnimatePresence mode="wait">
@@ -152,7 +156,7 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
   return (
     <motion.button
       whileTap={{ scale: 0.99 }} onClick={onClick}
-      className="w-full text-left rounded-xl border overflow-hidden bg-surface border-line"
+      className="stats-paper-card w-full text-left overflow-hidden"
       style={goal.color ? { backgroundColor: `${goal.color}0a`, borderColor: `${goal.color}40` } : undefined}
     >
       {/* 헤더 */}
@@ -163,7 +167,7 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
           </span>
           {goal.category && (
             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
-              goal.category === 'faith' ? 'bg-emerald-100 text-emerald-600' : 'bg-primary-soft text-primary'
+              goal.category === 'faith' ? 'bg-faith-soft text-faith' : 'bg-primary-soft text-primary'
             }`}>
               {goal.category === 'faith'
                 ? <><BookOpen size={11} strokeWidth={1.9} /> 신앙</>
@@ -201,7 +205,7 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
             <div className="flex items-center justify-between mb-1">
               <span className="text-body2 text-label truncate flex-1 mr-2 inline-flex items-center gap-1.5">
                 {item.emoji
-                  ? <span>{item.emoji}</span>
+                  ? <OnjuIcon emoji={item.emoji} size={18} />
                   : item.kind === 'faith'
                     ? <BookOpen size={14} strokeWidth={1.9} className="text-label-assistive flex-shrink-0" />
                     : <Pin size={14} strokeWidth={1.9} className="text-label-assistive flex-shrink-0" />}
@@ -213,7 +217,7 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
               </span>
             </div>
             <div className="bg-fill-strong rounded-full h-1 overflow-hidden">
-              <div className="h-full rounded-full transition-all" style={{ width: `${item.adherence}%`, backgroundColor: accent }} />
+              <div className="crayon-chart-fill h-full rounded-full transition-all" style={{ width: `${item.adherence}%`, backgroundColor: accent }} />
             </div>
           </div>
         )) : (
@@ -271,7 +275,7 @@ function HabitStatsTab() {
           <p className="text-caption1 font-bold text-label-alt flex items-center gap-1.5"><BookOpen size={13} strokeWidth={1.9} className="text-label-alt" /> 신앙 루틴</p>
           {faithRoutines.map(r => (
             <HabitStatRow key={r.id}
-              emoji={r.emoji ?? '✝️'} title={r.title} accent="var(--color-positive)"
+              emoji={r.emoji ?? '✝️'} title={r.title} accent="var(--color-faith)"
               stat={getHabitStat(r.frequency, undefined, r.createdAt,
                 logs.filter(l => l.routineId === r.id))}
             />
@@ -291,24 +295,38 @@ const STATUS_STYLE: Record<DayStatus, string> = {
   future:'bg-transparent border border-dashed border-line-soft',
 };
 
+const STATUS_LABEL: Record<DayStatus, string> = {
+  done: '완료', sub: '대체 완료', rest: '쉼', miss: '미완료', off: '예정 없음', future: '예정',
+};
+
+const STATUS_MARK: Partial<Record<DayStatus, string>> = {
+  done: '✓', sub: '↗', rest: '–', miss: '·',
+};
+
 function HabitStatRow({ emoji, title, accent, stat }: {
   emoji: string; title: string; accent: string;
   stat: ReturnType<typeof getHabitStat>;
 }) {
   return (
-    <div className="bg-surface rounded-xl border border-line px-4 py-3.5">
+    <div className="stats-paper-card px-4 py-3.5">
       <div className="flex items-center gap-2.5 mb-3">
-        <span className="text-xl">{emoji}</span>
+        <OnjuIcon emoji={emoji} size={30} />
         <span className="flex-1 text-body2 font-bold text-label-strong truncate">{title}</span>
         <span className="text-title3 font-bold" style={{ color: accent }}>{stat.rate30}%</span>
       </div>
 
       {/* 최근 14일 도트 */}
-      <div className="flex gap-1 mb-3">
+      <div className="flex gap-1 mb-2" aria-label="최근 14일 실천 기록">
         {stat.recent.map((d, i) => (
-          <div key={i} className={`flex-1 h-5 rounded-md ${STATUS_STYLE[d.status]}`}
-            style={d.status === 'done' ? { backgroundColor: accent } : undefined} />
+          <div key={i} role="img" aria-label={`${format(new Date(d.date + 'T12:00:00'), 'M월 d일')} ${STATUS_LABEL[d.status]}`}
+            className={`habit-stat-mark flex h-5 flex-1 items-center justify-center rounded-md text-[9px] font-bold ${STATUS_STYLE[d.status]} ${d.status === 'done' || d.status === 'sub' ? 'text-white' : 'text-label-alt'}`}
+            style={d.status === 'done' ? { backgroundColor: accent } : undefined}>
+            {STATUS_MARK[d.status]}
+          </div>
         ))}
+      </div>
+      <div className="mb-3 flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-medium text-label-alt" aria-hidden="true">
+        <span>✓ 완료</span><span>↗ 대체</span><span>– 쉼</span><span>· 미완료</span>
       </div>
 
       {/* 지표 행 */}
@@ -428,7 +446,7 @@ function WeeklyTab() {
   return (
     <div className="flex flex-col gap-4 px-4 py-4 pb-8">
       {/* ── 이번 주 도장 캘린더 ── */}
-      <div className="bg-surface rounded-2xl border border-line px-4 py-4">
+      <div className="stats-paper-card px-4 py-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-body2 font-bold text-label-strong">이번 주 달성</p>
           <p className="text-caption1 text-label-alt">{getWeekRangeText(new Date(), weekStartDay as 0 | 1)}</p>
@@ -463,7 +481,7 @@ function WeeklyTab() {
       {hasData && (
         <>
           {/* ── 이번 주 vs 지난주 ── */}
-          <div className="bg-surface rounded-xl border border-line px-4 py-3.5 flex flex-col gap-3">
+          <div className="stats-paper-card px-4 py-3.5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <p className="text-caption1 font-bold text-label-strong">이번 주 vs 지난주</p>
               <span className={`text-caption1 font-bold tabular-nums ${
@@ -477,14 +495,14 @@ function WeeklyTab() {
           </div>
 
           {/* ── 이번 주 개인·신앙 ── */}
-          <div className="bg-surface rounded-xl border border-line px-4 py-3.5 flex flex-col gap-3">
+          <div className="stats-paper-card px-4 py-3.5 flex flex-col gap-3">
             <p className="text-caption1 font-bold text-label-strong">이번 주 개인·신앙</p>
-            <BarRow label="💪 개인" value={personalWeekRate} color="var(--color-primary)" highlight />
-            <BarRow label="🙏 신앙" value={faithWeekRate} color="var(--color-positive)" highlight />
+            <BarRow label="개인" value={personalWeekRate} color="var(--color-primary)" highlight />
+            <BarRow label="신앙" value={faithWeekRate} color="var(--color-faith)" highlight />
           </div>
 
           {/* ── 요일별 패턴 ── */}
-          <div className="bg-surface rounded-xl border border-line px-4 py-3.5">
+          <div className="stats-paper-card px-4 py-3.5">
             <p className="text-caption1 font-bold text-label-strong mb-3">
               요일별 패턴 <span className="text-caption2 text-label-assistive font-medium">· 최근 4주</span>
             </p>
@@ -493,15 +511,16 @@ function WeeklyTab() {
                 const avg = weekdayAvg[dow];
                 const isBest = bestDow === dow && dowWithData.length > 1;
                 return (
-                  <div key={dow} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div className="w-full h-16 bg-fill rounded-md flex items-end overflow-hidden">
+                  <div key={dow} className="flex-1 flex flex-col items-center gap-1.5"
+                    aria-label={`${ALL_DAY_LABELS[dow]}요일 ${avg === null ? '기록 없음' : `평균 ${avg}%${isBest ? ', 가장 꾸준한 요일' : ''}`}`}>
+                    <div className="w-full h-16 bg-fill rounded-lg flex items-end overflow-hidden">
                       {avg !== null && (
                         <motion.div initial={{ height: 0 }} animate={{ height: `${avg}%` }} transition={{ duration: 0.5 }}
-                          className="w-full rounded-md" style={{ backgroundColor: isBest ? 'var(--color-positive)' : 'var(--color-primary)' }} />
+                          className="crayon-chart-fill w-full rounded-lg" style={{ backgroundColor: isBest ? 'var(--color-positive)' : 'var(--color-primary)' }} />
                       )}
                     </div>
                     <span className={`text-caption2 font-bold ${isBest ? 'text-positive' : 'text-label-assistive'}`}>
-                      {ALL_DAY_LABELS[dow]}
+                      {isBest && '★ '}{ALL_DAY_LABELS[dow]}
                     </span>
                   </div>
                 );
@@ -602,7 +621,7 @@ function RecordsTab() {
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04, duration: 0.12 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => navigate('/diary', { state: { date: d.date } })}
-                  className="w-full bg-surface rounded-xl p-3.5 border border-line text-left flex items-center gap-3 hover:bg-fill transition-colors">
+                  className="stats-paper-card w-full p-3.5 text-left flex items-center gap-3 hover:bg-fill transition-colors">
                   <span className="text-2xl flex-shrink-0 flex items-center justify-center w-7">
                     {d.mood ? DIARY_MOODS.find(m => m.key === d.mood)?.emoji : <FileText size={20} strokeWidth={1.9} className="text-label-assistive" />}
                   </span>
@@ -649,7 +668,7 @@ function RecordsTab() {
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04, duration: 0.12 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => navigate(`/review/result/${review.year}-${review.weekNumber}`)}
-                  className="w-full bg-surface rounded-xl p-3.5 border border-line text-left flex items-center gap-3 hover:bg-fill transition-colors">
+                  className="stats-paper-card w-full p-3.5 text-left flex items-center gap-3 hover:bg-fill transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-caption1 font-semibold text-label-strong">{review.year}년 {review.weekNumber}주차</p>
@@ -682,7 +701,7 @@ function MoodDistribution({ title, items, total, color }: {
   color: string;
 }) {
   return (
-    <div className="bg-surface rounded-xl border border-line px-4 py-3.5">
+    <div className="stats-paper-card px-4 py-3.5">
       <p className="text-caption1 font-bold text-label-strong mb-3">{title}</p>
       <div className="flex flex-col gap-2">
         {items.map(m => {
@@ -692,7 +711,7 @@ function MoodDistribution({ title, items, total, color }: {
               <span className="text-base w-5 text-center flex-shrink-0">{m.emoji}</span>
               <span className="text-caption1 text-label-alt w-8 flex-shrink-0">{m.label}</span>
               <div className="flex-1 h-2 bg-fill-strong rounded-full overflow-hidden">
-                <motion.div className="h-full rounded-full" style={{ backgroundColor: color }}
+                <motion.div className="crayon-chart-fill h-full rounded-full" style={{ backgroundColor: color }}
                   initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.5 }} />
               </div>
               <span className="text-caption1 font-bold text-label-strong w-8 text-right flex-shrink-0 tabular-nums">{m.count}</span>
@@ -708,7 +727,7 @@ function EmptyRecord({ text, sub, ctaLabel, onCta }: {
   text: string; sub: string; ctaLabel: string; onCta: () => void;
 }) {
   return (
-    <div className="bg-surface rounded-xl border border-line flex flex-col items-center text-center px-6 py-8">
+    <div className="stats-paper-card flex flex-col items-center text-center px-6 py-8">
       <p className="text-body2 font-bold text-label-strong mb-1">{text}</p>
       <p className="text-caption1 text-label-alt mb-4">{sub}</p>
       <motion.button whileTap={{ scale: 0.97 }} onClick={onCta}
@@ -728,7 +747,7 @@ function BarRow({ label, value, color, highlight = false }: {
       <span className="text-caption1 text-label-alt w-12 flex-shrink-0">{label}</span>
       <div className="flex-1 h-2.5 bg-fill-strong rounded-full overflow-hidden">
         {has && (
-          <motion.div className="h-full rounded-full" style={{ backgroundColor: color }}
+          <motion.div className="crayon-chart-fill h-full rounded-full" style={{ backgroundColor: color }}
             initial={{ width: 0 }} animate={{ width: `${value}%` }} transition={{ duration: 0.5 }} />
         )}
       </div>
@@ -743,7 +762,7 @@ function SummaryStat({ label, value, sub, subColor }: {
   label: string; value: string; sub: string; subColor: string;
 }) {
   return (
-    <div className="rounded-xl border border-line bg-surface p-3">
+    <div className="stats-paper-card p-3">
       <p className="text-caption2 text-label-alt font-medium mb-1">{label}</p>
       <p className="text-title3 font-bold text-label-strong leading-none">{value}</p>
       <p className={`text-caption2 mt-1 truncate ${subColor}`}>{sub}</p>

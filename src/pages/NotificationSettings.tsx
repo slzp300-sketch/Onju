@@ -7,6 +7,7 @@ import Card from '../components/ui/Card';
 import { useNotificationStore } from '../store/notificationStore';
 import { requestNotifPermission } from '../lib/notifyPermission';
 import { isWebPushConfigured } from '../lib/webPush';
+import Switch from '../components/ui/Switch';
 
 export default function NotificationSettings() {
   const navigate = useNavigate();
@@ -27,17 +28,20 @@ export default function NotificationSettings() {
   };
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
-      <div className="px-4 pt-5 flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="text-label-alt hover:text-label transition-colors">
+    <div className="notification-paper flex min-h-full flex-col gap-4 pb-6">
+      <header className="px-4 pt-5 flex items-center gap-3">
+        <button onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt hover:text-label transition-colors">
           <ChevronLeft size={22} />
         </button>
-        <h1 className="text-heading2 font-bold text-label-strong font-brand">알림 설정</h1>
-      </div>
+        <div>
+          <p className="text-caption1 font-medium text-label-alt">필요한 순간만 다정하게</p>
+          <h1 className="text-heading2 font-bold text-label-strong font-brand">알림 설정</h1>
+        </div>
+      </header>
 
       {/* 권한 상태 */}
       {!canNotify && (
-        <Card className="mx-4">
+        <Card className={`notification-permission-card mx-4 ${denied ? 'is-denied' : ''}`}>
           <div className="flex items-start gap-3">
             <div className={`mt-0.5 ${denied ? 'text-negative' : 'text-primary'}`}>
               {denied ? <BellOff size={20} /> : <Bell size={20} />}
@@ -72,7 +76,10 @@ export default function NotificationSettings() {
       )}
 
       {/* 아침 알림 */}
-      <Card className="mx-4">
+      <section className="mx-4">
+        <h2 className="mb-2 px-1 text-label2 font-bold text-label-strong">하루 알림</h2>
+      <Card className="notification-setting-card" padding="none">
+        <div className="p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-body2 font-semibold text-label-strong flex items-center gap-1.5"><Sunrise size={16} strokeWidth={1.9} className="text-label-alt" />아침 알림</p>
@@ -85,20 +92,21 @@ export default function NotificationSettings() {
           />
         </div>
         {store.morningEnabled && canNotify && (
-          <div className="mt-3 flex items-center gap-2">
+          <div className="notification-time-row mt-3 flex items-center justify-between gap-2">
             <span className="text-caption1 text-label-alt">알림 시간</span>
             <input
               type="time"
               value={store.morningTime}
               onChange={e => store.update({ morningTime: e.target.value })}
-              className="text-body2 border border-line rounded-lg px-2 py-1 focus:outline-none focus:border-primary bg-surface text-label"
+              className="notification-time-input text-body2 text-label"
             />
           </div>
         )}
-      </Card>
+        </div>
+        <div className="h-px bg-line-soft mx-4" />
+        <div className="p-4">
 
       {/* 저녁 알림 */}
-      <Card className="mx-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-body2 font-semibold text-label-strong flex items-center gap-1.5"><Moon size={16} strokeWidth={1.9} className="text-label-alt" />저녁 리마인드</p>
@@ -111,20 +119,24 @@ export default function NotificationSettings() {
           />
         </div>
         {store.eveningEnabled && canNotify && (
-          <div className="mt-3 flex items-center gap-2">
+          <div className="notification-time-row mt-3 flex items-center justify-between gap-2">
             <span className="text-caption1 text-label-alt">알림 시간</span>
             <input
               type="time"
               value={store.eveningTime}
               onChange={e => store.update({ eveningTime: e.target.value })}
-              className="text-body2 border border-line rounded-lg px-2 py-1 focus:outline-none focus:border-primary bg-surface text-label"
+              className="notification-time-input text-body2 text-label"
             />
           </div>
         )}
+        </div>
       </Card>
+      </section>
 
       {/* 주간 리뷰 알림 */}
-      <Card className="mx-4">
+      <section className="mx-4">
+        <h2 className="mb-2 px-1 text-label2 font-bold text-label-strong">돌아보기</h2>
+      <Card className="notification-setting-card">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-body2 font-semibold text-label-strong flex items-center gap-1.5"><ClipboardList size={16} strokeWidth={1.9} className="text-label-alt" />주간 리뷰 알림</p>
@@ -137,6 +149,7 @@ export default function NotificationSettings() {
           />
         </div>
       </Card>
+      </section>
 
       {canNotify && (
         <p className="text-center text-caption1 text-label-assistive px-4">
@@ -150,19 +163,5 @@ export default function NotificationSettings() {
 }
 
 function Toggle({ enabled, disabled, onChange }: { enabled: boolean; disabled: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button
-      onClick={() => !disabled && onChange(!enabled)}
-      disabled={disabled}
-      className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${
-        enabled ? 'bg-primary' : 'bg-fill-strong'
-      } ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
-    >
-      <motion.span
-        animate={{ x: enabled ? 20 : 2 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        className="absolute top-1 w-4 h-4 rounded-full bg-white shadow"
-      />
-    </button>
-  );
+  return <Switch checked={enabled} disabled={disabled} onCheckedChange={onChange} label="알림 설정" />;
 }

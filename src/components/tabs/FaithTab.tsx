@@ -15,6 +15,7 @@ import TwoMinuteMode from '../routines/TwoMinuteMode';
 import BibleInput from '../routines/BibleInput';
 import PrayerMemo from '../routines/PrayerMemo';
 import { inferFaithKind, parseFaithMemo, faithMemoSummary } from '../../utils/faithMemo';
+import OnjuIcon from '../ui/OnjuIcon';
 
 const TIME_SLOTS: { value: TimeSlot; label: string; time: string; icon: ReactNode }[] = [
   { value: 'morning', label: '아침', time: '07:00', icon: <Sunrise size={15} strokeWidth={1.9} /> },
@@ -82,7 +83,7 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
     return (
       <div className="relative">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-5"><Church size={36} strokeWidth={1.9} /></div>
+          <div className="w-20 h-20 rounded-3xl bg-faith-soft border border-faith/20 flex items-center justify-center text-faith mb-5 shadow-emphasize"><Church size={36} strokeWidth={1.9} /></div>
           <p className="text-headline1 font-bold text-label mb-1">신앙으로 하루를 시작해 보세요</p>
           <p className="text-body2 text-label-alt leading-relaxed">
             말씀과 기도로 쌓아가는 하루가<br />직장 생활의 든든한 버팀목이 돼요
@@ -94,18 +95,20 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
   }
 
   return (
-    <div className="relative flex flex-col pb-24">
+    <div className="relative flex flex-col gap-3 px-3 pb-24">
       {/* 은혜 기록 진입 */}
       {!readOnly && (
         <button
           onClick={() => navigate('/faith-notes')}
-          className="mx-4 mb-2 flex items-center gap-2.5 bg-faith-soft border border-faith/20 rounded-2xl px-4 py-3 text-left hover:bg-faith-soft/70 transition-colors"
+          className="faith-note-card flex min-h-16 items-center gap-3 px-4 py-3 text-left hover:bg-faith-soft/70 transition-colors"
         >
-          <Feather size={16} className="text-faith flex-shrink-0" strokeWidth={1.9} />
-          <span className="flex-1 text-body2 font-bold text-label-strong">
-            은혜 기록
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface/70 text-faith flex-shrink-0">
+            <Feather size={19} strokeWidth={1.9} />
+          </span>
+          <span className="flex-1">
+            <span className="block text-body2 font-bold text-label-strong">은혜 기록</span>
             {faithNoteCount > 0 && (
-              <span className="text-caption1 font-semibold text-label-alt ml-1.5">말씀·기도 {faithNoteCount}개</span>
+              <span className="block text-caption2 font-medium text-label-alt mt-0.5">차곡차곡 모은 말씀·기도 {faithNoteCount}개</span>
             )}
           </span>
           <ChevronRight size={15} className="text-label-assistive flex-shrink-0" />
@@ -117,16 +120,18 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
         const cnt = group.routines.filter(r => isDone(r.id)).length;
         const allDone = cnt === group.routines.length;
         return (
-          <div key={group.value}>
-            <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
-              <span className="text-caption2 font-bold text-label-alt w-10 flex-shrink-0">{group.time}</span>
-              <span className="text-label-alt">{group.icon}</span>
-              <span className="flex-1 text-caption2 font-bold text-label">{group.label} 루틴</span>
-              <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${allDone ? 'bg-emerald-100 text-emerald-600' : 'bg-fill text-label-alt'}`}>
+          <section key={group.value} className="routine-paper-group overflow-hidden" aria-labelledby={`faith-${group.value}-title`}>
+            <div className="flex items-center gap-2.5 px-4 py-3 bg-faith-soft/55 border-b border-line-soft">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface text-faith shadow-emphasize">{group.icon}</span>
+              <span className="min-w-0 flex-1">
+                <span id={`faith-${group.value}-title`} className="block text-label2 font-bold text-label-strong">{group.label} 루틴</span>
+                <span className="block text-caption2 text-label-alt mt-0.5">{group.time} 무렵</span>
+              </span>
+              <span className={`text-caption2 font-bold px-2 py-1 rounded-lg ${allDone ? 'bg-faith-soft text-faith' : 'bg-fill text-label-alt'}`}>
                 {cnt}/{group.routines.length}
               </span>
             </div>
-            <div className="bg-surface divide-y divide-line-soft">
+            <div className="divide-y divide-line-soft">
               {group.routines.map((r, idx) => (
                 <FaithRoutineRow
                   key={r.id}
@@ -140,26 +145,26 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
                 />
               ))}
             </div>
-          </div>
+          </section>
         );
       })}
 
       {/* 시간대 없는 루틴 */}
       {unslotted.length > 0 && (
-        <div>
+        <section className="routine-paper-group overflow-hidden" aria-labelledby="faith-other-title">
           {grouped.length > 0 && (
-            <div className="flex items-center gap-2 px-4 py-2.5 bg-surface-alt border-b border-line-soft">
-              <Church size={15} className="text-label-alt" strokeWidth={1.9} />
-              <span className="flex-1 text-caption2 font-bold text-label">기타 신앙 루틴</span>
+            <div className="flex items-center gap-2.5 px-4 py-3 bg-faith-soft/55 border-b border-line-soft">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface text-faith shadow-emphasize"><Church size={16} strokeWidth={1.9} /></span>
+              <span id="faith-other-title" className="flex-1 text-label2 font-bold text-label-strong">기타 신앙 루틴</span>
               <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full ${
                 unslotted.filter(r => isDone(r.id)).length === unslotted.length
-                  ? 'bg-emerald-100 text-emerald-600' : 'bg-fill text-label-alt'
+                  ? 'bg-faith-soft text-faith' : 'bg-fill text-label-alt'
               }`}>
                 {unslotted.filter(r => isDone(r.id)).length}/{unslotted.length}
               </span>
             </div>
           )}
-          <div className="bg-surface divide-y divide-line-soft">
+          <div className="divide-y divide-line-soft">
             {unslotted.map((r, idx) => (
               <FaithRoutineRow
                 key={r.id}
@@ -173,7 +178,7 @@ export default function FaithTab({ date, readOnly = false }: { date?: string; re
               />
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {!readOnly && <FAB options={fabOptions} />}
@@ -232,7 +237,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
       <motion.div
         layout
         onClick={() => navigate(`/faith-routines/edit/${routine.id}`)}
-        className={`relative flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
+        className={`habit-paper-row relative flex min-h-[68px] items-center gap-3 px-3 py-2.5 cursor-pointer active:bg-surface-alt transition-colors ${(done || skipped) ? 'opacity-70' : ''}`}
       >
         {/* 미니 스탬프 */}
         <AnimatePresence>
@@ -240,20 +245,22 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
         </AnimatePresence>
 
         {/* 번호 */}
-        <span className={`text-caption2 font-bold w-5 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
+        <span aria-hidden="true" className={`text-caption2 font-bold w-4 text-center flex-shrink-0 ${done ? 'text-label-assistive' : 'text-label-alt'}`}>
           {index}
         </span>
 
         {/* 이모지 아이콘 (장식) */}
-        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 emoji-crayon ${
-          done ? 'bg-emerald-50' : skipped ? 'bg-amber-50' : 'bg-fill'
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${
+          done ? 'bg-faith-soft' : skipped ? 'bg-amber-50' : 'bg-fill'
         }`}>
-          {routine.emoji ?? <Church size={18} strokeWidth={1.9} className="text-emerald-500" />}
+          {routine.emoji
+            ? <OnjuIcon emoji={routine.emoji} size={34} />
+            : <Church size={20} strokeWidth={1.9} className="text-faith" />}
         </div>
 
         {/* 텍스트 */}
         <div className="flex-1 min-w-0">
-          <p className={`text-label1 font-semibold truncate ${
+          <p className={`text-body2 font-bold truncate ${
             done ? 'line-through text-label-alt'
             : skipped ? 'line-through text-label-assistive'
             : 'text-label-strong'
@@ -268,7 +275,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
             <button
               onClick={e => { e.stopPropagation(); if (!readOnly) onRecord(routine); }}
               className={`block max-w-full text-left text-[11px] font-medium mt-0.5 truncate ${
-                memo.type === 'bible' ? 'text-faith' : 'text-emerald-600'
+                memo.type === 'bible' ? 'text-faith' : 'text-primary'
               }`}
             >
               {memo.type === 'bible' ? '📖 ' : '🙏 '}{faithMemoSummary(memo)}
@@ -279,14 +286,14 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
             <button
               onClick={e => { e.stopPropagation(); onRecord(routine); }}
               className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full mt-1 ${
-                recordKind === 'bible' ? 'text-faith bg-faith-soft' : 'text-emerald-600 bg-emerald-50'
+                recordKind === 'bible' ? 'text-faith bg-faith-soft' : 'text-primary bg-primary-soft'
               }`}
             >
               ✍️ {recordKind === 'bible' ? '말씀 한 줄 남기기' : '기도 제목 남기기'}
             </button>
           )}
           {routine.durationSeconds && !done && !skipped && (
-            <p className="text-[11px] text-emerald-500 font-medium mt-0.5 flex items-center gap-0.5">
+            <p className="text-caption2 text-faith font-medium mt-1 flex items-center gap-1">
               <Timer size={10} />
               {routine.durationSeconds >= 60
                 ? `${Math.floor(routine.durationSeconds / 60)}분 ${routine.durationSeconds % 60 > 0 ? `${routine.durationSeconds % 60}초` : ''}`.trim()
@@ -299,7 +306,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
         <div className="flex items-center gap-1.5 flex-shrink-0">
           {readOnly ? (
             <span className={`text-caption2 font-bold px-2 py-1 rounded-lg ${
-              done ? 'bg-emerald-100 text-emerald-600'
+              done ? 'bg-faith-soft text-faith'
               : skipped ? 'bg-amber-100 text-amber-500'
               : 'bg-fill text-label-assistive'
             }`}>
@@ -317,8 +324,9 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
                         if (routine.twoMinuteHabit) setTwoMinOpen(true);
                         else setFocusOpen(true);
                       }}
-                      className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                        routine.twoMinuteHabit ? 'bg-amber-100 text-amber-500' : 'bg-emerald-50 text-emerald-500'
+                      aria-label={`${routine.title} ${routine.twoMinuteHabit ? '2분 루틴' : '집중 타이머'} 시작`}
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                        routine.twoMinuteHabit ? 'bg-amber-100 text-amber-500' : 'bg-faith-soft text-faith'
                       }`}
                     >
                       {routine.twoMinuteHabit ? <Zap size={13} strokeWidth={1.9} /> : <Play size={11} fill="currentColor" />}
@@ -328,13 +336,15 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
                     <motion.button
                       whileTap={{ scale: 0.88 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}
                       onClick={e => { e.stopPropagation(); setFocusOpen(true); }}
-                      className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center"
+                      aria-label={`${routine.title} 집중 시작`}
+                      className="w-8 h-8 rounded-xl bg-faith-soft text-faith flex items-center justify-center"
                     >
                       <Play size={11} fill="currentColor" />
                     </motion.button>
                   )}
                   <motion.button whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 700, damping: 22 }}
-                    onClick={e => { e.stopPropagation(); setConfirmDelete(true); }} className="text-label-assistive hover:text-negative transition-colors p-1">
+                    onClick={e => { e.stopPropagation(); setConfirmDelete(true); }} aria-label={`${routine.title} 신앙 루틴 삭제`}
+                    className="flex h-8 w-7 items-center justify-center text-label-assistive hover:text-negative transition-colors">
                     <Trash2 size={13} />
                   </motion.button>
                 </>
@@ -349,7 +359,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
 
               {!skipped && (
                 <StampButton label="완료" active={done}
-                  activeColor="bg-emerald-500 border-emerald-500" inkColor="text-white" dryColor="text-emerald-600" rotation={-10}
+                  activeColor="bg-faith border-faith" inkColor="text-white" dryColor="text-faith" rotation={-10}
                   onClick={e => {
                     e.stopPropagation();
                     if (!done) { fireStamp('done'); onCompleted(routine); }

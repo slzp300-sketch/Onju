@@ -115,30 +115,32 @@ function BottomNav() {
     return location.pathname.startsWith(item.to);
   };
 
-  // 플랫 리스트로 변환 + 그룹 경계 위치 계산
-  const flatItems = NAV_GROUPS.flatMap((group, gIdx) =>
-    group.map((item, iIdx) => ({ ...item, dividerBefore: iIdx === 0 && gIdx > 0 }))
-  );
+  const flatItems = NAV_GROUPS.flat();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-sm border-t border-line-soft z-30 max-w-md mx-auto safe-bottom">
-      <div className="flex items-stretch" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+    <nav aria-label="주요 메뉴" className="bottom-paper-nav fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto safe-bottom">
+      <div className="flex items-stretch px-2" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {flatItems.map(item => {
           const active = isActive(item);
           const Icon = item.icon;
           return (
             <div key={item.to} className="flex flex-1">
-              {item.dividerBefore && (
-                <div className="w-px bg-line-soft my-2 flex-shrink-0" />
-              )}
               <NavLink
                 to={item.to}
-                className={`relative flex-1 flex flex-col items-center gap-1 py-3.5 text-[12px] font-medium transition-colors ${active ? 'text-primary' : 'text-label-assistive'}`}
+                aria-current={active ? 'page' : undefined}
+                className={`relative flex min-h-[68px] flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors ${active ? 'text-primary' : 'text-label-alt'}`}
               >
-                <motion.div whileTap={{ scale: 1.2 }} transition={{ duration: 0.08 }}>
-                  <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
+                {active && (
+                  <motion.span
+                    layoutId="bottomNavPaper"
+                    className="absolute inset-x-1.5 inset-y-1.5 rounded-xl bg-primary-soft border border-primary/15"
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                  />
+                )}
+                <motion.div className="relative" whileTap={{ scale: 1.14, rotate: -3 }} transition={{ duration: 0.08 }}>
+                  <Icon size={23} strokeWidth={active ? 2.4 : 1.8} />
                 </motion.div>
-                <span className={active ? 'font-semibold' : ''}>{item.label}</span>
+                <span className={`relative ${active ? 'font-bold' : ''}`}>{item.label}</span>
               </NavLink>
             </div>
           );
@@ -224,10 +226,11 @@ function TreeStageWatcher() {
 /** 루트 셸 — 네비가 보이는 경로에서만 하단 패딩(네비 높이)을 적용 */
 function AppShell({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
+  const managesOwnNavSpace = pathname === '/';
   return (
     <div
       className="max-w-md mx-auto min-h-dvh bg-surface-alt relative"
-      style={isNavHidden(pathname) ? undefined : { paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}
+      style={isNavHidden(pathname) || managesOwnNavSpace ? undefined : { paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}
     >
       {children}
     </div>

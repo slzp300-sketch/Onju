@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X } from '../../icons';
+import OverlayDialog from './OverlayDialog';
+import Button from './Button';
 
 /* ── 드럼롤 컬럼 ── */
 const ITEM_H = 48;
@@ -91,7 +92,7 @@ function toSecs(h: number, m: number, s: number) {
   return h * 3600 + m * 60 + s;
 }
 
-/* ── 피커 내용 (AnimatePresence 리마운트로 state 초기화됨) ── */
+/* ── 피커 내용 (시트 재오픈 시 key로 state 초기화) ── */
 interface PickerContentProps {
   seconds: number;
   onConfirm: (seconds: number) => void;
@@ -106,15 +107,11 @@ function PickerContent({ seconds, onConfirm, onClose, title }: PickerContentProp
   const [sIdx, setSIdx] = useState(s);
 
   return (
-    <motion.div
-      initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-      className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-surface rounded-t-3xl z-50"
-    >
+    <div>
       {/* 헤더 */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-line-soft">
-        <span className="text-headline1 font-bold text-label-strong">{title}</span>
-        <button onClick={onClose} className="p-1 text-label-assistive hover:text-label-alt">
+        <span id="duration-sheet-title" className="text-headline1 font-bold text-label-strong">{title}</span>
+        <button type="button" aria-label="시간 설정 닫기" onClick={onClose} className="min-w-11 min-h-11 -m-2 flex items-center justify-center text-label-assistive hover:text-label-alt">
           <X size={20} />
         </button>
       </div>
@@ -134,21 +131,14 @@ function PickerContent({ seconds, onConfirm, onClose, title }: PickerContentProp
         className="flex gap-3 px-5 pb-6"
         style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
       >
-        <button
-          onClick={onClose}
-          className="flex-1 py-3.5 rounded-xl border border-line text-body2 font-semibold text-label-alt"
-        >
-          취소
-        </button>
-        <motion.button
-          whileTap={{ scale: 0.97 }}
+        <Button variant="outlined" className="flex-1" onClick={onClose}>취소</Button>
+        <Button className="flex-1"
           onClick={() => { onConfirm(toSecs(hIdx, mIdx, sIdx)); onClose(); }}
-          className="flex-1 py-3.5 rounded-xl bg-primary text-white text-body2 font-bold"
         >
           설정
-        </motion.button>
+        </Button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -165,14 +155,7 @@ export default function DurationPickerSheet({
   isOpen, seconds, onConfirm, onClose, title = '⏱️ 타이머 설정',
 }: DurationPickerSheetProps) {
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-40"
-            onClick={onClose}
-          />
+    <OverlayDialog isOpen={isOpen} onClose={onClose} labelledBy="duration-sheet-title" variant="sheet">
           {/* key로 시트 열릴 때마다 PickerContent 리마운트 → state 초기화 */}
           <PickerContent
             key={seconds}
@@ -181,8 +164,6 @@ export default function DurationPickerSheet({
             onClose={onClose}
             title={title}
           />
-        </>
-      )}
-    </AnimatePresence>
+    </OverlayDialog>
   );
 }

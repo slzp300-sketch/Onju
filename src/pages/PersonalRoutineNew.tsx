@@ -9,6 +9,8 @@ import { useHabitStore } from '../store/habitStore';
 import { useGoalStore } from '../store/goalStore';
 import type { Habit } from '../types';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
+import OnjuIcon from '../components/ui/OnjuIcon';
+import Switch from '../components/ui/Switch';
 import {
   DndContext, closestCenter, PointerSensor, TouchSensor,
   useSensor, useSensors, type DragEndEvent,
@@ -96,10 +98,10 @@ export default function PersonalRoutineNew() {
 
 
   return (
-    <div className="min-h-dvh bg-surface-alt flex flex-col">
+    <div className="form-paper min-h-dvh flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center px-4 pt-5 pb-3 bg-surface border-b border-line-soft">
-        <motion.button {...tapSm} onClick={() => navigate(-1)} className="p-1 -ml-1 text-label-alt">
+      <div className="form-paper-header flex items-center px-4 pt-5 pb-3">
+        <motion.button {...tapSm} onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">
@@ -145,12 +147,12 @@ export default function PersonalRoutineNew() {
             <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
             <input type="text" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="루틴 이름을 입력하세요" autoFocus
-              className="flex-1 h-12 bg-surface border border-line rounded-lg px-4 text-body2 font-medium focus:outline-none focus:border-primary focus:shadow-[0_0_0_3px_rgba(47,158,96,0.16)] shadow-emphasize transition-all" />
+              className="form-paper-input flex-1 text-body2 font-medium" />
           </div>
         </div>
 
         {/* 언제 + 타이머 */}
-        <div className="bg-surface rounded-xl border border-line overflow-hidden">
+        <div className="form-paper-card overflow-hidden">
           <div className="px-4 py-4 border-b border-line-soft">
             <div className="flex items-center gap-3 mb-2">
               <Clock size={20} strokeWidth={1.9} className="text-label-strong" />
@@ -168,11 +170,7 @@ export default function PersonalRoutineNew() {
                 <p className="text-caption1 text-label-alt">습관마다 시간을 설정해 순서대로 진행</p>
               </div>
             </div>
-            <button onClick={() => setTimerEnabled(v => !v)}
-              className={`w-11 h-6 rounded-full transition-colors relative ${timerEnabled ? 'bg-primary' : 'bg-fill-strong'}`}>
-              <motion.div animate={{ x: timerEnabled ? 20 : 2 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                className="absolute top-1 w-4 h-4 rounded-full bg-white shadow" />
-            </button>
+            <Switch checked={timerEnabled} onCheckedChange={setTimerEnabled} label="타이머 기능" />
           </div>
         </div>
 
@@ -229,7 +227,7 @@ export default function PersonalRoutineNew() {
                   <motion.button key={h.id} {...tap} onClick={() => toggle(h.id)}
                     className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-line bg-surface text-left hover:bg-fill transition-colors">
                     <div className="w-7 h-7 rounded-full border-2 border-line flex-shrink-0" />
-                    <span className="text-2xl">{h.emoji}</span>
+                    <OnjuIcon emoji={h.emoji} size={34} />
                     <div className="flex-1 min-w-0">
                       <p className="text-body2 font-semibold text-label">{h.title}</p>
                       {h.when && <p className="text-caption1 text-label-alt truncate">{h.when}</p>}
@@ -249,7 +247,7 @@ export default function PersonalRoutineNew() {
       </div>
 
       {/* 하단 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 bg-surface border-t border-line-soft"
+      <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         <motion.button whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
           onClick={handleSubmit}
@@ -294,7 +292,7 @@ function SortableHabitCard({
             className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-label1 font-bold">
             {order}
           </button>
-          <span className="text-2xl">{habit.emoji}</span>
+          <OnjuIcon emoji={habit.emoji} size={34} />
           <div className="flex-1 min-w-0">
             <p className="text-body2 font-semibold text-label-strong">{habit.title}</p>
             {habit.when && <p className="text-caption1 text-label-alt truncate">{habit.when}</p>}

@@ -25,14 +25,14 @@ export default function FAB({ options }: FABProps) {
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-30"
+            className="fixed inset-0 z-[var(--z-scrim)] bg-[var(--scrim)]"
             onClick={close}
           />
         )}
       </AnimatePresence>
 
       <div
-        className="fixed right-5 z-40 flex flex-col items-end gap-3"
+        className="fixed right-[var(--layout-page-gutter)] z-[var(--z-sheet)] flex flex-col items-end gap-3"
         style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
       >
         <AnimatePresence>
@@ -50,6 +50,7 @@ export default function FAB({ options }: FABProps) {
                   exit={{ opacity: 0, y: 8, scale: 0.9 }}
                   transition={{ delay: i * 0.04, duration: 0.18, ease: 'easeOut' }}
                   onClick={() => { opt.onClick(); close(); }}
+                  aria-label={opt.label}
                   className="flex items-center gap-3"
                 >
                   <div className="text-right">
@@ -69,7 +70,9 @@ export default function FAB({ options }: FABProps) {
           whileTap={{ scale: 0.9 }}
           transition={{ duration: 0.12 }}
           onClick={() => setOpen(v => !v)}
-          className="w-14 h-14 rounded-full bg-primary text-white shadow-strong flex items-center justify-center"
+          aria-label={open ? '빠른 메뉴 닫기' : '빠른 메뉴 열기'}
+          aria-expanded={open}
+          className="w-14 h-14 rounded-full bg-primary text-white shadow-strong flex items-center justify-center focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
         >
           <motion.div
             animate={{ rotate: open ? 45 : 0 }}

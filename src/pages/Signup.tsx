@@ -81,7 +81,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative min-h-dvh bg-surface flex flex-col px-6">
+    <div className="auth-paper relative min-h-dvh flex flex-col px-6">
       <ForestBackdrop />
       <div className="flex flex-col items-center pt-16 pb-8">
         <div className="mb-4">
@@ -91,7 +91,7 @@ export default function Signup() {
         <p className="text-label2 text-label-alt mt-1">함께 루틴을 만들어가요</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="auth-paper-panel flex flex-col gap-3">
         {/* 이름 */}
         <div className="flex flex-col gap-1">
           <input

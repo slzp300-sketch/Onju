@@ -57,20 +57,24 @@ export default function GroupDetail() {
   };
 
   return (
-    <div className="flex flex-col gap-4 pb-8">
+    <div className="group-detail-paper flex min-h-full flex-col gap-4 pb-8">
       {/* 헤더 */}
-      <div className="px-4 pt-4 flex items-center gap-2">
-        <button onClick={() => navigate(-1)} className="text-label-alt p-1 hover:text-label transition-colors">
+      <header className="px-4 pt-4 flex items-center gap-2">
+        <button onClick={() => navigate(-1)} aria-label="소모임 목록으로 돌아가기"
+          className="paper-control flex h-11 w-11 items-center justify-center text-label-alt hover:text-label transition-colors">
           <ChevronLeft size={22} />
         </button>
-        <h1 className="text-headline1 font-bold text-label-strong flex-1 truncate">{group.title}</h1>
-      </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-caption2 font-medium text-label-alt">함께 자라는 소모임</p>
+          <h1 className="text-headline1 font-bold text-label-strong truncate">{group.title}</h1>
+        </div>
+      </header>
 
       {/* 그룹 정보 */}
-      <Card className="mx-4">
+      <Card className="group-detail-hero mx-4">
         <div className="flex items-start gap-3 mb-2">
           {group.coverIcon && COVER_ICONS[group.coverIcon] && (
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-emphasize"
               style={{ backgroundColor: `${group.color ?? '#2f9e60'}1a` }}>
               {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={24} strokeWidth={1.9} style={{ color: group.color ?? '#2f9e60' }} />; })()}
             </div>
@@ -78,7 +82,7 @@ export default function GroupDetail() {
           <div className="flex items-center gap-2 flex-wrap">
             <Badge label={statusMeta.label} color={statusMeta.color} />
             {group.category && (
-              <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-fill text-label-alt">
+              <span className="text-caption2 font-bold px-2 py-1 rounded-lg bg-fill text-label-alt">
                 {GROUP_CATEGORY_LABEL[group.category]}
               </span>
             )}
@@ -94,6 +98,9 @@ export default function GroupDetail() {
             {format(new Date(group.startDate), 'M.d', { locale: ko })} —{' '}
             {format(new Date(group.endDate), 'M.d', { locale: ko })}
           </span>
+        </div>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-fill-strong" aria-label={`정원 ${Math.min(100, Math.round((group.currentMemberCount / group.maxMembers) * 100))}% 참여`}>
+          <div className="crayon-chart-fill h-full rounded-full" style={{ width: `${Math.min(100, (group.currentMemberCount / group.maxMembers) * 100)}%`, backgroundColor: group.color ?? 'var(--color-primary)' }} />
         </div>
 
         {group.rules && group.rules.length > 0 && (
@@ -132,7 +139,7 @@ export default function GroupDetail() {
       {isJoined && (
         <>
           <div className="px-4">
-            <p className="text-center text-caption1 text-primary bg-primary-soft rounded-xl py-2.5 font-medium">
+            <p className="paper-note text-center text-caption1 text-primary py-2.5 font-medium">
               {isCreator ? '내가 만든 소모임이에요' : '참여 중인 소모임이에요'}
             </p>
           </div>
@@ -193,11 +200,17 @@ function MemberBoard({ groupId }: { groupId: string }) {
       </div>
 
       {isLoading ? (
-        <div className="bg-surface rounded-xl border border-line py-10 text-center text-caption1 text-label-assistive">
+        <div className="group-detail-card py-10 text-center text-caption1 text-label-assistive">
           불러오는 중…
         </div>
+      ) : sorted.length === 0 ? (
+        <div className="group-detail-card flex flex-col items-center py-7 text-center">
+          <Sprout size={28} strokeWidth={1.9} className="mb-2 text-label-assistive" />
+          <p className="text-caption1 font-bold text-label-alt">멤버 기록을 준비하고 있어요</p>
+          <p className="mt-1 text-caption2 text-label-assistive">활동이 시작되면 주간 달성률이 보여요</p>
+        </div>
       ) : (
-        <div className="bg-surface rounded-xl border border-line divide-y divide-line-soft overflow-hidden">
+        <div className="group-detail-card divide-y divide-line-soft overflow-hidden">
           {sorted.map((m, i) => (
             <MemberRow key={m.userId} member={m} rank={i + 1} isMe={m.userId === user?.id} />
           ))}
@@ -210,11 +223,11 @@ function MemberBoard({ groupId }: { groupId: string }) {
 function MemberRow({ member, rank, isMe }: { member: MemberGroupProgress; rank: number; isMe: boolean }) {
   const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
   return (
-    <div className={`flex items-center gap-3 px-4 py-3 ${isMe ? 'bg-primary-soft/40' : ''}`}>
+    <div className={`flex items-center gap-3 px-4 py-3 ${isMe ? 'bg-primary-soft/45' : ''}`}>
       <span className="w-5 text-center text-caption1 font-bold text-label-assistive flex-shrink-0">
         {medal ?? rank}
       </span>
-      <div className="w-9 h-9 rounded-full bg-primary-soft flex items-center justify-center text-label1 font-bold text-primary flex-shrink-0">
+      <div className="w-10 h-10 rounded-xl border border-primary/15 bg-primary-soft flex items-center justify-center text-label1 font-bold text-primary flex-shrink-0">
         {member.userName[0]}
       </div>
       <div className="flex-1 min-w-0">
@@ -230,7 +243,7 @@ function MemberRow({ member, rank, isMe }: { member: MemberGroupProgress; rank: 
           <span className="ml-auto text-label1 font-bold text-primary tabular-nums flex-shrink-0">{member.weeklyRate}%</span>
         </div>
         <div className="h-1.5 bg-fill-strong rounded-full overflow-hidden">
-          <motion.div className="h-full bg-primary rounded-full"
+          <motion.div className="crayon-chart-fill h-full bg-primary rounded-full"
             initial={{ width: 0 }} animate={{ width: `${member.weeklyRate}%` }} transition={{ duration: 0.5 }} />
         </div>
         <p className="text-[10px] text-label-assistive mt-1">
@@ -254,14 +267,14 @@ function WeeklyShareFeed({ groupId }: { groupId: string }) {
 
   return (
     <section className="px-4">
-      <h2 className="text-body2 font-bold text-label-strong mb-2 px-1">💬 주간 나눔</h2>
+      <h2 className="text-body2 font-bold text-label-strong mb-2 px-1">주간 나눔</h2>
 
       {isLoading ? (
-        <div className="bg-surface rounded-xl border border-line py-10 text-center text-caption1 text-label-assistive">
+        <div className="group-detail-card py-10 text-center text-caption1 text-label-assistive">
           불러오는 중…
         </div>
       ) : sorted.length === 0 ? (
-        <div className="bg-surface rounded-xl border border-line flex flex-col items-center text-center px-6 py-8">
+        <div className="group-detail-card flex flex-col items-center text-center px-6 py-8">
           <Sprout size={36} strokeWidth={1.9} className="text-label-assistive mb-2" />
           <p className="text-body2 font-bold text-label-strong mb-1">아직 이번 주 나눔이 없어요</p>
           <p className="text-caption1 text-label-alt">주간 리뷰를 완료하고 소모임에 나눠보세요</p>
@@ -287,7 +300,7 @@ function ShareCard({ share }: { share: GroupWeeklyShare }) {
   const isOn = (k: CheerType) => !!cheered[`${share.id}:${k}`];
 
   return (
-    <div className="bg-surface rounded-2xl border border-line overflow-hidden">
+    <div className="group-detail-card overflow-hidden">
       <div className="px-4 pt-3.5 pb-3">
         <div className="flex items-center gap-2.5 mb-3">
           <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-label2 font-bold text-primary flex-shrink-0">
@@ -299,7 +312,7 @@ function ShareCard({ share }: { share: GroupWeeklyShare }) {
           </div>
           <div className="flex gap-1.5 flex-shrink-0">
             <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-primary-soft text-primary">개인 {share.personalRate}%</span>
-            <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-positive/10 text-positive">신앙 {share.faithRate}%</span>
+            <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-faith-soft text-faith">신앙 {share.faithRate}%</span>
           </div>
         </div>
 

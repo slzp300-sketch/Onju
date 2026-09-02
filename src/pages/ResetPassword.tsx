@@ -42,7 +42,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="relative min-h-dvh bg-surface flex flex-col px-6">
+    <div className="auth-paper relative min-h-dvh flex flex-col px-6">
       <ForestBackdrop />
       <div className="flex flex-col items-center pt-20 pb-10">
         <div className="mb-4">
@@ -52,7 +52,7 @@ export default function ResetPassword() {
       </div>
 
       {isAuthenticated ? (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="auth-paper-panel flex flex-col gap-3">
           <input
             type="password"
             value={password}

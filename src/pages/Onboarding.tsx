@@ -102,7 +102,7 @@ export default function Onboarding() {
   const canPlant = title.trim().length > 0;
 
   return (
-    <div className="relative min-h-dvh bg-surface flex flex-col select-none">
+    <div className="onboarding-paper relative min-h-dvh flex flex-col select-none">
       <ForestBackdrop />
 
       {/* 상단: 진행 도트 + 건너뛰기 */}
@@ -143,7 +143,7 @@ export default function Onboarding() {
             {/* ── 0. 환영 ── */}
             {idx === 0 && (
               <>
-                <div className="flex-shrink-0 w-full rounded-2xl bg-primary-soft p-5 mb-5 flex items-center justify-center min-h-[220px]">
+                <div className="onboarding-illustration flex-shrink-0 w-full p-5 mb-5 flex items-center justify-center min-h-[220px]">
                   <div className="flex flex-col items-center gap-3 w-full">
                     <BrandLogo size={80} />
                     <p className="text-caption2 font-bold text-primary tracking-widest">ONJU</p>
@@ -174,7 +174,7 @@ export default function Onboarding() {
             {/* ── 1. 개념 ── */}
             {idx === 1 && (
               <>
-                <div className="flex-shrink-0 w-full rounded-2xl bg-primary-soft p-4 mb-5 flex flex-col gap-2.5 min-h-[220px] justify-center">
+                <div className="onboarding-illustration flex-shrink-0 w-full p-4 mb-5 flex flex-col gap-2.5 min-h-[220px] justify-center">
                   {CONCEPT_FEATURES.map(item => (
                     <div key={item.label} className="flex items-center gap-3 bg-surface rounded-xl px-4 py-3 shadow-emphasize">
                       <div className="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center text-primary flex-shrink-0">
@@ -215,7 +215,7 @@ export default function Onboarding() {
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={() => chooseType('faith')}
-                    className="w-full flex items-center gap-4 rounded-2xl bg-surface border border-line p-4 text-left shadow-emphasize hover:border-primary transition-colors"
+                    className="onboarding-choice-card w-full flex items-center gap-4 p-4 text-left hover:border-primary transition-colors"
                   >
                     <div className="w-12 h-12 rounded-2xl bg-primary-soft flex items-center justify-center text-primary flex-shrink-0">
                       <Church size={24} strokeWidth={1.9} />
@@ -228,7 +228,7 @@ export default function Onboarding() {
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={() => chooseType('personal')}
-                    className="w-full flex items-center gap-4 rounded-2xl bg-surface border border-line p-4 text-left shadow-emphasize hover:border-primary transition-colors"
+                    className="onboarding-choice-card w-full flex items-center gap-4 p-4 text-left hover:border-primary transition-colors"
                   >
                     <div className="w-12 h-12 rounded-2xl bg-primary-soft flex items-center justify-center text-primary flex-shrink-0">
                       <Dumbbell size={24} strokeWidth={1.9} />

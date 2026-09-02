@@ -8,8 +8,8 @@ type LegacyColor = 'indigo' | 'green' | 'yellow' | 'red' | 'gray' | 'purple';
 const TONES: Record<Tone, string> = {
   solid: 'bg-primary text-white',
   soft: 'bg-primary-soft text-primary',
-  positive: 'bg-positive/10 text-[#009632]',
-  cautionary: 'bg-cautionary/10 text-[#d47800]',
+  positive: 'bg-positive/10 text-positive',
+  cautionary: 'bg-cautionary/10 text-cautionary',
   negative: 'bg-negative/10 text-negative',
   neutral: 'bg-fill text-label-alt',
 };
@@ -36,7 +36,7 @@ export default function Badge({ label, tone, color, className, children }: Badge
   return (
     <span
       className={cn(
-        'inline-flex h-[22px] items-center gap-1 whitespace-nowrap rounded px-2',
+        'inline-flex min-h-6 items-center gap-1 whitespace-nowrap rounded-full border border-transparent px-2.5',
         'text-caption1 font-bold',
         TONES[resolved],
         className,

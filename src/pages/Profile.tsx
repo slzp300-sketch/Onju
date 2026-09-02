@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { User, Bell, ChevronRight, LogOut, CalendarDays, Clock } from '../icons';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
 import ConfirmModal from '../components/ui/ConfirmModal';
+import SegmentedControl from '../components/ui/SegmentedControl';
 import { useAuthStore } from '../store/authStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { useThemeStore, THEME_TIERS } from '../store/themeStore';
@@ -31,47 +31,36 @@ export default function Profile() {
   };
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
-      <div className="px-4 pt-5">
-        <h1 className="text-heading2 font-bold text-label-strong font-brand">프로필</h1>
-      </div>
+    <div className="profile-paper flex min-h-full flex-col gap-4 pb-4">
+      <header className="px-5 pt-5">
+        <p className="text-caption1 font-medium tracking-wide text-label-alt">나답게 가꾸는 공간</p>
+        <h1 className="mt-0.5 text-heading1 font-bold text-label-strong font-brand">나의 온주</h1>
+      </header>
 
-      <Card className="mx-4">
+      <Card className="profile-hero mx-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-primary-soft flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl border border-primary/15 bg-primary-soft flex items-center justify-center shadow-emphasize">
             <User size={22} className="text-primary" />
           </div>
-          <div>
-            <p className="text-body2 font-bold text-label-strong">{user!.name}</p>
-            <p className="text-caption1 text-label-alt">{user!.email}</p>
+          <div className="min-w-0">
+            <p className="text-body1 font-bold text-label-strong truncate">{user!.name}</p>
+            <p className="text-caption1 text-label-alt truncate">{user!.email}</p>
           </div>
         </div>
       </Card>
 
-      <Card className="mx-4" padding="none">
+      <section className="mx-4">
+        <h2 className="mb-2 px-1 text-label2 font-bold text-label-strong">생활 설정</h2>
+      <Card className="profile-settings-card" padding="none">
         {/* 주 시작 요일 */}
         <div className="flex items-center justify-between px-4 py-3.5">
           <div className="flex items-center gap-3">
             <CalendarDays size={16} className="text-label-alt" />
             <span className="text-body2 font-semibold text-label-strong">주 시작 요일</span>
           </div>
-          <div className="flex bg-fill rounded-xl p-0.5">
-            {([{ label: '월', value: 1 }, { label: '일', value: 0 }] as const).map(opt => (
-              <motion.button
-                key={opt.value}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.1 }}
-                onClick={() => setWeekStartDay(opt.value)}
-                className={`px-4 py-1.5 rounded-lg text-body2 font-bold transition-all ${
-                  weekStartDay === opt.value
-                    ? 'bg-surface shadow-sm text-label-strong'
-                    : 'text-label-assistive'
-                }`}
-              >
-                {opt.label}
-              </motion.button>
-            ))}
-          </div>
+          <SegmentedControl value={String(weekStartDay) as '0' | '1'}
+            onChange={value => setWeekStartDay(Number(value) as 0 | 1)} label="주 시작 요일"
+            items={[{ label: '월', value: '1' }, { label: '일', value: '0' }]} className="w-28" />
         </div>
         <div className="h-px bg-line-soft mx-4" />
         {/* 전날 체크 마감 시각 */}
@@ -83,46 +72,33 @@ export default function Profile() {
               <p className="text-caption2 text-label-assistive mt-0.5">이 시각까지 어제 루틴·습관을 마저 체크할 수 있어요</p>
             </div>
           </div>
-          <div className="flex bg-fill rounded-xl p-0.5">
-            {([{ label: '없음', value: 0 }, { label: '새벽 3시', value: 3 }, { label: '새벽 6시', value: 6 }] as const).map(opt => (
-              <motion.button
-                key={opt.value}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.1 }}
-                onClick={() => setGraceEndHour(opt.value)}
-                className={`flex-1 py-1.5 rounded-lg text-caption1 font-bold whitespace-nowrap transition-all ${
-                  graceEndHour === opt.value
-                    ? 'bg-surface shadow-sm text-label-strong'
-                    : 'text-label-assistive'
-                }`}
-              >
-                {opt.label}
-              </motion.button>
-            ))}
-          </div>
+          <SegmentedControl value={String(graceEndHour) as '0' | '3' | '6'}
+            onChange={value => setGraceEndHour(Number(value))} label="전날 체크 마감 시각"
+            items={[{ label: '없음', value: '0' }, { label: '새벽 3시', value: '3' }, { label: '새벽 6시', value: '6' }]} />
         </div>
         <div className="h-px bg-line-soft mx-4" />
         <MenuItem icon={<Bell size={16} />} label="알림 설정" onClick={() => navigate('/notification-settings')} />
-        <div className="h-px bg-line-soft mx-4" />
-        <button
-          onClick={() => { logout(); navigate('/login', { replace: true }); }}
-          className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-fill transition-colors"
-        >
-          <LogOut size={16} className="text-negative" />
-          <span className="text-body2 text-negative flex-1">로그아웃</span>
-        </button>
       </Card>
+      </section>
 
       {/* 숲 테마 — 보상 트랙으로 이동 */}
       <ThemeEntryCard />
 
-      {/* 계정 삭제 — 스토어 정책상 앱 내 제공 필수 */}
-      <button
-        onClick={() => setDeleteOpen(true)}
-        className="mx-4 mb-2 py-2 text-caption1 text-label-assistive underline underline-offset-2 self-center"
-      >
-        계정 삭제
-      </button>
+      <section className="mx-4 mb-2">
+        <h2 className="mb-2 px-1 text-label2 font-bold text-label-strong">계정</h2>
+        <Card className="profile-account-card" padding="none">
+          <button onClick={() => { logout(); navigate('/login', { replace: true }); }}
+            className="w-full flex min-h-12 items-center gap-3 px-4 py-3.5 text-left hover:bg-fill transition-colors">
+            <LogOut size={16} className="text-label-alt" />
+            <span className="text-body2 text-label flex-1">로그아웃</span>
+          </button>
+          <div className="h-px bg-line-soft mx-4" />
+          <button onClick={() => setDeleteOpen(true)}
+            className="w-full min-h-12 px-4 py-3.5 text-left text-caption1 text-negative hover:bg-negative/5 transition-colors">
+            계정과 모든 기록 영구 삭제
+          </button>
+        </Card>
+      </section>
 
       <ConfirmModal
         isOpen={deleteOpen}
@@ -148,7 +124,7 @@ function ThemeEntryCard() {
   const remaining = growth.nextThreshold !== null ? growth.nextThreshold - growth.points : 0;
 
   return (
-    <Card className="mx-4" padding="none">
+    <Card className="profile-theme-card mx-4" padding="none">
       <button
         onClick={() => navigate('/themes')}
         className="w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-fill transition-colors rounded-2xl"

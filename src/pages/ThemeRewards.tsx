@@ -22,23 +22,24 @@ export default function ThemeRewards() {
   const remaining = growth.nextThreshold !== null ? growth.nextThreshold - growth.points : 0;
 
   return (
-    <div className="pb-6">
+    <div className="theme-rewards-paper min-h-full pb-6">
       <motion.div variants={container} initial="hidden" animate="show">
         {/* 헤더 */}
-        <motion.div variants={itemV} className="flex items-center gap-2 px-4 pt-4 pb-3">
+        <motion.div variants={itemV} className="flex items-center gap-3 px-4 pt-5 pb-3">
           <motion.button
             whileTap={{ scale: 0.9 }}
             transition={{ duration: 0.1 }}
             onClick={() => navigate(-1)}
-            className="p-1 -ml-1 text-label-alt"
+            aria-label="뒤로 가기"
+            className="paper-back-button text-label-alt"
           >
             <ChevronLeft size={24} />
           </motion.button>
-          <h1 className="text-heading2 font-bold text-label-strong font-brand">숲 테마</h1>
+          <div><p className="text-caption1 font-medium text-label-alt">나무와 함께 열리는 풍경</p><h1 className="text-heading2 font-bold text-label-strong font-brand">숲 테마</h1></div>
         </motion.div>
 
         {/* 성장 현황 히어로 */}
-        <motion.div variants={itemV} className="mx-4 rounded-3xl p-4 flex items-center gap-3" style={{ background: 'var(--gradient-hero)' }}>
+        <motion.div variants={itemV} className="theme-rewards-hero mx-4 p-4 flex items-center gap-3" style={{ background: 'var(--gradient-hero)' }}>
           <TreeVisual stage={growth.stage} health={growth.health} size={88} />
           <div className="flex-1 min-w-0">
             <p className="text-caption1 text-label-alt">나의 나무</p>
@@ -135,7 +136,7 @@ function TierRow({
       </div>
 
       {/* 보상 카드 */}
-      <div className={`flex-1 mb-5 rounded-2xl border bg-surface p-4 ${unlocked || isNext ? 'border-line-soft shadow-sm' : 'border-line-soft/70'}`}>
+      <div className={`theme-reward-card flex-1 mb-5 p-4 ${isActive ? 'is-active' : ''} ${unlocked ? '' : 'is-locked'}`}>
         <div className="flex items-center justify-between gap-2">
           <span className="text-caption2 font-bold tracking-wide" style={{ color: tier.preview.accent }}>
             {tier.requiredStage === 0 ? '이야기의 시작' : `${STAGE_NAMES[tier.requiredStage]} 보상 · ${STAGE_THRESHOLDS[tier.requiredStage]}pt`}
@@ -237,7 +238,7 @@ function ThemePreviewModal({ tier, growth, onClose }: { tier: ThemeTier | null; 
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            className="bg-surface rounded-3xl p-5 w-full max-w-xs shadow-2xl"
+            className="theme-preview-sheet bg-surface p-5 w-full max-w-xs shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">
@@ -245,7 +246,7 @@ function ThemePreviewModal({ tier, growth, onClose }: { tier: ThemeTier | null; 
                 <span className="w-3.5 h-3.5 rounded-full flex-shrink-0" style={{ backgroundColor: tier.preview.accent }} />
                 <p className="text-body1 font-bold text-label-strong">'{tier.name}' 미리보기</p>
               </div>
-              <button onClick={onClose} className="p-1 -mr-1 text-label-assistive">
+              <button onClick={onClose} aria-label="미리보기 닫기" className="min-w-11 min-h-11 -mr-2 grid place-items-center text-label-assistive">
                 <X size={18} />
               </button>
             </div>

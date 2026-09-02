@@ -1,7 +1,8 @@
 import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { X, Lock, BellRing, Bell } from '../../icons';
-import { motion, AnimatePresence } from 'framer-motion';
 import { to12h, to24h } from '../../utils/alarmTime';
+import OverlayDialog from './OverlayDialog';
+import Button from './Button';
 
 /* ══════════════════════════════════════
    드럼롤 컬럼
@@ -116,23 +117,11 @@ export function AlarmTimeSheet({ isOpen, time, onChange, onDelete, onClose }: Al
   const { ampmIdx, hourIdx, minuteIdx } = to12h(time);
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-40"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-            className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-surface rounded-t-3xl z-50"
-          >
+    <OverlayDialog isOpen={isOpen} onClose={onClose} labelledBy="alarm-time-sheet-title" variant="sheet">
             {/* 헤더 */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-line-soft">
-              <span className="text-headline1 font-bold text-label-strong">🔔 알림</span>
-              <button onClick={onClose} className="p-1 text-label-assistive hover:text-label-alt">
+              <span id="alarm-time-sheet-title" className="text-headline1 font-bold text-label-strong">🔔 알림</span>
+              <button type="button" aria-label="알림 시간 닫기" onClick={onClose} className="min-w-11 min-h-11 -m-2 flex items-center justify-center text-label-assistive hover:text-label-alt">
                 <X size={20} />
               </button>
             </div>
@@ -149,12 +138,7 @@ export function AlarmTimeSheet({ isOpen, time, onChange, onDelete, onClose }: Al
               className="px-5 pb-6 flex flex-col gap-3"
               style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
             >
-              <button
-                onClick={onClose}
-                className="w-full h-12 rounded-xl bg-primary text-white font-bold text-body1 hover:bg-primary-strong transition-colors"
-              >
-                확인
-              </button>
+              <Button fullWidth onClick={onClose}>확인</Button>
               <button
                 onClick={() => { onDelete(); onClose(); }}
                 className="text-negative text-body2 font-medium self-center"
@@ -162,10 +146,7 @@ export function AlarmTimeSheet({ isOpen, time, onChange, onDelete, onClose }: Al
                 알림 삭제
               </button>
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+    </OverlayDialog>
   );
 }
 
@@ -181,23 +162,11 @@ interface AlarmTypeSheetProps {
 
 export function AlarmTypeSheet({ isOpen, type, onChange, onClose }: AlarmTypeSheetProps) {
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-40"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-            className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-surface rounded-t-3xl z-50"
-          >
+    <OverlayDialog isOpen={isOpen} onClose={onClose} labelledBy="alarm-type-sheet-title" variant="sheet">
             {/* 헤더 */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-line-soft">
-              <span className="text-headline1 font-bold text-label-strong">🔔 알림</span>
-              <button onClick={onClose} className="p-1 text-label-assistive hover:text-label-alt">
+              <span id="alarm-type-sheet-title" className="text-headline1 font-bold text-label-strong">🔔 알림</span>
+              <button type="button" aria-label="알림 유형 닫기" onClick={onClose} className="min-w-11 min-h-11 -m-2 flex items-center justify-center text-label-assistive hover:text-label-alt">
                 <X size={20} />
               </button>
             </div>
@@ -257,9 +226,6 @@ export function AlarmTypeSheet({ isOpen, type, onChange, onClose }: AlarmTypeShe
                 ? '시간에 맞춰 푸시 알림을 받아요'
                 : '알림음은 네이티브 앱 전환 시 지원돼요'}
             </p>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+    </OverlayDialog>
   );
 }

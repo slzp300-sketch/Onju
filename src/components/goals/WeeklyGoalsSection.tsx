@@ -12,6 +12,7 @@ import { currentWeek, currentYear, getWeekRangeFor } from '../../utils/date';
 import { countWeeklyGoalDone, weeklyGoalRate } from '../../utils/weeklyGoalProgress';
 import { newId } from '../../utils/id';
 import type { WeeklyGoal } from '../../types';
+import OnjuIcon from '../ui/OnjuIcon';
 
 const MAX_TARGET = 7;
 
@@ -106,7 +107,7 @@ export default function WeeklyGoalsSection() {
           <div key={g.id}
             className={`bg-surface border rounded-xl px-4 py-3.5 ${achieved ? 'border-positive/35' : 'border-line-soft'}`}>
             <div className="flex items-center gap-2.5">
-              <span className="text-lg">{g.emoji ?? '🎯'}</span>
+              <OnjuIcon emoji={g.emoji} fallback="🎯" size={26} />
               <div className="flex-1 min-w-0">
                 <p className="text-body2 font-bold text-label-strong truncate">{g.title} 주 {g.targetCount}회</p>
                 <p className="text-caption2 text-primary-strong font-semibold mt-0.5 flex items-center gap-1">
@@ -179,7 +180,7 @@ export default function WeeklyGoalsSection() {
                       onClick={() => setPickedId(l.id)}
                       className="w-full flex items-center gap-3 py-3 border-b border-line-soft text-left disabled:opacity-40"
                     >
-                      <span className="text-lg">{l.emoji ?? '🌱'}</span>
+                      <OnjuIcon emoji={l.emoji} size={26} />
                       <span className="flex-1 text-body2 font-semibold text-label-strong truncate">{l.title}</span>
                       <span className="text-caption2 text-label-assistive flex-shrink-0">
                         {used ? '이미 목표 있음' : l.kind === 'habit' ? '습관' : l.isFaith ? '신앙루틴' : '루틴'}
