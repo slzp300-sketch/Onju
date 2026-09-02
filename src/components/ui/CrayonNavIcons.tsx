@@ -1,5 +1,6 @@
 /**
- * 하단 네비 크레파스 아이콘 — lucide 대체 손그림 세트.
+ * 하단 네비 손그림 아이콘 — 브랜드 모티프 세트.
+ * 홈=침엽수 나무, 통계=나이테, 소모임=새싹, 마이페이지=사람.
  * lucide와 동일한 {size, strokeWidth} 인터페이스라 App의 NavItem에 그대로 꽂힌다.
  */
 interface IconProps {
@@ -28,50 +29,47 @@ function CrayonSvg({ children, size = 22 }: { children: React.ReactNode; size?: 
   );
 }
 
-/** 홈 — 언덕 위 작은 나무 */
+/** 홈 — 침엽수 나무 */
 export function NavTree({ size, strokeWidth = 1.8 }: IconProps) {
   return (
     <CrayonSvg size={size}>
       <g strokeWidth={strokeWidth}>
-        <path d="M12 20 V13.5" />
-        <circle cx="12" cy="8" r="3.6" />
-        <circle cx="8.6" cy="11" r="2.6" />
-        <circle cx="15.4" cy="11" r="2.6" />
-        <path d="M6 20.5 Q12 17.5 18 20.5" />
+        <path d="M12 3.5 L8.2 9 H10 L6.8 14 H9 L5.8 19 H18.2 L15 14 H17.2 L14 9 H15.8 Z" />
+        <path d="M12 19 V21.5" />
       </g>
     </CrayonSvg>
   );
 }
 
-/** 통계 — 삐뚤한 막대 셋 */
+/** 통계 — 나이테 (자라난 기록의 결) */
 export function NavBars({ size, strokeWidth = 1.8 }: IconProps) {
   return (
     <CrayonSvg size={size}>
-      <g strokeWidth={strokeWidth + 0.6}>
-        <path d="M6 19.5 L6.2 13" />
-        <path d="M12 19.5 L11.8 6.5" />
-        <path d="M18 19.5 L18.1 10.5" />
+      <g strokeWidth={strokeWidth}>
+        <circle cx="12" cy="12" r="8.8" />
+        <path d="M12 6.2 A5.8 5.8 0 1 1 6.2 12" />
+        <path d="M12 9.2 A2.8 2.8 0 1 1 9.2 12" />
+        <circle cx="12" cy="12" r="0.4" fill="currentColor" />
       </g>
-      <path d="M4 20 Q12 19.2 20 20" strokeWidth={strokeWidth * 0.8} opacity="0.6" />
     </CrayonSvg>
   );
 }
 
-/** 소모임 — 나란한 두 사람 */
+/** 소모임 — 함께 자라는 새싹 */
 export function NavPeople({ size, strokeWidth = 1.8 }: IconProps) {
   return (
     <CrayonSvg size={size}>
       <g strokeWidth={strokeWidth}>
-        <circle cx="9" cy="8.5" r="2.8" />
-        <path d="M4.5 19 Q4.8 13.8 9 13.8 Q13.2 13.8 13.5 19" />
-        <circle cx="16.3" cy="9.5" r="2.3" />
-        <path d="M14.8 13.6 Q19.4 13.8 19.7 18.6" />
+        <path d="M12 21 V12.5" />
+        <path d="M12 14.5 C12 10.2 9 7.5 5.2 7.5 C5.2 11.8 8.2 14.7 12 14.5 Z" />
+        <path d="M12 12 C12 8.4 14.6 5.6 18.8 5.6 C18.8 9.4 16 12.2 12 12 Z" />
+        <path d="M6.5 21 Q12 19.2 17.5 21" />
       </g>
     </CrayonSvg>
   );
 }
 
-/** 마이페이지 — 동그라미 속 사람 */
+/** 마이페이지 — 사람 */
 export function NavProfile({ size, strokeWidth = 1.8 }: IconProps) {
   return (
     <CrayonSvg size={size}>

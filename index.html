@@ -13,6 +13,15 @@
     <title>온주</title>
   </head>
   <body>
+    <!-- 전역 손그림 필터 — 모든 lucide 아이콘에 CSS(filter: url(#ui-crayon))로 적용 -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <filter id="ui-crayon" x="-15%" y="-15%" width="130%" height="130%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.25 0.35" numOctaves="2" seed="8" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="0.8" />
+        </filter>
+      </defs>
+    </svg>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
