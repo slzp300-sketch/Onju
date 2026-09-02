@@ -1,4 +1,4 @@
-/** 원형 도장 SVG — worn-ink 느낌 */
+/** 원형 도장 SVG — 크레파스로 그린 손도장 느낌 */
 interface StampSealProps {
   label: string;
   sublabel?: string;
@@ -19,24 +19,29 @@ export default function StampSeal({ label, sublabel, color, size = 200 }: StampS
       width={size}
       height={size}
       viewBox="0 0 100 100"
-      style={{ filter: `drop-shadow(0 0 12px ${color}70)` }}
+      style={{ filter: `drop-shadow(0 2px 6px ${color}45)` }}
     >
       <defs>
-        <filter id={filterId} x="-8%" y="-8%" width="116%" height="116%">
+        <filter id={filterId} x="-10%" y="-10%" width="120%" height="120%">
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="0.042"
-            numOctaves="4"
+            baseFrequency="0.05 0.08"
+            numOctaves="3"
             seed="9"
             result="noise"
           />
           <feDisplacementMap
             in="SourceGraphic"
             in2="noise"
-            scale="2.8"
+            scale="3.6"
             xChannelSelector="R"
             yChannelSelector="G"
+            result="d"
           />
+          {/* 크레파스 칠 압력 그레인 */}
+          <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="13" result="g" />
+          <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.8 0" result="ga" />
+          <feComposite in="d" in2="ga" operator="arithmetic" k1="0.45" k2="0.75" k3="0" k4="0" />
         </filter>
       </defs>
 
@@ -67,10 +72,10 @@ export default function StampSeal({ label, sublabel, color, size = 200 }: StampS
           <>
             <text x="50" y={baseY} textAnchor="middle" dominantBaseline="middle"
               fill={color} fontSize={fs} fontWeight="900" letterSpacing="-0.3"
-              style={{ fontFamily: 'system-ui, sans-serif' }} opacity="0.95">{line1}</text>
+              style={{ fontFamily: 'Jua, system-ui, sans-serif' }} opacity="0.95">{line1}</text>
             <text x="50" y={baseY + 17} textAnchor="middle" dominantBaseline="middle"
               fill={color} fontSize={fs} fontWeight="900" letterSpacing="-0.3"
-              style={{ fontFamily: 'system-ui, sans-serif' }} opacity="0.95">{line2}</text>
+              style={{ fontFamily: 'Jua, system-ui, sans-serif' }} opacity="0.95">{line2}</text>
           </>
         );
       })() : (
@@ -83,7 +88,7 @@ export default function StampSeal({ label, sublabel, color, size = 200 }: StampS
           fontSize={label.length <= 3 ? '24' : '18'}
           fontWeight="900"
           letterSpacing="-0.5"
-          style={{ fontFamily: 'system-ui, sans-serif' }}
+          style={{ fontFamily: 'Jua, system-ui, sans-serif' }}
           opacity="0.95"
         >
           {label}
@@ -101,7 +106,7 @@ export default function StampSeal({ label, sublabel, color, size = 200 }: StampS
           fontSize="9"
           fontWeight="700"
           letterSpacing="0.5"
-          style={{ fontFamily: 'system-ui, sans-serif' }}
+          style={{ fontFamily: 'Jua, system-ui, sans-serif' }}
           opacity="0.85"
         >
           {sublabel}

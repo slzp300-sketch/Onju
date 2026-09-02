@@ -100,6 +100,11 @@
   background-image: var(--gradient-cta);
 }
 
+/* 이모지를 크레파스 톤으로 — 채도 낮추고 세피아를 살짝 입혀 그림체에 붙인다 */
+.emoji-crayon {
+  filter: saturate(0.72) sepia(0.18) contrast(0.92);
+}
+
 /* 종이 테마: 순백 카드를 종이색으로 일괄 매핑 (모달·카드 등 bg-white 사용처) */
 .bg-white {
   background-color: var(--color-surface);

@@ -120,7 +120,7 @@ function RoutineGroup({ routineId, viewDate, readOnly }: { routineId: string; vi
           <ChevronDown size={16} />
         </motion.button>
 
-        <span className="text-lg">{routine.emoji}</span>
+        <span className="text-lg emoji-crayon">{routine.emoji}</span>
         <span className="flex-1 text-label1 font-bold text-label-strong">{routine.title}</span>
 
         {routine.when && (
@@ -228,7 +228,7 @@ function HabitRow({ habit, index, inRoutine = false, viewDate, readOnly = false 
         </span>
 
         {/* 이모지 */}
-        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${
+        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 emoji-crayon ${
           done ? 'bg-primary-soft' : substituted ? 'bg-orange-50' : skipped ? 'bg-amber-50' : 'bg-fill'
         }`}>
           {habit.emoji}

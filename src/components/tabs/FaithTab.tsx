@@ -245,7 +245,7 @@ function FaithRoutineRow({ routine, index, viewDate, readOnly = false, onRemove,
         </span>
 
         {/* 이모지 아이콘 (장식) */}
-        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 ${
+        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 emoji-crayon ${
           done ? 'bg-emerald-50' : skipped ? 'bg-amber-50' : 'bg-fill'
         }`}>
           {routine.emoji ?? <Church size={18} strokeWidth={1.9} className="text-emerald-500" />}

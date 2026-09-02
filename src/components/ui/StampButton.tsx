@@ -24,8 +24,8 @@ export default function StampButton({
       }`}
     >
       <span
-        className={`text-[10px] font-black tracking-tighter leading-none ${
-          active ? inkColor : `${dryColor} opacity-30`
+        className={`text-[11px] font-brand leading-none ${
+          active ? inkColor : `${dryColor} opacity-35`
         }`}
       >
         {label}

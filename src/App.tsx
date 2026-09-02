@@ -2,7 +2,7 @@ import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
-import { BarChart2, Users, UserCircle, TreePine } from 'lucide-react';
+import { NavTree, NavBars, NavPeople, NavProfile } from './components/ui/CrayonNavIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/authStore';
 import { useThemeStore, applyTheme } from './store/themeStore';
@@ -63,16 +63,16 @@ type NavItem = {
 const NAV_GROUPS: NavItem[][] = [
   // 그룹 1: 홈, 통계
   [
-    { to: '/', icon: TreePine, label: '홈', matchPaths: ['/goals', '/review', '/faith-notes'] },
-    { to: '/stats', icon: BarChart2, label: '통계' },
+    { to: '/', icon: NavTree, label: '홈', matchPaths: ['/goals', '/review', '/faith-notes'] },
+    { to: '/stats', icon: NavBars, label: '통계' },
   ],
   // 그룹 2: 소모임 (루틴공유는 백엔드 연결 전까지 네비에서 숨김 — 경로는 유지)
   [
-    { to: '/groups', icon: Users, label: '소모임' },
+    { to: '/groups', icon: NavPeople, label: '소모임' },
   ],
   // 그룹 3: 마이페이지
   [
-    { to: '/profile', icon: UserCircle, label: '마이페이지' },
+    { to: '/profile', icon: NavProfile, label: '마이페이지' },
   ],
 ];
 
