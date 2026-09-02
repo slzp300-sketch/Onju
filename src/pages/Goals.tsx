@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, ChevronLeft, ChevronDown, ChevronUp, Pencil, Trash2, Lock, PartyPopper, BookOpen, Dumbbell, Link2, ClipboardList, Pin, Clock, CheckCircle2, Flame, Zap } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronDown, ChevronUp, Pencil, Trash2, Lock, PartyPopper, BookOpen, Dumbbell, Link2, ClipboardList, Pin, Clock, CheckCircle2, Flame, Zap } from '../icons';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';

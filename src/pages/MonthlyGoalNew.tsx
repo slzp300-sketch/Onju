@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Check, Star, Lightbulb, Calendar, Dumbbell, Flame, Zap, Palette, BookOpen } from 'lucide-react';
+import { ChevronLeft, Check, Star, Lightbulb, Calendar, Dumbbell, Flame, Zap, Palette, BookOpen } from '../icons';
 import { motion } from 'framer-motion';
 import { format, addDays } from 'date-fns';
 import { useGoalStore } from '../store/goalStore';

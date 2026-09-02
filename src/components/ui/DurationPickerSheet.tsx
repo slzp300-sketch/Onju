@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X } from '../../icons';
 
 /* ── 드럼롤 컬럼 ── */
 const ITEM_H = 48;

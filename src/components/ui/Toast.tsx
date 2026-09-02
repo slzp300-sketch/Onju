@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Info, X } from '../../icons';
 import { useToastStore, type ToastType } from '../../store/toastStore';
 
 const ICON: Record<ToastType, React.ElementType> = {

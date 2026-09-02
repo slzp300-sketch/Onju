@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { PartyPopper, Check } from 'lucide-react';
+import { PartyPopper, Check } from '../../icons';
 import { useUIStore } from '../../store/uiStore';
 
 /** 주간 목표 슬롯 해금 축하 — 지난 주 평균 달성률 80% 이상 시 SlotUnlockWatcher가 띄운다 */

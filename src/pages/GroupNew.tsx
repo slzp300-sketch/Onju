@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Check } from 'lucide-react';
+import { ChevronLeft, Check } from '../icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, addDays } from 'date-fns';
 import { useGroupStore } from '../store/groupStore';

@@ -1,8 +1,15 @@
 import {
   Church, Sprout, Briefcase, Dumbbell, Sparkles,
   Sunrise, BookOpen, Footprints, Sun, Flame, Cross, Target,
-  type LucideIcon,
-} from 'lucide-react';
+} from '../icons';
+
+// lucide·온주 커스텀 아이콘 공용 타입
+type IconType = React.ComponentType<{
+  size?: number | string;
+  strokeWidth?: number | string;
+  className?: string;
+  style?: React.CSSProperties;
+}>;
 import type { GroupCategory, GroupStatus, SmallGroup } from '../types';
 
 export const GROUP_STATUS_META: Record<GroupStatus, { label: string; color: 'green' | 'indigo' | 'gray' }> = {
@@ -17,7 +24,7 @@ export function effectiveStatus(g: Pick<SmallGroup, 'status' | 'endDate'>): Grou
   return g.status;
 }
 
-export const GROUP_CATEGORIES: { key: GroupCategory; label: string; Icon: LucideIcon }[] = [
+export const GROUP_CATEGORIES: { key: GroupCategory; label: string; Icon: IconType }[] = [
   { key: 'faith', label: '신앙', Icon: Church },
   { key: 'growth', label: '자기계발', Icon: Sprout },
   { key: 'work', label: '직장', Icon: Briefcase },
@@ -30,7 +37,7 @@ export const GROUP_CATEGORY_LABEL = Object.fromEntries(
 ) as Record<GroupCategory, string>;
 
 // 커버 아이콘 프리셋 (저장 값 = 아이콘 키)
-export const COVER_ICONS: Record<string, LucideIcon> = {
+export const COVER_ICONS: Record<string, IconType> = {
   sunrise: Sunrise, church: Church, dumbbell: Dumbbell, book: BookOpen, run: Footprints,
   sun: Sun, flame: Flame, sprout: Sprout, cross: Cross, target: Target,
 };

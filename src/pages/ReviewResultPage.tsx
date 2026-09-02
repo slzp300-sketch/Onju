@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, Star, Smile, Frown } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { ChevronLeft, Star, Smile, Frown } from '../icons';
+import type { LucideIcon } from '../icons';
 import { fetchReviewByWeek } from '../api/reviews';
 import Card from '../components/ui/Card';
 

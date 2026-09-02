@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronDown } from 'lucide-react';
+import { X, ChevronDown } from '../../icons';
 import Button from '../ui/Button';
 import { parseFaithMemo, type BibleMemoData } from '../../utils/faithMemo';
 

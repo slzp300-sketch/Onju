@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, Trash2, ListTodo, BookOpen, Flame, Dumbbell, Link2, Clock, Lock } from 'lucide-react';
+import { Target, Trash2, ListTodo, BookOpen, Flame, Dumbbell, Link2, Clock, Lock } from '../icons';
 import FAB from '../components/ui/FAB';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';

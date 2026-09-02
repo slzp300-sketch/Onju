@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X } from '../../icons';
 import Button from '../ui/Button';
 import { parseFaithMemo, type PrayerCategory, type PrayerMemoData } from '../../utils/faithMemo';
 

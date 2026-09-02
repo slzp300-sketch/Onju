@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Check, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Trash2 } from '../icons';
 import { motion } from 'framer-motion';
 import { format, addDays, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';

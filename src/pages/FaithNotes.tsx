@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ChevronLeft, Feather, Sparkles } from 'lucide-react';
+import { ChevronLeft, Feather, Sparkles } from '../icons';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Target, BookOpen, Dumbbell, Link2, Pin, BarChart3, Flame, FileText, Moon } from 'lucide-react';
+import { ChevronRight, Target, BookOpen, Dumbbell, Link2, Pin, BarChart3, Flame, FileText, Moon } from '../icons';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, getDay } from 'date-fns';

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Trash2, BookOpen, Play, Timer, Church, Sunrise, Sun, Moon, Cloud, Zap, Feather, ChevronRight } from 'lucide-react';
+import { Trash2, BookOpen, Play, Timer, Church, Sunrise, Sun, Moon, Cloud, Zap, Feather, ChevronRight } from '../../icons';
 import type { ReactNode } from 'react';
 import StampButton from '../ui/StampButton';
 import RowStamp from '../ui/RowStamp';

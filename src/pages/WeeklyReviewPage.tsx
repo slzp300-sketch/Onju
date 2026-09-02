@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronRight, Check, Plus, X, Pencil, ChevronLeft, Trash2, Target, PartyPopper, Dumbbell, Sprout, BookOpen, Smile, Zap, Flame } from 'lucide-react';
+import { ChevronRight, Check, Plus, X, Pencil, ChevronLeft, Trash2, Target, PartyPopper, Dumbbell, Sprout, BookOpen, Smile, Zap, Flame } from '../icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRoutineStore } from '../store/routineStore';
 import { useGoalStore } from '../store/goalStore';

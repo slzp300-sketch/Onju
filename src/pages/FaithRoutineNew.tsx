@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Check, Timer, Church, Pencil, Bell, Calendar, Zap, Lightbulb, Target, Sunrise, Sun, Moon } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { ChevronLeft, Check, Timer, Church, Pencil, Bell, Calendar, Zap, Lightbulb, Target, Sunrise, Sun, Moon } from '../icons';
+import type { LucideIcon } from '../icons';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 import DurationPickerSheet from '../components/ui/DurationPickerSheet';
 import { AlarmTimeSheet, AlarmTypeSheet } from '../components/ui/HabitAlarmSheet';

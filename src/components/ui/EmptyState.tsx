@@ -1,4 +1,4 @@
-import { Sprout } from 'lucide-react';
+import { Sprout } from '../../icons';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;

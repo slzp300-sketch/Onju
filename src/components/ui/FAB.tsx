@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus } from '../../icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FABOption {

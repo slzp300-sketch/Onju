@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ChevronRight, CheckCircle2, Sparkles, AlarmClock, Flame } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Sparkles, AlarmClock, Flame } from '../../icons';
 
 interface ReviewBannerProps {
   completed: boolean;

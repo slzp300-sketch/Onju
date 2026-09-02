@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Target, Bell, Calendar, Check, Zap, Lightbulb, Flame } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Target, Bell, Calendar, Check, Zap, Lightbulb, Flame } from '../icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 import { format } from 'date-fns';
@@ -8,7 +8,7 @@ import { AlarmTimeSheet, AlarmTypeSheet } from '../components/ui/HabitAlarmSheet
 import { to12h } from '../utils/alarmTime';
 import DurationPickerSheet from '../components/ui/DurationPickerSheet';
 import { fmtDuration } from '../utils/duration';
-import { Timer } from 'lucide-react';
+import { Timer } from '../icons';
 import { useNotificationStore } from '../store/notificationStore';
 
 const tap = { whileTap: { scale: 0.98 }, transition: { duration: 0.12 } };

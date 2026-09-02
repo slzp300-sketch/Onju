@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Shield, X, Flame, Check } from 'lucide-react';
+import { ChevronLeft, Shield, X, Flame, Check } from '../icons';
 import { format, getDay } from 'date-fns';
 import { useRoutineStore } from '../store/routineStore';
 import { useHabitStore } from '../store/habitStore';

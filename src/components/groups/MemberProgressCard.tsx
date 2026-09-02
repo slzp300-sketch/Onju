@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, X, Heart, Church } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Flame, X, Heart, Church } from '../../icons';
 import type { MemberGroupProgress, CheerType } from '../../types';
 
-const CHEER_ICONS: Record<CheerType, LucideIcon> = {
+type IconType = React.ComponentType<{ size?: number | string; strokeWidth?: number | string; className?: string }>;
+
+const CHEER_ICONS: Record<CheerType, IconType> = {
   heart: Heart,
   fire: Flame,
   pray: Church,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Bell, BellOff, Sunrise, Moon, ClipboardList } from 'lucide-react';
+import { ChevronLeft, Bell, BellOff, Sunrise, Moon, ClipboardList } from '../icons';
 import { motion } from 'framer-motion';
 import { Capacitor } from '@capacitor/core';
 import Card from '../components/ui/Card';

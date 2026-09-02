@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Zap, PartyPopper } from 'lucide-react';
+import { X, Check, Zap, PartyPopper } from '../../icons';
 import type { Habit, DailyRoutine } from '../../types';
 import HabitFocusMode from './HabitFocusMode';
 import FocusMode from './FocusMode';

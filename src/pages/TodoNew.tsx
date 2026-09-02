@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Calendar } from 'lucide-react';
+import { ChevronLeft, Calendar } from '../icons';
 import { motion } from 'framer-motion';
 import { useTodoStore } from '../store/todoStore';
 import { today } from '../utils/date';

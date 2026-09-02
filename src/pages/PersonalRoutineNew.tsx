@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Timer, GripVertical, Dumbbell, Flame, Clock } from 'lucide-react';
+import { ChevronLeft, Timer, GripVertical, Dumbbell, Flame, Clock } from '../icons';
 import DurationPickerSheet from '../components/ui/DurationPickerSheet';
 import { fmtDuration } from '../utils/duration';
 import { format } from 'date-fns';

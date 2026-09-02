@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Users, Check, LogOut, Play, Flag, BarChart3, Sprout, Flame, Heart, Church } from 'lucide-react';
+import { ChevronLeft, Users, Check, LogOut, Play, Flag, BarChart3, Sprout, Flame, Heart, Church } from '../icons';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Plus, Trash2, Pencil, ChevronDown, ChevronUp, ChevronLeft, Dumbbell, CheckCircle2, Pin, Clock, MapPin, Flame, Zap } from 'lucide-react';
+import { Plus, Trash2, Pencil, ChevronDown, ChevronUp, ChevronLeft, Dumbbell, CheckCircle2, Pin, Clock, MapPin, Flame, Zap } from '../icons';
 import { motion as m } from 'framer-motion';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';

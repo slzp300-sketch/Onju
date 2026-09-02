@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown, Smile, ClipboardList, Flame, Cloud, Zap } from 'lucide-react';
+import { Trash2, Timer, CheckSquare, LayoutList, Play, ChevronDown, Smile, ClipboardList, Flame, Cloud, Zap } from '../../icons';
 import StampButton from '../ui/StampButton';
 import RowStamp from '../ui/RowStamp';
 import RowRestAnim from '../ui/RowRestAnim';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, CheckCircle, XCircle, AlertCircle, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, XCircle, AlertCircle, ChevronDown } from '../icons';
 import { useAuthStore } from '../store/authStore';
 import BrandLogo from '../components/ui/BrandLogo';
 import ForestBackdrop from '../components/tree/ForestBackdrop';

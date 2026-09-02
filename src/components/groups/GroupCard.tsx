@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Users, Calendar } from 'lucide-react';
+import { Users, Calendar } from '../../icons';
 import type { SmallGroup } from '../../types';
 import Badge from '../ui/Badge';
 import { GROUP_CATEGORY_LABEL, GROUP_STATUS_META, effectiveStatus, COVER_ICONS } from '../../utils/groupMeta';

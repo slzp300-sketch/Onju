@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback, useMemo } from 'react';
-import { X, Lock, BellRing, Bell } from 'lucide-react';
+import { X, Lock, BellRing, Bell } from '../../icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { to12h, to24h } from '../../utils/alarmTime';
 

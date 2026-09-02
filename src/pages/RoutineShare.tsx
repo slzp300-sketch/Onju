@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Check, Share2, Heart, X, Users } from 'lucide-react';
+import { Camera, Check, Share2, Heart, X, Users } from '../icons';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';

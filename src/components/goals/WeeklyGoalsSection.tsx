@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Check, Link2 } from 'lucide-react';
+import { Plus, X, Check, Link2 } from '../../icons';
 import { format } from 'date-fns';
 import { useAuthStore } from '../../store/authStore';
 import { useGoalStore } from '../../store/goalStore';

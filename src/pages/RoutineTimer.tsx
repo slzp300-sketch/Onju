@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pause, Play, SkipForward, Check, Timer } from 'lucide-react';
+import { X, Pause, Play, SkipForward, Check, Timer } from '../icons';
 import confetti from 'canvas-confetti';
 import { useHabitStore } from '../store/habitStore';
 import type { Habit } from '../types';

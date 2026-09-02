@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { X, Check } from 'lucide-react';
+import { X, Check } from '../../icons';
 import confetti from 'canvas-confetti';
 import type { Habit } from '../../types';
 import { useHabitStore } from '../../store/habitStore';

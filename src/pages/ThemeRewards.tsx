@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Lock, Check, Eye, X, TreePine, Users, UserCircle, Sparkles } from 'lucide-react';
+import { ChevronLeft, Lock, Check, Eye, X, TreePine, Users, UserCircle, Sparkles } from '../icons';
 import { useThemeStore, THEME_TIERS, TIER_LEVEL, type ThemeTier } from '../store/themeStore';
 import { useTreeGrowth } from '../hooks/useTreeGrowth';
 import { STAGE_NAMES, STAGE_THRESHOLDS, type TreeGrowth } from '../utils/treeGrowth';

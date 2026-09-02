@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Camera, ChevronRight } from 'lucide-react';
+import { Plus, Camera, ChevronRight } from '../icons';
 import { useQuery } from '@tanstack/react-query';
 import GroupCard from '../components/groups/GroupCard';
 import Button from '../components/ui/Button';

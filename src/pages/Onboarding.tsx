@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, Dumbbell, BarChart3, Sunrise, Sun, Moon, Church, Sprout, Check } from 'lucide-react';
+import { BookOpen, Dumbbell, BarChart3, Sunrise, Sun, Moon, Church, Sprout, Check } from '../icons';
 import { useAuthStore } from '../store/authStore';
 import { useHabitStore } from '../store/habitStore';
 import { useRoutineStore } from '../store/routineStore';
