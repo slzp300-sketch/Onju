@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle, XCircle, AlertCircle, ChevronDown } from '../icons';
 import { useAuthStore } from '../store/authStore';
-import BrandLogo from '../components/ui/BrandLogo';
 import ForestBackdrop from '../components/tree/ForestBackdrop';
 
 const DOMAIN_OPTIONS = [
@@ -83,10 +82,7 @@ export default function Signup() {
   return (
     <div className="auth-paper relative min-h-dvh flex flex-col px-6">
       <ForestBackdrop />
-      <div className="flex flex-col items-center pt-16 pb-8">
-        <div className="mb-4">
-          <BrandLogo size={56} />
-        </div>
+      <div className="auth-copy-header flex flex-col items-center pt-20 pb-8">
         <h1 className="text-heading2 font-bold text-label-strong font-brand">회원가입</h1>
         <p className="text-label2 text-label-alt mt-1">함께 루틴을 만들어가요</p>
       </div>

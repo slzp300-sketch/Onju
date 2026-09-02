@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { loginWithGoogle, loginWithKakao, requestPasswordReset } from '../lib/authActions';
-import BrandLogo from '../components/ui/BrandLogo';
 import ForestBackdrop from '../components/tree/ForestBackdrop';
 
 export default function Login() {
@@ -62,10 +61,7 @@ export default function Login() {
     <div className="auth-paper relative min-h-dvh flex flex-col px-6">
       <ForestBackdrop />
       {/* 헤더 */}
-      <div className="flex flex-col items-center pt-20 pb-10">
-        <div className="mb-4">
-          <BrandLogo size={56} />
-        </div>
+      <div className="auth-copy-header flex flex-col items-center pt-20 pb-10">
         <h1 className="text-heading2 font-bold text-label-strong font-brand">온주</h1>
         <p className="text-label2 text-label-alt mt-1">크리스천 직장인의 루틴 파트너</p>
       </div>

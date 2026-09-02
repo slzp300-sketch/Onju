@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { updatePassword } from '../lib/authActions';
-import BrandLogo from '../components/ui/BrandLogo';
 import ForestBackdrop from '../components/tree/ForestBackdrop';
 
 /**
@@ -44,10 +43,7 @@ export default function ResetPassword() {
   return (
     <div className="auth-paper relative min-h-dvh flex flex-col px-6">
       <ForestBackdrop />
-      <div className="flex flex-col items-center pt-20 pb-10">
-        <div className="mb-4">
-          <BrandLogo size={56} />
-        </div>
+      <div className="auth-copy-header flex flex-col items-center pt-24 pb-10">
         <h1 className="text-heading2 font-bold text-label-strong font-brand">비밀번호 재설정</h1>
       </div>
 

@@ -612,12 +612,48 @@ body:has(.stats-paper)::-webkit-scrollbar {
     linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
 }
 
+.auth-paper {
+  overflow-x: hidden;
+}
+
+.auth-paper::before {
+  position: absolute;
+  z-index: 0;
+  top: -56px;
+  left: 50%;
+  width: min(112vw, 470px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  content: '';
+  transform: translateX(-50%);
+  opacity: .13;
+  background: url('/brand/onju-tree-logo.webp') center / contain no-repeat;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 58%, transparent 92%);
+  mask-image: linear-gradient(to bottom, #000 0 58%, transparent 92%);
+}
+
+.auth-copy-header,
+.auth-paper-panel,
+.auth-paper > p {
+  position: relative;
+  z-index: 1;
+}
+
 .auth-paper-panel {
   padding: var(--space-4);
   border: var(--line-emphasis) solid var(--ui-border);
   border-radius: var(--radius-xl);
   background: color-mix(in srgb, var(--ui-bg-surface) 93%, transparent);
   box-shadow: var(--shadow-emphasize);
+}
+
+.brand-logo-image {
+  display: block;
+  flex-shrink: 0;
+  border-radius: 24%;
+  object-fit: cover;
+  box-shadow: 0 7px 16px rgb(74 62 34 / 12%);
 }
 
 .auth-paper-panel button,
