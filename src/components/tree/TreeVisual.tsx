@@ -45,9 +45,17 @@ export default function TreeVisual({ stage, health, size = 110, animateGrowth = 
       role="img"
       aria-label={`나의 나무 — ${stage}단계, ${health === 'healthy' ? '싱싱함' : health === 'dry' ? '약간 시듦' : '시듦'}`}
     >
-      {/* 땅 */}
-      <ellipse cx="100" cy="164" rx="72" ry="11" fill="#e2ebe0" />
-      <ellipse cx="100" cy="162" rx="52" ry="7" fill="#d3e2cf" />
+      <defs>
+        {/* 크레파스 가장자리 — 노이즈 변위로 손그림 질감 */}
+        <filter id="tree-crayon" x="-8%" y="-8%" width="116%" height="116%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.06 0.1" numOctaves="3" seed="5" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5" />
+        </filter>
+      </defs>
+      <g filter="url(#tree-crayon)">
+      {/* 땅 — 종이 캔버스에 맞춘 웜 톤 */}
+      <ellipse cx="100" cy="164" rx="72" ry="11" fill="#e6dfc6" />
+      <ellipse cx="100" cy="162" rx="52" ry="7" fill="#d9d0b2" />
 
       {/* 풀포기 — 나무 곁에 자라는 풀 */}
       <g opacity={health === 'wilted' ? 0.5 : 0.85}>
@@ -147,6 +155,7 @@ export default function TreeVisual({ stage, health, size = 110, animateGrowth = 
           </g>
         </g>
       )}
+      </g>
     </svg>
   );
 }

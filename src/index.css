@@ -99,6 +99,11 @@
   background-image: var(--gradient-cta);
 }
 
+/* 종이 테마: 순백 카드를 종이색으로 일괄 매핑 (모달·카드 등 bg-white 사용처) */
+.bg-white {
+  background-color: var(--color-surface);
+}
+
 /* 크레파스 채움 질감 — 프라이머리 면 위에 밝은 왁스 결 오버레이 */
 .bg-primary,
 .bg-faith {
