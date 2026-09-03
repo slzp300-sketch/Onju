@@ -7,9 +7,9 @@ const goalCardProperties={
   fallbackAction:{type:'string'},recoveryRule:{type:'string'},reviewCycle:{type:'string'},
   weeklyActions:{type:'array',maxItems:7,items:{type:'object',additionalProperties:false,required:['title','frequencyPerWeek','durationMinutes','preferredDays'],properties:{title:{type:'string'},frequencyPerWeek:{type:'integer',minimum:1,maximum:7},durationMinutes:{type:'integer',minimum:1,maximum:480},preferredDays:{type:'array',items:{type:'integer',minimum:0,maximum:6}}}}},
 }
-const schema={type:'object',additionalProperties:false,required:['assistant_message','goal_card','missing_fields','ready_for_confirmation'],properties:{
+const schema={type:'object',additionalProperties:false,required:['assistant_message','goal_card','missing_fields','ready_for_confirmation','suggestions'],properties:{
   assistant_message:{type:'string'},goal_card:{type:'object',additionalProperties:false,required:Object.keys(goalCardProperties),properties:goalCardProperties},
-  missing_fields:{type:'array',items:{type:'string'}},ready_for_confirmation:{type:'boolean'},
+  missing_fields:{type:'array',items:{type:'string'}},ready_for_confirmation:{type:'boolean'},suggestions:{type:'array',maxItems:3,items:{type:'string'}},
 }}
 
 const instructions=(today:string)=>`당신은 온주(Onju)의 목표 설계 파트너다. 현재 한국 시각은 ${today}, 기준 시간대는 Asia/Seoul이다.
@@ -18,6 +18,10 @@ const instructions=(today:string)=>`당신은 온주(Onju)의 목표 설계 파�
 대화 원칙:
 - 매 응답에서 사용자가 가장 쉽게 답할 수 있는 질문을 정확히 하나만 한다. 한꺼번에 설문하지 않는다.
 - 이미 답한 내용은 다시 묻지 않고 goal_card를 매번 완전한 최신 상태로 반환한다. 모르는 문자열은 "", 모르는 숫자는 0, 모르는 배열은 []로 둔다.
+- 질문부터 던지지 않는다. 지금까지 파악한 내용 → 현실적인 판단 → 추천 기본안 → 결정에 필요한 질문 하나의 순서로 사용자를 주도적으로 이끈다.
+- 추천할 때는 사용자가 정하도록 넘기지 말고 가장 현실적인 숫자 하나를 먼저 제시한다. 사용자가 원하면 바꿀 수 있다고 덧붙인다.
+- 사용 가능한 시간과 행동량을 직접 계산하고 목표 기간 안에 가능한 주간 횟수·분량인지 점검한다.
+- 여러 목표가 나오면 우선순위를 제안하고, 초기에는 영역당 핵심 목표 1개와 전체 핵심 루틴 5개 이하를 권한다.
 - 사용자가 말한 목표는 표현이 다소 막연해도 category와 outcome에 먼저 자연스럽게 요약한다. 운동·체력·신디는 건강·운동, 공부·자격증·독서는 자기계발·공부, 업무·사업·출시는 일·커리어로 분류한다. 명백한 카테고리를 기타로 두지 않는다.
 - 결과 지표(종료 시 달성 여부)와 행동 지표(매주 통제 가능한 반복)를 분리한다.
 - 기준선이 없으면 수치를 꾸며내지 말고 첫 1~2주 측정을 제안한다.
@@ -31,7 +35,17 @@ const instructions=(today:string)=>`당신은 온주(Onju)의 목표 설계 파�
 - 필수 정보가 모두 구체적일 때만 ready_for_confirmation=true로 둔다. 그때는 질문 대신 카드 확인과 승인을 요청한다.
 - 다음 질문은 missing_fields 중 우선순위가 가장 높은 하나만 묻는다. 한 문장 안에서 두 가지 수치나 정보를 동시에 요구하지 않는다. 우선순위는 기준선 → 결과 목표 수치 → 정체성 → 주간 행동 → 실행 단서 → 2분 시작 → 축소 실행 → 복귀 규칙이다.
 
-필수 정보: category, outcome, durationWeeks/deadline, baselineMetric, targetMetric, identity, weeklyActions, tinyStart, cue, fallbackAction, recoveryRule.`
+필수 정보: category, outcome, durationWeeks/deadline, baselineMetric, targetMetric, identity, weeklyActions, tinyStart, cue, fallbackAction, recoveryRule.
+
+assistant_message 형식:
+- ChatGPT와 함께 계획을 다듬는 것처럼 자연스럽게 답한다. 고정된 섹션을 매번 반복하지 않는다.
+- 간단한 답은 1~2개 문단으로 쓰고, 수치·계획·비교가 둘 이상일 때만 목록을 사용한다.
+- 중요한 판단이나 추천이 있을 때만 "💡 온주의 제안" 같은 짧은 제목을 선택적으로 사용한다.
+- 한 문단은 2~3문장을 넘기지 않고 빈 줄은 문단 사이에 하나만 둔다. 문장마다 강제로 줄바꿈하지 않는다.
+- 질문은 마지막에 한 번만 한다. ready_for_confirmation=true이면 질문 대신 자연스럽게 승인을 요청한다.
+- 마크다운 표와 # 제목, 별표 강조 문법은 사용하지 않는다.
+- 사용자가 답한 뒤 현실적인 선택지가 분명할 때만 suggestions에 2~3개의 짧은 답변 후보를 넣는다. 사용자의 수치나 설명이 필요한 질문이면 빈 배열을 반환한다.
+- suggestions는 누르면 그대로 사용자 답변이 될 수 있는 문구로 쓰고 설명이나 물음표를 넣지 않는다.`
 
 Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{headers:corsHeaders});try{
   const apiKey=Deno.env.get('OPENAI_API_KEY');if(!apiKey)throw new Error('OPENAI_API_KEY is not configured')
@@ -39,7 +53,8 @@ Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{head
   const today=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'full',timeStyle:'short'}).format(new Date())
   const requestBody:Record<string,unknown>={model:'gpt-4o-mini',store:true,instructions:instructions(today),input:JSON.stringify({user_message:body.message,current_goal_card:body.goalCard??{},confirmed_schedule_blocks:Array.isArray(body.scheduleBlocks)?body.scheduleBlocks:[]}),text:{format:{type:'json_schema',name:'onju_goal_design_turn',strict:true,schema}}}
   if(typeof body.previousResponseId==='string'&&body.previousResponseId.startsWith('resp_'))requestBody.previous_response_id=body.previousResponseId
-  const response=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(requestBody)})
+  let response=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(requestBody)})
+  if(!response.ok&&requestBody.previous_response_id){delete requestBody.previous_response_id;response=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(requestBody)})}
   if(!response.ok)throw new Error(`OpenAI request failed: ${response.status}`)
   const result=await response.json();const outputText=result.output?.flatMap((item:{content?:{type:string;text?:string}[]})=>item.content??[]).find((part:{type:string})=>part.type==='output_text')?.text
   if(!outputText||typeof result.id!=='string')throw new Error('No structured output returned')

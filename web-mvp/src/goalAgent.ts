@@ -8,13 +8,13 @@ export type GoalCard={
   baselineMetric:string;targetMetric:string;weeklyActions:WeeklyAction[];tinyStart:string
   cue:string;environment:string;fallbackAction:string;recoveryRule:string;reviewCycle:string
 }
-export type GoalAgentResult={assistant_message:string;goal_card:GoalCard;missing_fields:string[];ready_for_confirmation:boolean;response_id:string}
+export type GoalAgentResult={assistant_message:string;goal_card:GoalCard;missing_fields:string[];ready_for_confirmation:boolean;suggestions:string[];response_id:string}
 
 export const emptyGoalCard:GoalCard={category:'기타',outcome:'',identity:'',durationWeeks:0,deadline:'',baselineMetric:'',targetMetric:'',weeklyActions:[],tinyStart:'',cue:'',environment:'',fallbackAction:'',recoveryRule:'두 번 연속 놓치지 않기',reviewCycle:'매주 실행률 확인 · 4주마다 조정'}
 
 const url=import.meta.env.VITE_SUPABASE_URL as string|undefined
 const anonKey=import.meta.env.VITE_SUPABASE_ANON_KEY as string|undefined
-const supabase=url&&anonKey?createClient(url,anonKey):null
+const supabase=url&&anonKey?createClient(url,anonKey,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}):null
 
 export async function designGoal(input:{message:string;goalCard:GoalCard;scheduleBlocks:AiScheduleBlock[];previousResponseId?:string}){
   if(!supabase)throw new Error('Supabase 환경변수가 연결되지 않았어요.')

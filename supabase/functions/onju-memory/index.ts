@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     if (body.action === 'load') {
       const { data, error } = await supabase
         .from('web_mvp_agent_sessions')
-        .select('stage,messages,blocks,pending_blocks,goal,reason,obstacle,openai_response_id,goal_card,goal_response_id,generated_plan,plan_response_id,updated_at')
+        .select('stage,messages,blocks,pending_blocks,day_bounds,goal,reason,obstacle,openai_response_id,goal_card,goal_response_id,generated_plan,plan_response_id,pending_plan,plan_revision_history,plan_revision_response_id,updated_at')
         .eq('session_id', body.sessionId)
         .gt('expires_at', new Date().toISOString())
         .maybeSingle()
@@ -43,10 +43,11 @@ Deno.serve(async (req) => {
       const state = body.state ?? {}
       const payload = {
         session_id: body.sessionId,
-        stage: Math.max(0, Math.min(4, Number.isInteger(state.stage) ? state.stage : 0)),
+        stage: Math.max(0, Math.min(5, Number.isInteger(state.stage) ? state.stage : 0)),
         messages: cleanArray(state.messages, 100),
         blocks: cleanArray(state.blocks, 100),
         pending_blocks: cleanArray(state.pendingBlocks, 30),
+        day_bounds: cleanArray(state.dayBounds, 14),
         goal: cleanText(state.goal),
         reason: cleanText(state.reason),
         obstacle: cleanText(state.obstacle),
@@ -55,6 +56,21 @@ Deno.serve(async (req) => {
         goal_response_id: cleanText(state.goalResponseId, 200) || null,
         generated_plan: cleanArray(state.generatedPlan, 14),
         plan_response_id: cleanText(state.planResponseId, 200) || null,
+        updated_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      }
+      const { error } = await supabase.from('web_mvp_agent_sessions').upsert(payload, { onConflict: 'session_id' })
+      if (error) throw error
+      return new Response(JSON.stringify({ saved: true }), { headers: jsonHeaders })
+    }
+
+    if (body.action === 'save_plan_revision') {
+      const payload = {
+        session_id: body.sessionId,
+        generated_plan: cleanArray(body.plan, 14),
+        pending_plan: cleanArray(body.pendingPlan, 14),
+        plan_revision_history: cleanArray(body.history, 50),
+        plan_revision_response_id: cleanText(body.responseId, 200) || null,
         updated_at: new Date().toISOString(),
         expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       }
