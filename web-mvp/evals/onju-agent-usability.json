@@ -1,0 +1,19 @@
+[
+  {
+    "name": "여러 목표로 자연스럽게 전환하고 초안 제안",
+    "turns": ["매일 6시 기상 23시 취침", "평일 9시부터 18시까지 근무해", "목표를 세우고 달성하고 싶어. 일적인 부분과 건강, 신앙 세 파트야. 너무 질문이 많으니까 네가 작게 시작할 초안부터 추천해줘"],
+    "expect": {"stage":5,"goalOutcome":true,"contains":"초안","minChoices":2,"paragraphs":true,"maxQuestions":1,"maxReplyLength":900,"noGoalActions":true}
+  },
+  {
+    "name": "미정 주말을 강요하지 않고 아는 일정부터 반영",
+    "turns": ["평일은 6시 기상 23시 취침. 주말 기상 취침은 전혀 일정하지 않아, 그때그때 알려줄게", "평일 6:30-8:30까지 이동하고, 8:30-17:30까지 근무해"],
+    "turnExpect": [{"stage":1,"allDayBounds":false}],
+    "expect": {"stage":1,"allDayBounds":false,"minBlocks":2,"minChoices":2,"maxQuestions":1,"paragraphs":true,"blocks":[{"days":[0,1,2,3,4],"start":"06:30","end":"08:30"},{"days":[0,1,2,3,4],"start":"08:30","end":"17:30"}]}
+  },
+  {
+    "name": "기준선 없이 독서 초안을 제시하고 동의 후 묶음 저장",
+    "turns": ["매일 6시 기상 23시 취침", "일정은 여기까지예요", "독서 습관을 만들고 싶어. 현재 독서량은 모르겠고 구체적인 횟수랑 기간은 네가 가볍게 추천해줘", "네가 제안한 초안 그대로 시작할게. 현재 독서량은 미정으로 두고 기간과 목표 수치, 주간 행동을 반영해줘"],
+    "turnExpect": [{},{},{"noGoalActions":true,"minChoices":2,"contains":"초안","maxQuestions":1}],
+    "expect": {"stage":5,"goalOutcome":true,"goalActions":1,"readyGoal":true,"maxQuestions":1,"maxReplyLength":900}
+  }
+]

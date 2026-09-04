@@ -1,0 +1,5048 @@
+{
+  "manifest": {
+    "runId": "2026-09-04T01-59-46-188Z",
+    "expires": 1788494386189,
+    "sourceHashes": {
+      "agent.ts": "c6058f2a6dbe9a112ec0f49f8b69ceeff7afe31dd73ffd3622fe3b3a823c98ca",
+      "goal.ts": "75c43b1c2971ce629ce18d536d9b8b18b5dca753751ea0b6eadceb7dc4dcc155",
+      "policy.ts": "e5c457a199ba69c5844cc80b81f9c9dc4a93ae70e063d0cb4c42ee998412fe24",
+      "prompt.ts": "54e648f0693f5039dd2eb803e19f89b6f1596660fbf1721b68879077e599b8d0",
+      "state.ts": "8b568836ec0cd7451177b59d76db2f187e7b42e316d0c09db18deed81d887eaf"
+    },
+    "fixtures": [
+      {
+        "id": "two-blocks",
+        "name": "이동·근무 동시 추출",
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": []
+        },
+        "message": "평일 6:30-8:30까지 이동하고, 8:30-17:30까지 근무해",
+        "rules": [
+          "commuteWork"
+        ]
+      },
+      {
+        "id": "unknown-weekend",
+        "name": "주말 미정 허용",
+        "initial": {},
+        "message": "평일은 6시 기상 23시 취침. 주말 기상 취침은 전혀 일정하지 않아, 그때그때 알려줄게",
+        "rules": [
+          "weekdayOnly",
+          "scheduleFocus"
+        ]
+      },
+      {
+        "id": "partial-sleep",
+        "name": "토요일 답변을 일요일에 복제하지 않기",
+        "initial": {
+          "stage": 0,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "평일은 6시 기상 23시 취침, 토요일 8시 기상이고 일요일 7시 기상이야"
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "평일 기상·취침을 반영했어요. 토요일에는 몇 시에 잠드나요?"
+            }
+          ]
+        },
+        "message": "토요일에는 자정에 자요",
+        "rules": [
+          "saturdayOnly",
+          "askSunday"
+        ]
+      },
+      {
+        "id": "correct-wednesday",
+        "name": "수요일 수정·나머지 요일 보존",
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "평일 9시부터 18시까지 근무해"
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "평일 근무 시간을 반영했어요."
+            }
+          ]
+        },
+        "message": "수요일만 종료 시간을 17시로 바꿔줘",
+        "rules": [
+          "wednesdayCorrection"
+        ]
+      },
+      {
+        "id": "schedule-done",
+        "name": "일정 완료 후 목표 전환",
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "messages": []
+        },
+        "message": "더이상 일정에 대해 설명할게 없어. 이제 목표를 세우자",
+        "rules": [
+          "goalsFocus",
+          "goalReply"
+        ]
+      },
+      {
+        "id": "three-goals",
+        "name": "일·건강·신앙 초안 능동 제안",
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "messages": []
+        },
+        "message": "목표를 세우고 달성하고 싶어. 일적인 부분과 건강, 신앙 세 파트야. 너무 질문이 많으니까 네가 작게 시작할 초안부터 추천해줘",
+        "rules": [
+          "goalsFocus",
+          "threeDomains",
+          "draftChoices",
+          "noUnapprovedNumbers"
+        ]
+      },
+      {
+        "id": "approve-draft",
+        "name": "동의한 기간·수치·루틴 정확히 저장",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "독서 습관을 만들고 싶어. 수치와 기간은 네가 가볍게 추천해줘."
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "**독서 초안**: 우선 2주 동안 주 3회, 한 번에 10분 읽기를 제안해요. 결과 기준은 2주간 6회 실행이에요. 현재 독서량은 미정으로 둘게요.\n\n이 초안으로 시작할까요?"
+            }
+          ],
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "reading-fixture-v1",
+              "presentedMessageId": "a",
+              "card": {
+                "category": "독서",
+                "outcome": "독서 습관 만들기",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주간 6회 실행",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "독서",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "message": "그 초안 그대로 시작할게",
+        "rules": [
+          "approvedReading"
+        ]
+      },
+      {
+        "id": "reject-draft",
+        "name": "초안 거절·축소 제안은 미확정",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "독서 습관을 만들고 싶어. 수치와 기간은 네가 가볍게 추천해줘."
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "**독서 초안**: 우선 2주 동안 주 3회, 한 번에 10분 읽기를 제안해요. 결과 기준은 2주간 6회 실행이에요. 현재 독서량은 미정으로 둘게요.\n\n이 초안으로 시작할까요?"
+            }
+          ]
+        },
+        "message": "아니, 그건 부담돼. 더 가벼운 다른 초안을 제안해줘. 아직 확정하지는 말고.",
+        "rules": [
+          "noUnapprovedNumbers",
+          "draftChoices"
+        ]
+      },
+      {
+        "id": "overnight",
+        "name": "자정 넘는 일정 구조 한계",
+        "structuralControl": true,
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": []
+        },
+        "message": "매주 금요일 밤 11시부터 토요일 새벽 1시까지 모임이 있어. 시간 지도에 반영해줘",
+        "rules": [
+          "overnightCoverage"
+        ]
+      }
+    ],
+    "model": "gpt-4.1-2025-04-14",
+    "limitUsd": 2,
+    "notes": [
+      "Identical legacy fixtures except approval now contains the versioned displayed draft and a simple unqualified acceptance.",
+      "Unknown rhythm fields are represented explicitly rather than absent records. Criteria compare known time values.",
+      "Temporary function imports the production core directly; no database access.",
+      "No 429 retries; record failures as observed."
+    ]
+  },
+  "summary": {
+    "all": {
+      "n": 18,
+      "pass": 18,
+      "usd": 0.13196200000000002
+    },
+    "before": {
+      "n": 16,
+      "pass": 12,
+      "meanUsd": 0.012888374999999999,
+      "meanUncachedUsd": 0.018024375000000002,
+      "meanCalls": 2.375,
+      "medianSeconds": 3.5952053000000017
+    },
+    "after": {
+      "n": 16,
+      "pass": 16,
+      "meanUsd": 0.008247625000000001,
+      "meanUncachedUsd": 0.009855625,
+      "meanCalls": 1.6875,
+      "medianSeconds": 2.9429619999999996
+    }
+  },
+  "results": [
+    {
+      "id": "two-blocks",
+      "rep": 0,
+      "elapsedMs": 5532.7973999999995,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "separateBlocks": true,
+        "noRepeatedRhythm": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4928,
+        "cached": 0,
+        "output": 261,
+        "calls": 2,
+        "usd": 0.011944,
+        "uncachedUsd": 0.011944
+      },
+      "result": {
+        "state": {
+          "stage": 1,
+          "messages": [
+            {
+              "id": "8d92c10d-6737-4d5d-b5cf-592a82b31d6e",
+              "role": "user",
+              "text": "평일 6:30-8:30까지 이동하고, 8:30-17:30까지 근무해"
+            },
+            {
+              "id": "39b23e8e-0d71-4279-a0a6-8d0d9773bda7",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **평일 이동**: 06:30–08:30\n- **평일 근무**: 08:30–17:30\n- 등록된 일정 기준 평일 **06:00–06:30**, **17:30–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**여기서 추가로 기록할 고정 일정이 더 있나요?**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "이동",
+              "start": "06:30",
+              "end": "08:30",
+              "kind": "fixed"
+            },
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "08:30",
+              "end": "17:30",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false,
+              "deferred": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:14.118Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2161,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 154,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2315
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:01:14.120Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**평일 이동**: 06:30–08:30",
+                "**평일 근무**: 08:30–17:30"
+              ],
+              "missingRhythm": null,
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 6,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                }
+              ]
+            },
+            "args": {
+              "bounds": [
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금"
+                  ],
+                  "wake": "06:00",
+                  "bedtime": "23:00",
+                  "variable": false,
+                  "deferred": false
+                },
+                {
+                  "days": [
+                    "토",
+                    "일"
+                  ],
+                  "wake": "06:00",
+                  "bedtime": "23:00",
+                  "variable": false,
+                  "deferred": false
+                }
+              ],
+              "blocks": [
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금"
+                  ],
+                  "title": "이동",
+                  "start": "06:30",
+                  "end": "08:30",
+                  "kind": "fixed"
+                },
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금"
+                  ],
+                  "title": "근무",
+                  "start": "08:30",
+                  "end": "17:30",
+                  "kind": "fixed"
+                }
+              ],
+              "updates": []
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:15.894Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2767,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 107,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2874
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:01:15.895Z",
+            "result": {
+              "ok": true,
+              "stage": 1,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "schedule",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**평일 이동**: 06:30–08:30",
+                "**평일 근무**: 08:30–17:30",
+                "등록된 일정 기준 평일 **06:00–06:30**, **17:30–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요."
+              ],
+              "question": "여기서 추가로 기록할 고정 일정이 더 있나요?",
+              "choices": [
+                "일정은 여기까지예요",
+                "추가할 일정이 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **평일 이동**: 06:30–08:30\n- **평일 근무**: 08:30–17:30\n- 등록된 일정 기준 평일 **06:00–06:30**, **17:30–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**여기서 추가로 기록할 고정 일정이 더 있나요?**",
+        "suggestions": [
+          "일정은 여기까지예요",
+          "추가할 일정이 있어요"
+        ],
+        "response_id": "resp_0935a0d748c09a79016a9a266a3fdc87d08ef263b7a7b5ad9c",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2161,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 154,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2315
+            },
+            "elapsedMs": 2402
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2767,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 107,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2874
+            },
+            "elapsedMs": 1774
+          }
+        ]
+      }
+    },
+    {
+      "id": "unknown-weekend",
+      "rep": 0,
+      "elapsedMs": 3524.117699999999,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "knownWeekdays": true,
+        "noInventedWeekend": true,
+        "scheduleFocus": true,
+        "noDeferredQuestion": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4549,
+        "cached": 0,
+        "output": 209,
+        "calls": 2,
+        "usd": 0.01077,
+        "uncachedUsd": 0.01077
+      },
+      "result": {
+        "state": {
+          "stage": 1,
+          "messages": [
+            {
+              "id": "9e4c5329-11b2-40cb-9b0d-1d0c17b3722d",
+              "role": "user",
+              "text": "평일은 6시 기상 23시 취침. 주말 기상 취침은 전혀 일정하지 않아, 그때그때 알려줄게"
+            },
+            {
+              "id": "a3a044c7-9870-47ee-835d-d6281018881e",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **평일**: 06:00 기상 · 23:00 취침\n- **토요일·일요일**: 기상 미정 · 취침 미정 (나중에 확인)\n\n**이제 꼭 지키고 싶은 일정(근무, 이동 등)이 있나요?**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false,
+              "deferred": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:25.353Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2071,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 77,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2148
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:01:25.354Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**평일**: 06:00 기상 · 23:00 취침",
+                "**토요일·일요일**: 기상 미정 · 취침 미정 (나중에 확인)"
+              ],
+              "missingRhythm": null,
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "미정 또는 변동",
+                  "slots": []
+                },
+                {
+                  "day": 6,
+                  "status": "미정 또는 변동",
+                  "slots": []
+                }
+              ]
+            },
+            "args": {
+              "bounds": [
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금"
+                  ],
+                  "wake": "06:00",
+                  "bedtime": "23:00",
+                  "variable": false,
+                  "deferred": false
+                },
+                {
+                  "days": [
+                    "토",
+                    "일"
+                  ],
+                  "wake": "",
+                  "bedtime": "",
+                  "variable": true,
+                  "deferred": true
+                }
+              ],
+              "blocks": [],
+              "updates": []
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:27.435Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2478,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 132,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2610
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:01:27.435Z",
+            "result": {
+              "ok": true,
+              "stage": 1,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "schedule",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**평일**: 06:00 기상 · 23:00 취침",
+                "**토요일·일요일**: 기상 미정 · 취침 미정 (나중에 확인)"
+              ],
+              "question": "이제 꼭 지키고 싶은 일정(근무, 이동 등)이 있나요?",
+              "choices": [
+                "일정은 여기까지예요",
+                "추가할 일정이 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **평일**: 06:00 기상 · 23:00 취침\n- **토요일·일요일**: 기상 미정 · 취침 미정 (나중에 확인)\n\n**이제 꼭 지키고 싶은 일정(근무, 이동 등)이 있나요?**",
+        "suggestions": [
+          "일정은 여기까지예요",
+          "추가할 일정이 있어요"
+        ],
+        "response_id": "resp_0238efa917c2b3b8016a9a2675949c87d0bff23f77984b7eeb",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2071,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 77,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2148
+            },
+            "elapsedMs": 1258
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2478,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 132,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2610
+            },
+            "elapsedMs": 2081
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-sleep",
+      "rep": 0,
+      "elapsedMs": 3405.5537000000004,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "saturday": true,
+        "sundayNotGuessed": true,
+        "stillRhythm": true,
+        "askExactSunday": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4797,
+        "cached": 0,
+        "output": 182,
+        "calls": 2,
+        "usd": 0.01105,
+        "uncachedUsd": 0.01105
+      },
+      "result": {
+        "state": {
+          "stage": 0,
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "평일은 6시 기상 23시 취침, 토요일 8시 기상이고 일요일 7시 기상이야"
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "평일 기상·취침을 반영했어요. 토요일에는 몇 시에 잠드나요?"
+            },
+            {
+              "id": "04375021-a53a-4d79-a458-e9b9f457a5a2",
+              "role": "user",
+              "text": "토요일에는 자정에 자요"
+            },
+            {
+              "id": "275b42e0-8a04-49b4-bace-9407c5dfc1cd",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **토요일**: 08:00 기상 · 00:00 취침\n- **일요일**: 07:00 기상 · 취침 미정\n\n**일요일에는 보통 몇 시에 잠드나요?**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5
+              ],
+              "wake": "08:00",
+              "bedtime": "00:00",
+              "variable": false,
+              "deferred": false
+            },
+            {
+              "days": [
+                6
+              ],
+              "wake": "07:00",
+              "bedtime": "",
+              "variable": false,
+              "deferred": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:37.011Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2201,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 71,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2272
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:01:37.012Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**토요일**: 08:00 기상 · 00:00 취침",
+                "**일요일**: 07:00 기상 · 취침 미정"
+              ],
+              "missingRhythm": {
+                "day": 6,
+                "field": "bedtime",
+                "question": "일요일에는 보통 몇 시에 잠드나요?"
+              },
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "08:00",
+                      "end": "24:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 6,
+                  "status": "미정 또는 변동",
+                  "slots": []
+                }
+              ]
+            },
+            "args": {
+              "bounds": [
+                {
+                  "days": [
+                    "토"
+                  ],
+                  "wake": "08:00",
+                  "bedtime": "00:00",
+                  "variable": false,
+                  "deferred": false
+                },
+                {
+                  "days": [
+                    "일"
+                  ],
+                  "wake": "07:00",
+                  "bedtime": "",
+                  "variable": false,
+                  "deferred": false
+                }
+              ],
+              "blocks": [],
+              "updates": []
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:38.846Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2596,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 111,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2707
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:01:38.846Z",
+            "result": {
+              "ok": true,
+              "stage": 0,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "rhythm",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**토요일**: 08:00 기상 · 00:00 취침",
+                "**일요일**: 07:00 기상 · 취침 미정"
+              ],
+              "question": "일요일에는 보통 몇 시에 잠드나요?",
+              "choices": []
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **토요일**: 08:00 기상 · 00:00 취침\n- **일요일**: 07:00 기상 · 취침 미정\n\n**일요일에는 보통 몇 시에 잠드나요?**",
+        "suggestions": [],
+        "response_id": "resp_06f7164d47c75e5c016a9a268127b487d0b51a5460e13b8952",
+        "needs_clarification": true,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2201,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 71,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2272
+            },
+            "elapsedMs": 1443
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2596,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 111,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2707
+            },
+            "elapsedMs": 1834
+          }
+        ]
+      }
+    },
+    {
+      "id": "correct-wednesday",
+      "rep": 0,
+      "elapsedMs": 2690.8871999999974,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "corrected": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4949,
+        "cached": 0,
+        "output": 157,
+        "calls": 2,
+        "usd": 0.011154,
+        "uncachedUsd": 0.011154
+      },
+      "result": {
+        "state": {
+          "stage": 1,
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "평일 9시부터 18시까지 근무해"
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "평일 근무 시간을 반영했어요."
+            },
+            {
+              "id": "30ed8384-2968-43f4-980c-09a1c5069013",
+              "role": "user",
+              "text": "수요일만 종료 시간을 17시로 바꿔줘"
+            },
+            {
+              "id": "ed57a362-b3f3-4e31-a4a4-fde4d12d053f",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **월요일·화요일·목요일·금요일 근무**: 09:00–18:00\n- **수요일 근무**: 09:00–17:00\n- 등록된 일정 기준 월요일·화요일·목요일·금요일 **06:00–09:00**, **18:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**이제 보호하고 싶은 시간을 추가할까요?**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            },
+            {
+              "days": [
+                2
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "17:00",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:48.222Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2279,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 43,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2322
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:01:48.223Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**월요일·화요일·목요일·금요일 근무**: 09:00–18:00",
+                "**수요일 근무**: 09:00–17:00"
+              ],
+              "missingRhythm": null,
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 6,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                }
+              ]
+            },
+            "args": {
+              "bounds": [],
+              "blocks": [],
+              "updates": [
+                {
+                  "block_index": 0,
+                  "days": [
+                    "수"
+                  ],
+                  "start": "09:00",
+                  "end": "17:00"
+                }
+              ]
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:49.552Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2670,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 114,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2784
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:01:49.553Z",
+            "result": {
+              "ok": true,
+              "stage": 1,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "schedule",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**월요일·화요일·목요일·금요일 근무**: 09:00–18:00",
+                "**수요일 근무**: 09:00–17:00",
+                "등록된 일정 기준 월요일·화요일·목요일·금요일 **06:00–09:00**, **18:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요."
+              ],
+              "question": "이제 보호하고 싶은 시간을 추가할까요?",
+              "choices": [
+                "일정은 여기까지예요",
+                "추가할 일정이 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **월요일·화요일·목요일·금요일 근무**: 09:00–18:00\n- **수요일 근무**: 09:00–17:00\n- 등록된 일정 기준 월요일·화요일·목요일·금요일 **06:00–09:00**, **18:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**이제 보호하고 싶은 시간을 추가할까요?**",
+        "suggestions": [
+          "일정은 여기까지예요",
+          "추가할 일정이 있어요"
+        ],
+        "response_id": "resp_046890a8e358d6a4016a9a268c5a0087d0ac4d6261a3f5b105",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2279,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 43,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2322
+            },
+            "elapsedMs": 1216
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2670,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 114,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2784
+            },
+            "elapsedMs": 1329
+          }
+        ]
+      }
+    },
+    {
+      "id": "schedule-done",
+      "rep": 0,
+      "elapsedMs": 2779.160799999998,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "goalsFocus": true,
+        "goalQuestion": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4671,
+        "cached": 0,
+        "output": 235,
+        "calls": 2,
+        "usd": 0.011222,
+        "uncachedUsd": 0.011222
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "fa336b1f-b0f7-439c-b0fd-bc96d84adff6",
+              "role": "user",
+              "text": "더이상 일정에 대해 설명할게 없어. 이제 목표를 세우자"
+            },
+            {
+              "id": "19695834-6c27-461f-b2ab-7c3a17f9579a",
+              "role": "assistant",
+              "text": "일정은 여기까지예요.\n\n- 주중은 오전 6시~9시, 오후 6시~11시가 비어 있어요.\n- 주말은 오전 6시~오후 11시 모두 비어 있어요.\n\n**특정 목표가 있나요, 아니면 추천을 받아볼까요?**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:01:58.991Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2251,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 121,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2372
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:01:58.992Z",
+            "result": {
+              "ok": false,
+              "error": "reply_needs_short_sections_and_one_question",
+              "instruction": "저장되지 않았다. 잘못된 항목을 수정하고 다시 실행하라. 성공했다고 말하지 말라."
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "일정 등록 완료! 목표를 시작할 수 있어.",
+              "details": [
+                "등록된 일정 기준, 주중은 06:00~09:00/18:00~23:00, 주말은 06:00~23:00 비어 있음."
+              ],
+              "question": "관심 분야나 이루고 싶은 목표가 있나요? 아니면 추천을 원하세요?",
+              "choices": [
+                "목표 추천 받고 싶어요",
+                "원하는 목표가 있어요"
+              ]
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:02:00.349Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2420,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 114,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2534
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:02:00.349Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "일정은 여기까지예요.",
+              "details": [
+                "주중은 오전 6시~9시, 오후 6시~11시가 비어 있어요.",
+                "주말은 오전 6시~오후 11시 모두 비어 있어요."
+              ],
+              "question": "특정 목표가 있나요, 아니면 추천을 받아볼까요?",
+              "choices": [
+                "추천 받고 싶어요",
+                "원하는 목표가 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "일정은 여기까지예요.\n\n- 주중은 오전 6시~9시, 오후 6시~11시가 비어 있어요.\n- 주말은 오전 6시~오후 11시 모두 비어 있어요.\n\n**특정 목표가 있나요, 아니면 추천을 받아볼까요?**",
+        "suggestions": [
+          "추천 받고 싶어요",
+          "원하는 목표가 있어요"
+        ],
+        "response_id": "resp_000967e168751a66016a9a26971d3887d083a294a00b9b62dc",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2251,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 121,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2372
+            },
+            "elapsedMs": 1292
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2420,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 114,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2534
+            },
+            "elapsedMs": 1356
+          }
+        ]
+      }
+    },
+    {
+      "id": "three-goals",
+      "rep": 0,
+      "elapsedMs": 3654.7932,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "goalsFocus": true,
+        "draftOnly": true,
+        "threeDomains": true,
+        "choices": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 2277,
+        "cached": 0,
+        "output": 409,
+        "calls": 1,
+        "usd": 0.007826,
+        "uncachedUsd": 0.007826
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "d7a7520c-c617-4163-9694-28a7370e761f",
+              "role": "user",
+              "text": "목표를 세우고 달성하고 싶어. 일적인 부분과 건강, 신앙 세 파트야. 너무 질문이 많으니까 네가 작게 시작할 초안부터 추천해줘"
+            },
+            {
+              "id": "cb96bb8d-5112-49b7-aa0e-ea491332ac70",
+              "role": "assistant",
+              "text": "부담 없이 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n- **목표**: 일, 건강, 신앙 목표를 소규모로 실천하여 습관을 길러 꾸준히 관리한다.\n- **기간**: 2주 · 2026-10-02\n- **결과 기준**: 각 영역별 행동을 최소 2주간 4회 이상 실시\n- **출근 30분 전 오늘 업무 목록 적기**: 주 2회 · 10분\n- **아침 10분 스트레칭 또는 산책**: 주 2회 · 10분\n- **취침 전 5분 감사 기도 또는 말씀 읽기**: 주 2회 · 5분\n- 작게 시작: 각 영역별로 주 2회씩 작은 행동을 실천\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "일·건강·신앙 목표를 작게 시작해 달성하고 싶음",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "f56d1606-812d-4685-99b0-76f824f763a0",
+              "card": {
+                "category": "복합",
+                "outcome": "일, 건강, 신앙 목표를 소규모로 실천하여 습관을 길러 꾸준히 관리한다.",
+                "identity": "",
+                "deadline": "2026-10-02",
+                "baselineMetric": "",
+                "targetMetric": "각 영역별 행동을 최소 2주간 4회 이상 실시",
+                "tinyStart": "각 영역별로 주 2회씩 작은 행동을 실천",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "출근 30분 전 오늘 업무 목록 적기",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  },
+                  {
+                    "title": "아침 10분 스트레칭 또는 산책",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  },
+                  {
+                    "title": "취침 전 5분 감사 기도 또는 말씀 읽기",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 5,
+                    "preferredDays": []
+                  }
+                ]
+              },
+              "presentedMessageId": "cb96bb8d-5112-49b7-aa0e-ea491332ac70"
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:02:12.012Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2277,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 409,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2686
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:02:12.012Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "일·건강·신앙 목표를 작게 시작해 달성하고 싶음",
+              "goal_draft": {
+                "category": "복합",
+                "outcome": "일, 건강, 신앙 목표를 소규모로 실천하여 습관을 길러 꾸준히 관리한다.",
+                "identity": "",
+                "deadline": "2026-10-02",
+                "baselineMetric": "",
+                "targetMetric": "각 영역별 행동을 최소 2주간 4회 이상 실시",
+                "tinyStart": "각 영역별로 주 2회씩 작은 행동을 실천",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "출근 30분 전 오늘 업무 목록 적기",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  },
+                  {
+                    "title": "아침 10분 스트레칭 또는 산책",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  },
+                  {
+                    "title": "취침 전 5분 감사 기도 또는 말씀 읽기",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 5,
+                    "preferredDays": []
+                  }
+                ]
+              },
+              "summary": "일, 건강, 신앙에 작게 도전하는 2주 시험 초안을 제안해요.",
+              "details": [
+                "일: 출근 전 업무 목록 작성, 주 2회",
+                "건강: 아침 스트레칭/산책, 주 2회",
+                "신앙: 취침 전 감사 기도/말씀, 주 2회",
+                "모두 2주간 최소 4회씩, 한 번 5~10분 정도"
+              ],
+              "question": "이 초안으로 바로 시작할까요, 수정할 부분이 있나요?",
+              "choices": [
+                "네, 바로 시작할래요",
+                "일부만 수정할래요",
+                "전체 새로 짤래요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "부담 없이 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n- **목표**: 일, 건강, 신앙 목표를 소규모로 실천하여 습관을 길러 꾸준히 관리한다.\n- **기간**: 2주 · 2026-10-02\n- **결과 기준**: 각 영역별 행동을 최소 2주간 4회 이상 실시\n- **출근 30분 전 오늘 업무 목록 적기**: 주 2회 · 10분\n- **아침 10분 스트레칭 또는 산책**: 주 2회 · 10분\n- **취침 전 5분 감사 기도 또는 말씀 읽기**: 주 2회 · 5분\n- 작게 시작: 각 영역별로 주 2회씩 작은 행동을 실천\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_0a7cc5879cc3da34016a9a26a0a34487d0b65a33da10ad8273",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2277,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 409,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2686
+            },
+            "elapsedMs": 3523
+          }
+        ]
+      }
+    },
+    {
+      "id": "approve-draft",
+      "rep": 0,
+      "elapsedMs": 127.7164000000048,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "exactApprovedCard": true,
+        "noDraft": true,
+        "noModelCost": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 0,
+        "cached": 0,
+        "output": 0,
+        "calls": 0,
+        "usd": 0,
+        "uncachedUsd": 0
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "독서 습관을 만들고 싶어. 수치와 기간은 네가 가볍게 추천해줘."
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "**독서 초안**: 우선 2주 동안 주 3회, 한 번에 10분 읽기를 제안해요. 결과 기준은 2주간 6회 실행이에요. 현재 독서량은 미정으로 둘게요.\n\n이 초안으로 시작할까요?"
+            },
+            {
+              "id": "a82a9722-1464-40bc-a79c-d1efd5198dad",
+              "role": "user",
+              "text": "그 초안 그대로 시작할게"
+            },
+            {
+              "id": "55b9b404-819f-4e7e-8d79-3fc31129c83a",
+              "role": "assistant",
+              "text": "좋아요. 확인하신 초안 그대로 확정했어요.\n\n- **목표**: 독서 습관 만들기\n- **기간**: 2주\n- **결과 기준**: 2주간 6회 실행\n- **독서**: 주 3회 · 10분\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이제 시간 지도에 맞춰 주간 계획을 만들 수 있어요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "독서",
+            "outcome": "독서 습관 만들기",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "2주간 6회 실행",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 2,
+            "weeklyActions": [
+              {
+                "title": "독서",
+                "frequencyPerWeek": 3,
+                "durationMinutes": 10,
+                "preferredDays": []
+              }
+            ]
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "confirm_goal",
+            "at": "2026-09-04T02:02:20.153Z",
+            "result": {
+              "ok": true,
+              "draftId": "reading-fixture-v1"
+            }
+          }
+        ],
+        "assistant_message": "좋아요. 확인하신 초안 그대로 확정했어요.\n\n- **목표**: 독서 습관 만들기\n- **기간**: 2주\n- **결과 기준**: 2주간 6회 실행\n- **독서**: 주 3회 · 10분\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이제 시간 지도에 맞춰 주간 계획을 만들 수 있어요.**",
+        "suggestions": [],
+        "response_id": "",
+        "needs_clarification": false,
+        "usage": []
+      }
+    },
+    {
+      "id": "reject-draft",
+      "rep": 0,
+      "elapsedMs": 2360.065499999997,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "draftOnly": true,
+        "choices": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 2263,
+        "cached": 0,
+        "output": 291,
+        "calls": 1,
+        "usd": 0.006854,
+        "uncachedUsd": 0.006854
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "독서 습관을 만들고 싶어. 수치와 기간은 네가 가볍게 추천해줘."
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "**독서 초안**: 우선 2주 동안 주 3회, 한 번에 10분 읽기를 제안해요. 결과 기준은 2주간 6회 실행이에요. 현재 독서량은 미정으로 둘게요.\n\n이 초안으로 시작할까요?"
+            },
+            {
+              "id": "ea928f84-9aaa-4601-b24f-cf37330bef1b",
+              "role": "user",
+              "text": "아니, 그건 부담돼. 더 가벼운 다른 초안을 제안해줘. 아직 확정하지는 말고."
+            },
+            {
+              "id": "87c368cf-5cf5-4f2a-85f1-aac0ef88923d",
+              "role": "assistant",
+              "text": "부담 없이 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n- **목표**: 2주 동안 주 2회, 한 번에 5분 이상 책 읽기\n- **기간**: 2주\n- **결과 기준**: 2주에 4회 이상 5분 독서\n- **5분 독서**: 주 2회 · 5분\n- 작게 시작: 5분간 아무 책이나 읽기\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "독서 습관 만들기",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "ba40c3f7-7268-44c1-af70-f50b8a8c80f5",
+              "card": {
+                "category": "기타",
+                "outcome": "2주 동안 주 2회, 한 번에 5분 이상 책 읽기",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주에 4회 이상 5분 독서",
+                "tinyStart": "5분간 아무 책이나 읽기",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "5분 독서",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 5,
+                    "preferredDays": []
+                  }
+                ]
+              },
+              "presentedMessageId": "87c368cf-5cf5-4f2a-85f1-aac0ef88923d"
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:02:30.517Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2263,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 291,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2554
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:02:30.517Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "독서 습관 만들기",
+              "goal_draft": {
+                "category": "기타",
+                "outcome": "2주 동안 주 2회, 한 번에 5분 이상 책 읽기",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주에 4회 이상 5분 독서",
+                "tinyStart": "5분간 아무 책이나 읽기",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "5분 독서",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 5,
+                    "preferredDays": []
+                  }
+                ]
+              },
+              "summary": "2주간 주 2회, 한 번에 5분씩 읽는 가벼운 독서 목표 초안을 만들어봤어요.",
+              "details": [
+                "목표: 2주간 4회 이상, 회당 5분 이상 읽기",
+                "주 2회, 5분씩이면 부담 없이 시작 가능해요"
+              ],
+              "question": "이 초안보다 더 가벼운 시작이 필요할까요? 혹은 부분 수정이 필요할까요?",
+              "choices": [
+                "이 정도면 무난해요",
+                "더 쉽게 시작하고 싶어요",
+                "부분만 바꿔보고 싶어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "부담 없이 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n- **목표**: 2주 동안 주 2회, 한 번에 5분 이상 책 읽기\n- **기간**: 2주\n- **결과 기준**: 2주에 4회 이상 5분 독서\n- **5분 독서**: 주 2회 · 5분\n- 작게 시작: 5분간 아무 책이나 읽기\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_02edf3ad80fddf36016a9a26b469c087d0a46f955a1133b505",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2263,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 291,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2554
+            },
+            "elapsedMs": 2248
+          }
+        ]
+      }
+    },
+    {
+      "id": "overnight",
+      "rep": 0,
+      "elapsedMs": 2995.693499999994,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "fullInterval": true,
+        "accurateReceipt": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4732,
+        "cached": 0,
+        "output": 222,
+        "calls": 2,
+        "usd": 0.01124,
+        "uncachedUsd": 0.01124
+      },
+      "result": {
+        "state": {
+          "stage": 1,
+          "messages": [
+            {
+              "id": "90328064-ecd1-43e6-b39a-e8f157917377",
+              "role": "user",
+              "text": "매주 금요일 밤 11시부터 토요일 새벽 1시까지 모임이 있어. 시간 지도에 반영해줘"
+            },
+            {
+              "id": "b04b3f8f-07e3-4c3b-a2f6-93fc71f045d8",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **금요일 모임**: 23:00–24:00\n- **토요일 모임**: 00:00–01:00\n- 등록된 일정 기준 금요일·토요일 **06:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**추가로 보호할 시간이 더 있나요?**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                4
+              ],
+              "title": "모임",
+              "start": "23:00",
+              "end": "24:00",
+              "kind": "fixed"
+            },
+            {
+              "days": [
+                5
+              ],
+              "title": "모임",
+              "start": "00:00",
+              "end": "01:00",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false,
+              "deferred": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:02:39.777Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2164,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 87,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2251
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:02:39.778Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**금요일 모임**: 23:00–24:00",
+                "**토요일 모임**: 00:00–01:00"
+              ],
+              "missingRhythm": null,
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 6,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                }
+              ]
+            },
+            "args": {
+              "bounds": [
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금",
+                    "토",
+                    "일"
+                  ],
+                  "wake": "06:00",
+                  "bedtime": "23:00",
+                  "variable": false,
+                  "deferred": false
+                }
+              ],
+              "blocks": [
+                {
+                  "days": [
+                    "금"
+                  ],
+                  "title": "모임",
+                  "start": "23:00",
+                  "end": "01:00",
+                  "kind": "fixed"
+                }
+              ],
+              "updates": []
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:02:41.516Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2568,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 135,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2703
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:02:41.517Z",
+            "result": {
+              "ok": true,
+              "stage": 1,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "schedule",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**금요일 모임**: 23:00–24:00",
+                "**토요일 모임**: 00:00–01:00",
+                "등록된 일정 기준 금요일·토요일 **06:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요."
+              ],
+              "question": "추가로 보호할 시간이 더 있나요?",
+              "choices": [
+                "일정은 여기까지예요",
+                "추가할 일정이 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **금요일 모임**: 23:00–24:00\n- **토요일 모임**: 00:00–01:00\n- 등록된 일정 기준 금요일·토요일 **06:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**추가로 보호할 시간이 더 있나요?**",
+        "suggestions": [
+          "일정은 여기까지예요",
+          "추가할 일정이 있어요"
+        ],
+        "response_id": "resp_06589173900ccee7016a9a26bff6b487d08182705ff6fd04bf",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2164,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 87,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2251
+            },
+            "elapsedMs": 1142
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2568,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 135,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2703
+            },
+            "elapsedMs": 1738
+          }
+        ]
+      }
+    },
+    {
+      "id": "two-blocks",
+      "rep": 1,
+      "elapsedMs": 2716.248800000001,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "separateBlocks": true,
+        "noRepeatedRhythm": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4928,
+        "cached": 2048,
+        "output": 263,
+        "calls": 2,
+        "usd": 0.008888,
+        "uncachedUsd": 0.01196
+      },
+      "result": {
+        "state": {
+          "stage": 1,
+          "messages": [
+            {
+              "id": "92d4d17c-7921-41c7-a977-1cda163a7c1e",
+              "role": "user",
+              "text": "평일 6:30-8:30까지 이동하고, 8:30-17:30까지 근무해"
+            },
+            {
+              "id": "526abc89-8fc7-4268-a790-31f6986dc9da",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **평일 이동**: 06:30–08:30\n- **평일 근무**: 08:30–17:30\n- 등록된 일정 기준 평일 **06:00–06:30**, **17:30–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**이 외에 꼭 고정하거나 보호할 일정이 있나요?**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "이동",
+              "start": "06:30",
+              "end": "08:30",
+              "kind": "fixed"
+            },
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "08:30",
+              "end": "17:30",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false,
+              "deferred": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:02:50.970Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2161,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 154,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2315
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:02:50.971Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**평일 이동**: 06:30–08:30",
+                "**평일 근무**: 08:30–17:30"
+              ],
+              "missingRhythm": null,
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "06:30"
+                    },
+                    {
+                      "start": "17:30",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 6,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                }
+              ]
+            },
+            "args": {
+              "bounds": [
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금"
+                  ],
+                  "wake": "06:00",
+                  "bedtime": "23:00",
+                  "variable": false,
+                  "deferred": false
+                },
+                {
+                  "days": [
+                    "토",
+                    "일"
+                  ],
+                  "wake": "06:00",
+                  "bedtime": "23:00",
+                  "variable": false,
+                  "deferred": false
+                }
+              ],
+              "blocks": [
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금"
+                  ],
+                  "title": "이동",
+                  "start": "06:30",
+                  "end": "08:30",
+                  "kind": "fixed"
+                },
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금"
+                  ],
+                  "title": "근무",
+                  "start": "08:30",
+                  "end": "17:30",
+                  "kind": "fixed"
+                }
+              ],
+              "updates": []
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:02:52.238Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2767,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 109,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2876
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:02:52.239Z",
+            "result": {
+              "ok": true,
+              "stage": 1,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "schedule",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**평일 이동**: 06:30–08:30",
+                "**평일 근무**: 08:30–17:30",
+                "등록된 일정 기준 평일 **06:00–06:30**, **17:30–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요."
+              ],
+              "question": "이 외에 꼭 고정하거나 보호할 일정이 있나요?",
+              "choices": [
+                "일정은 여기까지예요",
+                "추가할 일정이 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **평일 이동**: 06:30–08:30\n- **평일 근무**: 08:30–17:30\n- 등록된 일정 기준 평일 **06:00–06:30**, **17:30–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**이 외에 꼭 고정하거나 보호할 일정이 있나요?**",
+        "suggestions": [
+          "일정은 여기까지예요",
+          "추가할 일정이 있어요"
+        ],
+        "response_id": "resp_031a0b7c9c10074c016a9a26cb180887d0ae1de090ff8cb298",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2161,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 154,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2315
+            },
+            "elapsedMs": 1339
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2767,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 109,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2876
+            },
+            "elapsedMs": 1267
+          }
+        ]
+      }
+    },
+    {
+      "id": "unknown-weekend",
+      "rep": 1,
+      "elapsedMs": 2592.471399999995,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "knownWeekdays": true,
+        "noInventedWeekend": true,
+        "scheduleFocus": true,
+        "noDeferredQuestion": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4549,
+        "cached": 0,
+        "output": 198,
+        "calls": 2,
+        "usd": 0.010682,
+        "uncachedUsd": 0.010682
+      },
+      "result": {
+        "state": {
+          "stage": 1,
+          "messages": [
+            {
+              "id": "651499c9-6e33-4782-a90e-fda70e2dbbac",
+              "role": "user",
+              "text": "평일은 6시 기상 23시 취침. 주말 기상 취침은 전혀 일정하지 않아, 그때그때 알려줄게"
+            },
+            {
+              "id": "e01ebc16-c838-4a5a-b49f-d790b6c76a2d",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **평일**: 06:00 기상 · 23:00 취침\n- **토요일·일요일**: 기상 미정 · 취침 미정 (나중에 확인)\n\n**다음으로 보호할 일정이 있나요?**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false,
+              "deferred": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:03:01.535Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2071,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 77,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2148
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:03:01.536Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**평일**: 06:00 기상 · 23:00 취침",
+                "**토요일·일요일**: 기상 미정 · 취침 미정 (나중에 확인)"
+              ],
+              "missingRhythm": null,
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "미정 또는 변동",
+                  "slots": []
+                },
+                {
+                  "day": 6,
+                  "status": "미정 또는 변동",
+                  "slots": []
+                }
+              ]
+            },
+            "args": {
+              "bounds": [
+                {
+                  "days": [
+                    "월",
+                    "화",
+                    "수",
+                    "목",
+                    "금"
+                  ],
+                  "wake": "06:00",
+                  "bedtime": "23:00",
+                  "variable": false,
+                  "deferred": false
+                },
+                {
+                  "days": [
+                    "토",
+                    "일"
+                  ],
+                  "wake": "",
+                  "bedtime": "",
+                  "variable": true,
+                  "deferred": true
+                }
+              ],
+              "blocks": [],
+              "updates": []
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:03:02.840Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2478,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 121,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2599
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:03:02.840Z",
+            "result": {
+              "ok": true,
+              "stage": 1,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "schedule",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**평일**: 06:00 기상 · 23:00 취침",
+                "**토요일·일요일**: 기상 미정 · 취침 미정 (나중에 확인)"
+              ],
+              "question": "다음으로 보호할 일정이 있나요?",
+              "choices": [
+                "일정은 여기까지예요",
+                "추가할 일정이 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **평일**: 06:00 기상 · 23:00 취침\n- **토요일·일요일**: 기상 미정 · 취침 미정 (나중에 확인)\n\n**다음으로 보호할 일정이 있나요?**",
+        "suggestions": [
+          "일정은 여기까지예요",
+          "추가할 일정이 있어요"
+        ],
+        "response_id": "resp_0b1c9ee38918f75b016a9a26d5a86087d08e6675fed13da734",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2071,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 77,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2148
+            },
+            "elapsedMs": 1104
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2478,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 121,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2599
+            },
+            "elapsedMs": 1304
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-sleep",
+      "rep": 1,
+      "elapsedMs": 2890.230500000005,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "saturday": true,
+        "sundayNotGuessed": true,
+        "stillRhythm": true,
+        "askExactSunday": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4797,
+        "cached": 4480,
+        "output": 198,
+        "calls": 2,
+        "usd": 0.004458,
+        "uncachedUsd": 0.011178
+      },
+      "result": {
+        "state": {
+          "stage": 0,
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "평일은 6시 기상 23시 취침, 토요일 8시 기상이고 일요일 7시 기상이야"
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "평일 기상·취침을 반영했어요. 토요일에는 몇 시에 잠드나요?"
+            },
+            {
+              "id": "5d7ec1ff-6ea7-401e-b757-3c72cab258f7",
+              "role": "user",
+              "text": "토요일에는 자정에 자요"
+            },
+            {
+              "id": "baa2d7de-08c5-4d8f-851a-b9d7f942819e",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **토요일**: 08:00 기상 · 00:00 취침\n- **일요일**: 07:00 기상 · 취침 미정\n\n**일요일에는 보통 몇 시에 잠드나요?**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5
+              ],
+              "wake": "08:00",
+              "bedtime": "00:00",
+              "variable": false,
+              "deferred": false
+            },
+            {
+              "days": [
+                6
+              ],
+              "wake": "07:00",
+              "bedtime": "",
+              "variable": false,
+              "deferred": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:03:12.089Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2201,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 71,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2272
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:03:12.090Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**토요일**: 08:00 기상 · 00:00 취침",
+                "**일요일**: 07:00 기상 · 취침 미정"
+              ],
+              "missingRhythm": {
+                "day": 6,
+                "field": "bedtime",
+                "question": "일요일에는 보통 몇 시에 잠드나요?"
+              },
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "08:00",
+                      "end": "24:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 6,
+                  "status": "미정 또는 변동",
+                  "slots": []
+                }
+              ]
+            },
+            "args": {
+              "bounds": [
+                {
+                  "days": [
+                    "토"
+                  ],
+                  "wake": "08:00",
+                  "bedtime": "00:00",
+                  "variable": false,
+                  "deferred": false
+                },
+                {
+                  "days": [
+                    "일"
+                  ],
+                  "wake": "07:00",
+                  "bedtime": "",
+                  "variable": false,
+                  "deferred": false
+                }
+              ],
+              "blocks": [],
+              "updates": []
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:03:13.744Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2596,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2432
+              },
+              "output_tokens": 127,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2723
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:03:13.744Z",
+            "result": {
+              "ok": true,
+              "stage": 0,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "rhythm",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**토요일**: 08:00 기상 · 00:00 취침",
+                "**일요일**: 07:00 기상 · 취침 미정"
+              ],
+              "question": "일요일에는 보통 몇 시에 잠드나요?",
+              "choices": []
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **토요일**: 08:00 기상 · 00:00 취침\n- **일요일**: 07:00 기상 · 취침 미정\n\n**일요일에는 보통 몇 시에 잠드나요?**",
+        "suggestions": [],
+        "response_id": "resp_07972ca551b31fdb016a9a26e0370c87d08629d6f0a8e782d3",
+        "needs_clarification": true,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2201,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 71,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2272
+            },
+            "elapsedMs": 1117
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2596,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2432
+              },
+              "output_tokens": 127,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2723
+            },
+            "elapsedMs": 1654
+          }
+        ]
+      }
+    },
+    {
+      "id": "correct-wednesday",
+      "rep": 1,
+      "elapsedMs": 4169.136799999978,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "corrected": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4949,
+        "cached": 4480,
+        "output": 157,
+        "calls": 2,
+        "usd": 0.0044340000000000004,
+        "uncachedUsd": 0.011154
+      },
+      "result": {
+        "state": {
+          "stage": 1,
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "평일 9시부터 18시까지 근무해"
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "평일 근무 시간을 반영했어요."
+            },
+            {
+              "id": "25b11214-1c48-4be5-8aad-fa79f42f9f7f",
+              "role": "user",
+              "text": "수요일만 종료 시간을 17시로 바꿔줘"
+            },
+            {
+              "id": "6e1cdbe7-994f-4d88-ae51-57143e9f912b",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **월요일·화요일·목요일·금요일 근무**: 09:00–18:00\n- **수요일 근무**: 09:00–17:00\n- 등록된 일정 기준 월요일·화요일·목요일·금요일 **06:00–09:00**, **18:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**여기에 추가할 일정이 있나요, 아니면 일정은 여기까지인가요?**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            },
+            {
+              "days": [
+                2
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "17:00",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:03:23.168Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2279,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 43,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2322
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:03:23.170Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**월요일·화요일·목요일·금요일 근무**: 09:00–18:00",
+                "**수요일 근무**: 09:00–17:00"
+              ],
+              "missingRhythm": null,
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "09:00"
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 6,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                }
+              ]
+            },
+            "args": {
+              "bounds": [],
+              "blocks": [],
+              "updates": [
+                {
+                  "block_index": 0,
+                  "days": [
+                    "수"
+                  ],
+                  "start": "09:00",
+                  "end": "17:00"
+                }
+              ]
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:03:25.922Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2670,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2432
+              },
+              "output_tokens": 114,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2784
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:03:25.923Z",
+            "result": {
+              "ok": true,
+              "stage": 1,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "schedule",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**월요일·화요일·목요일·금요일 근무**: 09:00–18:00",
+                "**수요일 근무**: 09:00–17:00",
+                "등록된 일정 기준 월요일·화요일·목요일·금요일 **06:00–09:00**, **18:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요."
+              ],
+              "question": "여기에 추가할 일정이 있나요, 아니면 일정은 여기까지인가요?",
+              "choices": [
+                "추가할 일정이 있어요",
+                "일정은 여기까지예요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **월요일·화요일·목요일·금요일 근무**: 09:00–18:00\n- **수요일 근무**: 09:00–17:00\n- 등록된 일정 기준 월요일·화요일·목요일·금요일 **06:00–09:00**, **18:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**여기에 추가할 일정이 있나요, 아니면 일정은 여기까지인가요?**",
+        "suggestions": [
+          "추가할 일정이 있어요",
+          "일정은 여기까지예요"
+        ],
+        "response_id": "resp_0e494c9e3d9bee42016a9a26eb4e6487d0af2d677a08820de2",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2279,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 43,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2322
+            },
+            "elapsedMs": 1303
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2670,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2432
+              },
+              "output_tokens": 114,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2784
+            },
+            "elapsedMs": 2752
+          }
+        ]
+      }
+    },
+    {
+      "id": "schedule-done",
+      "rep": 1,
+      "elapsedMs": 1468.0320000000065,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "goalsFocus": true,
+        "goalQuestion": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 2251,
+        "cached": 0,
+        "output": 96,
+        "calls": 1,
+        "usd": 0.00527,
+        "uncachedUsd": 0.00527
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "34439e22-ce23-40ed-8fbd-a4160dd564d1",
+              "role": "user",
+              "text": "더이상 일정에 대해 설명할게 없어. 이제 목표를 세우자"
+            },
+            {
+              "id": "c1f78482-9088-48bb-803d-2e980a2e30d8",
+              "role": "assistant",
+              "text": "이제 목표 설계를 시작할 수 있어요.\n\n- 일정 정보는 모두 정리됐어요.\n\n**어떤 분야의 목표를 만들어볼까요?**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "새 목표를 세우고 싶음",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:03:35.395Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2251,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 96,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2347
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:03:35.396Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "새 목표를 세우고 싶음",
+              "goal_draft": null,
+              "summary": "이제 목표 설계를 시작할 수 있어요.",
+              "details": [
+                "일정 정보는 모두 정리됐어요."
+              ],
+              "question": "어떤 분야의 목표를 만들어볼까요?",
+              "choices": [
+                "일·공부",
+                "건강·운동",
+                "마음·습관·신앙"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "이제 목표 설계를 시작할 수 있어요.\n\n- 일정 정보는 모두 정리됐어요.\n\n**어떤 분야의 목표를 만들어볼까요?**",
+        "suggestions": [
+          "일·공부",
+          "건강·운동",
+          "마음·습관·신앙"
+        ],
+        "response_id": "resp_03f793f31851320b016a9a26f62f1087d08a7af97d793ab426",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2251,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 96,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2347
+            },
+            "elapsedMs": 1349
+          }
+        ]
+      }
+    },
+    {
+      "id": "three-goals",
+      "rep": 1,
+      "elapsedMs": 5701.694900000002,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "goalsFocus": true,
+        "draftOnly": true,
+        "threeDomains": true,
+        "choices": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 2277,
+        "cached": 2048,
+        "output": 391,
+        "calls": 1,
+        "usd": 0.00461,
+        "uncachedUsd": 0.007682
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "2601c420-15a5-446e-8296-d1f76baf101f",
+              "role": "user",
+              "text": "목표를 세우고 달성하고 싶어. 일적인 부분과 건강, 신앙 세 파트야. 너무 질문이 많으니까 네가 작게 시작할 초안부터 추천해줘"
+            },
+            {
+              "id": "1805aa7a-e61b-44d3-83b5-7f1e789d7c14",
+              "role": "assistant",
+              "text": "부담 없이 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n- **목표**: 일·건강·신앙 세 부문에서 실천력을 높인다\n- **기간**: 2주\n- **결과 기준**: 각 분야별 최소 2회 이상 실천 완료(2주간 6회 이상)\n- **주간 휴일 또는 근무 전후, 1시간 집중 업무 정리·실행**: 주 2회 · 60분\n- **출근 전후, 30분 걷기 또는 스트레칭**: 주 2회 · 30분\n- **주간(주말 포함) 1회 신앙 독서·기도 또는 명상 30분**: 주 2회 · 30분\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "일, 건강, 신앙 세 분야 목표 달성",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "83f36ab1-4153-47dd-b52b-788200b1967c",
+              "card": {
+                "category": "종합",
+                "outcome": "일·건강·신앙 세 부문에서 실천력을 높인다",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "각 분야별 최소 2회 이상 실천 완료(2주간 6회 이상)",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "주간 휴일 또는 근무 전후, 1시간 집중 업무 정리·실행",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 60,
+                    "preferredDays": []
+                  },
+                  {
+                    "title": "출근 전후, 30분 걷기 또는 스트레칭",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 30,
+                    "preferredDays": []
+                  },
+                  {
+                    "title": "주간(주말 포함) 1회 신앙 독서·기도 또는 명상 30분",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 30,
+                    "preferredDays": []
+                  }
+                ]
+              },
+              "presentedMessageId": "1805aa7a-e61b-44d3-83b5-7f1e789d7c14"
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:03:49.112Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2277,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 391,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2668
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:03:49.113Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "일, 건강, 신앙 세 분야 목표 달성",
+              "goal_draft": {
+                "category": "종합",
+                "outcome": "일·건강·신앙 세 부문에서 실천력을 높인다",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "각 분야별 최소 2회 이상 실천 완료(2주간 6회 이상)",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "주간 휴일 또는 근무 전후, 1시간 집중 업무 정리·실행",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 60,
+                    "preferredDays": []
+                  },
+                  {
+                    "title": "출근 전후, 30분 걷기 또는 스트레칭",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 30,
+                    "preferredDays": []
+                  },
+                  {
+                    "title": "주간(주말 포함) 1회 신앙 독서·기도 또는 명상 30분",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 30,
+                    "preferredDays": []
+                  }
+                ]
+              },
+              "summary": "일·건강·신앙 각 2회씩 2주간 도전 초안을 제안할게요.",
+              "details": [
+                "각 분야별 주당 2회 이상, 2주간 총 6회 이상 실천을 목표로 잡았어요.",
+                "업무·건강·신앙 활동을 한 번이라도 실천하면 달성으로 인정해요.",
+                "실패하더라도 두 번 연속만 미루지 않으면 돼요."
+              ],
+              "question": "이렇게 세 분야 작은 목표부터 2주간 실험해 볼까요?",
+              "choices": [
+                "이대로 시작할래요",
+                "수정하고 싶어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "부담 없이 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n- **목표**: 일·건강·신앙 세 부문에서 실천력을 높인다\n- **기간**: 2주\n- **결과 기준**: 각 분야별 최소 2회 이상 실천 완료(2주간 6회 이상)\n- **주간 휴일 또는 근무 전후, 1시간 집중 업무 정리·실행**: 주 2회 · 60분\n- **출근 전후, 30분 걷기 또는 스트레칭**: 주 2회 · 30분\n- **주간(주말 포함) 1회 신앙 독서·기도 또는 명상 30분**: 주 2회 · 30분\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_0e3cf9eabac14091016a9a2701322c87d082113bfe9ffff8ff",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2277,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 391,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2668
+            },
+            "elapsedMs": 5580
+          }
+        ]
+      }
+    },
+    {
+      "id": "approve-draft",
+      "rep": 1,
+      "elapsedMs": 115.94659999999567,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "exactApprovedCard": true,
+        "noDraft": true,
+        "noModelCost": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 0,
+        "cached": 0,
+        "output": 0,
+        "calls": 0,
+        "usd": 0,
+        "uncachedUsd": 0
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "독서 습관을 만들고 싶어. 수치와 기간은 네가 가볍게 추천해줘."
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "**독서 초안**: 우선 2주 동안 주 3회, 한 번에 10분 읽기를 제안해요. 결과 기준은 2주간 6회 실행이에요. 현재 독서량은 미정으로 둘게요.\n\n이 초안으로 시작할까요?"
+            },
+            {
+              "id": "ac8a2410-09b9-4141-80ce-9fd00a301d9c",
+              "role": "user",
+              "text": "그 초안 그대로 시작할게"
+            },
+            {
+              "id": "6c3ce396-955a-49d5-9e37-73d43827e5b1",
+              "role": "assistant",
+              "text": "좋아요. 확인하신 초안 그대로 확정했어요.\n\n- **목표**: 독서 습관 만들기\n- **기간**: 2주\n- **결과 기준**: 2주간 6회 실행\n- **독서**: 주 3회 · 10분\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이제 시간 지도에 맞춰 주간 계획을 만들 수 있어요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "독서",
+            "outcome": "독서 습관 만들기",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "2주간 6회 실행",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 2,
+            "weeklyActions": [
+              {
+                "title": "독서",
+                "frequencyPerWeek": 3,
+                "durationMinutes": 10,
+                "preferredDays": []
+              }
+            ]
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "confirm_goal",
+            "at": "2026-09-04T02:03:57.231Z",
+            "result": {
+              "ok": true,
+              "draftId": "reading-fixture-v1"
+            }
+          }
+        ],
+        "assistant_message": "좋아요. 확인하신 초안 그대로 확정했어요.\n\n- **목표**: 독서 습관 만들기\n- **기간**: 2주\n- **결과 기준**: 2주간 6회 실행\n- **독서**: 주 3회 · 10분\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 4주마다 조정\n\n**이제 시간 지도에 맞춰 주간 계획을 만들 수 있어요.**",
+        "suggestions": [],
+        "response_id": "",
+        "needs_clarification": false,
+        "usage": []
+      }
+    },
+    {
+      "id": "reject-draft",
+      "rep": 1,
+      "elapsedMs": 2574.139599999995,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "draftOnly": true,
+        "choices": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 2263,
+        "cached": 2048,
+        "output": 303,
+        "calls": 1,
+        "usd": 0.003878,
+        "uncachedUsd": 0.00695
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "독서 습관을 만들고 싶어. 수치와 기간은 네가 가볍게 추천해줘."
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "**독서 초안**: 우선 2주 동안 주 3회, 한 번에 10분 읽기를 제안해요. 결과 기준은 2주간 6회 실행이에요. 현재 독서량은 미정으로 둘게요.\n\n이 초안으로 시작할까요?"
+            },
+            {
+              "id": "57b8eca8-8848-4978-bd98-d9cb444815c6",
+              "role": "user",
+              "text": "아니, 그건 부담돼. 더 가벼운 다른 초안을 제안해줘. 아직 확정하지는 말고."
+            },
+            {
+              "id": "140130f7-e00c-4bc4-b5fc-169ce87c58dd",
+              "role": "assistant",
+              "text": "부담 없이 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n- **목표**: 2주 동안 최소 3회, 1회 5분 이상 독서하기\n- **기간**: 2주\n- **결과 기준**: 2주 내 3회 이상 독서 (회당 5분 이상)\n- **5분 이상 책 읽기**: 주 2회 · 5분\n- 작게 시작: 먼저 5분만 책 펼치기\n- 축소 실행: 아주 짧게라도 한 페이지 읽기\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 2주마다 조정\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "독서 습관 만들기",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "96ed1f2b-81ac-4575-85e3-4878fd02681c",
+              "card": {
+                "category": "생활",
+                "outcome": "2주 동안 최소 3회, 1회 5분 이상 독서하기",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주 내 3회 이상 독서 (회당 5분 이상)",
+                "tinyStart": "먼저 5분만 책 펼치기",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "아주 짧게라도 한 페이지 읽기",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 2주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "5분 이상 책 읽기",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 5,
+                    "preferredDays": []
+                  }
+                ]
+              },
+              "presentedMessageId": "140130f7-e00c-4bc4-b5fc-169ce87c58dd"
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:04:07.810Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2263,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 303,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2566
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:04:07.811Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "독서 습관 만들기",
+              "goal_draft": {
+                "category": "생활",
+                "outcome": "2주 동안 최소 3회, 1회 5분 이상 독서하기",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주 내 3회 이상 독서 (회당 5분 이상)",
+                "tinyStart": "먼저 5분만 책 펼치기",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "아주 짧게라도 한 페이지 읽기",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 2주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "5분 이상 책 읽기",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 5,
+                    "preferredDays": []
+                  }
+                ]
+              },
+              "summary": "2주간 총 3회 이상, 회당 5분 독서 제안이에요.",
+              "details": [
+                "회당 **5분**만 읽으면 돼요.",
+                "**2주에 총 3회**만 실천하면 성공이에요.",
+                "가장 쉬운 시작: 5분만 책을 펼치기."
+              ],
+              "question": "더 간단하게 하거나 내용 바꿔서 새로 제안해 드릴까요?",
+              "choices": [
+                "이 초안으로 갈게요",
+                "조금 더 가볍게",
+                "아예 다른 주제로"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "부담 없이 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n- **목표**: 2주 동안 최소 3회, 1회 5분 이상 독서하기\n- **기간**: 2주\n- **결과 기준**: 2주 내 3회 이상 독서 (회당 5분 이상)\n- **5분 이상 책 읽기**: 주 2회 · 5분\n- 작게 시작: 먼저 5분만 책 펼치기\n- 축소 실행: 아주 짧게라도 한 페이지 읽기\n- 복귀 규칙: 두 번 연속 놓치지 않기\n- 점검: 매주 실행률 확인 · 2주마다 조정\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_0d45eaf736d3bf3a016a9a27157fe087d08a3a6285c983743c",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2263,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 303,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2566
+            },
+            "elapsedMs": 2452
+          }
+        ]
+      }
+    },
+    {
+      "id": "overnight",
+      "rep": 1,
+      "elapsedMs": 3251.491699999984,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "fullInterval": true,
+        "accurateReceipt": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 4697,
+        "cached": 2048,
+        "output": 170,
+        "calls": 2,
+        "usd": 0.0076820000000000005,
+        "uncachedUsd": 0.010754
+      },
+      "result": {
+        "state": {
+          "stage": 1,
+          "messages": [
+            {
+              "id": "86641a04-4aab-471a-8e25-63528ea0f0c1",
+              "role": "user",
+              "text": "매주 금요일 밤 11시부터 토요일 새벽 1시까지 모임이 있어. 시간 지도에 반영해줘"
+            },
+            {
+              "id": "9ed67dc4-9597-42b4-aa51-8ebdda31597f",
+              "role": "assistant",
+              "text": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **금요일 금요 모임**: 23:00–24:00\n- **토요일 금요 모임**: 00:00–01:00\n- 등록된 일정 기준 금요일·토요일 **06:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**추가로 보호하거나 고정하고 싶은 시간이 있나요?**"
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                4
+              ],
+              "title": "금요 모임",
+              "start": "23:00",
+              "end": "24:00",
+              "kind": "fixed"
+            },
+            {
+              "days": [
+                5
+              ],
+              "title": "금요 모임",
+              "start": "00:00",
+              "end": "01:00",
+              "kind": "fixed"
+            }
+          ],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": null
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:04:17.017Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2164,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 49,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2213
+            }
+          },
+          {
+            "tool": "apply_schedule",
+            "at": "2026-09-04T02:04:17.018Z",
+            "result": {
+              "ok": true,
+              "saved": [
+                "**금요일 금요 모임**: 23:00–24:00",
+                "**토요일 금요 모임**: 00:00–01:00"
+              ],
+              "missingRhythm": null,
+              "openings": [
+                {
+                  "day": 0,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 1,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 2,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 3,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 4,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 5,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                },
+                {
+                  "day": 6,
+                  "status": "등록된 일정 기준",
+                  "slots": [
+                    {
+                      "start": "06:00",
+                      "end": "23:00"
+                    }
+                  ]
+                }
+              ]
+            },
+            "args": {
+              "bounds": [],
+              "blocks": [
+                {
+                  "days": [
+                    "금"
+                  ],
+                  "title": "금요 모임",
+                  "start": "23:00",
+                  "end": "01:00",
+                  "kind": "fixed"
+                }
+              ],
+              "updates": []
+            }
+          },
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T02:04:19.069Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2533,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 121,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2654
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T02:04:19.070Z",
+            "result": {
+              "ok": true,
+              "stage": 1,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "schedule",
+              "goal_outcome": "",
+              "goal_draft": null,
+              "summary": "알려주신 내용을 시간 지도에 반영했어요.",
+              "details": [
+                "**금요일 금요 모임**: 23:00–24:00",
+                "**토요일 금요 모임**: 00:00–01:00",
+                "등록된 일정 기준 금요일·토요일 **06:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요."
+              ],
+              "question": "추가로 보호하거나 고정하고 싶은 시간이 있나요?",
+              "choices": [
+                "일정은 여기까지예요",
+                "추가할 일정이 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "알려주신 내용을 시간 지도에 반영했어요.\n\n- **금요일 금요 모임**: 23:00–24:00\n- **토요일 금요 모임**: 00:00–01:00\n- 등록된 일정 기준 금요일·토요일 **06:00–23:00**이 비어 있어요. 휴식·이동은 더 확인할게요.\n\n**추가로 보호하거나 고정하고 싶은 시간이 있나요?**",
+        "suggestions": [
+          "일정은 여기까지예요",
+          "추가할 일정이 있어요"
+        ],
+        "response_id": "resp_043ed4bd46b091eb016a9a272123c087d0a067f73500cc582d",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2164,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 2048
+              },
+              "output_tokens": 49,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2213
+            },
+            "elapsedMs": 1075
+          },
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 2533,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 121,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 2654
+            },
+            "elapsedMs": 2051
+          }
+        ]
+      }
+    }
+  ]
+}

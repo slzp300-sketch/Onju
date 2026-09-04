@@ -7,7 +7,8 @@ export type AiScheduleBlock = {
   end: string
   kind: 'fixed' | 'variable' | 'recovery'
 }
-export type AiDayBounds = { days: number[]; wake: string; bedtime: string; variable: boolean }
+// Empty clock values are unknown, never inferred sleep boundaries.
+export type AiDayBounds = { days: number[]; wake: string; bedtime: string; variable: boolean; deferred?: boolean }
 
 export type AiScheduleResult = {
   assistant_message: string

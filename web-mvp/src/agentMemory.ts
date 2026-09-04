@@ -4,6 +4,7 @@ import type { GoalCard } from './goalAgent'
 import type { GeneratedPlanItem } from './planAgent'
 import type { PlanItem } from './model'
 import type { PlanChange } from './planRevisionAgent'
+import type { PendingGoalDraft } from './unifiedAgent'
 
 export type StoredChatMessage = { id: string; role: 'user' | 'assistant'; text: string }
 export type StoredBlock = AiScheduleBlock & { id: string; pending?: boolean }
@@ -18,6 +19,8 @@ export type AgentSetupState = {
   obstacle: string
   responseId?: string
   goalCard: GoalCard
+  goalDraft?: PendingGoalDraft | null
+  suggestions?: string[]
   goalResponseId?: string
   generatedPlan?: GeneratedPlanItem[]
   planResponseId?: string
@@ -44,7 +47,7 @@ export function getAgentSessionId() {
 export async function loadAgentState(sessionId: string): Promise<AgentSetupState | null> {
   if (!supabase) return null
   const { data, error } = await supabase.functions.invoke<{ state: null | {
-    stage: number; messages: StoredChatMessage[]; blocks: StoredBlock[]; pending_blocks: StoredBlock[]; day_bounds?:AiDayBounds[]
+    stage: number; messages: StoredChatMessage[]; blocks: StoredBlock[]; pending_blocks: StoredBlock[]; day_bounds?:AiDayBounds[]; agent_v2_context?:{draft?:PendingGoalDraft|null}; agent_v2_suggestions?:string[]
     goal: string; reason: string; obstacle: string; openai_response_id?: string; goal_card:GoalCard; goal_response_id?:string; generated_plan?:GeneratedPlanItem[]; plan_response_id?:string; pending_plan?:PlanItem[]; plan_revision_history?:PlanRevisionRecord[]; plan_revision_response_id?:string
   } }>('onju-memory', { body: { action: 'load', sessionId } })
   if (error || !data?.state) return null
@@ -59,6 +62,8 @@ export async function loadAgentState(sessionId: string): Promise<AgentSetupState
     obstacle: data.state.obstacle,
     responseId: data.state.openai_response_id,
     goalCard: data.state.goal_card,
+    goalDraft: data.state.agent_v2_context?.draft ?? null,
+    suggestions: data.state.agent_v2_suggestions ?? [],
     goalResponseId: data.state.goal_response_id,
     generatedPlan: data.state.generated_plan??[],
     planResponseId: data.state.plan_response_id,

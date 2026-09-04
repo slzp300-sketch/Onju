@@ -21,7 +21,71 @@
 @media(max-width:600px){.revision-agent{padding:18px}.change-row{grid-template-columns:1fr 18px 1fr}.change-row>span{grid-column:1/-1}.revision-preview-title{display:grid}.revision-actions{display:grid;grid-template-columns:1fr 1.3fr}.revision-actions button{justify-content:center}}
 
 /* Structured agent replies */
+.schedule-setup .chat-setup{font-family:system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;font-synthesis:weight}
 .assistant-bubble,.revision-message{white-space:pre-line;line-height:1.7}
 .assistant-question p{white-space:pre-line;line-height:1.7}
 .rhythm-summary{display:grid;gap:6px;margin:10px 0 16px;padding:12px;background:#edf3e9;border-radius:11px}.rhythm-summary span{font-size:11px;color:#5f6c63}.rhythm-summary b{color:var(--green)}.rhythm-summary em{font-style:normal;color:#8b692d;background:#f5e6c8;border-radius:99px;padding:2px 6px;margin-left:4px}
-.agent-text{display:grid;gap:5px}.agent-space{height:5px}.agent-section{display:block;color:#315d41;font-size:12px;margin-top:2px}.agent-bullet{display:grid;grid-template-columns:6px 1fr;gap:7px;align-items:start}.agent-bullet i{width:4px;height:4px;margin-top:8px;border-radius:50%;background:#6e8d76}.agent-paragraph{display:block}.assistant-bubble .agent-text,.revision-message .agent-text{white-space:normal}
+.agent-text{display:flex;flex-direction:column;gap:14px;min-width:0;font-size:14px;line-height:1.8;color:#394f42;overflow-wrap:anywhere;word-break:normal}.agent-text p{margin:0;font:inherit;color:inherit}.agent-text strong{font-weight:750;color:#174d34}.agent-text .agent-section{font-weight:700;color:#315d41}.agent-text ul,.agent-text ol{margin:0;padding-left:1.4em;display:grid;gap:6px;list-style-position:outside}.agent-text ul{list-style-type:disc}.agent-text ol{list-style-type:decimal}.agent-text li{padding-left:3px}.agent-text li::marker{color:#426b50}.assistant-bubble .agent-text,.revision-message .agent-text{white-space:normal}.assistant-bubble:has(.agent-text){padding:16px 18px;max-width:92%}
+
+/* Conversation-first setup: a stable composer and a single chat scroll surface. */
+.schedule-layout{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;margin:20px auto;align-items:start}
+.chat-setup{position:sticky;top:86px;height:calc(100dvh - 106px);min-height:400px;display:flex;flex-direction:column;padding:24px;overflow:hidden}
+.chat-setup .chat-top{flex:none;padding-bottom:16px}
+.chat-top span{color:#657269}
+.conversation-viewport{position:relative;flex:1;min-height:0}
+.conversation-history{height:100%;max-height:none;margin:0;padding:0 8px 0 0;display:block;overflow-y:auto;overscroll-behavior:contain;scroll-behavior:auto;scrollbar-width:thin;scrollbar-color:#b8c7b9 transparent;overflow-anchor:none}
+.conversation-content{display:flex;flex-direction:column;gap:24px;padding:24px 0 20px}
+.chat-setup .assistant-bubble:has(.agent-text){background:transparent;border-radius:0;padding:0 4px;max-width:100%;width:100%}
+.chat-setup .agent-text{font-size:16px;line-height:1.85;gap:16px;color:#293b30;word-break:keep-all;overflow-wrap:anywhere;letter-spacing:-.015em}
+.chat-setup .agent-text strong{font-weight:700;color:#153c29}
+.chat-setup .agent-text li{padding-left:2px}
+.chat-setup .user-bubble{font-size:15px;line-height:1.7;max-width:88%;padding:12px 16px;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.chat-setup .assistant-question{padding:20px;background:#f0f4eb}
+.chat-setup .assistant-question h1{font-family:inherit;font-weight:700;font-size:23px;margin:10px 0 16px}
+.chat-setup .assistant-question p{font-size:15px;color:#526158;line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}
+.chat-setup .typing{align-items:center;background:transparent;padding:8px 4px;max-width:100%;white-space:normal;color:#53675a}
+.typing span{font-size:13px;margin-left:6px}
+.agent-suggestions{gap:8px}
+.agent-suggestions button{font-family:inherit;font-size:14px;line-height:1.5;min-height:44px;border-radius:12px;text-align:left;color:#27573b;background:#f3f7ef}
+.chat-input-area{flex:none;border-top:1px solid #e9e7dc;padding-top:12px}
+.chat-input-area .composer{margin:0;padding:8px;border-color:#b8c6b7}
+.chat-input-area textarea{min-width:0;font-size:16px;line-height:1.6}
+.composer-hint{font-size:12px;line-height:1.5;color:#627166;margin:8px 0 0;text-align:center}
+.latest-message{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;align-items:center;white-space:nowrap;border:1px solid #ccd8c9;border-radius:99px;background:#fffdf7;color:#27573b;padding:10px 16px;font-size:13px;box-shadow:0 4px 18px #183b2820;cursor:pointer}
+.map-sidebar{min-width:0;max-height:calc(100dvh - 106px);overflow-y:auto;scrollbar-width:thin}
+.map-toggle{display:none}
+.map-sidebar .week-map{padding:24px;box-shadow:none}
+.map-sidebar .goal-draft{margin:16px 0 0}
+.goal-draft summary{cursor:pointer;color:#315d41;font-weight:700;font-size:14px}
+.goal-draft .button:disabled{opacity:.5;cursor:wait}
+.chat-setup button:focus-visible,.conversation-history:focus-visible,.map-toggle:focus-visible{outline:2px solid #246343;outline-offset:3px}
+.chat-setup .composer:focus-within{outline:2px solid #246343;outline-offset:2px}
+@media(max-width:900px){
+  .schedule-layout{grid-template-columns:minmax(0,1fr);gap:12px;width:min(680px,calc(100% - 28px));margin:12px auto}
+  .map-sidebar{order:-1;max-height:none;overflow:visible}
+  .map-toggle{display:flex;gap:8px;align-items:center;width:100%;min-height:44px;padding:10px 14px;border:1px solid #d4dccf;border-radius:12px;background:#edf3e9;color:#315d41;cursor:pointer;font-size:14px}
+  .map-toggle span{margin-left:auto}
+  .map-content{display:none;margin-top:10px}
+  .map-content.is-open{display:block}
+  .chat-setup{position:relative;top:auto;height:calc(100dvh - 158px);min-height:340px}
+  .map-sidebar .goal-draft{margin:10px 0 0}
+}
+@media(max-width:600px){
+  .schedule-layout{width:100%;gap:8px;margin:8px auto 0}
+  .map-sidebar{padding:0 12px}
+  .chat-setup{height:calc(100dvh - 134px);border-radius:18px 18px 0 0;border-bottom:0;padding:16px 16px max(10px,env(safe-area-inset-bottom));min-height:310px}
+  .chat-setup .chat-top{padding-bottom:12px;gap:10px}
+  .chat-top .assistant-avatar.small{width:36px;height:36px;font-size:17px}
+  .conversation-content{gap:22px;padding-top:20px}
+  .conversation-history{padding-right:4px}
+  .chat-setup .agent-text{font-size:16px;line-height:1.8}
+  .composer-hint{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.typing i{animation:none}}
+.goal-change-summary,.goal-related-review{margin:14px 0;padding:12px;border:1px solid #cfdacb;border-radius:12px;font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.goal-related-review{background:#fff8e9;border-color:#dbc69b;color:#664c27}
+.goal-change-summary ul,.goal-related-review ul{padding-left:18px;margin:8px 0;display:grid;gap:10px}
+.goal-change-summary li span,.goal-related-review li span{display:block}
+.goal-related-review p{margin:8px 0}
+.goal-execution-list{margin:0;padding-left:18px;display:grid;gap:10px;line-height:1.65}
+.goal-execution-list li span{display:block}

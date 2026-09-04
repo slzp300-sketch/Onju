@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     if (body.action === 'load') {
       const { data, error } = await supabase
         .from('web_mvp_agent_sessions')
-        .select('stage,messages,blocks,pending_blocks,day_bounds,goal,reason,obstacle,openai_response_id,goal_card,goal_response_id,generated_plan,plan_response_id,pending_plan,plan_revision_history,plan_revision_response_id,updated_at')
+        .select('stage,messages,blocks,pending_blocks,day_bounds,goal,reason,obstacle,openai_response_id,goal_card,goal_response_id,generated_plan,plan_response_id,pending_plan,plan_revision_history,plan_revision_response_id,agent_v2_context,agent_v2_suggestions,updated_at')
         .eq('session_id', body.sessionId)
         .gt('expires_at', new Date().toISOString())
         .maybeSingle()
@@ -41,7 +41,10 @@ Deno.serve(async (req) => {
 
     if (body.action === 'save') {
       const state = body.state ?? {}
-      const payload = {
+      const { data: current, error: loadError } = await supabase.from('web_mvp_agent_sessions')
+        .select('goal_card,goal,reason,obstacle,agent_v2_context').eq('session_id', body.sessionId).maybeSingle()
+      if (loadError) throw loadError
+      const payload: Record<string, unknown> = {
         session_id: body.sessionId,
         stage: Math.max(0, Math.min(5, Number.isInteger(state.stage) ? state.stage : 0)),
         messages: cleanArray(state.messages, 100),
@@ -58,6 +61,10 @@ Deno.serve(async (req) => {
         plan_response_id: cleanText(state.planResponseId, 200) || null,
         updated_at: new Date().toISOString(),
         expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      }
+      // Autosave must not bypass or undo server-side proposal confirmation.
+      if (current?.agent_v2_context?.version === 3) {
+        for (const key of ['goal_card', 'goal', 'reason', 'obstacle']) delete payload[key]
       }
       const { error } = await supabase.from('web_mvp_agent_sessions').upsert(payload, { onConflict: 'session_id' })
       if (error) throw error

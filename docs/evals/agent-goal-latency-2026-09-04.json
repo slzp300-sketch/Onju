@@ -1,0 +1,2563 @@
+{
+  "manifest": {
+    "runId": "2026-09-04T05-20-26-677Z",
+    "expires": 1788506426680,
+    "sourceHashes": {
+      "agent.ts": "9133805dec572816275be90862653091266802ef597645ec37b1d5120fd98463",
+      "goal.ts": "6250c2477f006ae9d81c73af320785008ee4d83b91531ff68741095032fe7e78",
+      "policy.ts": "e5c457a199ba69c5844cc80b81f9c9dc4a93ae70e063d0cb4c42ee998412fe24",
+      "prompt.ts": "b20fb450ec0dbeb6e582b33e2982780f694c3a6b971247ef74e51ba23f90e3d2",
+      "state.ts": "e8037fe0882043084a49e56e375bb3b13e62c2f98a5544cd04d6a293a1bfe284",
+      "goalRevision.ts": "dc414aa8974db9f2974e492f38e5c11b2daca9261e49628ebfc9e443b80a630b",
+      "goalEffort.ts": "729915075b96665d30e86f2c341d30e634180aeeb3648c24c863a706fb123845",
+      "goalExecution.ts": "f9360fd9263298b955a8dbd5f691f24b6431f5afae96f096d1f9e8b73104c517"
+    },
+    "fixtures": [
+      {
+        "id": "two-blocks",
+        "name": "이동·근무 동시 추출",
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": []
+        },
+        "message": "평일 6:30-8:30까지 이동하고, 8:30-17:30까지 근무해",
+        "rules": [
+          "commuteWork"
+        ]
+      },
+      {
+        "id": "unknown-weekend",
+        "name": "주말 미정 허용",
+        "initial": {},
+        "message": "평일은 6시 기상 23시 취침. 주말 기상 취침은 전혀 일정하지 않아, 그때그때 알려줄게",
+        "rules": [
+          "weekdayOnly",
+          "scheduleFocus"
+        ]
+      },
+      {
+        "id": "partial-sleep",
+        "name": "토요일 답변을 일요일에 복제하지 않기",
+        "initial": {
+          "stage": 0,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "평일은 6시 기상 23시 취침, 토요일 8시 기상이고 일요일 7시 기상이야"
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "평일 기상·취침을 반영했어요. 토요일에는 몇 시에 잠드나요?"
+            }
+          ]
+        },
+        "message": "토요일에는 자정에 자요",
+        "rules": [
+          "saturdayOnly",
+          "askSunday"
+        ]
+      },
+      {
+        "id": "correct-wednesday",
+        "name": "수요일 수정·나머지 요일 보존",
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "평일 9시부터 18시까지 근무해"
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "평일 근무 시간을 반영했어요."
+            }
+          ]
+        },
+        "message": "수요일만 종료 시간을 17시로 바꿔줘",
+        "rules": [
+          "wednesdayCorrection"
+        ]
+      },
+      {
+        "id": "schedule-done",
+        "name": "일정 완료 후 목표 전환",
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "messages": []
+        },
+        "message": "더이상 일정에 대해 설명할게 없어. 이제 목표를 세우자",
+        "rules": [
+          "goalsFocus",
+          "goalReply"
+        ]
+      },
+      {
+        "id": "three-goals",
+        "name": "일·건강·신앙 초안 능동 제안",
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "title": "근무",
+              "start": "09:00",
+              "end": "18:00",
+              "kind": "fixed"
+            }
+          ],
+          "messages": []
+        },
+        "message": "목표를 세우고 달성하고 싶어. 일적인 부분과 건강, 신앙 세 파트야. 너무 질문이 많으니까 네가 작게 시작할 초안부터 추천해줘",
+        "rules": [
+          "goalsFocus",
+          "threeDomains",
+          "draftChoices",
+          "noUnapprovedNumbers"
+        ]
+      },
+      {
+        "id": "approve-draft",
+        "name": "동의한 기간·수치·루틴 정확히 저장",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "독서 습관을 만들고 싶어. 수치와 기간은 네가 가볍게 추천해줘."
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "**독서 초안**: 우선 2주 동안 주 3회, 한 번에 10분 읽기를 제안해요. 결과 기준은 2주간 6회 실행이에요. 현재 독서량은 미정으로 둘게요.\n\n이 초안으로 시작할까요?"
+            }
+          ],
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "reading-fixture-v1",
+              "presentedMessageId": "a",
+              "card": {
+                "category": "독서",
+                "outcome": "독서 습관 만들기",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주간 6회 실행",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "독서",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "message": "그 초안 그대로 시작할게",
+        "rules": [
+          "approvedReading"
+        ]
+      },
+      {
+        "id": "reject-draft",
+        "name": "초안 거절·축소 제안은 미확정",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": [
+            {
+              "id": "u",
+              "role": "user",
+              "text": "독서 습관을 만들고 싶어. 수치와 기간은 네가 가볍게 추천해줘."
+            },
+            {
+              "id": "a",
+              "role": "assistant",
+              "text": "**독서 초안**: 우선 2주 동안 주 3회, 한 번에 10분 읽기를 제안해요. 결과 기준은 2주간 6회 실행이에요. 현재 독서량은 미정으로 둘게요.\n\n이 초안으로 시작할까요?"
+            }
+          ]
+        },
+        "message": "아니, 그건 부담돼. 더 가벼운 다른 초안을 제안해줘. 아직 확정하지는 말고.",
+        "rules": [
+          "noUnapprovedNumbers",
+          "draftChoices"
+        ]
+      },
+      {
+        "id": "overnight",
+        "name": "자정 넘는 일정 구조 한계",
+        "structuralControl": true,
+        "initial": {
+          "stage": 1,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            }
+          ],
+          "blocks": [],
+          "messages": []
+        },
+        "message": "매주 금요일 밤 11시부터 토요일 새벽 1시까지 모임이 있어. 시간 지도에 반영해줘",
+        "rules": [
+          "overnightCoverage"
+        ]
+      },
+      {
+        "id": "goal-only-frequency",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "복수 분야",
+            "outcome": "일·건강·신앙의 습관",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "2주간 최소 7회",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "책을 펼쳐 한 문장 읽기",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 2,
+            "weeklyActions": [
+              {
+                "title": "업무 회고",
+                "frequencyPerWeek": 2,
+                "durationMinutes": 5,
+                "preferredDays": []
+              },
+              {
+                "title": "산책",
+                "frequencyPerWeek": 2,
+                "durationMinutes": 20,
+                "preferredDays": []
+              },
+              {
+                "title": "기도",
+                "frequencyPerWeek": 3,
+                "durationMinutes": 3,
+                "preferredDays": []
+              }
+            ]
+          }
+        },
+        "message": "업무 회고만 주 1회로 줄여줘. 나머지 조건은 그대로 두고 아직 확정하지 마."
+      },
+      {
+        "id": "goal-related-count",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "독서",
+            "outcome": "독서 습관",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "2주간 6회",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "책을 펼쳐 한 문장 읽기",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 2,
+            "weeklyActions": [
+              {
+                "title": "독서",
+                "frequencyPerWeek": 3,
+                "durationMinutes": 10,
+                "preferredDays": []
+              }
+            ]
+          }
+        },
+        "message": "독서 횟수만 주 1회로 줄여줘. 기간과 다른 조건은 그대로."
+      },
+      {
+        "id": "goal-duration-only",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "독서",
+            "outcome": "독서 습관",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "2주간 6회",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "책을 펼쳐 한 문장 읽기",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 2,
+            "weeklyActions": [
+              {
+                "title": "독서",
+                "frequencyPerWeek": 3,
+                "durationMinutes": 10,
+                "preferredDays": []
+              }
+            ]
+          }
+        },
+        "message": "독서 시간만 5분으로 바꿔줘. 횟수와 기간, 결과 기준은 그대로."
+      },
+      {
+        "id": "goal-small-budget",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ]
+        },
+        "message": "하루 10분밖에 없어. 일, 건강, 신앙 목표를 작게 시작할 초안을 추천해줘."
+      },
+      {
+        "id": "goal-light-first",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ]
+        },
+        "message": "퇴근하고 지쳐서 길게는 못 하겠어. 일, 건강, 신앙을 가볍게 시작하는 초안을 추천해줘."
+      },
+      {
+        "id": "goal-explicit-long",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ]
+        },
+        "message": "운동을 주 3회 60분씩 하고 싶어. 이 횟수와 시간은 유지해서 2주 시험 계획을 제안해줘."
+      },
+      {
+        "id": "execution-percent",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ]
+        },
+        "message": "독서 주 3회, 10분씩 2주 동안 하고 실행률 80%를 목표로 할게. 완료 기준과 바쁜 날 최소 행동까지 초안으로 제안해줘."
+      },
+      {
+        "id": "execution-korean-number",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "독서",
+            "outcome": "독서 습관",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "독서: 책 한 문장 읽기 (1분)",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검",
+            "durationWeeks": 2,
+            "weeklyActions": [
+              {
+                "title": "독서",
+                "frequencyPerWeek": 3,
+                "durationMinutes": 10,
+                "preferredDays": []
+              }
+            ],
+            "execution": {
+              "measurement": "routine_completion",
+              "completionPercent": 80,
+              "reviewEveryWeeks": 1,
+              "actions": [
+                {
+                  "completionCriterion": "읽은 문장 한 개 표시하기",
+                  "minimumAction": "책 한 문장 읽기",
+                  "minimumMinutes": 1
+                }
+              ]
+            }
+          }
+        },
+        "message": "독서 횟수만 일주일에 한 번으로 줄여줘. 나머지는 그대로."
+      },
+      {
+        "id": "execution-correction",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "독서",
+            "outcome": "독서 습관",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "독서: 책 한 문장 읽기 (1분)",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검",
+            "durationWeeks": 2,
+            "weeklyActions": [
+              {
+                "title": "독서",
+                "frequencyPerWeek": 3,
+                "durationMinutes": 10,
+                "preferredDays": []
+              }
+            ],
+            "execution": {
+              "measurement": "routine_completion",
+              "completionPercent": 80,
+              "reviewEveryWeeks": 1,
+              "actions": [
+                {
+                  "completionCriterion": "읽은 문장 한 개 표시하기",
+                  "minimumAction": "책 한 문장 읽기",
+                  "minimumMinutes": 1
+                }
+              ]
+            }
+          }
+        },
+        "message": "독서 시간만 5분 말고 7분으로 바꿔줘."
+      },
+      {
+        "id": "execution-minimum",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "독서",
+            "outcome": "독서 습관",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "독서: 책 한 문장 읽기 (1분)",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검",
+            "durationWeeks": 2,
+            "weeklyActions": [
+              {
+                "title": "독서",
+                "frequencyPerWeek": 3,
+                "durationMinutes": 10,
+                "preferredDays": []
+              }
+            ],
+            "execution": {
+              "measurement": "routine_completion",
+              "completionPercent": 80,
+              "reviewEveryWeeks": 1,
+              "actions": [
+                {
+                  "completionCriterion": "읽은 문장 한 개 표시하기",
+                  "minimumAction": "책 한 문장 읽기",
+                  "minimumMinutes": 1
+                }
+              ]
+            }
+          }
+        },
+        "message": "독서의 바쁜 날 최소 행동만 책 제목 읽기로 바꿔줘. 횟수, 시간과 기간은 그대로."
+      },
+      {
+        "id": "execution-custom-outcome",
+        "initial": {
+          "stage": 5,
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ]
+        },
+        "message": "4주 동안 소설 초고를 현재 1000자에서 2000자로 늘리고 싶어. 매주 초고를 주 2회 10분씩 쓰는 루틴과 완료 기준을 제안해줘. 성과 목표를 루틴 완료율로 바꾸지는 마."
+      }
+    ],
+    "model": "gpt-4.1-2025-04-14",
+    "limitUsd": 2,
+    "resultPrefix": "agent-goal-latency",
+    "notes": [
+      "Identical legacy fixtures except approval now contains the versioned displayed draft and a simple unqualified acceptance.",
+      "Unknown rhythm fields are represented explicitly rather than absent records. Criteria compare known time values.",
+      "Temporary function imports the production core directly; no database access.",
+      "No 429 retries; record failures as observed."
+    ]
+  },
+  "summary": {
+    "all": {
+      "n": 6,
+      "pass": 6,
+      "usd": 0.034776
+    },
+    "before": {
+      "n": 16,
+      "pass": 12,
+      "meanUsd": 0.012888374999999999,
+      "meanUncachedUsd": 0.018024375000000002,
+      "meanCalls": 2.375,
+      "meanSeconds": 3.98660625625,
+      "meanOutputTokens": 262.375,
+      "meanReplyCharacters": 142.25,
+      "medianSeconds": 3.5952053000000017
+    },
+    "after": {
+      "n": 0,
+      "pass": 0,
+      "meanUsd": null,
+      "meanUncachedUsd": null,
+      "meanCalls": null,
+      "meanSeconds": null,
+      "meanOutputTokens": null,
+      "meanReplyCharacters": null,
+      "medianSeconds": null
+    },
+    "matchedComparison": {
+      "baselineRunId": "2026-09-04T04-30-27-696Z",
+      "notes": "Same frozen scenarios; baseline once per scenario, revised run as specified. Wall-clock includes API/network variation. Not the unrelated legacy before/after table.",
+      "allBefore": {
+        "n": 20,
+        "pass": 20,
+        "meanUsd": 0.013624500000000001,
+        "meanUncachedUsd": 0.0143541,
+        "meanCalls": 1.5,
+        "meanSeconds": 3.533638385000001,
+        "meanOutputTokens": 366.1,
+        "meanReplyCharacters": 414.3,
+        "medianSeconds": 2.793266649999998
+      },
+      "allAfter": {
+        "n": 6,
+        "pass": 6,
+        "meanUsd": 0.005796,
+        "meanUncachedUsd": 0.009124,
+        "meanCalls": 1,
+        "meanSeconds": 3.1406877000000013,
+        "meanOutputTokens": 263.1666666666667,
+        "meanReplyCharacters": 515.8333333333334,
+        "medianSeconds": 3.27340365
+      },
+      "newDraftBefore": {
+        "n": 7,
+        "pass": 7,
+        "meanUsd": 0.018801428571428573,
+        "meanUncachedUsd": 0.020886,
+        "meanCalls": 1.8571428571428572,
+        "meanSeconds": 6.273228285714288,
+        "meanOutputTokens": 828.4285714285714,
+        "meanReplyCharacters": 735.2857142857143,
+        "medianSeconds": 5.89790340000001
+      },
+      "newDraftAfter": {
+        "n": 6,
+        "pass": 6,
+        "meanUsd": 0.005796,
+        "meanUncachedUsd": 0.009124,
+        "meanCalls": 1,
+        "meanSeconds": 3.1406877000000013,
+        "meanOutputTokens": 263.1666666666667,
+        "meanReplyCharacters": 515.8333333333334,
+        "medianSeconds": 3.27340365
+      },
+      "cases": [
+        {
+          "id": "three-goals",
+          "before": {
+            "n": 1,
+            "pass": 1,
+            "meanUsd": 0.02479,
+            "meanUncachedUsd": 0.02479,
+            "meanCalls": 2,
+            "meanSeconds": 9.769970199999996,
+            "meanOutputTokens": 1146,
+            "meanReplyCharacters": 946,
+            "medianSeconds": 9.769970199999996
+          },
+          "after": {
+            "n": 0,
+            "pass": 0,
+            "meanUsd": null,
+            "meanUncachedUsd": null,
+            "meanCalls": null,
+            "meanSeconds": null,
+            "meanOutputTokens": null,
+            "meanReplyCharacters": null,
+            "medianSeconds": null
+          }
+        },
+        {
+          "id": "reject-draft",
+          "before": {
+            "n": 1,
+            "pass": 1,
+            "meanUsd": 0.00965,
+            "meanUncachedUsd": 0.00965,
+            "meanCalls": 1,
+            "meanSeconds": 2.7998505000000007,
+            "meanOutputTokens": 316,
+            "meanReplyCharacters": 616,
+            "medianSeconds": 2.7998505000000007
+          },
+          "after": {
+            "n": 0,
+            "pass": 0,
+            "meanUsd": null,
+            "meanUncachedUsd": null,
+            "meanCalls": null,
+            "meanSeconds": null,
+            "meanOutputTokens": null,
+            "meanReplyCharacters": null,
+            "medianSeconds": null
+          }
+        },
+        {
+          "id": "goal-small-budget",
+          "before": {
+            "n": 1,
+            "pass": 1,
+            "meanUsd": 0.029560000000000003,
+            "meanUncachedUsd": 0.035320000000000004,
+            "meanCalls": 3,
+            "meanSeconds": 8.984138399999996,
+            "meanOutputTokens": 1409,
+            "meanReplyCharacters": 887,
+            "medianSeconds": 8.984138399999996
+          },
+          "after": {
+            "n": 0,
+            "pass": 0,
+            "meanUsd": null,
+            "meanUncachedUsd": null,
+            "meanCalls": null,
+            "meanSeconds": null,
+            "meanOutputTokens": null,
+            "meanReplyCharacters": null,
+            "medianSeconds": null
+          }
+        },
+        {
+          "id": "goal-light-first",
+          "before": {
+            "n": 1,
+            "pass": 1,
+            "meanUsd": 0.030882,
+            "meanUncachedUsd": 0.036834,
+            "meanCalls": 3,
+            "meanSeconds": 10.9775435,
+            "meanOutputTokens": 1555,
+            "meanReplyCharacters": 893,
+            "medianSeconds": 10.9775435
+          },
+          "after": {
+            "n": 0,
+            "pass": 0,
+            "meanUsd": null,
+            "meanUncachedUsd": null,
+            "meanCalls": null,
+            "meanSeconds": null,
+            "meanOutputTokens": null,
+            "meanReplyCharacters": null,
+            "medianSeconds": null
+          }
+        },
+        {
+          "id": "goal-explicit-long",
+          "before": {
+            "n": 1,
+            "pass": 1,
+            "meanUsd": 0.017158,
+            "meanUncachedUsd": 0.020038,
+            "meanCalls": 2,
+            "meanSeconds": 5.89790340000001,
+            "meanOutputTokens": 666,
+            "meanReplyCharacters": 578,
+            "medianSeconds": 5.89790340000001
+          },
+          "after": {
+            "n": 2,
+            "pass": 2,
+            "meanUsd": 0.006514000000000001,
+            "meanUncachedUsd": 0.00901,
+            "meanCalls": 1,
+            "meanSeconds": 3.824164500000003,
+            "meanOutputTokens": 251.5,
+            "meanReplyCharacters": 507.5,
+            "medianSeconds": 3.824164500000003
+          }
+        },
+        {
+          "id": "execution-percent",
+          "before": {
+            "n": 1,
+            "pass": 1,
+            "meanUsd": 0.009722,
+            "meanUncachedUsd": 0.009722,
+            "meanCalls": 1,
+            "meanSeconds": 2.628806099999987,
+            "meanOutputTokens": 348,
+            "meanReplyCharacters": 603,
+            "medianSeconds": 2.628806099999987
+          },
+          "after": {
+            "n": 2,
+            "pass": 2,
+            "meanUsd": 0.00384,
+            "meanUncachedUsd": 0.008832,
+            "meanCalls": 1,
+            "meanSeconds": 2.32449495,
+            "meanOutputTokens": 228.5,
+            "meanReplyCharacters": 501.5,
+            "medianSeconds": 2.32449495
+          }
+        },
+        {
+          "id": "execution-custom-outcome",
+          "before": {
+            "n": 1,
+            "pass": 1,
+            "meanUsd": 0.009848,
+            "meanUncachedUsd": 0.009848,
+            "meanCalls": 1,
+            "meanSeconds": 2.854385900000023,
+            "meanOutputTokens": 359,
+            "meanReplyCharacters": 624,
+            "medianSeconds": 2.854385900000023
+          },
+          "after": {
+            "n": 2,
+            "pass": 2,
+            "meanUsd": 0.007034,
+            "meanUncachedUsd": 0.00953,
+            "meanCalls": 1,
+            "meanSeconds": 3.27340365,
+            "meanOutputTokens": 309.5,
+            "meanReplyCharacters": 538.5,
+            "medianSeconds": 3.27340365
+          }
+        }
+      ]
+    }
+  },
+  "results": [
+    {
+      "id": "goal-explicit-long",
+      "rep": 0,
+      "elapsedMs": 3769.8779,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "requestedLong": true,
+        "period": true,
+        "draftOnly": true,
+        "executionDetails": true,
+        "canonicalReview": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 3499,
+        "cached": 0,
+        "output": 258,
+        "calls": 1,
+        "usd": 0.009062,
+        "uncachedUsd": 0.009062
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "060150df-17a2-4a80-a424-8aae52b884cc",
+              "role": "user",
+              "text": "운동을 주 3회 60분씩 하고 싶어. 이 횟수와 시간은 유지해서 2주 시험 계획을 제안해줘."
+            },
+            {
+              "id": "99605a62-4b91-4215-b8b4-4e877d7db51b",
+              "role": "assistant",
+              "text": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n운동 습관을 기르는 것\n\n**시험 기간**\n\n2주\n\n**주간 실행**\n\n- **운동 1회 실시**: 주 3회 · 60분\n\n**완료 기준**\n\n- 2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)\n- **운동 1회 실시**: 운동 1회 끝까지 수행\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **운동 1회 실시**: 스트레칭 1세트를 하기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "운동을 주 3회 60분씩 실천하고 싶음",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "2a561ce2-2bd8-4908-a8f9-5e89a6d0b60c",
+              "card": {
+                "category": "건강/운동",
+                "outcome": "운동 습관을 기르는 것",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "운동 1회 실시: 스트레칭 1세트를 하기 (1분)",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "운동 1회 실시",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 60,
+                    "preferredDays": []
+                  }
+                ],
+                "execution": {
+                  "measurement": "routine_completion",
+                  "completionPercent": 80,
+                  "reviewEveryWeeks": 1,
+                  "actions": [
+                    {
+                      "completionCriterion": "운동 1회 끝까지 수행",
+                      "minimumAction": "스트레칭 1세트를 하기",
+                      "minimumMinutes": 1
+                    }
+                  ]
+                }
+              },
+              "presentedMessageId": "99605a62-4b91-4215-b8b4-4e877d7db51b",
+              "notes": [
+                "말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.",
+                "확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요."
+              ]
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T05:20:48.221Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3499,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 258,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3757
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T05:20:48.223Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "운동을 주 3회 60분씩 실천하고 싶음",
+              "goal_draft": {
+                "category": "건강/운동",
+                "outcome": "운동 습관을 기르는 것",
+                "identity": "",
+                "cue": "",
+                "environment": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "실행률 80%",
+                "durationWeeks": 2,
+                "measurement": "routine_completion",
+                "completionPercent": 80,
+                "reviewEveryWeeks": 1,
+                "actions": [
+                  {
+                    "title": "운동 1회 실시",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 60,
+                    "preferredDays": [],
+                    "completionCriterion": "운동 1회 끝까지 수행",
+                    "minimumAction": "스트레칭 1세트를 하기",
+                    "minimumMinutes": 1
+                  }
+                ]
+              },
+              "summary": "주 3회 60분 운동 2주 시험 계획 초안이에요.",
+              "details": [
+                "카테고리: 건강/운동",
+                "주 3회, 회당 60분 운동",
+                "최소 실행: 스트레칭 1세트(1분)",
+                "실행률 80% 달성 목표"
+              ],
+              "question": "이대로 진행할까요?",
+              "choices": [
+                "이 계획으로 시작할래요",
+                "수정하고 싶어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n운동 습관을 기르는 것\n\n**시험 기간**\n\n2주\n\n**주간 실행**\n\n- **운동 1회 실시**: 주 3회 · 60분\n\n**완료 기준**\n\n- 2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)\n- **운동 1회 실시**: 운동 1회 끝까지 수행\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **운동 1회 실시**: 스트레칭 1세트를 하기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_024d0d27b0e5e3d0016a9a552e2f2487d0a5b7ea30f94c3ea6",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3499,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 258,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3757
+            },
+            "elapsedMs": 2447,
+            "output": [
+              {
+                "id": "fc_024d0d27b0e5e3d0016a9a552eb98c87d09793451e08a9468d",
+                "type": "function_call",
+                "status": "completed",
+                "arguments": "{\"focus\":\"goals\",\"goal_outcome\":\"운동을 주 3회 60분씩 실천하고 싶음\",\"goal_draft\":{\"category\":\"건강/운동\",\"outcome\":\"운동 습관을 기르는 것\",\"identity\":\"\",\"cue\":\"\",\"environment\":\"\",\"deadline\":\"\",\"baselineMetric\":\"\",\"targetMetric\":\"실행률 80%\",\"durationWeeks\":2,\"measurement\":\"routine_completion\",\"completionPercent\":80,\"reviewEveryWeeks\":1,\"actions\":[{\"title\":\"운동 1회 실시\",\"frequencyPerWeek\":3,\"durationMinutes\":60,\"preferredDays\":[],\"completionCriterion\":\"운동 1회 끝까지 수행\",\"minimumAction\":\"스트레칭 1세트를 하기\",\"minimumMinutes\":1}]},\"summary\":\"주 3회 60분 운동 2주 시험 계획 초안이에요.\",\"details\":[\"카테고리: 건강/운동\",\"주 3회, 회당 60분 운동\",\"최소 실행: 스트레칭 1세트(1분)\",\"실행률 80% 달성 목표\"],\"question\":\"이대로 진행할까요?\",\"choices\":[\"이 계획으로 시작할래요\",\"수정하고 싶어요\"]}",
+                "call_id": "call_idpk1IGVSA5umwb9aYjtjN3n",
+                "name": "respond"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "execution-percent",
+      "rep": 0,
+      "elapsedMs": 2236.0602,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "percent": true,
+        "denominator": true,
+        "review": true,
+        "guides": true,
+        "minimumSeparate": true,
+        "executionDetails": true,
+        "canonicalReview": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 3502,
+        "cached": 3328,
+        "output": 215,
+        "calls": 1,
+        "usd": 0.003732,
+        "uncachedUsd": 0.008724
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "795772d0-b366-43f6-a49d-b5b8ea37f29c",
+              "role": "user",
+              "text": "독서 주 3회, 10분씩 2주 동안 하고 실행률 80%를 목표로 할게. 완료 기준과 바쁜 날 최소 행동까지 초안으로 제안해줘."
+            },
+            {
+              "id": "dd8791f0-83cf-423f-9fa3-3371b45a4c8d",
+              "role": "assistant",
+              "text": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n2주 동안 규칙적으로 독서를 실천한다\n\n**시험 기간**\n\n2주\n\n**주간 실행**\n\n- **책 읽기**: 주 3회 · 10분\n\n**완료 기준**\n\n- 2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)\n- **책 읽기**: 읽은 문장 한 개 표시하기\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **책 읽기**: 책 한 문장 읽기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "독서를 꾸준히 실천하고 싶음",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "db3f15ad-4605-4fd5-88fe-6af90e8c6aea",
+              "card": {
+                "category": "독서",
+                "outcome": "2주 동안 규칙적으로 독서를 실천한다",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "책 읽기: 책 한 문장 읽기 (1분)",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "책 읽기",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  }
+                ],
+                "execution": {
+                  "measurement": "routine_completion",
+                  "completionPercent": 80,
+                  "reviewEveryWeeks": 1,
+                  "actions": [
+                    {
+                      "completionCriterion": "읽은 문장 한 개 표시하기",
+                      "minimumAction": "책 한 문장 읽기",
+                      "minimumMinutes": 1
+                    }
+                  ]
+                }
+              },
+              "presentedMessageId": "dd8791f0-83cf-423f-9fa3-3371b45a4c8d",
+              "notes": [
+                "말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.",
+                "확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요."
+              ]
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T05:20:58.475Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3502,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 3328
+              },
+              "output_tokens": 215,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3717
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T05:20:58.478Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "독서를 꾸준히 실천하고 싶음",
+              "goal_draft": {
+                "category": "독서",
+                "outcome": "2주 동안 규칙적으로 독서를 실천한다",
+                "identity": "",
+                "cue": "",
+                "environment": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "실행률 80%",
+                "durationWeeks": 2,
+                "measurement": "routine_completion",
+                "completionPercent": 80,
+                "reviewEveryWeeks": 1,
+                "actions": [
+                  {
+                    "title": "책 읽기",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 10,
+                    "preferredDays": [],
+                    "completionCriterion": "읽은 문장 한 개 표시하기",
+                    "minimumAction": "책 한 문장 읽기",
+                    "minimumMinutes": 1
+                  }
+                ]
+              },
+              "summary": "독서 주 3회, 10분씩 2주간 실천 초안 제안했어요.",
+              "details": [
+                "목표 실행률: 80%",
+                "완료 기준: 읽은 문장 한 개 표시",
+                "최소 행동: 책 한 문장 읽기"
+              ],
+              "question": "",
+              "choices": []
+            }
+          }
+        ],
+        "assistant_message": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n2주 동안 규칙적으로 독서를 실천한다\n\n**시험 기간**\n\n2주\n\n**주간 실행**\n\n- **책 읽기**: 주 3회 · 10분\n\n**완료 기준**\n\n- 2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)\n- **책 읽기**: 읽은 문장 한 개 표시하기\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **책 읽기**: 책 한 문장 읽기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_0be9c0c371805278016a9a553883ac87d08b97928fa5ad3d5b",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3502,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 3328
+              },
+              "output_tokens": 215,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3717
+            },
+            "elapsedMs": 2088,
+            "output": [
+              {
+                "id": "fc_0be9c0c371805278016a9a5539389487d0a3ee79b006dd224f",
+                "type": "function_call",
+                "status": "completed",
+                "arguments": "{\"focus\":\"goals\",\"goal_outcome\":\"독서를 꾸준히 실천하고 싶음\",\"goal_draft\":{\"category\":\"독서\",\"outcome\":\"2주 동안 규칙적으로 독서를 실천한다\",\"identity\":\"\",\"cue\":\"\",\"environment\":\"\",\"deadline\":\"\",\"baselineMetric\":\"\",\"targetMetric\":\"실행률 80%\",\"durationWeeks\":2,\"measurement\":\"routine_completion\",\"completionPercent\":80,\"reviewEveryWeeks\":1,\"actions\":[{\"title\":\"책 읽기\",\"frequencyPerWeek\":3,\"durationMinutes\":10,\"preferredDays\":[],\"completionCriterion\":\"읽은 문장 한 개 표시하기\",\"minimumAction\":\"책 한 문장 읽기\",\"minimumMinutes\":1}]},\"summary\":\"독서 주 3회, 10분씩 2주간 실천 초안 제안했어요.\",\"details\":[\"목표 실행률: 80%\",\"완료 기준: 읽은 문장 한 개 표시\",\"최소 행동: 책 한 문장 읽기\"],\"question\":\"\",\"choices\":[]}",
+                "call_id": "call_otOlgRo7L2AmfhHXoCo00UWo",
+                "name": "respond"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "execution-custom-outcome",
+      "rep": 0,
+      "elapsedMs": 2991.401700000002,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "custom": true,
+        "keepsOutcome": true,
+        "guides": true,
+        "executionDetails": true,
+        "canonicalReview": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 3527,
+        "cached": 0,
+        "output": 318,
+        "calls": 1,
+        "usd": 0.009598,
+        "uncachedUsd": 0.009598
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "fc42b4f2-baa8-4fa8-ab28-c010573e8b14",
+              "role": "user",
+              "text": "4주 동안 소설 초고를 현재 1000자에서 2000자로 늘리고 싶어. 매주 초고를 주 2회 10분씩 쓰는 루틴과 완료 기준을 제안해줘. 성과 목표를 루틴 완료율로 바꾸지는 마."
+            },
+            {
+              "id": "98e4c03e-79b5-489a-a8e4-f4b166db3c68",
+              "role": "assistant",
+              "text": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n4주 동안 소설 초고 분량을 1000자에서 2000자로 늘린다\n\n**시험 기간**\n\n4주\n\n**주간 실행**\n\n- **소설 초고 추가 집필**: 주 2회 · 10분\n\n현재 기준: 현재 초고 분량 1000자\n\n**완료 기준**\n\n- 소설 초고 최종 분량 2000자\n- **소설 초고 추가 집필**: 작성한 분량을 초고 파일에 저장\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **소설 초고 추가 집필**: 초고 분량 1문장 추가 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 4주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "소설 초고를 4주 동안 1000자에서 2000자로 늘리기",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "788e3fed-db88-4f06-bb0a-619dcbdce831",
+              "card": {
+                "category": "창작·글쓰기",
+                "outcome": "4주 동안 소설 초고 분량을 1000자에서 2000자로 늘린다",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "현재 초고 분량 1000자",
+                "targetMetric": "소설 초고 최종 분량 2000자",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "소설 초고 추가 집필: 초고 분량 1문장 추가 (1분)",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행 기록 점검 · 4주 시험 종료 시 전체 점검",
+                "durationWeeks": 4,
+                "weeklyActions": [
+                  {
+                    "title": "소설 초고 추가 집필",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  }
+                ],
+                "execution": {
+                  "measurement": "custom_outcome",
+                  "completionPercent": null,
+                  "reviewEveryWeeks": 1,
+                  "actions": [
+                    {
+                      "completionCriterion": "작성한 분량을 초고 파일에 저장",
+                      "minimumAction": "초고 분량 1문장 추가",
+                      "minimumMinutes": 1
+                    }
+                  ]
+                }
+              },
+              "presentedMessageId": "98e4c03e-79b5-489a-a8e4-f4b166db3c68",
+              "notes": [
+                "말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.",
+                "확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요."
+              ]
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T05:21:09.488Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3527,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 318,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3845
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T05:21:09.491Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "소설 초고를 4주 동안 1000자에서 2000자로 늘리기",
+              "goal_draft": {
+                "category": "창작·글쓰기",
+                "outcome": "4주 동안 소설 초고 분량을 1000자에서 2000자로 늘린다",
+                "identity": "",
+                "cue": "",
+                "environment": "",
+                "deadline": "",
+                "baselineMetric": "현재 초고 분량 1000자",
+                "targetMetric": "소설 초고 최종 분량 2000자",
+                "durationWeeks": 4,
+                "measurement": "custom_outcome",
+                "completionPercent": null,
+                "reviewEveryWeeks": 1,
+                "actions": [
+                  {
+                    "title": "소설 초고 추가 집필",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 10,
+                    "preferredDays": [],
+                    "completionCriterion": "작성한 분량을 초고 파일에 저장",
+                    "minimumAction": "초고 분량 1문장 추가",
+                    "minimumMinutes": 1
+                  }
+                ]
+              },
+              "summary": "4주 동안 소설 초고를 1000자에서 2000자로 늘리는 목표를 제안해요.",
+              "details": [
+                "루틴: 주 2회, 회당 10분 소설 초고 집필",
+                "성과 기준: 최종 분량 2000자 달성",
+                "최소 실행: 1문장 추가 시도",
+                "완료 증거: 작성 분량을 파일에 저장"
+              ],
+              "question": "이렇게 목표를 시작할까요?",
+              "choices": [
+                "확인, 이대로 시작",
+                "수정할 내용 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n4주 동안 소설 초고 분량을 1000자에서 2000자로 늘린다\n\n**시험 기간**\n\n4주\n\n**주간 실행**\n\n- **소설 초고 추가 집필**: 주 2회 · 10분\n\n현재 기준: 현재 초고 분량 1000자\n\n**완료 기준**\n\n- 소설 초고 최종 분량 2000자\n- **소설 초고 추가 집필**: 작성한 분량을 초고 파일에 저장\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **소설 초고 추가 집필**: 초고 분량 1문장 추가 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 4주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_0c091d726f926ee4016a9a5542c0e087d08de569feeeb97862",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3527,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 0
+              },
+              "output_tokens": 318,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3845
+            },
+            "elapsedMs": 2871,
+            "output": [
+              {
+                "id": "fc_0c091d726f926ee4016a9a55438c4087d0acf1bd3dd2621ca5",
+                "type": "function_call",
+                "status": "completed",
+                "arguments": "{\"focus\":\"goals\",\"goal_outcome\":\"소설 초고를 4주 동안 1000자에서 2000자로 늘리기\",\"goal_draft\":{\"category\":\"창작·글쓰기\",\"outcome\":\"4주 동안 소설 초고 분량을 1000자에서 2000자로 늘린다\",\"identity\":\"\",\"cue\":\"\",\"environment\":\"\",\"deadline\":\"\",\"baselineMetric\":\"현재 초고 분량 1000자\",\"targetMetric\":\"소설 초고 최종 분량 2000자\",\"durationWeeks\":4,\"measurement\":\"custom_outcome\",\"completionPercent\":null,\"reviewEveryWeeks\":1,\"actions\":[{\"title\":\"소설 초고 추가 집필\",\"frequencyPerWeek\":2,\"durationMinutes\":10,\"preferredDays\":[],\"completionCriterion\":\"작성한 분량을 초고 파일에 저장\",\"minimumAction\":\"초고 분량 1문장 추가\",\"minimumMinutes\":1}]},\"summary\":\"4주 동안 소설 초고를 1000자에서 2000자로 늘리는 목표를 제안해요.\",\"details\":[\"루틴: 주 2회, 회당 10분 소설 초고 집필\",\"성과 기준: 최종 분량 2000자 달성\",\"최소 실행: 1문장 추가 시도\",\"완료 증거: 작성 분량을 파일에 저장\"],\"question\":\"이렇게 목표를 시작할까요?\",\"choices\":[\"확인, 이대로 시작\",\"수정할 내용 있어요\"]}",
+                "call_id": "call_mxEzD3R4dxB5Q4CDAxN3cfW8",
+                "name": "respond"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "goal-explicit-long",
+      "rep": 1,
+      "elapsedMs": 3878.4511000000057,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "requestedLong": true,
+        "period": true,
+        "draftOnly": true,
+        "executionDetails": true,
+        "canonicalReview": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 3499,
+        "cached": 3328,
+        "output": 245,
+        "calls": 1,
+        "usd": 0.003966,
+        "uncachedUsd": 0.008958
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "3a3c2906-2c51-4cd4-93f0-7862ed283147",
+              "role": "user",
+              "text": "운동을 주 3회 60분씩 하고 싶어. 이 횟수와 시간은 유지해서 2주 시험 계획을 제안해줘."
+            },
+            {
+              "id": "c6aefb46-a4de-4e54-83b3-f63426b89160",
+              "role": "assistant",
+              "text": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n규칙적으로 운동하는 습관 만들기\n\n**시험 기간**\n\n2주\n\n**주간 실행**\n\n- **운동 실천**: 주 3회 · 60분\n\n**완료 기준**\n\n- 2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)\n- **운동 실천**: 운동 후 간단한 일지 작성\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **운동 실천**: 운동복 입고 스트레칭 1분 하기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "운동을 주 3회, 회당 60분 실천",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "23e3534c-455f-4108-a750-c24cad6ef2b8",
+              "card": {
+                "category": "건강",
+                "outcome": "규칙적으로 운동하는 습관 만들기",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "운동 실천: 운동복 입고 스트레칭 1분 하기 (1분)",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "운동 실천",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 60,
+                    "preferredDays": []
+                  }
+                ],
+                "execution": {
+                  "measurement": "routine_completion",
+                  "completionPercent": 80,
+                  "reviewEveryWeeks": 1,
+                  "actions": [
+                    {
+                      "completionCriterion": "운동 후 간단한 일지 작성",
+                      "minimumAction": "운동복 입고 스트레칭 1분 하기",
+                      "minimumMinutes": 1
+                    }
+                  ]
+                }
+              },
+              "presentedMessageId": "c6aefb46-a4de-4e54-83b3-f63426b89160",
+              "notes": [
+                "말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.",
+                "확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요."
+              ]
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T05:21:21.367Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3499,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 3328
+              },
+              "output_tokens": 245,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3744
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T05:21:21.370Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "운동을 주 3회, 회당 60분 실천",
+              "goal_draft": {
+                "category": "건강",
+                "outcome": "규칙적으로 운동하는 습관 만들기",
+                "identity": "",
+                "cue": "",
+                "environment": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "실행률 80%",
+                "durationWeeks": 2,
+                "measurement": "routine_completion",
+                "completionPercent": 80,
+                "reviewEveryWeeks": 1,
+                "actions": [
+                  {
+                    "title": "운동 실천",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 60,
+                    "preferredDays": [],
+                    "completionCriterion": "운동 후 간단한 일지 작성",
+                    "minimumAction": "운동복 입고 스트레칭 1분 하기",
+                    "minimumMinutes": 1
+                  }
+                ]
+              },
+              "summary": "운동 주 3회, 60분씩 2주간 도전 초안이에요.",
+              "details": [
+                "회당 60분 운동, 주 3회",
+                "실행률 80% 목표",
+                "시험 기간 2주, 매주 검토"
+              ],
+              "question": "바로 시작해볼까요?",
+              "choices": [
+                "네, 시작해요",
+                "수정할게 있어요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n규칙적으로 운동하는 습관 만들기\n\n**시험 기간**\n\n2주\n\n**주간 실행**\n\n- **운동 실천**: 주 3회 · 60분\n\n**완료 기준**\n\n- 2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)\n- **운동 실천**: 운동 후 간단한 일지 작성\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **운동 실천**: 운동복 입고 스트레칭 1분 하기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_0e21075a0faaa9d9016a9a554dcdc887d093afab6274b2972a",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3499,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 3328
+              },
+              "output_tokens": 245,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3744
+            },
+            "elapsedMs": 3754,
+            "output": [
+              {
+                "id": "fc_0e21075a0faaa9d9016a9a554fc21887d09a5f2857b57cfe54",
+                "type": "function_call",
+                "status": "completed",
+                "arguments": "{\"focus\":\"goals\",\"goal_outcome\":\"운동을 주 3회, 회당 60분 실천\",\"goal_draft\":{\"category\":\"건강\",\"outcome\":\"규칙적으로 운동하는 습관 만들기\",\"identity\":\"\",\"cue\":\"\",\"environment\":\"\",\"deadline\":\"\",\"baselineMetric\":\"\",\"targetMetric\":\"실행률 80%\",\"durationWeeks\":2,\"measurement\":\"routine_completion\",\"completionPercent\":80,\"reviewEveryWeeks\":1,\"actions\":[{\"title\":\"운동 실천\",\"frequencyPerWeek\":3,\"durationMinutes\":60,\"preferredDays\":[],\"completionCriterion\":\"운동 후 간단한 일지 작성\",\"minimumAction\":\"운동복 입고 스트레칭 1분 하기\",\"minimumMinutes\":1}]},\"summary\":\"운동 주 3회, 60분씩 2주간 도전 초안이에요.\",\"details\":[\"회당 60분 운동, 주 3회\",\"실행률 80% 목표\",\"시험 기간 2주, 매주 검토\"],\"question\":\"바로 시작해볼까요?\",\"choices\":[\"네, 시작해요\",\"수정할게 있어요\"]}",
+                "call_id": "call_g3rRTyToeXrmENIz4i2x69sN",
+                "name": "respond"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "execution-percent",
+      "rep": 1,
+      "elapsedMs": 2412.9297000000006,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "percent": true,
+        "denominator": true,
+        "review": true,
+        "guides": true,
+        "minimumSeparate": true,
+        "executionDetails": true,
+        "canonicalReview": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 3502,
+        "cached": 3328,
+        "output": 242,
+        "calls": 1,
+        "usd": 0.003948,
+        "uncachedUsd": 0.00894
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "0e66912a-d61e-48d6-a1a9-48f56f5e73d2",
+              "role": "user",
+              "text": "독서 주 3회, 10분씩 2주 동안 하고 실행률 80%를 목표로 할게. 완료 기준과 바쁜 날 최소 행동까지 초안으로 제안해줘."
+            },
+            {
+              "id": "51190f5e-3071-4e84-a54e-8e74369ca8f6",
+              "role": "assistant",
+              "text": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n규칙적으로 책을 읽는 습관을 들인다.\n\n**시험 기간**\n\n2주\n\n**주간 실행**\n\n- **책 읽기**: 주 3회 · 10분\n\n**완료 기준**\n\n- 2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)\n- **책 읽기**: 읽은 내용 한 문장 표시하기\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **책 읽기**: 책 한 문장 읽기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "독서 루틴 만들기",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "f100f119-1d4e-4fed-9116-b49d394554c5",
+              "card": {
+                "category": "자기계발",
+                "outcome": "규칙적으로 책을 읽는 습관을 들인다.",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "책 읽기: 책 한 문장 읽기 (1분)",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검",
+                "durationWeeks": 2,
+                "weeklyActions": [
+                  {
+                    "title": "책 읽기",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  }
+                ],
+                "execution": {
+                  "measurement": "routine_completion",
+                  "completionPercent": 80,
+                  "reviewEveryWeeks": 1,
+                  "actions": [
+                    {
+                      "completionCriterion": "읽은 내용 한 문장 표시하기",
+                      "minimumAction": "책 한 문장 읽기",
+                      "minimumMinutes": 1
+                    }
+                  ]
+                }
+              },
+              "presentedMessageId": "51190f5e-3071-4e84-a54e-8e74369ca8f6",
+              "notes": [
+                "말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.",
+                "확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요."
+              ]
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T05:21:31.786Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3502,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 3328
+              },
+              "output_tokens": 242,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3744
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T05:21:31.789Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "독서 루틴 만들기",
+              "goal_draft": {
+                "category": "자기계발",
+                "outcome": "규칙적으로 책을 읽는 습관을 들인다.",
+                "identity": "",
+                "cue": "",
+                "environment": "",
+                "deadline": "",
+                "baselineMetric": "",
+                "targetMetric": "실행률 80%",
+                "durationWeeks": 2,
+                "measurement": "routine_completion",
+                "completionPercent": 80,
+                "reviewEveryWeeks": 1,
+                "actions": [
+                  {
+                    "title": "책 읽기",
+                    "frequencyPerWeek": 3,
+                    "durationMinutes": 10,
+                    "preferredDays": [],
+                    "completionCriterion": "읽은 내용 한 문장 표시하기",
+                    "minimumAction": "책 한 문장 읽기",
+                    "minimumMinutes": 1
+                  }
+                ]
+              },
+              "summary": "독서 목표 초안을 준비했어요.",
+              "details": [
+                "주 3회, 회당 10분 독서",
+                "실행률 80% 목표, 2주간 진행",
+                "완료는 읽은 내용 한 문장 표시",
+                "바쁜 날에는 책 한 문장 읽기로 대체 가능"
+              ],
+              "question": "이대로 시작할까요?",
+              "choices": [
+                "네, 시작할게요",
+                "조금만 수정할게요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n규칙적으로 책을 읽는 습관을 들인다.\n\n**시험 기간**\n\n2주\n\n**주간 실행**\n\n- **책 읽기**: 주 3회 · 10분\n\n**완료 기준**\n\n- 2주간 계획한 기본 실행 6회 중 5회 이상 완료 (80% 기준·올림)\n- **책 읽기**: 읽은 내용 한 문장 표시하기\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **책 읽기**: 책 한 문장 읽기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 2주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_08be270652e2fe00016a9a5559b14887d083802f9fc5b56cf1",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3502,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 3328
+              },
+              "output_tokens": 242,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3744
+            },
+            "elapsedMs": 2286,
+            "output": [
+              {
+                "id": "fc_08be270652e2fe00016a9a555a3c3487d09fe2e766e1c6e903",
+                "type": "function_call",
+                "status": "completed",
+                "arguments": "{\"focus\":\"goals\",\"goal_outcome\":\"독서 루틴 만들기\",\"goal_draft\":{\"category\":\"자기계발\",\"outcome\":\"규칙적으로 책을 읽는 습관을 들인다.\",\"identity\":\"\",\"cue\":\"\",\"environment\":\"\",\"deadline\":\"\",\"baselineMetric\":\"\",\"targetMetric\":\"실행률 80%\",\"durationWeeks\":2,\"measurement\":\"routine_completion\",\"completionPercent\":80,\"reviewEveryWeeks\":1,\"actions\":[{\"title\":\"책 읽기\",\"frequencyPerWeek\":3,\"durationMinutes\":10,\"preferredDays\":[],\"completionCriterion\":\"읽은 내용 한 문장 표시하기\",\"minimumAction\":\"책 한 문장 읽기\",\"minimumMinutes\":1}]},\"summary\":\"독서 목표 초안을 준비했어요.\",\"details\":[\"주 3회, 회당 10분 독서\",\"실행률 80% 목표, 2주간 진행\",\"완료는 읽은 내용 한 문장 표시\",\"바쁜 날에는 책 한 문장 읽기로 대체 가능\"],\"question\":\"이대로 시작할까요?\",\"choices\":[\"네, 시작할게요\",\"조금만 수정할게요\"]}",
+                "call_id": "call_UkccmlGFVEdDpe770UHEl6cY",
+                "name": "respond"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "execution-custom-outcome",
+      "rep": 1,
+      "elapsedMs": 3555.4055999999982,
+      "checks": {
+        "completed": true,
+        "paragraphs": true,
+        "oneQuestion": true,
+        "custom": true,
+        "keepsOutcome": true,
+        "guides": true,
+        "executionDetails": true,
+        "canonicalReview": true
+      },
+      "pass": true,
+      "cost": {
+        "input": 3527,
+        "cached": 3328,
+        "output": 301,
+        "calls": 1,
+        "usd": 0.00447,
+        "uncachedUsd": 0.009462
+      },
+      "result": {
+        "state": {
+          "stage": 5,
+          "messages": [
+            {
+              "id": "2c0f7056-d0f3-45a8-b401-98cd1ae7b864",
+              "role": "user",
+              "text": "4주 동안 소설 초고를 현재 1000자에서 2000자로 늘리고 싶어. 매주 초고를 주 2회 10분씩 쓰는 루틴과 완료 기준을 제안해줘. 성과 목표를 루틴 완료율로 바꾸지는 마."
+            },
+            {
+              "id": "2848390a-fe9a-420c-a79a-31c3f79fa031",
+              "role": "assistant",
+              "text": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n소설 초고 분량을 1000자에서 2000자로 늘린다.\n\n**시험 기간**\n\n4주\n\n**주간 실행**\n\n- **소설 초고 쓰기**: 주 2회 · 10분\n\n현재 기준: 현재 초고 분량 1000자\n\n**완료 기준**\n\n- 초고 분량 2000자 도달\n- **소설 초고 쓰기**: 소설 초고에 글자 수가 늘어난 부분이 보인다.\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **소설 초고 쓰기**: 소설 한 문장 추가하기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 4주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**"
+            }
+          ],
+          "blocks": [],
+          "day_bounds": [
+            {
+              "days": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "wake": "06:00",
+              "bedtime": "23:00",
+              "variable": false
+            },
+            {
+              "days": [
+                5,
+                6
+              ],
+              "wake": "",
+              "bedtime": "",
+              "variable": true,
+              "deferred": true
+            }
+          ],
+          "goal_card": {
+            "category": "기타",
+            "outcome": "4주간 소설 초고 분량을 1000자에서 2000자로 늘린다.",
+            "identity": "",
+            "deadline": "",
+            "baselineMetric": "",
+            "targetMetric": "",
+            "tinyStart": "",
+            "cue": "",
+            "environment": "",
+            "fallbackAction": "",
+            "recoveryRule": "두 번 연속 놓치지 않기",
+            "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+            "durationWeeks": 0,
+            "weeklyActions": []
+          },
+          "agent_v2_context": {
+            "version": 3,
+            "draft": {
+              "id": "2dacc7e5-c718-4303-86a3-205b218da647",
+              "card": {
+                "category": "창작",
+                "outcome": "소설 초고 분량을 1000자에서 2000자로 늘린다.",
+                "identity": "",
+                "deadline": "",
+                "baselineMetric": "현재 초고 분량 1000자",
+                "targetMetric": "초고 분량 2000자 도달",
+                "tinyStart": "",
+                "cue": "",
+                "environment": "",
+                "fallbackAction": "소설 초고 쓰기: 소설 한 문장 추가하기 (1분)",
+                "recoveryRule": "두 번 연속 놓치지 않기",
+                "reviewCycle": "매주 실행 기록 점검 · 4주 시험 종료 시 전체 점검",
+                "durationWeeks": 4,
+                "weeklyActions": [
+                  {
+                    "title": "소설 초고 쓰기",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 10,
+                    "preferredDays": []
+                  }
+                ],
+                "execution": {
+                  "measurement": "custom_outcome",
+                  "completionPercent": null,
+                  "reviewEveryWeeks": 1,
+                  "actions": [
+                    {
+                      "completionCriterion": "소설 초고에 글자 수가 늘어난 부분이 보인다.",
+                      "minimumAction": "소설 한 문장 추가하기",
+                      "minimumMinutes": 1
+                    }
+                  ]
+                }
+              },
+              "presentedMessageId": "2848390a-fe9a-420c-a79a-31c3f79fa031",
+              "notes": [
+                "말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.",
+                "확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요."
+              ]
+            }
+          }
+        },
+        "events": [
+          {
+            "tool": "model_usage",
+            "at": "2026-09-04T05:21:43.352Z",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3527,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 3328
+              },
+              "output_tokens": 301,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3828
+            }
+          },
+          {
+            "tool": "respond",
+            "at": "2026-09-04T05:21:43.355Z",
+            "result": {
+              "ok": true,
+              "stage": 5,
+              "goalConfirmed": false
+            },
+            "args": {
+              "focus": "goals",
+              "goal_outcome": "4주간 소설 초고 분량을 1000자에서 2000자로 늘린다.",
+              "goal_draft": {
+                "category": "창작",
+                "outcome": "소설 초고 분량을 1000자에서 2000자로 늘린다.",
+                "identity": "",
+                "cue": "",
+                "environment": "",
+                "deadline": "",
+                "baselineMetric": "현재 초고 분량 1000자",
+                "targetMetric": "초고 분량 2000자 도달",
+                "durationWeeks": 4,
+                "measurement": "custom_outcome",
+                "completionPercent": null,
+                "reviewEveryWeeks": 1,
+                "actions": [
+                  {
+                    "title": "소설 초고 쓰기",
+                    "frequencyPerWeek": 2,
+                    "durationMinutes": 10,
+                    "preferredDays": [],
+                    "completionCriterion": "소설 초고에 글자 수가 늘어난 부분이 보인다.",
+                    "minimumAction": "소설 한 문장 추가하기",
+                    "minimumMinutes": 1
+                  }
+                ]
+              },
+              "summary": "4주 동안 소설 초고를 1000자에서 2000자로 늘리는 목표예요.",
+              "details": [
+                "성과 기준은 초고 분량 2000자 달성입니다.",
+                "주 2회, 회당 10분씩 초고를 이어서 씁니다.",
+                "한 문장만 추가해도 완료로 인정해요."
+              ],
+              "question": "이 계획으로 시작해볼까요?",
+              "choices": [
+                "네, 시작할래요",
+                "아니요, 수정할래요"
+              ]
+            }
+          }
+        ],
+        "assistant_message": "함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.\n\n**목표**\n\n소설 초고 분량을 1000자에서 2000자로 늘린다.\n\n**시험 기간**\n\n4주\n\n**주간 실행**\n\n- **소설 초고 쓰기**: 주 2회 · 10분\n\n현재 기준: 현재 초고 분량 1000자\n\n**완료 기준**\n\n- 초고 분량 2000자 도달\n- **소설 초고 쓰기**: 소설 초고에 글자 수가 늘어난 부분이 보인다.\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.\n\n**바쁜 날 최소 실행**\n\n- **소설 초고 쓰기**: 소설 한 문장 추가하기 · 1분\n\n최소 실행은 흐름을 잇는 기록이며, 기본 실행 완료 횟수에는 넣지 않아요.\n\n**점검**\n\n매주 실행 기록 점검 · 4주 시험 종료 시 전체 점검\n\n말씀하신 실행 가능 시간을 기준으로 초안을 잡았어요.\n\n확인된 요일의 빈 시간만 기준으로 봤어요. 미정인 요일은 여유 시간에 포함하지 않았어요.\n\n**이 초안으로 시작할까요? 바꾸고 싶은 부분만 말씀해 주세요.**",
+        "suggestions": [
+          "이 초안으로 시작할게요",
+          "조금 더 가볍게 바꿔줘"
+        ],
+        "response_id": "resp_0a2a8431a8bb592a016a9a55640ec487d086deeb3d53b3d4ab",
+        "needs_clarification": false,
+        "usage": [
+          {
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "input_tokens": 3527,
+              "input_tokens_details": {
+                "cache_write_tokens": 0,
+                "cached_tokens": 3328
+              },
+              "output_tokens": 301,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 3828
+            },
+            "elapsedMs": 3440,
+            "output": [
+              {
+                "id": "fc_0a2a8431a8bb592a016a9a5565b45c87d08e287148155f8e96",
+                "type": "function_call",
+                "status": "completed",
+                "arguments": "{\"focus\":\"goals\",\"goal_outcome\":\"4주간 소설 초고 분량을 1000자에서 2000자로 늘린다.\",\"goal_draft\":{\"category\":\"창작\",\"outcome\":\"소설 초고 분량을 1000자에서 2000자로 늘린다.\",\"identity\":\"\",\"cue\":\"\",\"environment\":\"\",\"deadline\":\"\",\"baselineMetric\":\"현재 초고 분량 1000자\",\"targetMetric\":\"초고 분량 2000자 도달\",\"durationWeeks\":4,\"measurement\":\"custom_outcome\",\"completionPercent\":null,\"reviewEveryWeeks\":1,\"actions\":[{\"title\":\"소설 초고 쓰기\",\"frequencyPerWeek\":2,\"durationMinutes\":10,\"preferredDays\":[],\"completionCriterion\":\"소설 초고에 글자 수가 늘어난 부분이 보인다.\",\"minimumAction\":\"소설 한 문장 추가하기\",\"minimumMinutes\":1}]},\"summary\":\"4주 동안 소설 초고를 1000자에서 2000자로 늘리는 목표예요.\",\"details\":[\"성과 기준은 초고 분량 2000자 달성입니다.\",\"주 2회, 회당 10분씩 초고를 이어서 씁니다.\",\"한 문장만 추가해도 완료로 인정해요.\"],\"question\":\"이 계획으로 시작해볼까요?\",\"choices\":[\"네, 시작할래요\",\"아니요, 수정할래요\"]}",
+                "call_id": "call_fI1uTCcc7pOLDGa0FMFKwfE7",
+                "name": "respond"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
