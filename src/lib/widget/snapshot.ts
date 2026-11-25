@@ -6,9 +6,10 @@ import { useDiaryStore } from '../../store/diaryStore';
 import { calcTreeGrowth } from '../../utils/treeGrowth';
 import { calcStreak } from '../../utils/completion';
 import { getDayCompletion } from '../../utils/dayCompletion';
-import { isScheduled } from '../../utils/goalProgress';
+import { isHabitDue, isFaithDue } from '../../utils/scheduledItems';
 import { today } from '../../utils/date';
 import { queryClient } from '../queryClient';
+import { useAuthStore } from '../../store/authStore';
 import { WidgetBridge } from '../../plugins/widget-bridge';
 
 /** 홈 위젯에 그릴 한입 요약. 네이티브가 이 JSON을 읽어 렌더한다. */
@@ -25,7 +26,7 @@ interface WidgetSnapshot {
     /** -1 = 오늘 예정 없음(휴식) */
     personalRate: number;
     faithRate: number;
-    /** 신앙 루틴 연속일 — 홈 헤더 🔥와 동일 */
+    /** 개인+신앙 통합 연속일 — 홈 헤더 🔥와 동일 */
     streak: number;
   };
   /**
@@ -51,20 +52,21 @@ function buildSnapshot(): WidgetSnapshot {
   const { faithRoutines, logs } = useRoutineStore.getState();
   const { habits, habitLogs, personalRoutines } = useHabitStore.getState();
   const diaryEntries = useDiaryStore.getState().entries;
-  const reviews = queryClient.getQueryData<WeeklyReview[]>(['reviews']) ?? [];
+  const userId = useAuthStore.getState().user?.id;
+  const reviews = userId ? queryClient.getQueryData<WeeklyReview[]>(['reviews', userId]) ?? [] : [];
 
   const tree = calcTreeGrowth(habits, habitLogs, faithRoutines, logs, diaryEntries, reviews);
   const { personalRate, faithRate } = getDayCompletion(todayStr, habits, habitLogs, faithRoutines, logs);
-  const { current: streak } = calcStreak(faithRoutines, logs, todayStr);
+  const { current: streak } = calcStreak(faithRoutines, logs, todayStr, habits, habitLogs);
 
   // 오늘 예정 & 미완료 (완료·대체·쉬어가기는 달성으로 인정 → 제외)
   const openHabit = (h: (typeof habits)[number]) =>
-    isScheduled(todayStr, h.frequency, h.customDays) &&
+    isHabitDue(h, todayStr) &&
     !habitLogs.some(
       (l) => l.habitId === h.id && l.date === todayStr && (l.completed || l.skipped || l.substitute),
     );
   const openFaith = (r: (typeof faithRoutines)[number]) =>
-    isScheduled(todayStr, r.frequency) &&
+    isFaithDue(r, todayStr) &&
     !logs.some((l) => l.routineId === r.id && l.date === todayStr && (l.completed || l.skipped));
 
   // 타이머 켠 개인 루틴 — 오늘 예정 멤버 중 미완료가 있으면 ▶ 세션으로 노출

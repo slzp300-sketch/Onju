@@ -1,14 +1,16 @@
-import { getISOWeek, getYear } from 'date-fns';
 import { supabase } from '../lib/supabase';
 import type { WeeklyReview, GroupWeeklyShare } from '../types';
-import { reviewToRow, reviewFromRow, shareFromRow } from '../data/mappers';
-import { newId } from '../utils/id';
+import { reviewFromRow, shareFromRow } from '../data/mappers';
+import type { ReviewStep, ReviewStepResult } from '../lib/reviewSubmission';
 
-export const fetchReviews = async (): Promise<WeeklyReview[]> => {
-  const { data, error } = await supabase
+export const fetchReviews = async (userId: string, signal?: AbortSignal): Promise<WeeklyReview[]> => {
+  let query = supabase
     .from('weekly_reviews')
     .select('*')
+    .eq('user_id', userId)
     .order('created_at', { ascending: false });
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []).map(reviewFromRow);
 };
@@ -16,43 +18,19 @@ export const fetchReviews = async (): Promise<WeeklyReview[]> => {
 export const fetchReviewByWeek = async (
   weekNumber: number,
   year: number,
+  userId: string,
+  signal?: AbortSignal,
 ): Promise<WeeklyReview | null> => {
-  const { data, error } = await supabase
+  let query = supabase
     .from('weekly_reviews')
     .select('*')
+    .eq('user_id', userId)
     .eq('week_number', weekNumber)
-    .eq('year', year)
-    .maybeSingle();
+    .eq('year', year);
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query.maybeSingle();
   if (error) throw error;
   return data ? reviewFromRow(data) : null;
-};
-
-export const createReview = async (data: Partial<WeeklyReview>): Promise<WeeklyReview> => {
-  const review: WeeklyReview = {
-    id: newId(),
-    userId: '',
-    weekNumber: getISOWeek(new Date()),
-    year: getYear(new Date()),
-    personalRate: 0,
-    faithRate: 0,
-    goalAchievedCount: 0,
-    goalTotalCount: 0,
-    mood: null,
-    goalRatings: {},
-    comment: '',
-    intention: '',
-    shareToGroups: [],
-    routineChanges: [],
-    completedAt: null,
-    createdAt: new Date().toISOString(),
-    ...data,
-  };
-  // 같은 주에 다시 작성하면 덮어쓴다 (unique user_id+week_number+year)
-  const { error } = await supabase
-    .from('weekly_reviews')
-    .upsert(reviewToRow(review), { onConflict: 'user_id,week_number,year' });
-  if (error) throw error;
-  return review;
 };
 
 export const fetchWeeklyShares = async (
@@ -70,25 +48,14 @@ export const fetchWeeklyShares = async (
   return (data ?? []).map(shareFromRow);
 };
 
-export const createWeeklyShare = async (
-  groupId: string,
-  data: Partial<GroupWeeklyShare>,
-): Promise<GroupWeeklyShare> => {
-  const share = {
-    id: newId(),
-    group_id: groupId,
-    week_number: data.weekNumber ?? getISOWeek(new Date()),
-    year: data.year ?? getYear(new Date()),
-    personal_rate: data.personalRate ?? 0,
-    faith_rate: data.faithRate ?? 0,
-    comment: data.comment ?? '',
-    intention: data.intention ?? '',
-  };
-  const { data: inserted, error } = await supabase
-    .from('group_weekly_shares')
-    .insert(share)
-    .select('*, profiles(name)')
-    .single();
-  if (error) throw error;
-  return shareFromRow(inserted);
-};
+/** Keep the raw row as the comparison baseline; never fetch a new baseline on retry. */
+export async function readReviewBase(week: number, year: number, owner: string, client = supabase): Promise<Record<string, unknown> | null> {
+  const {data,error}=await client.from('weekly_reviews').select('*').eq('user_id',owner).eq('week_number',week).eq('year',year).maybeSingle();
+  if(error) throw error;
+  return data;
+}
+export async function sendReviewStep(step: ReviewStep, client = supabase): Promise<ReviewStepResult> {
+  const {data,error}=await client.rpc('apply_weekly_review_step',{request_id:step.id,step_kind:step.kind,step_payload:step.payload});
+  if(error) throw new Error(error.message);
+  return data;
+}

@@ -1,5 +1,5 @@
 // Supabase Edge Function: send-reminders
-// pg_cron이 매분 호출 → 현재(KST) 시각에 해당하는 reminder_schedule을 조회해 Web Push 발송.
+// pg_cron이 매분 호출 → 저장된 시간대의 현재 시각에 해당하는 reminder_schedule을 조회해 Web Push 발송.
 // 배포: supabase functions deploy send-reminders --no-verify-jwt
 // 필요한 시크릿: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT(선택)
 //   supabase secrets set VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... VAPID_SUBJECT=mailto:you@example.com
@@ -22,19 +22,7 @@ interface Reminder { user_id: string; title: string; body: string }
 interface Sub { endpoint: string; p256dh: string; auth: string; user_id: string }
 
 Deno.serve(async () => {
-  // 현재 KST(UTC+9) 시각
-  const kst = new Date(Date.now() + 9 * 3600 * 1000);
-  const hour = kst.getUTCHours();
-  const minute = kst.getUTCMinutes();
-  const weekday = kst.getUTCDay() + 1; // 0=일 → 1=일 (Capacitor 규약과 동일)
-
-  // 이번 분에 발송할 알림 (매일 = weekdays null, 또는 오늘 요일 포함)
-  const { data: reminders, error } = await supabase
-    .from('reminder_schedule')
-    .select('user_id, title, body')
-    .eq('hour', hour)
-    .eq('minute', minute)
-    .or(`weekdays.is.null,weekdays.cs.{${weekday}}`);
+  const { data: reminders, error } = await supabase.rpc('claim_due_reminders');
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -64,6 +52,7 @@ Deno.serve(async () => {
         await webpush.sendNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           JSON.stringify({ title: r.title, body: r.body, url: '/' }),
+          { TTL: 60 },
         );
         sent++;
       } catch (e) {

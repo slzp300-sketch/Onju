@@ -22,12 +22,12 @@ function freqToWeekdays(
   if (frequency === 'daily') return undefined;
   if (frequency === 'weekdays') return [2, 3, 4, 5, 6]; // 월~금
   if (frequency === 'weekends') return [1, 7]; // 일, 토
-  if (Array.isArray(frequency)) return frequency.map(d => d + 1); // 0=일 → 1=일
-  if (customDays && customDays.length) return customDays.map(d => d + 1);
-  return undefined;
+  const days = Array.isArray(frequency) ? frequency : customDays ?? [];
+  return [...new Set(days.filter(d => Number.isInteger(d) && d >= 0 && d <= 6))].map(d => d + 1);
 }
 
-function parseTime(hhmm: string): { h: number; m: number } {
+function parseTime(hhmm: string): { h: number; m: number } | null {
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(hhmm)) return null;
   const [h, m] = hhmm.split(':').map(Number);
   return { h, m };
 }
@@ -46,14 +46,16 @@ export interface ReminderInputs {
 /** 설정·루틴·습관 → 예약할 알림 spec 목록 (네이티브/웹 공통) */
 export function buildReminderSpecs(input: ReminderInputs): ReminderSpec[] {
   const specs: ReminderSpec[] = [];
-  const totalRoutines = input.personalCount + input.faithRoutines.length;
+  const totalRoutines = input.personalCount + input.habits.filter(h => !h.archivedAt).length + input.faithRoutines.filter(r => r.isActive && !r.archivedAt).length;
+  const morning = parseTime(input.morningTime);
+  const evening = parseTime(input.eveningTime);
 
-  if (input.morningEnabled && totalRoutines > 0) {
-    const { h, m } = parseTime(input.morningTime);
+  if (input.morningEnabled && totalRoutines > 0 && morning) {
+    const { h, m } = morning;
     specs.push({ key: 'morning', title: '좋은 아침이에요! ☀️', body: '오늘의 루틴을 시작해볼까요?', hour: h, minute: m });
   }
-  if (input.eveningEnabled) {
-    const { h, m } = parseTime(input.eveningTime);
+  if (input.eveningEnabled && evening) {
+    const { h, m } = evening;
     specs.push({ key: 'evening', title: '오늘 루틴 확인해요 🌙', body: '아직 남은 루틴이 있는지 확인해보세요.', hour: h, minute: m });
   }
   if (input.reviewEnabled) {
@@ -62,19 +64,25 @@ export function buildReminderSpecs(input: ReminderInputs): ReminderSpec[] {
   }
   input.faithRoutines.forEach(routine => {
     const n = routine.notification;
-    if (!n?.enabled) return;
+    if (!n?.enabled || !routine.isActive || routine.archivedAt) return;
     const weekdays = freqToWeekdays(routine.frequency);
-    n.times.forEach((timeStr, idx) => {
-      const { h, m } = parseTime(timeStr);
+    if (weekdays?.length === 0) return;
+    [...new Set(n.times)].forEach((timeStr, idx) => {
+      const time = parseTime(timeStr);
+      if (!time) return;
+      const { h, m } = time;
       specs.push({ key: `faith-${routine.id}-${idx}`, title: `${routine.emoji ?? '🙏'} ${routine.title}`, body: '신앙 루틴을 실천할 시간이에요!', hour: h, minute: m, weekdays });
     });
   });
-  input.habits.forEach(habit => {
+  input.habits.filter(h => !h.archivedAt).forEach(habit => {
     const n = habit.notification;
     if (!n?.enabled) return;
     const weekdays = freqToWeekdays(habit.frequency, habit.customDays);
-    n.times.forEach((timeStr, idx) => {
-      const { h, m } = parseTime(timeStr);
+    if (weekdays?.length === 0) return;
+    [...new Set(n.times)].forEach((timeStr, idx) => {
+      const time = parseTime(timeStr);
+      if (!time) return;
+      const { h, m } = time;
       specs.push({ key: `habit-${habit.id}-${idx}`, title: `${habit.emoji} ${habit.title}`, body: '습관을 실천할 시간이에요!', hour: h, minute: m, weekdays });
     });
   });

@@ -1,3 +1,4 @@
+import { toast } from '../../store/toastStore';
 import { Capacitor } from '@capacitor/core';
 import { useRoutineStore } from '../../store/routineStore';
 import { useHabitStore } from '../../store/habitStore';
@@ -38,7 +39,7 @@ export async function reconcilePending(): Promise<void> {
       if (a.kind === 'personal') {
         if (!habitStore.isHabitCompleted(a.id, a.date)) habitStore.toggleHabitLog(a.id, a.date);
       } else {
-        if (!routineStore.isCompleted(a.id, a.date)) routineStore.toggleRoutineLog(a.id, a.date);
+        try{if(!routineStore.isCompleted(a.id,a.date))routineStore.toggleRoutineLog(a.id,a.date);}catch{toast.error('위젯의 수행 체크를 보관하지 못했어요. 앱에서 해당 날짜를 확인하고 다시 체크해주세요.');}
       }
     }
   }

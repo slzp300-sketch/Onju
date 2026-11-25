@@ -1,10 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Habit, PersonalRoutine } from '../types';
+import { withHistory } from '../utils/scheduleHistory';
 import { today } from '../utils/date';
+import { newId } from '../utils/id';
+import { isOutboxOwner } from '../lib/sync/outbox';
+import { habitFromRow, personalRoutineFromRow } from '../data/mappers';
 import {
   upsertHabit,
-  deleteHabit,
   upsertHabitLog,
   upsertPersonalRoutine,
   deletePersonalRoutine,
@@ -26,12 +29,13 @@ interface HabitState {
   habitLogs: HabitLog[];
 
   addHabit: (habit: Habit) => void;
-  removeHabit: (id: string) => void;
-  updateHabit: (id: string, patch: Partial<Habit>) => void;
+  removeHabit: (id: string, base?: Habit) => void;
+  restoreHabit: (id: string) => void;
+  updateHabit: (id: string, patch: Partial<Habit>, base?: Habit) => void;
 
   addPersonalRoutine: (routine: PersonalRoutine) => void;
-  removePersonalRoutine: (id: string) => void;
-  updatePersonalRoutine: (id: string, patch: Partial<PersonalRoutine>) => void;
+  removePersonalRoutine: (id: string, reviewed?: PersonalRoutine) => void;
+  updatePersonalRoutine: (id: string, patch: Partial<PersonalRoutine>, base?: PersonalRoutine) => void;
 
   toggleHabitLog: (habitId: string, date?: string) => void;
   skipHabitLog: (habitId: string, date?: string) => void;
@@ -49,33 +53,40 @@ export const useHabitStore = create<HabitState>()(
       habitLogs: [],
 
       addHabit: (habit) => {
-        set((s) => ({ habits: [...s.habits, habit] }));
-        upsertHabit(habit);
+        if (get().habits.some(h => h.id === habit.id)) return;
+        const next = { ...habit, revision: newId() };
+        upsertHabit(next, null, true);
+        set((s) => ({ habits: [...s.habits, next] }));
       },
-      removeHabit: (id) => {
-        set((s) => ({ habits: s.habits.filter((h) => h.id !== id) }));
-        deleteHabit(id);
+      removeHabit: (id, base) => {
+        get().updateHabit(id, { archivedAt: today() }, base);
       },
-      updateHabit: (id, patch) => {
-        set((s) => ({ habits: s.habits.map((h) => (h.id === id ? { ...h, ...patch } : h)) }));
-        const found = get().habits.find((h) => h.id === id);
-        if (found) upsertHabit(found);
+      restoreHabit: (id) => get().updateHabit(id, { archivedAt: undefined }),
+      updateHabit: (id, patch, base) => {
+        const previous = base ?? get().habits.find(h => h.id === id);
+        if (!previous || previous.id !== id) throw new Error('습관을 다시 확인해주세요.');
+        const next = { ...withHistory(previous, patch), id, revision: newId() };
+        upsertHabit(next, previous.revision ?? null);
+        set(s => ({ habits: s.habits.some(h => h.id === id) ? s.habits.map(h => h.id === id ? next : h) : [...s.habits, next] }));
       },
 
       addPersonalRoutine: (routine) => {
-        set((s) => ({ personalRoutines: [...s.personalRoutines, routine] }));
-        upsertPersonalRoutine(routine);
+        if (get().personalRoutines.some(r => r.id === routine.id)) return;
+        const next = { ...routine, revision: newId() };
+        upsertPersonalRoutine(next, null, true);
+        set(s => ({ personalRoutines: [...s.personalRoutines, next] }));
       },
-      removePersonalRoutine: (id) => {
-        set((s) => ({ personalRoutines: s.personalRoutines.filter((r) => r.id !== id) }));
-        deletePersonalRoutine(id);
+      removePersonalRoutine: (id, reviewed) => {
+        const current = get().personalRoutines.find(r => r.id === id);
+        if (!current || (reviewed && JSON.stringify(current) !== JSON.stringify(reviewed))) throw new Error('루틴 묶음이 바뀌었어요. 다시 확인해주세요.');
+        deletePersonalRoutine(reviewed ?? current);
       },
-      updatePersonalRoutine: (id, patch) => {
-        set((s) => ({
-          personalRoutines: s.personalRoutines.map((r) => (r.id === id ? { ...r, ...patch } : r)),
-        }));
-        const found = get().personalRoutines.find((r) => r.id === id);
-        if (found) upsertPersonalRoutine(found);
+      updatePersonalRoutine: (id, patch, base) => {
+        const previous = base ?? get().personalRoutines.find(r => r.id === id);
+        if (!previous || previous.id !== id) throw new Error('루틴 묶음을 다시 확인해주세요.');
+        const next = { ...previous, ...patch, id, revision: newId() };
+        upsertPersonalRoutine(next, previous.revision ?? null);
+        set(s => ({ personalRoutines: [...s.personalRoutines.filter(r => r.id !== id), next] }));
       },
 
       toggleHabitLog: (habitId, date) => {
@@ -83,7 +94,7 @@ export const useHabitStore = create<HabitState>()(
         const { habitLogs } = get();
         const existing = habitLogs.find(l => l.habitId === habitId && l.date === d);
         const next = existing
-          ? { ...existing, completed: !existing.completed, skipped: false }
+          ? { ...existing, completed: !existing.completed, skipped: false, substitute: false }
           : { habitId, date: d, completed: true, skipped: false };
         set({
           habitLogs: existing
@@ -144,3 +155,15 @@ export const useHabitStore = create<HabitState>()(
     { name: 'habit-store' }
   )
 );
+
+if (typeof window !== 'undefined') window.addEventListener('onju-practice-saved', event => {
+  const { ownerId, kind, id, revision, current } = (event as CustomEvent).detail;
+  if (kind !== 'habit' || !isOutboxOwner(ownerId)) return;
+  useHabitStore.setState(s => ({ habits: s.habits.flatMap(h => h.id !== id || h.revision !== revision ? [h] : current ? [habitFromRow(current)] : []) }));
+});
+
+if (typeof window !== 'undefined') window.addEventListener('onju-plan-saved', event => {
+  const { ownerId, kind, id, revision, current } = (event as CustomEvent).detail;
+  if (kind !== 'bundle' || !isOutboxOwner(ownerId)) return;
+  useHabitStore.setState(s => ({ personalRoutines: s.personalRoutines.flatMap(r => r.id !== id || (r.revision ?? null) !== revision ? [r] : current ? [personalRoutineFromRow(current)] : []) }));
+});

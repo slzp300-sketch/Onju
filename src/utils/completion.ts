@@ -1,6 +1,8 @@
-import type { RoutineLog, DailyRoutine } from '../types';
+import { getDayCompletion } from './dayCompletion';
+import type { RoutineLog, DailyRoutine, Habit } from '../types';
 import { eachDayOfInterval, format, subDays } from 'date-fns';
 
+/** @preserved 보존된 routineRecommendation에서 사용하는 과거 계산 방식 */
 export function calcCompletionRate(
   routines: DailyRoutine[],
   logs: RoutineLog[],
@@ -25,33 +27,27 @@ export function calcCompletionRate(
   return total === 0 ? 0 : Math.round((completed / total) * 100);
 }
 
+/** 최근 365일, 개인 습관+신앙의 예정 항목 절반 이상 기록한 날의 연속.
+ * 예정이 없는 날은 끊지 않고 오늘 미완료는 아직 기회가 있어 제외한다. */
 export function calcStreak(
-  routines: DailyRoutine[],
-  logs: RoutineLog[],
-  today: string
+  routines: DailyRoutine[], logs: RoutineLog[], today: string,
+  habits: Habit[] = [], habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean; substitute?: boolean }[] = [],
 ): { current: number; best: number } {
-  if (routines.length === 0) return { current: 0, best: 0 };
-  let current = 0;
-  let best = 0;
-  let running = 0;
-
+  let current = 0, best = 0, running = 0;
+  let countingCurrent = true;
   for (let i = 0; i < 365; i++) {
-    const date = format(subDays(new Date(today), i), 'yyyy-MM-dd');
-    const dayLogs = logs.filter(l => l.date === date);
-    const done = routines.filter(r => dayLogs.find(l => l.routineId === r.id && l.completed)).length;
-    const rate = Math.round((done / routines.length) * 100);
-
-    if (rate >= 50) {
+    const date = format(subDays(new Date(today + 'T12:00:00'), i), 'yyyy-MM-dd');
+    const result = getDayCompletion(date, habits, habitLogs, routines, logs);
+    if (result.state === 'rest') continue;
+    if (result.combinedRate >= 50) {
       running++;
       best = Math.max(best, running);
-      if (i === 0 || current === i) current = running;
-    } else {
-      if (i === 0) { break; }
-      best = Math.max(best, running);
+      if (countingCurrent) current++;
+    } else if (i !== 0) {
+      countingCurrent = false;
       running = 0;
     }
   }
-
   return { current, best };
 }
 

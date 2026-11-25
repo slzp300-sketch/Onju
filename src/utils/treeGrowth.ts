@@ -1,6 +1,6 @@
 import { format, subDays } from 'date-fns';
 import type { Habit, DailyRoutine, RoutineLog, WeeklyReview, DiaryEntry } from '../types';
-import { isScheduled } from './goalProgress';
+import { isItemDue } from './scheduleHistory';
 import { today } from './date';
 
 /**
@@ -74,22 +74,6 @@ function buildDayScores(
     }
   }
 
-  // 아이템별 생성일(그 전 날짜는 예정에서 제외 — 새 습관 추가가 과거 점수를 깎지 않도록)
-  const habitItems = habits.map(h => ({
-    id: h.id,
-    frequency: h.frequency,
-    customDays: h.customDays,
-    createdDate: h.createdAt.slice(0, 10),
-  }));
-  const faithItems = faithRoutines
-    .filter(r => r.isActive)
-    .map(r => ({
-      id: r.id,
-      frequency: r.frequency,
-      customDays: undefined as number[] | undefined,
-      createdDate: r.createdAt.slice(0, 10),
-    }));
-
   const scores = new Map<string, DayScore>();
   const d = new Date(fromIso + 'T12:00:00');
   const end = new Date(toIso + 'T12:00:00');
@@ -98,15 +82,15 @@ function buildDayScores(
     let total = 0;
     let done = 0;
     const dh = doneHabits.get(iso);
-    for (const h of habitItems) {
-      if (h.createdDate <= iso && isScheduled(iso, h.frequency, h.customDays)) {
+    for (const h of habits) {
+      if (isItemDue(h, iso)) {
         total++;
         if (dh?.has(h.id)) done++;
       }
     }
     const df = doneFaith.get(iso);
-    for (const f of faithItems) {
-      if (f.createdDate <= iso && isScheduled(iso, f.frequency)) {
+    for (const f of faithRoutines) {
+      if (isItemDue(f, iso)) {
         total++;
         if (df?.has(f.id)) done++;
       }

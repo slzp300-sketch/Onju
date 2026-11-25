@@ -1,15 +1,16 @@
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseForSession } from '../lib/supabase';
 import type { SmallGroup, GroupStatus, CheerType } from '../types';
-import { groupFromRow, groupToRow } from './mappers';
+import { groupFromRow } from './mappers';
 import { enqueue } from '../lib/sync/outbox';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** 내가 속한 소모임 목록 (멤버십 → 그룹 + 멤버 수 조인) */
-export async function listMyGroups(): Promise<SmallGroup[]> {
+export async function listMyGroups(userId: string): Promise<SmallGroup[]> {
   const { data, error } = await supabase
     .from('group_members')
-    .select('small_groups(*, group_members(count))');
+    .select('small_groups(*, group_members(count))')
+    .eq('user_id', userId);
   if (error) throw error;
   return (data ?? [])
     .map((row: any) => row.small_groups)
@@ -29,23 +30,57 @@ export async function listMyCheers(userId: string): Promise<Record<string, boole
   return map;
 }
 
-/** 그룹 생성 + 생성자 멤버십 등록. 아웃박스 FIFO가 그룹 → 멤버십 순서를 보장한다. */
-export function insertGroup(g: SmallGroup, creatorId: string) {
-  enqueue({ type: 'insert', table: 'small_groups', values: { ...groupToRow(g), creator_id: creatorId } });
-  enqueue({ type: 'insert', table: 'group_members', values: { group_id: g.id, user_id: creatorId, role: 'creator' } });
+/** 같은 ID로 재시도해도 모임 내용을 덮어쓰지 않고 누락된 방장 등록을 복구한다. */
+export async function createGroupRemote(id: string, details: Record<string, unknown> | undefined, token: string) {
+  const { error } = await supabaseForSession(token).rpc('create_group_with_owner', { gid: id, details: details ?? null })
+    .abortSignal(AbortSignal.timeout(15_000));
+  if (error) throw error;
 }
 
-/** 그룹 가입 — 정원 체크는 서버 RPC가 원자적으로 수행 */
-export function joinGroupRemote(groupId: string) {
-  enqueue({ type: 'rpc', fn: 'join_group', args: { gid: groupId } });
+export async function readGroupCreation(id: string, owner: string, token: string) {
+  const { data, error } = await supabaseForSession(token).from('small_groups').select('*, group_members(count)')
+    .eq('id', id).eq('creator_id', owner).abortSignal(AbortSignal.timeout(15_000)).maybeSingle();
+  if (error) throw error;
+  const membership = await readMembership(id, owner, token);
+  return { group: data ? groupFromRow(data, data.group_members?.[0]?.count ?? 0) : undefined, joined: membership.joined && membership.role === 'creator' };
 }
 
-export function leaveGroupRemote(groupId: string, userId: string) {
-  enqueue({ type: 'delete', table: 'group_members', match: { group_id: groupId, user_id: userId } });
+/** 구버전에서 모임만 남고 로컬 요청이 사라졌어도 본인 소유의 불완전 생성을 찾는다. */
+export async function listUnfinishedGroupCreations(owner: string) {
+  const { data, error } = await supabase.from('small_groups').select('id, title, group_members(user_id, role)')
+    .eq('creator_id', owner).abortSignal(AbortSignal.timeout(15_000));
+  if (error) throw error;
+  return (data ?? []).filter((g: any) => !(g.group_members ?? []).some((m: any) => m.user_id === owner && m.role === 'creator'))
+    .map((g: any) => ({ groupId: g.id as string, title: g.title as string }));
 }
 
-export function updateGroupStatus(groupId: string, status: GroupStatus) {
-  enqueue({ type: 'update', table: 'small_groups', values: { status }, match: { id: groupId } });
+/** 가입·탈퇴는 온라인에서 서버 응답을 확인한다. 일반 기록 outbox에 넣지 않는다. */
+export async function changeMembershipRemote(groupId: string, join: boolean, accessToken: string) {
+  const { error } = await supabaseForSession(accessToken).rpc(join ? 'join_group' : 'leave_group', { gid: groupId })
+    .abortSignal(AbortSignal.timeout(15_000));
+  if (error) throw error;
+}
+
+export async function readMembership(groupId: string, userId: string, accessToken: string) {
+  const { data, error } = await supabaseForSession(accessToken).from('group_members')
+    .select('group_id, role, small_groups(*, group_members(count))').eq('user_id', userId).eq('group_id', groupId)
+    .abortSignal(AbortSignal.timeout(15_000)).maybeSingle();
+  if (error) throw error;
+  const row = data?.small_groups as any;
+  return { joined: !!data, role: data?.role as string | undefined, group: row ? groupFromRow(row, row.group_members?.[0]?.count ?? 0) : undefined };
+}
+
+export async function changeGroupStatusRemote(groupId: string, status: GroupStatus, expected: GroupStatus, token: string) {
+  const { error } = await supabaseForSession(token).rpc('change_group_status', { gid: groupId, next_status: status, expected_status: expected })
+    .abortSignal(AbortSignal.timeout(15_000));
+  if (error) throw error;
+}
+
+export async function readOwnedGroup(groupId: string, owner: string, token: string) {
+  const { data, error } = await supabaseForSession(token).from('small_groups').select('*, group_members(count)')
+    .eq('id', groupId).eq('creator_id', owner).abortSignal(AbortSignal.timeout(15_000)).maybeSingle();
+  if (error) throw error;
+  return data ? groupFromRow(data, data.group_members?.[0]?.count ?? 0) : undefined;
 }
 
 export function insertCheer(shareId: string, type: CheerType, groupId: string) {

@@ -21,6 +21,7 @@ export interface GoalRoutineItem {
 }
 
 export interface MonthlyGoal {
+  revision?: string; // 서버 버전. 저장 요청 ID를 다음 버전으로 사용한다.
   id: string;
   userId: string;
   title: string;
@@ -44,6 +45,7 @@ export interface MonthlyGoal {
  * completionRate는 주간 리뷰 완료 시점에 확정 기록된다.
  */
 export interface WeeklyGoal {
+  revision?: string;
   id: string;
   userId: string;
   monthlyGoalId?: string;
@@ -65,6 +67,9 @@ export interface WeeklyGoal {
 export type TimeSlot = 'morning' | 'afternoon' | 'evening';
 
 export interface DailyRoutine {
+  revision?: string;
+  archivedAt?: string;
+  scheduleHistory?: ScheduleRevision[];
   id: string;
   userId: string;
   title: string;
@@ -95,6 +100,8 @@ export interface FaithRoutineTemplate {
 }
 
 export interface RoutineLog {
+  memoRevision?: string;
+  checkRequestId?: string;
   id: string;
   routineId: string;
   userId: string;
@@ -148,6 +155,9 @@ interface HabitNotification {
 
 // 습관 (개별 단위)
 export interface Habit {
+  revision?: string;
+  archivedAt?: string;
+  scheduleHistory?: ScheduleRevision[];
   id: string;
   userId: string;
   title: string;
@@ -165,18 +175,20 @@ export interface Habit {
 
 // 개인 루틴 (습관 2개 이상의 묶음)
 export interface PersonalRoutine {
+  revision?: string;
   id: string;
   userId: string;
   title: string;
   emoji: string;
   when: string;
   habitIds: string[]; // 순서 있는 습관 ID 목록
-  habitDurations?: Record<string, number>; // habitId → 분
+  habitDurations?: Record<string, number>; // habitId → 초
   timerEnabled: boolean;
   createdAt: string;
 }
 
 export interface Todo {
+  revision?: string;
   id: string;
   userId: string;
   title: string;
@@ -191,6 +203,7 @@ export interface Todo {
 export type DiaryMood = 'great' | 'good' | 'neutral' | 'down' | 'bad';
 
 export interface DiaryEntry {
+  revision?: string;
   date: string; // YYYY-MM-DD (날짜를 키로 사용)
   mood: DiaryMood | null;
   content: string;
@@ -199,7 +212,9 @@ export interface DiaryEntry {
 
 // 루틴 조정 내역
 export interface RoutineChange {
+  baseRoutine?: DailyRoutine;
   routineId: string;
+  title?: string;
   action: 'keep' | 'edit' | 'delete' | 'add';
   changes?: {
     title?: string;
@@ -215,8 +230,12 @@ export interface RoutineChange {
 
 // 습관 조정 내역
 export interface HabitChange {
+  baseHabit?: Habit;
   habitId: string;
-  action: 'keep' | 'edit' | 'delete';
+  title?: string;
+  action: 'keep' | 'edit' | 'delete' | 'add';
+  newHabit?: Omit<Habit, 'id' | 'userId' | 'createdAt'>;
+  personalRoutineId?: string;
   changes?: {
     title?: string;
     frequency?: HabitFrequency;
@@ -243,6 +262,9 @@ export interface WeeklyReview {
   intention: string;
   shareToGroups: string[];
   routineChanges: RoutineChange[];
+  habitChanges?: HabitChange[];
+  changesAppliedAt?: string;
+  applicationResults?: { label: string; status: 'done' | 'skipped'; date?: string }[];
   completedAt: string | null;
   createdAt: string;
 }
@@ -299,4 +321,15 @@ export interface GroupWeeklyShare {
   comment: string;
   intention: string;
   sharedAt: string;
+}
+
+/** 날짜별 예정 규칙. 변경일 당일부터 새 규칙을 쓰며 이전 날짜는 보존한다. */
+export interface ScheduleRevision {
+  from: string;
+  title: string;
+  emoji?: string;
+  frequency: HabitFrequency | number[];
+  customDays?: number[];
+  active: boolean;
+  goalId?: string;
 }

@@ -1,5 +1,6 @@
 import type { Habit, DailyRoutine, RoutineLog } from '../types';
-import { isScheduled } from './goalProgress';
+import { isHabitDue, isFaithDue } from './scheduledItems';
+import { eachDayOfInterval, format } from 'date-fns';
 
 interface HabitLog {
   habitId: string;
@@ -16,6 +17,10 @@ export interface DayCompletion {
   faithRate: number;    // -1 = 예정 없음
   combinedRate: number; // -1 = 예정 없음 (개인+신앙 통합)
   state: DayState;
+  personalTotal: number;
+  personalDone: number;
+  faithTotal: number;
+  faithDone: number;
 }
 
 /**
@@ -30,8 +35,8 @@ export function getDayCompletion(
   routineLogs: RoutineLog[],
   isFuture = false,
 ): DayCompletion {
-  const schedHabits = habits.filter(h => isScheduled(dateIso, h.frequency, h.customDays));
-  const schedFaith  = faithRoutines.filter(r => isScheduled(dateIso, r.frequency));
+  const schedHabits = habits.filter(h => isHabitDue(h, dateIso));
+  const schedFaith  = faithRoutines.filter(r => isFaithDue(r, dateIso));
 
   const doneH = schedHabits.filter(h =>
     habitLogs.some(l => l.habitId === h.id && l.date === dateIso && (l.completed || l.skipped || l.substitute))
@@ -56,5 +61,20 @@ export function getDayCompletion(
     : done > 0 ? 'partial'
     : 'missed';
 
-  return { personalRate, faithRate, combinedRate, state };
+  return { personalRate, faithRate, combinedRate, state, personalTotal: totalP, personalDone: doneH, faithTotal: totalF, faithDone: doneF };
+}
+
+/** 통계와 같은 일별 기록률의 평균. 미래와 예정 없는 날은 제외한다. */
+export function getPeriodCompletion(
+  start: Date, end: Date, todayIso: string,
+  habits: Habit[], habitLogs: HabitLog[], faithRoutines: DailyRoutine[], routineLogs: RoutineLog[],
+) {
+  const days = start > end ? [] : eachDayOfInterval({ start, end })
+    .map(d => format(d, 'yyyy-MM-dd')).filter(d => d <= todayIso)
+    .map(d => getDayCompletion(d, habits, habitLogs, faithRoutines, routineLogs));
+  const average = (rates: number[]) => {
+    const scheduled = rates.filter(rate => rate >= 0);
+    return scheduled.length ? Math.round(scheduled.reduce((a, b) => a + b, 0) / scheduled.length) : 0;
+  };
+  return { personalRate: average(days.map(d => d.personalRate)), faithRate: average(days.map(d => d.faithRate)), combinedRate: average(days.map(d => d.combinedRate)) };
 }

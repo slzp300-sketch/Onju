@@ -21,6 +21,8 @@ const orNull = <T>(v: T | undefined): T | null => (v === undefined ? null : v);
 // ── DailyRoutine ──────────────────────────────────────
 export function routineToRow(r: DailyRoutine) {
   return {
+    archived_at: orNull(r.archivedAt),
+    schedule_history: r.scheduleHistory ?? [],
     id: r.id,
     title: r.title,
     emoji: orNull(r.emoji),
@@ -43,6 +45,9 @@ export function routineToRow(r: DailyRoutine) {
 
 export function routineFromRow(row: any): DailyRoutine {
   return {
+    revision: row.revision,
+    archivedAt: row.archived_at ?? undefined,
+    scheduleHistory: row.schedule_history?.length ? row.schedule_history : undefined,
     id: row.id,
     userId: row.user_id,
     title: row.title,
@@ -79,6 +84,7 @@ export function routineLogToRow(l: RoutineLog) {
 
 export function routineLogFromRow(row: any): RoutineLog {
   return {
+    memoRevision: row.memo_revision,
     id: row.id,
     routineId: row.routine_id,
     userId: row.user_id,
@@ -93,6 +99,8 @@ export function routineLogFromRow(row: any): RoutineLog {
 // ── Habit ─────────────────────────────────────────────
 export function habitToRow(h: Habit) {
   return {
+    archived_at: orNull(h.archivedAt),
+    schedule_history: h.scheduleHistory ?? [],
     id: h.id,
     title: h.title,
     emoji: h.emoji,
@@ -110,6 +118,9 @@ export function habitToRow(h: Habit) {
 
 export function habitFromRow(row: any): Habit {
   return {
+    revision: row.revision,
+    archivedAt: row.archived_at ?? undefined,
+    scheduleHistory: row.schedule_history?.length ? row.schedule_history : undefined,
     id: row.id,
     userId: row.user_id,
     title: row.title,
@@ -171,6 +182,7 @@ export function personalRoutineToRow(r: PersonalRoutine) {
 
 export function personalRoutineFromRow(row: any): PersonalRoutine {
   return {
+    revision: row.revision as string | undefined,
     id: row.id,
     userId: row.user_id,
     title: row.title,
@@ -204,6 +216,7 @@ export function monthlyGoalToRow(g: MonthlyGoal) {
 
 export function monthlyGoalFromRow(row: any): MonthlyGoal {
   return {
+    revision: row.revision ?? undefined,
     id: row.id,
     userId: row.user_id,
     title: row.title,
@@ -243,6 +256,7 @@ export function weeklyGoalToRow(g: WeeklyGoal) {
 
 export function weeklyGoalFromRow(row: any): WeeklyGoal {
   return {
+    revision: row.revision as string | undefined,
     id: row.id,
     userId: row.user_id,
     monthlyGoalId: row.monthly_goal_id ?? undefined,
@@ -277,6 +291,7 @@ export function todoToRow(t: Todo) {
 
 export function todoFromRow(row: any): Todo {
   return {
+    revision: row.revision,
     id: row.id,
     userId: row.user_id,
     title: row.title,
@@ -300,6 +315,7 @@ export function diaryToRow(e: DiaryEntry) {
 
 export function diaryFromRow(row: any): DiaryEntry {
   return {
+    revision: row.revision,
     date: row.date,
     mood: row.mood ?? null,
     content: row.content,
@@ -323,6 +339,9 @@ export function reviewToRow(r: WeeklyReview) {
     intention: r.intention,
     share_to_groups: r.shareToGroups,
     routine_changes: r.routineChanges,
+    habit_changes: r.habitChanges ?? [],
+    changes_applied_at: r.changesAppliedAt ?? null,
+    application_results: r.applicationResults ?? null,
     completed_at: orNull(r.completedAt),
     created_at: r.createdAt,
   };
@@ -344,6 +363,9 @@ export function reviewFromRow(row: any): WeeklyReview {
     intention: row.intention,
     shareToGroups: row.share_to_groups ?? [],
     routineChanges: row.routine_changes ?? [],
+    habitChanges: row.habit_changes ?? [],
+    changesAppliedAt: row.changes_applied_at ?? undefined,
+    applicationResults: row.application_results ?? undefined,
     completedAt: row.completed_at ?? null,
     createdAt: row.created_at,
   };

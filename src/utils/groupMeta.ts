@@ -20,7 +20,8 @@ export const GROUP_STATUS_META: Record<GroupStatus, { label: string; color: 'gre
 
 // 종료일이 지나면 자동으로 '완료'로 간주
 export function effectiveStatus(g: Pick<SmallGroup, 'status' | 'endDate'>): GroupStatus {
-  if (g.status !== 'completed' && new Date(g.endDate).getTime() < Date.now()) return 'completed';
+  const dateInSeoul = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' }).format(new Date());
+  if (g.status !== 'completed' && g.endDate.slice(0, 10) < dateInSeoul) return 'completed';
   return g.status;
 }
 

@@ -7,7 +7,7 @@ import type { ReminderSpec } from './reminderSpecs';
  * 매일/요일 반복(schedule.on)으로 등록하고, 설정이 바뀔 때마다 전체 재예약한다.
  */
 
-export async function syncNativeNotifications(specs: ReminderSpec[]): Promise<void> {
+export async function syncNativeNotifications(specs: ReminderSpec[], isCurrent: () => boolean): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   const { LocalNotifications } = await import('@capacitor/local-notifications');
 
@@ -19,34 +19,24 @@ export async function syncNativeNotifications(specs: ReminderSpec[]): Promise<vo
     });
   }
 
-  if (!specs.length) return;
+  if (!specs.length) { await LocalNotifications.removeAllDeliveredNotifications(); return; }
+  if (!isCurrent()) return;
 
   let id = 1;
   const notifications = specs.flatMap(s => {
-    const days = s.weekdays && s.weekdays.length ? s.weekdays : [undefined];
+    const days = s.weekdays ?? [undefined];
     return days.map(wd => ({
       id: id++,
       title: s.title,
       body: s.body,
       schedule: {
         on: wd == null
-          ? { hour: s.hour, minute: s.minute }
-          : { weekday: wd, hour: s.hour, minute: s.minute },
+          ? { hour: s.hour, minute: s.minute, second: 0 }
+          : { weekday: wd, hour: s.hour, minute: s.minute, second: 0 },
         allowWhileIdle: true,
       },
     }));
   });
 
   await LocalNotifications.schedule({ notifications });
-}
-
-export async function cancelAllNativeNotifications(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-  const { LocalNotifications } = await import('@capacitor/local-notifications');
-  const pending = await LocalNotifications.getPending();
-  if (pending.notifications.length) {
-    await LocalNotifications.cancel({
-      notifications: pending.notifications.map(n => ({ id: n.id })),
-    });
-  }
 }

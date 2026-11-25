@@ -1,8 +1,17 @@
-import { format, getISOWeek, getYear, getDay, startOfWeek, endOfWeek, subWeeks, addWeeks, addDays } from 'date-fns';
+import { format, getISOWeek, getISOWeekYear, getDay, startOfWeek, endOfWeek, subWeeks, addDays } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { WeeklyReview } from '../types';
+import { calendarDayNumber } from './goalRules';
 
 const WEEK_OPTIONS = { weekStartsOn: 1 } as const;
+
+/** 서버의 UTC 생성 시각을 사용자가 기록하는 현지 날짜로 맞춘다. */
+export function createdLocalDate(createdAt: string, timeZone?: string): string {
+  if (!createdAt || /^\d{4}-\d{2}-\d{2}$/.test(createdAt)) return createdAt;
+  const value = new Date(createdAt);
+  if (Number.isNaN(value.getTime())) return '';
+  return timeZone ? new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(value) : format(value, 'yyyy-MM-dd');
+}
 
 // 요일 레이블 (0=일 ~ 6=토)
 export const ALL_DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
@@ -27,21 +36,11 @@ export function getWeekRangeFor(date: Date, weekStartDay: number): { start: Date
   };
 }
 
-export function formatDateRange(startDate: string, endDate: string): string {
-  const s = new Date(startDate);
-  const e = new Date(endDate);
-  return `${format(s, 'M/d')} ~ ${format(e, 'M/d')}`;
-}
-
 export function elapsedDays(startDate: string, endDate: string): { elapsed: number; total: number } {
-  const today = new Date();
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const totalMs = end.getTime() - start.getTime();
-  const elapsedMs = Math.min(today.getTime() - start.getTime(), totalMs);
-  const total = Math.round(totalMs / 86400000) + 1;
-  const elapsed = Math.max(0, Math.round(elapsedMs / 86400000) + 1);
-  return { elapsed: Math.min(elapsed, total), total };
+  const start = calendarDayNumber(startDate), end = calendarDayNumber(endDate);
+  const total = end - start + 1;
+  if (!Number.isFinite(total) || total <= 0) return { elapsed: 0, total: 0 };
+  return { elapsed: Math.max(0, Math.min(calendarDayNumber(format(new Date(), 'yyyy-MM-dd')) - start + 1, total)), total };
 }
 
 const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
@@ -74,7 +73,7 @@ export const isEditableDay = (dateIso: string, graceEndHour: number): boolean =>
   return false;
 };
 export const currentWeek = () => getISOWeek(new Date());
-export const currentYear = () => getYear(new Date());
+export const currentYear = () => getISOWeekYear(new Date());
 
 // 오늘이 일요일인지 (getDay === 0)
 export const isSunday = (date: Date = new Date()): boolean => getDay(date) === 0;
@@ -84,14 +83,6 @@ export const getCurrentWeekRange = (date: Date = new Date()) => ({
   start: startOfWeek(date, WEEK_OPTIONS),
   end: endOfWeek(date, WEEK_OPTIONS),
 });
-
-// 다음 주 첫날 (월요일)
-const getNextWeekMonday = (date: Date = new Date()): Date =>
-  addWeeks(startOfWeek(date, WEEK_OPTIONS), 1);
-
-// 루틴 변경 적용 시각 (다음 주 월요일 00:00)
-export const getNextWeekApplyTime = (): string =>
-  format(getNextWeekMonday(), "yyyy-MM-dd'T'00:00:00");
 
 // "5월 19일(월) ~ 5월 25일(일)" 형태
 export const getWeekRangeText = (date: Date = new Date(), weekStartDay: 0 | 1 = 1): string => {
@@ -136,7 +127,7 @@ export const getReviewPrompt = (
   const targetDate = isGrace ? subWeeks(date, 1) : date;
 
   const weekNumber = getISOWeek(targetDate);
-  const year = getYear(targetDate);
+  const year = getISOWeekYear(targetDate);
   const { start, end } = getCurrentWeekRange(targetDate);
   const completed = isReviewCompleted(reviews, weekNumber, year);
 

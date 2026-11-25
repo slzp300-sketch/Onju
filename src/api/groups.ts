@@ -1,3 +1,5 @@
+import { localTimeZone } from '../utils/timeZone';
+import { useSettingsStore } from '../store/settingsStore';
 import { supabase } from '../lib/supabase';
 import type { SmallGroup, MemberGroupProgress } from '../types';
 import { groupFromRow } from '../data/mappers';
@@ -51,7 +53,7 @@ export const fetchGroupById = async (id: string): Promise<SmallGroup> => {
 
 /** 멤버별 진행도 — 서버 RPC가 집계 (타인 로그 비공개 유지) */
 export const fetchGroupMembers = async (id: string): Promise<MemberGroupProgress[]> => {
-  const { data, error } = await supabase.rpc('get_group_member_progress', { gid: id });
+  const { data, error } = await supabase.rpc('get_group_member_progress_v2', { gid: id, p_timezone: localTimeZone(), p_week_start: useSettingsStore.getState().weekStartDay });
   if (error) throw error;
   return (data ?? []).map((row: any) => ({
     userId: row.user_id,

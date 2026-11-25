@@ -1,4 +1,4 @@
-import { getISOWeek, getYear } from 'date-fns';
+import { getISOWeek, getISOWeekYear } from 'date-fns';
 import type { WeeklyReview } from '../types';
 
 /**
@@ -17,7 +17,7 @@ export function calcReviewStreak(reviews: WeeklyReview[]): number {
 
   const now = new Date();
   const thisWeek = getISOWeek(now);
-  const thisYear = getYear(now);
+  const thisYear = getISOWeekYear(now);
 
   const { year: ly, weekNumber: lw } = completed[0];
   const isRecent =

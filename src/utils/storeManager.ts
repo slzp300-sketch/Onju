@@ -10,22 +10,25 @@ import { useSettingsStore } from '../store/settingsStore';
 import { useNotificationStore } from '../store/notificationStore';
 import { useTreeStore } from '../store/treeStore';
 import { useUIStore } from '../store/uiStore';
+import { queryClient } from '../lib/queryClient';
 
 /**
  * 로그아웃 시 전체 사용자 데이터 초기화.
- * 서버(Supabase)가 source of truth — 로컬은 캐시일 뿐이므로 모두 비운다.
+ * 표시용 스토어·조회 캐시를 비운다. 미전송 outbox는 별도로 계정별 보관한다.
  * (테마는 기기 설정으로 보고 유지)
  */
 export function clearStores() {
+  // 진행 중인 조회도 취소한다. 늦은 응답이 다음 계정의 캐시에 남지 않는다.
+  queryClient.clear();
   useRoutineStore.setState({ personalRoutines: [], faithRoutines: [], logs: [] });
   useGoalStore.setState({ monthlyGoals: [], weeklyGoals: [], goalSlots: 3 });
-  useGroupStore.setState({ groups: [], myGroupIds: [] });
+  useGroupStore.setState({ groups: [], myGroupIds: [], membershipStatus: {}, creationStatus: {}, statusChanges: {} });
   useDiaryStore.setState({ entries: [] });
   useCheerStore.setState({ cheered: {} });
   useHabitStore.setState({ habits: [], personalRoutines: [], habitLogs: [] });
   useStreakStore.setState({ shields: 0, lastCheckedStreak: 0 });
   useTodoStore.setState({ todos: [] });
-  useSettingsStore.setState({ weekStartDay: 1, graceEndHour: 6 });
+  useSettingsStore.setState({ weekStartDay: 1, graceEndHour: 6, lastSlotUnlockWeek: '' });
   useNotificationStore.setState({
     morningEnabled: false,
     morningTime: '07:00',
@@ -34,7 +37,7 @@ export function clearStores() {
     reviewEnabled: true,
   });
   useTreeStore.setState({ lastCelebratedStage: null });
-  useUIStore.setState({ dataHydrated: false, pendingStageUp: null });
+  useUIStore.setState({ dataHydrated: false, pendingStageUp: null, pendingUnlockCelebration: false, newSlotCount: 0 });
 
   const keys = [
     'routine-store', 'goal-store', 'group-store', 'diary-store', 'cheer-store',

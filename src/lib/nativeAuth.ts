@@ -1,8 +1,9 @@
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
 import { SocialLogin } from '@capgo/capacitor-social-login';
 import { supabase } from './supabase';
+import { runAuthMutation } from './authMutation';
 
 /** Capacitor 네이티브(안드로이드/iOS) 실행 여부. 웹이면 false. */
 export const isNativePlatform = () => Capacitor.isNativePlatform();
@@ -43,23 +44,48 @@ export async function googleNativeIdToken(): Promise<string> {
 export function kakaoNativeLogin(authorizeUrl: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     let settled = false;
-    const handlePromise = App.addListener('appUrlOpen', async ({ url }) => {
-      if (!url.startsWith(NATIVE_REDIRECT_URI)) return;
+    let handlingCallback = false;
+    let closeTimeout: ReturnType<typeof setTimeout> | undefined;
+    const listeners: Promise<PluginListenerHandle>[] = [];
+    const finish = (error?: unknown) => {
+      if (settled) return;
       settled = true;
-      try { await Browser.close(); } catch { /* 일부 플랫폼은 close 미지원 */ }
-      (await handlePromise).remove();
-      try {
-        const code = new URL(url).searchParams.get('code');
-        if (!code) throw new Error('인가코드를 받지 못했어요.');
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        if (error) throw error;
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    });
-    Browser.open({ url: authorizeUrl }).catch((e) => {
-      if (!settled) reject(e);
-    });
+      clearTimeout(timeout);
+      clearTimeout(closeTimeout);
+      for (const listener of listeners) void listener.then(handle => handle.remove()).catch(() => {});
+      if (error) reject(error);
+      else resolve();
+    };
+    const timeout = setTimeout(() => finish(new Error('로그인 시간이 초과됐어요. 다시 시도해주세요.')), 120_000);
+    try {
+      listeners.push(App.addListener('appUrlOpen', async ({ url }) => {
+        if (settled || handlingCallback) return;
+        let callback: URL;
+        try { callback = new URL(url); } catch { return; }
+        if (callback.protocol !== 'onju:' || callback.hostname !== 'oauth'
+          || (callback.pathname !== '' && callback.pathname !== '/') || callback.username || callback.password || callback.port) return;
+        handlingCallback = true;
+        clearTimeout(closeTimeout);
+        try {
+          try { await Browser.close(); } catch { /* 일부 플랫폼은 close 미지원 */ }
+          if (callback.searchParams.has('error')) throw new Error('카카오 로그인이 취소되었거나 거절됐어요.');
+          const code = callback.searchParams.get('code');
+          if (!code) throw new Error('인가코드를 받지 못했어요.');
+          const { error } = await runAuthMutation(() => supabase.auth.exchangeCodeForSession(code));
+          if (error) throw error;
+          finish();
+        } catch (error) { finish(error); }
+      }));
+      listeners.push(Browser.addListener('browserFinished', () => {
+        // Android의 복귀·탭 종료 이벤트 순서는 기기별로 달라 딥링크 전달을 기다린다.
+        if (!handlingCallback && !settled) {
+          clearTimeout(closeTimeout);
+          closeTimeout = setTimeout(() => finish(new Error('카카오 로그인을 취소했어요.')), 1000);
+        }
+      }));
+      void Promise.all(listeners).then(() => {
+        if (!settled) return Browser.open({ url: authorizeUrl });
+      }).catch(error => finish(error));
+    } catch (error) { finish(error); }
   });
 }

@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import type { HabitFrequency, DailyRoutine } from '../types';
-import { isScheduled } from './goalProgress';
+import { isScheduled } from './schedule';
+import { createdLocalDate } from './date';
 
 export type DayStatus = 'done' | 'sub' | 'rest' | 'miss' | 'off' | 'future';
 
@@ -31,10 +32,11 @@ export function getHabitStat(
   customDays: number[] | undefined,
   createdAt: string,
   logs: LogLike[],
+  scheduled = (date: string) => isScheduled(date, frequency, customDays),
 ): HabitStat {
   const todayMid = new Date(new Date().setHours(12, 0, 0, 0));
   const todayIso = ymd(todayMid);
-  const createdIso = createdAt.slice(0, 10);
+  const createdIso = createdLocalDate(createdAt) || logs.map(l => l.date).sort()[0] || todayIso;
 
   const logMap = new Map<string, LogLike>();
   logs.forEach(l => logMap.set(l.date, l));
@@ -50,7 +52,7 @@ export function getHabitStat(
     const d = new Date(todayMid); d.setDate(d.getDate() - i);
     const iso = ymd(d);
     if (iso < createdIso) continue;
-    if (!isScheduled(iso, frequency, customDays)) continue;
+    if (!scheduled(iso)) continue;
     sched30++;
     if (doneOn(iso)) done30++;
   }
@@ -62,13 +64,13 @@ export function getHabitStat(
   {
     const d = new Date(todayMid);
     // 오늘이 예정일인데 아직 안 했으면 오늘은 제외하고 시작
-    if (isScheduled(todayIso, frequency, customDays) && !doneOn(todayIso)) {
+    if (scheduled(todayIso) && !doneOn(todayIso)) {
       d.setDate(d.getDate() - 1);
     }
     while (true) {
       const iso = ymd(d);
       if (iso < createdIso) break;
-      if (isScheduled(iso, frequency, customDays)) {
+      if (scheduled(iso)) {
         if (doneOn(iso)) streak++;
         else break;
       }
@@ -83,7 +85,7 @@ export function getHabitStat(
     const d = new Date(start);
     while (ymd(d) <= todayIso) {
       const iso = ymd(d);
-      if (isScheduled(iso, frequency, customDays)) {
+      if (scheduled(iso)) {
         if (doneOn(iso)) { run++; best = Math.max(best, run); }
         else run = 0;
       }
@@ -98,7 +100,7 @@ export function getHabitStat(
     const iso = ymd(d);
     let status: DayStatus;
     if (iso > todayIso) status = 'future';
-    else if (iso < createdIso || !isScheduled(iso, frequency, customDays)) status = 'off';
+    else if (iso < createdIso || !scheduled(iso)) status = 'off';
     else {
       const l = logMap.get(iso);
       if (l?.substitute) status = 'sub';

@@ -1,5 +1,8 @@
-import { format, getDay } from 'date-fns';
-import type { MonthlyGoal, Habit, DailyRoutine, RoutineLog, HabitFrequency } from '../types';
+import { isItemDue, ruleAt } from './scheduleHistory';
+import { createdLocalDate } from './date';
+import { calendarDayNumber, goalPeriodError } from './goalRules';
+import { isScheduled } from './schedule';
+import type { MonthlyGoal, Habit, DailyRoutine, RoutineLog } from '../types';
 
 interface HabitLog {
   habitId: string;
@@ -9,50 +12,28 @@ interface HabitLog {
   substitute?: boolean;
 }
 
-/** start~end (양끝 포함) 날짜 문자열 배열 */
-function dateRange(startIso: string, endIso: string): string[] {
-  if (startIso > endIso) return [];
-  const days: string[] = [];
-  const d = new Date(startIso + 'T12:00:00');
-  const end = new Date(endIso + 'T12:00:00');
-  while (d <= end) {
-    days.push(format(d, 'yyyy-MM-dd'));
-    d.setDate(d.getDate() + 1);
+/** Count whole weeks plus at most six days per revision, even for long periods. */
+function scheduledCount(item: Habit | DailyRoutine, goal: MonthlyGoal, end: string): number {
+  const start = [goal.startDate, createdLocalDate(item.createdAt)].sort().at(-1)!;
+  if (start > end) return 0;
+  const points = [...new Set([start, ...(item.scheduleHistory ?? []).map(r => r.from).filter(d => d > start && d <= end)])].sort();
+  let count = 0;
+  for (let i = 0; i < points.length; i++) {
+    const rule = ruleAt(item, points[i]);
+    if (!rule?.active || rule.goalId !== goal.id) continue;
+    const from = calendarDayNumber(points[i]);
+    const through = i + 1 < points.length ? calendarDayNumber(points[i + 1]) - 1 : calendarDayNumber(end);
+    const length = through - from + 1;
+    if (!Number.isFinite(length) || length <= 0) continue;
+    const due = Array.from({ length: 7 }, (_, offset) => isScheduled(new Date((from + offset) * 86400000).toISOString().slice(0, 10), rule.frequency, rule.customDays));
+    count += Math.floor(length / 7) * due.filter(Boolean).length + due.slice(0, length % 7).filter(Boolean).length;
   }
-  return days;
-}
-
-/**
- * 해당 날짜가 습관/루틴의 "예정일"인지 판정.
- * getDay(): 0=일 ~ 6=토 (customDays/number[]도 동일 인덱스 사용)
- */
-export function isScheduled(
-  dateIso: string,
-  frequency: HabitFrequency | DailyRoutine['frequency'],
-  customDays?: number[],
-): boolean {
-  const dow = getDay(new Date(dateIso + 'T12:00:00')); // 0=일 ~ 6=토
-  if (Array.isArray(frequency)) return frequency.includes(dow);
-  switch (frequency) {
-    case 'daily':    return true;
-    case 'weekdays': return dow >= 1 && dow <= 5;
-    case 'weekends': return dow === 0 || dow === 6;
-    case 'custom':   return (customDays ?? []).includes(dow);
-    default:         return true;
-  }
-}
-
-/** 기간 내 예정일만 추출 */
-function scheduledDays(
-  days: string[],
-  frequency: HabitFrequency | DailyRoutine['frequency'],
-  customDays?: number[],
-): string[] {
-  return days.filter(d => isScheduled(d, frequency, customDays));
+  return count;
 }
 
 /** 목표에 연동된 항목 (개인 습관 + 신앙 루틴) */
 export interface LinkedItem {
+  currentlyLinked: boolean;
   id: string;
   title: string;
   emoji?: string;
@@ -64,12 +45,6 @@ export interface LinkedItem {
   scheduledElapsed: number; // 오늘까지 경과한 예정일 수
 }
 
-/** 유효 시작일 = max(목표 시작일, 항목 생성일) — 연동 전 기간은 분모에서 제외 */
-function effectiveStart(goalStart: string, createdAt: string): string {
-  const createdIso = createdAt.slice(0, 10); // ISO datetime → yyyy-MM-dd
-  return createdIso > goalStart ? createdIso : goalStart;
-}
-
 export function getLinkedItems(
   goal: MonthlyGoal,
   habits: Habit[],
@@ -78,45 +53,25 @@ export function getLinkedItems(
   routineLogs: RoutineLog[],
   todayIso: string,
 ): LinkedItem[] {
-  if (dateRange(goal.startDate, goal.endDate).length === 0) return [];
+  if (goalPeriodError(goal.startDate, goal.endDate)) return [];
 
   const items: LinkedItem[] = [];
-
-  const endForCount = todayIso < goal.endDate ? todayIso : goal.endDate;
-
-  habits.filter(h => h.goalId === goal.id).forEach(h => {
-    const start = effectiveStart(goal.startDate, h.createdAt);
-    const scheduledTotal = scheduledDays(dateRange(start, goal.endDate), h.frequency, h.customDays).length;
-    const scheduledElapsed = scheduledDays(dateRange(start, endForCount), h.frequency, h.customDays).length;
-    const elapsed = new Set(dateRange(start, endForCount));
-    const doneCount = habitLogs.filter(
-      l => l.habitId === h.id && elapsed.has(l.date) && isScheduled(l.date, h.frequency, h.customDays)
-        && (l.completed || l.skipped || l.substitute)
-    ).length;
-    items.push({
-      id: h.id, title: h.title, emoji: h.emoji, kind: 'habit',
-      rate: scheduledTotal === 0 ? 0 : Math.round((doneCount / scheduledTotal) * 100),
-      adherence: scheduledElapsed === 0 ? 0 : Math.round((doneCount / scheduledElapsed) * 100),
-      doneCount, scheduledTotal, scheduledElapsed,
-    });
-  });
-
-  faithRoutines.filter(r => r.goalId === goal.id).forEach(r => {
-    const start = effectiveStart(goal.startDate, r.createdAt);
-    const scheduledTotal = scheduledDays(dateRange(start, goal.endDate), r.frequency).length;
-    const scheduledElapsed = scheduledDays(dateRange(start, endForCount), r.frequency).length;
-    const elapsed = new Set(dateRange(start, endForCount));
-    const doneCount = routineLogs.filter(
-      l => l.routineId === r.id && elapsed.has(l.date) && isScheduled(l.date, r.frequency)
-        && (l.completed || l.skipped)
-    ).length;
-    items.push({
-      id: r.id, title: r.title, emoji: r.emoji, kind: 'faith',
-      rate: scheduledTotal === 0 ? 0 : Math.round((doneCount / scheduledTotal) * 100),
-      adherence: scheduledElapsed === 0 ? 0 : Math.round((doneCount / scheduledElapsed) * 100),
-      doneCount, scheduledTotal, scheduledElapsed,
-    });
-  });
+  for (const item of [...habits, ...faithRoutines]) {
+    const scheduledTotal = scheduledCount(item, goal, goal.endDate);
+    if (!scheduledTotal && item.goalId !== goal.id) continue;
+    const elapsedEnd = goal.endDate < todayIso ? goal.endDate : todayIso;
+    const scheduledElapsed = scheduledCount(item, goal, elapsedEnd);
+    const isHabit = !('isActive' in item);
+    const eligible = (date: string) => date >= goal.startDate && date <= elapsedEnd && isItemDue(item, date) && ruleAt(item, date)?.goalId === goal.id;
+    const dates = isHabit
+      ? habitLogs.filter(l => l.habitId === item.id && eligible(l.date) && (l.completed || l.skipped || l.substitute)).map(l => l.date)
+      : routineLogs.filter(l => l.routineId === item.id && eligible(l.date) && (l.completed || l.skipped)).map(l => l.date);
+    const doneCount = new Set(dates).size;
+    items.push({ currentlyLinked: item.goalId === goal.id, id: item.id, title: item.title, emoji: item.emoji, kind: isHabit ? 'habit' : 'faith',
+      rate: scheduledTotal ? Math.round(doneCount / scheduledTotal * 100) : 0,
+      adherence: scheduledElapsed ? Math.round(doneCount / scheduledElapsed * 100) : 0,
+      doneCount, scheduledTotal, scheduledElapsed });
+  }
 
   return items;
 }
