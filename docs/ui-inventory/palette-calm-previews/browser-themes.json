@@ -1,0 +1,42 @@
+[
+  {
+    "accent": "#F0876E",
+    "canvas": "#FAF0E6",
+    "card": "rgb(243, 234, 223)",
+    "overflow": 0,
+    "primary": "#1F4D3A",
+    "theme": "grove"
+  },
+  {
+    "accent": "#F0876E",
+    "canvas": "#FAF0E6",
+    "card": "rgb(243, 234, 223)",
+    "overflow": 0,
+    "primary": "#1F4D3A",
+    "theme": "sprout"
+  },
+  {
+    "accent": "#F0876E",
+    "canvas": "#FAF0E6",
+    "card": "rgb(243, 234, 223)",
+    "overflow": 0,
+    "primary": "#1F4D3A",
+    "theme": "meadow"
+  },
+  {
+    "accent": "#F0876E",
+    "canvas": "#FAF0E6",
+    "card": "rgb(243, 234, 223)",
+    "overflow": 0,
+    "primary": "#1F4D3A",
+    "theme": "deepforest"
+  },
+  {
+    "accent": "#F0876E",
+    "canvas": "#FAF0E6",
+    "card": "rgb(243, 234, 223)",
+    "overflow": 0,
+    "primary": "#1F4D3A",
+    "theme": "autumn"
+  }
+]

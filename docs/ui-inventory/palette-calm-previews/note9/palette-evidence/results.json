@@ -1,0 +1,81 @@
+{
+  "model": "SM-N960N",
+  "android": "10",
+  "fixtureOnly": true,
+  "recordsPreserved": true,
+  "selectedThemePreserved": true,
+  "checks": [
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "home",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "tree",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "themes",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "grove",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "sprout",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "meadow",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "deepforest",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "autumn",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    }
+  ]
+}

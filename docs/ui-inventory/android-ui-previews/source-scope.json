@@ -1,0 +1,30 @@
+{
+  "changed": [
+    "src/App.tsx",
+    "src/components/routines/BibleInput.tsx",
+    "src/components/routines/FocusMode.tsx",
+    "src/components/routines/HabitFocusMode.tsx",
+    "src/components/tree/ThemeAmbience.tsx",
+    "src/components/ui/DurationPickerSheet.tsx",
+    "src/components/ui/HabitAlarmSheet.tsx",
+    "src/components/ui/OverlayDialog.tsx",
+    "src/components/ui/Toast.tsx",
+    "src/hooks/useKeyboardInset.test.ts",
+    "src/hooks/useKeyboardInset.ts",
+    "src/index.css",
+    "src/pages/Diary.tsx",
+    "src/pages/FaithRoutineNew.tsx",
+    "src/pages/GroupNew.tsx",
+    "src/pages/HabitNew.tsx",
+    "src/pages/Login.tsx",
+    "src/pages/mobileFunctions.test.ts",
+    "src/pages/MonthlyGoalNew.tsx",
+    "src/pages/PersonalRoutineNew.tsx",
+    "src/pages/ResetPassword.tsx",
+    "src/pages/RoutineTimer.tsx",
+    "src/pages/Signup.tsx",
+    "src/pages/TodoNew.tsx",
+    "src/pages/WeeklyReviewPage.tsx"
+  ],
+  "protectedChanged": []
+}

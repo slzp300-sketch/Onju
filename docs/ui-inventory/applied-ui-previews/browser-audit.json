@@ -1,0 +1,353 @@
+{
+  "views": [
+    {
+      "heading": "마이페이지",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/profile",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "소모임",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/groups",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "은혜 기록",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/faith-notes",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "하루 일기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/diary",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "목표 추가하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/goals/monthly/new",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "할 일 추가하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/todos/new",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "습관 추가하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/habits/new",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "루틴 추가하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/personal-routines/new",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "신앙 루틴 추가",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/faith-routines/new",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "소모임 만들기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/groups/new",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "초대로 소모임 참여하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/groups/invite",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "알림 설정",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/notification-settings",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "보관한 습관·루틴",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/archive",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "숲 테마",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/themes",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "나의 나무",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/streak",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "온주 체험님, 반가워요",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "통계",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/stats",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "목표",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/goals",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "마이페이지",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/profile",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "소모임",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/groups",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "은혜 기록",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/faith-notes",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "하루 일기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/diary",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "습관 추가하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/habits/new",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "루틴 추가하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/personal-routines/new",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "목표 추가하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/goals/monthly/new",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "할 일 추가하기",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/todos/new",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "알림 설정",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/notification-settings",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "overflow": false,
+      "overflowing": [],
+      "path": "/review",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "2026년 44주차 리뷰",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/review/result/2026-44",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "목표 요청 충돌 확인",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/goals/conflicts",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "습관·루틴 충돌 확인",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/practices/conflicts",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "묶음·주간 목표 충돌 확인",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/plans/conflicts",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "할 일·일기·메모 충돌 확인",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/records/conflicts",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "온주 체험님, 반가워요",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "회원가입",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/signup",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "비밀번호 재설정",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/reset-password",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "회원가입",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/signup",
+      "unnamed": [],
+      "width": 305
+    },
+    {
+      "heading": "통계",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/stats",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "목표",
+      "overflow": false,
+      "overflowing": [],
+      "path": "/goals",
+      "unnamed": [],
+      "width": 375
+    },
+    {
+      "heading": "루틴 공유",
+      "overflow": false,
+      "overflowing": [
+        {
+          "tag": "BUTTON",
+          "text": "함께 걷는 점심시간"
+        },
+        {
+          "tag": "BUTTON",
+          "text": "복구할 점심 산책 모임"
+        },
+        {
+          "tag": "BUTTON",
+          "text": "함께 걷는 점심시간 · 운영 검증"
+        },
+        {
+          "tag": "BUTTON",
+          "text": "이전 종료 요청이 남은 모임"
+        },
+        {
+          "tag": "BUTTON",
+          "text": "우리끼리 점심 산책"
+        }
+      ],
+      "path": "/share",
+      "unnamed": [],
+      "width": 375
+    }
+  ],
+  "notes": [
+    "Share page group filter intentionally scrolls horizontally; document width stays within viewport.",
+    "Authenticated login preview redirects to home; auth interactions verified by tests."
+  ],
+  "viewportWidths": [
+    390,
+    320
+  ],
+  "draftRestore": "Name and optional timing input retained after leaving and restoring. Newly created QA draft discarded through UI."
+}

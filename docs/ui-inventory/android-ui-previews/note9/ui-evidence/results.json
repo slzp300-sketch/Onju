@@ -1,0 +1,134 @@
+[
+  {
+    "path": "\/",
+    "width": 411,
+    "height": 845,
+    "viewport": {
+      "height": 845.7142944335938,
+      "top": 0
+    },
+    "inset": "0px",
+    "safeTop": "24px",
+    "overflow": 0,
+    "footer": null,
+    "name": "01-home",
+    "ime": false
+  },
+  {
+    "path": "\/todos\/new",
+    "width": 411,
+    "height": 504,
+    "viewport": {
+      "height": 504.3809509277344,
+      "top": 0
+    },
+    "inset": "0px",
+    "safeTop": "24px",
+    "overflow": 0,
+    "footer": {
+      "top": 427.6190490722656,
+      "bottom": 504.3809585571289
+    },
+    "name": "02-todo-keyboard",
+    "ime": true
+  },
+  {
+    "path": "\/",
+    "width": 411,
+    "height": 845,
+    "viewport": {
+      "height": 845.7142944335938,
+      "top": 0
+    },
+    "inset": "0px",
+    "safeTop": "24px",
+    "overflow": 0,
+    "footer": null,
+    "name": "03-todo-saved",
+    "ime": false
+  },
+  {
+    "path": "\/habits\/new",
+    "width": 411,
+    "height": 845,
+    "viewport": {
+      "height": 845.7142944335938,
+      "top": 0
+    },
+    "inset": "0px",
+    "safeTop": "24px",
+    "overflow": 0,
+    "footer": {
+      "top": 736.952392578125,
+      "bottom": 845.7143020629883
+    },
+    "name": "04-draft-restored",
+    "ime": false
+  },
+  {
+    "path": "\/diary",
+    "width": 411,
+    "height": 504,
+    "viewport": {
+      "height": 504.3809509277344,
+      "top": 0
+    },
+    "inset": "0px",
+    "safeTop": "24px",
+    "overflow": 0,
+    "footer": {
+      "top": 427.6190490722656,
+      "bottom": 504.3809585571289
+    },
+    "name": "05-diary-keyboard",
+    "ime": true
+  },
+  {
+    "path": "\/diary",
+    "width": 411,
+    "height": 845,
+    "viewport": {
+      "height": 845.7142944335938,
+      "top": 0
+    },
+    "inset": "0px",
+    "safeTop": "24px",
+    "overflow": 0,
+    "footer": {
+      "top": 736.952392578125,
+      "bottom": 845.7143020629883
+    },
+    "name": "06-diary-restored",
+    "ime": false
+  },
+  {
+    "path": "\/",
+    "width": 411,
+    "height": 504,
+    "viewport": {
+      "height": 504.3809509277344,
+      "top": 0
+    },
+    "inset": "0px",
+    "safeTop": "24px",
+    "overflow": 0,
+    "footer": null,
+    "name": "07-memo-keyboard",
+    "ime": true
+  },
+  {
+    "path": "\/",
+    "width": 411,
+    "height": 845,
+    "viewport": {
+      "height": 845.7142944335938,
+      "top": 0
+    },
+    "inset": "0px",
+    "safeTop": "24px",
+    "overflow": 0,
+    "footer": null,
+    "name": "08-memo-saved",
+    "ime": false
+  }
+]

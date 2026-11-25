@@ -1,0 +1,174 @@
+{
+  "model": "SM-N960N",
+  "android": "10",
+  "fixtureOnly": true,
+  "recordsPreserved": true,
+  "themePreserved": true,
+  "settingsPreserved": true,
+  "homeGoalOpensDetail": true,
+  "statsGoalOpensDetail": true,
+  "checks": [
+    {
+      "growthBottom": 323.52381896972656,
+      "height": 845,
+      "name": "home-order",
+      "overflow": 0,
+      "routineTop": 335.5238037109375,
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "01-home",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "02-goal-detail",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "03-stats-weekly",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "04-stats-goal",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "05-stats-habit",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "06-stats-records",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "07-groups",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "08-group-detail",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "09-group-discover",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "accent": "#F0876E",
+      "canvas": "#FAF0E6",
+      "name": "10-profile",
+      "overflow": 0,
+      "primary": "#1F4D3A",
+      "surface": "#F3EADF",
+      "width": 411
+    },
+    {
+      "growthBottom": 323.4696960449219,
+      "height": 845,
+      "name": "home-390",
+      "overflow": 0,
+      "routineTop": 335.31597900390625,
+      "width": 390
+    },
+    {
+      "height": 845,
+      "name": "goals-390",
+      "overflow": 0,
+      "width": 390
+    },
+    {
+      "height": 845,
+      "name": "stats-390",
+      "overflow": 0,
+      "width": 390
+    },
+    {
+      "height": 845,
+      "name": "groups-390",
+      "overflow": 0,
+      "width": 390
+    },
+    {
+      "height": 845,
+      "name": "profile-390",
+      "overflow": 0,
+      "width": 390
+    },
+    {
+      "growthBottom": 349.02381896972656,
+      "height": 845,
+      "name": "home-320",
+      "overflow": 0,
+      "routineTop": 360.96075439453125,
+      "width": 320
+    },
+    {
+      "height": 845,
+      "name": "goals-320",
+      "overflow": 0,
+      "width": 320
+    },
+    {
+      "height": 845,
+      "name": "stats-320",
+      "overflow": 0,
+      "width": 320
+    },
+    {
+      "height": 845,
+      "name": "groups-320",
+      "overflow": 0,
+      "width": 320
+    },
+    {
+      "height": 845,
+      "name": "profile-320",
+      "overflow": 0,
+      "width": 320
+    }
+  ]
+}

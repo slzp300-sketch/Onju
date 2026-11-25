@@ -1,0 +1,19 @@
+[
+  {
+    "accent": "#F0876E",
+    "canvas": "#FAF0E6",
+    "fieldBottom": 328.76190185546875,
+    "fieldTop": 280.76190185546875,
+    "fontSize": 16,
+    "footerBottom": 504.3809585571289,
+    "footerTop": 427.6190490722656,
+    "height": 504,
+    "name": "01-habit-keyboard",
+    "overflow": 0,
+    "primary": "#1F4D3A",
+    "surface": "#F3EADF",
+    "viewportHeight": 504.3809509277344,
+    "width": 411,
+    "keyboard": true
+  }
+]

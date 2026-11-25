@@ -1,0 +1,14 @@
+{
+  "android": "10",
+  "model": "SM-N960N",
+  "loginScreen": true,
+  "authConnection": {
+    "emailEnabled": true,
+    "googleEnabled": true,
+    "kakaoEnabled": true,
+    "status": 200
+  },
+  "signedIn": false,
+  "accountSwitchVerified": false,
+  "serverSyncVerified": false
+}

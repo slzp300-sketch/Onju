@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-10-29T02:10:43.176Z",
+  "backendHost": "rtniupzlhgddebhslbin.supabase.co",
+  "auth": {
+    "status": 200,
+    "signupDisabled": false,
+    "emailAutoconfirm": true,
+    "emailEnabled": true,
+    "googleEnabled": true,
+    "kakaoEnabled": true,
+    "anonymousEnabled": false
+  },
+  "publicApi": {
+    "status": 401,
+    "visibleRequiredRpc": [],
+    "note": "Anonymous API visibility alone cannot prove authenticated RPC absence."
+  },
+  "schema": [
+    {
+      "table": "todos",
+      "column": "revision",
+      "status": 400,
+      "code": "42703",
+      "message": "column todos.revision does not exist"
+    },
+    {
+      "table": "diary_entries",
+      "column": "revision",
+      "status": 400,
+      "code": "42703",
+      "message": "column diary_entries.revision does not exist"
+    },
+    {
+      "table": "routine_logs",
+      "column": "memo_revision",
+      "status": 400,
+      "code": "42703",
+      "message": "column routine_logs.memo_revision does not exist"
+    },
+    {
+      "table": "habits",
+      "column": "revision",
+      "status": 400,
+      "code": "42703",
+      "message": "column habits.revision does not exist"
+    },
+    {
+      "table": "personal_routines",
+      "column": "revision",
+      "status": 400,
+      "code": "42703",
+      "message": "column personal_routines.revision does not exist"
+    },
+    {
+      "table": "weekly_goals",
+      "column": "revision",
+      "status": 400,
+      "code": "42703",
+      "message": "column weekly_goals.revision does not exist"
+    },
+    {
+      "table": "monthly_goals",
+      "column": "revision",
+      "status": 400,
+      "code": "42703",
+      "message": "column monthly_goals.revision does not exist"
+    }
+  ]
+}
