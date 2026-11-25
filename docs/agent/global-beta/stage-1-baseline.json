@@ -1,0 +1,261 @@
+{
+  "referenceCommit": "90528db8e55f06101a60eb7abefacc42579d13bc",
+  "roots": {
+    "local": "0457663fb98b412695ecd70662dfff9cd256f026ee59da45ded3b2a166337cac",
+    "releaseCommit": "0f2b7eee15fdc10d4770dfcb96769ead74fcbecbc5d8f885cf9a96e7c2d192d4",
+    "releaseWorkingTree": "f5bd89f2a488dae620a753a1bbb07e2d929f40a6d068759d0ef6382d28aa56d6"
+  },
+  "referenceMigrations": [
+    {
+      "path": "supabase/migrations/0019_web_mvp_stabilization.sql",
+      "version": "0019",
+      "sha256": "fc67e382d3027e47bea2df9861e8c1ac8de753994a9769d0e4a06e57f3a0bbf9",
+      "tables": [
+        "web_mvp_rate_limits"
+      ],
+      "functions": [
+        "web_mvp_consume_rate_limit",
+        "web_mvp_start_rule_trial",
+        "web_mvp_sync_routine_plan"
+      ]
+    },
+    {
+      "path": "supabase/migrations/0020_web_mvp_rate_limit_cleanup.sql",
+      "version": "0020",
+      "sha256": "2b401aebf7e39e8695f71e1118875cf8262526510109b97fd4559801942215b4",
+      "tables": [],
+      "functions": [
+        "web_mvp_consume_rate_limit"
+      ]
+    },
+    {
+      "path": "supabase/migrations/0021_web_mvp_weekly_review_loop.sql",
+      "version": "0021",
+      "sha256": "999af1b4dbf2720790fb5c0eb4d34371673bc2e9aecad9dca1d10190f4ae0614",
+      "tables": [
+        "web_mvp_weekly_reviews"
+      ],
+      "functions": [
+        "web_mvp_apply_weekly_review"
+      ]
+    },
+    {
+      "path": "supabase/migrations/0022_web_mvp_private_test_metrics.sql",
+      "version": "0022",
+      "sha256": "9a6e2c1c751632e7532bf0e212c32dea8c481ea02680939a2db1ca5de1253f29",
+      "tables": [
+        "web_mvp_test_events"
+      ],
+      "functions": []
+    },
+    {
+      "path": "supabase/migrations/0023_web_mvp_private_test_retention.sql",
+      "version": "0023",
+      "sha256": "d6cd09f34f3099f9baf5d886e8fb7ac10aaa80bce7f9e84845e550b1181e9a40",
+      "tables": [],
+      "functions": [
+        "web_mvp_cleanup_expired_sessions"
+      ]
+    },
+    {
+      "path": "supabase/migrations/0024_web_mvp_daily_adaptation.sql",
+      "version": "0024",
+      "sha256": "02a225ddede878957d06caab68f98c16eefa94ccc41b0eeee90aada6af5b7e9e",
+      "tables": [
+        "web_mvp_daily_adaptations"
+      ],
+      "functions": [
+        "web_mvp_sync_routine_plan"
+      ]
+    },
+    {
+      "path": "supabase/migrations/0025_web_mvp_daily_adaptation_feedback.sql",
+      "version": "0025",
+      "sha256": "8be3b6f4a3380894fffe9b4d00396a25aef0614718d223755850daf45af05f77",
+      "tables": [],
+      "functions": []
+    },
+    {
+      "path": "supabase/migrations/0026_web_mvp_seven_day_journey_metrics.sql",
+      "version": "0026",
+      "sha256": "9b4db856f0ff9b878295c2064918ecca64a35993475d1fd2c2852e88e093666a",
+      "tables": [],
+      "functions": []
+    },
+    {
+      "path": "supabase/migrations/0027_web_mvp_pilot_feedback_metrics.sql",
+      "version": "0027",
+      "sha256": "ac68e4166018cea82841c898ed0a1cb55b3846025e796dc1363d5aafa5bf1b23",
+      "tables": [],
+      "functions": []
+    },
+    {
+      "path": "supabase/migrations/0028_web_mvp_public_beta_budget.sql",
+      "version": "0028",
+      "sha256": "20642cb3478bda286afa47e3090b9a4b47f2befc4cc62269c9b9ad94a7a0af70",
+      "tables": [
+        "web_mvp_ai_daily_budget"
+      ],
+      "functions": [
+        "web_mvp_record_ai_spend",
+        "web_mvp_reserve_ai_budget"
+      ]
+    },
+    {
+      "path": "supabase/migrations/0029_web_mvp_public_beta_operations.sql",
+      "version": "0029",
+      "sha256": "813c53679243896a69e4f1ad3815db5676ec14e5a41643090d8220a09e854eef",
+      "tables": [],
+      "functions": []
+    },
+    {
+      "path": "supabase/migrations/0030_web_mvp_measurement_integrity.sql",
+      "version": "0030",
+      "sha256": "c3a58ac15d1b2c66233987ba010f938cf987cfa5f627c9c1cd5404e43f4692e3",
+      "tables": [],
+      "functions": []
+    },
+    {
+      "path": "supabase/migrations/0031_web_mvp_consented_diagnostics.sql",
+      "version": "0031",
+      "sha256": "57528965fca02cb385ee50e68bc69161c31bfbbbadffe4ed18a556475103d8c2",
+      "tables": [
+        "web_mvp_diagnostic_reports"
+      ],
+      "functions": [
+        "web_mvp_cleanup_expired_sessions"
+      ]
+    },
+    {
+      "path": "supabase/migrations/0032_web_mvp_ai_budget_settlement.sql",
+      "version": "0032",
+      "sha256": "feb69f2f98adf749a7eba73cfe05d40f7f183ea14696dc97574b0554ce78eedc",
+      "tables": [],
+      "functions": [
+        "web_mvp_reserve_ai_budget",
+        "web_mvp_settle_ai_budget"
+      ]
+    },
+    {
+      "path": "supabase/migrations/0033_web_mvp_learning_loop.sql",
+      "version": "0033",
+      "sha256": "4a7cd614393831de63485e7ccbb259ee7d1cd0813adf92e02198a51dd0f9f1cc",
+      "tables": [
+        "web_mvp_learning_reviews"
+      ],
+      "functions": [
+        "web_mvp_enqueue_learning_review"
+      ]
+    }
+  ],
+  "localHandlerNames": [
+    "interpret-schedule",
+    "onju-agent-v2",
+    "onju-agent",
+    "onju-daily",
+    "onju-goal-agent",
+    "onju-memory",
+    "onju-plan-agent",
+    "onju-plan-revision-agent",
+    "send-reminders"
+  ],
+  "localMissingTables": [
+    "web_mvp_daily_adaptations",
+    "web_mvp_test_events",
+    "web_mvp_weekly_reviews"
+  ],
+  "localMissingRpcs": [
+    "web_mvp_apply_weekly_review",
+    "web_mvp_consume_rate_limit",
+    "web_mvp_reserve_ai_budget",
+    "web_mvp_settle_ai_budget",
+    "web_mvp_start_rule_trial",
+    "web_mvp_sync_routine_plan"
+  ],
+  "versionDifferences": [
+    {
+      "version": "0001",
+      "local": "supabase/migrations/0001_init.sql",
+      "reference": "supabase/migrations/0001_init.sql"
+    },
+    {
+      "version": "0003",
+      "local": "supabase/migrations/0003_web_push.sql",
+      "reference": "supabase/migrations/0003_web_push.sql"
+    },
+    {
+      "version": "0007",
+      "local": "supabase/migrations/0007_web_mvp_agent_sessions.sql",
+      "reference": "supabase/migrations/0007_web_mvp_agent_sessions.sql"
+    },
+    {
+      "version": "0008",
+      "local": "supabase/migrations/0008_web_mvp_goal_design.sql",
+      "reference": "supabase/migrations/0008_web_mvp_goal_design.sql"
+    },
+    {
+      "version": "0012",
+      "local": "supabase/migrations/0012_web_mvp_agent_v2.sql",
+      "reference": "supabase/migrations/0012_web_mvp_agent_v2.sql"
+    },
+    {
+      "version": "0013",
+      "local": "supabase/migrations/0013_web_mvp_agent_context.sql",
+      "reference": "supabase/migrations/0013_web_mvp_agent_context.sql"
+    },
+    {
+      "version": "0016",
+      "local": "supabase/migrations/0016_web_mvp_prerequisites_and_trials.sql",
+      "reference": "supabase/migrations/0016_web_mvp_prerequisites_and_trials.sql"
+    },
+    {
+      "version": "0017",
+      "local": "supabase/migrations/0017_web_mvp_trial_reviews.sql",
+      "reference": "supabase/migrations/0017_web_mvp_trial_reviews.sql"
+    },
+    {
+      "version": "0018",
+      "local": "supabase/migrations/0018_web_mvp_trial_start_boundary.sql",
+      "reference": "supabase/migrations/0018_web_mvp_trial_start_boundary.sql"
+    },
+    {
+      "version": "0019",
+      "local": "supabase/migrations/0019_web_mvp_global_context.sql",
+      "reference": "supabase/migrations/0019_web_mvp_stabilization.sql"
+    },
+    {
+      "version": "0020",
+      "local": "supabase/migrations/0020_web_mvp_metrics.sql",
+      "reference": "supabase/migrations/0020_web_mvp_rate_limit_cleanup.sql"
+    },
+    {
+      "version": "0021",
+      "local": "supabase/migrations/0021_web_mvp_gpt_5_6_sol_pricing_backfill.sql",
+      "reference": "supabase/migrations/0021_web_mvp_weekly_review_loop.sql"
+    }
+  ],
+  "releasePending": {
+    "changed": [
+      "supabase/config.toml",
+      "supabase/functions/_shared/webMvpAiBudget.ts",
+      "supabase/functions/_shared/webMvpTelemetry.ts",
+      "supabase/functions/onju-agent-v2/agent.ts",
+      "supabase/functions/onju-agent-v2/goal.ts",
+      "supabase/functions/onju-agent-v2/goalBrief.ts",
+      "supabase/functions/onju-agent-v2/index.ts",
+      "supabase/functions/onju-agent-v2/policy.ts",
+      "supabase/functions/onju-agent-v2/prompt.ts",
+      "supabase/functions/onju-plan-agent/index.ts"
+    ],
+    "localOnly": [
+      "supabase/functions/onju-agent-cache-eval/index.ts",
+      "supabase/functions/onju-agent-gemini-eval/index.ts",
+      "supabase/functions/onju-agent-hybrid-eval/index.ts",
+      "supabase/functions/onju-agent-openai-eval/index.ts",
+      "supabase/migrations/0034_web_mvp_evaluation_budget.sql"
+    ],
+    "referenceOnly": [],
+    "migrationVersionCollisions": []
+  },
+  "scope": "offline-static baseline 2026-09-15; not proof of live deployment or security"
+}

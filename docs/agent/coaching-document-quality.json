@@ -1,0 +1,44 @@
+{
+  "version": "document-quality-v1",
+  "purpose": "원문 수준의 이해·설명·계획·관리 경험을 실제 응답으로 검수한다. 출력 대본이 아니다.",
+  "referenceSha256": "2ce1a48e3bc498ae141032a8691e82030499acd47daf1be12a893455ae219543",
+  "referenceAssistantAllowedInModelInput": false,
+  "criteria": [
+    {"id":"understanding","label":"사용자 이해·사실 근거","pass":"현재 수준·목표·환경이 판단에 반영되고, 사실·추천·미확인을 구분한다."},
+    {"id":"questions","label":"필요한 정보 요청","pass":"필요한 미확인 정보는 함께 묻고, 이미 답한 내용·거절·유동 상태를 반복 수집하지 않는다. 정보 부족 시 실행 초안 대신 방향을 제안한다."},
+    {"id":"depth","label":"설명의 깊이","pass":"요청에 맞는 방법·이유·기간별 진행·기록 예시·조정·복귀를 설명한다. 단순 확인에 장문을 강제하지 않는다."},
+    {"id":"actionability","label":"실행 가능성","pass":"무엇을 얼마나 어떤 순서로 할지 명확하고 시간·횟수·장비·목표가 합의한 조건과 일치한다."},
+    {"id":"continuity","label":"수정·관리","pass":"요청한 부분만 수정하고 실행 기록을 활용한다. 승인 전 확정하지 않고 재접속해도 내용과 승인 상태를 유지한다."},
+    {"id":"readability_delivery","label":"가독성·실제 전달","pass":"핵심 행동과 상세 설명을 읽기 쉽게 표시하고 모델 결과·저장 내용·화면이 일치한다. 거절된 후보는 전달 성공이 아니다."}
+  ],
+  "scoreMeaning": {"0":"실패","1":"일부 충족","2":"근거를 들어 충족","null":"미검증"},
+  "criticalFailures": ["invented_user_fact","repeated_resolved_question","premature_draft","unrequested_change","unapproved_activation","undelivered_answer","unsupported_feature_promise","lost_explanation","time_or_quantity_conflict"],
+  "coreJourney": [
+    {"id":"intake_1","inputKind":"exact_reference_user_1","checks":["understanding","questions","readability_delivery"]},
+    {"id":"intake_2","inputKind":"exact_reference_user_2","checks":["understanding","questions","depth","readability_delivery"]},
+    {"id":"intake_3","inputKind":"exact_reference_user_3","checks":["understanding","questions","depth","readability_delivery"]},
+    {"id":"plan","inputKind":"labeled_synthetic_supplement","checks":["understanding","questions","depth","actionability","readability_delivery"]},
+    {"id":"revision","inputKind":"labeled_synthetic_targeted_change","example":"근력 A의 턱걸이 반복만 줄여줘. 시간과 주당 횟수, 다른 운동은 유지해줘.","checks":["understanding","actionability","continuity","readability_delivery"]},
+    {"id":"approval_reload","inputKind":"explicit_confirmation_control","checks":["continuity","readability_delivery"]},
+    {"id":"execution_report","inputKind":"labeled_synthetic_execution_record","example":"오늘 턱걸이 5·4·3개 했고 마지막이 힘들었어. 통증은 없어. 다음에는 어떻게 하면 좋을까?","checks":["understanding","depth","actionability","continuity","readability_delivery"]}
+  ],
+  "evidenceFields": ["build","sourceSha256","contractSha256","userInput","inputKind","providerResponseIds","rawResponseArtifactSha256","displayedAnswer","storedStateArtifactSha256","renderEvidenceArtifactSha256","calls","usage","cost","uncertainReservation","criticalFailures","criterionScores","criterionEvidence","reviewer"],
+  "completion": {
+    "allApplicableCriteriaScore": 2,
+    "criticalFailureCount": 0,
+    "allAttemptsRetained": true,
+    "freshProviderResponsesRequired": true,
+    "separateAuthoredControls": true,
+    "humanFinalAcceptanceRequired": true,
+    "repeatAndHeldOutReviewRequiredForGeneralization": true,
+    "scope": "검수된 사례·소스·답변 범위에만 유효. 모든 미래 응답의 100% 품질 보증이 아님."
+  },
+  "spending": {
+    "offlinePreparationIsNotPaidPermission": true,
+    "existing70PercentGateChanged": false,
+    "boundedEvidenceCollectionRequiresSeparateApproval": true,
+    "unknownCostIsNotZero": true,
+    "automaticClientRetry": false,
+    "expandOnlyAfterReview": true
+  }
+}
