@@ -6,7 +6,9 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'android', 'public/mockServiceWorker.js']),
+  // Deployment snapshots and generated reports are records, not executable
+  // source. Lint the canonical app/web/functions instead of duplicate copies.
+  globalIgnores(['dist', 'android', 'logs', 'output', 'tmp', 'public/mockServiceWorker.js']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

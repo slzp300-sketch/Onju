@@ -40,3 +40,10 @@ android/keystore/
 # 피치덱 빌드 산출물 (render_deck.cjs / build_*.cjs 로 재생성)
 docs/deck_slides/
 docs/*.pptx
+
+# Private reference-conversation evaluation transcript
+output/ONJU_COACHING_LIVE_DEPTH_EVALUATION_2026-09-17.md
+
+# 작업 부산물 — 화면 기준 사본·안드로이드 도구·생성 이미지·평가 보고서 (재생성 가능, 일부 비공개)
+tmp/
+output/
