@@ -116,5 +116,17 @@ npm run gc           # eslint + knip 죽은 코드 검사
 npm run sync:android # 네이티브 빌드 + cap sync
 ```
 
----
-**Guides:** `~/.Codex/guides/coding.md` · `~/.Codex/guides/ui.md` · `~/.Codex/guides/testing.md`
+## 네이티브 껍데기 (Capacitor)
+화면·로직은 웹 코드 한 곳(`src/`)에 있고, `android/`는 그것을 감싸는 얇은 껍데기다. 기능은 웹 코드에서 고치고,
+플랫폼에서만 다른 것은 `Capacitor.isNativePlatform()`으로 나눈다(`src/lib/nativeAuth.ts`, `nativeNotifications.ts`,
+`notificationSync.ts`, `components/DeepLinkHandler.tsx`·`NativeBackHandler.tsx`·`WidgetSync.tsx` 등).
+
+| 플랫폼 | 상태 | 이 플랫폼에만 있는 것 |
+|---|---|---|
+| 웹(PWA) | 운영 중 — Vercel, main push 즉시 배포 | 서비스 워커(웹에서만 등록), 웹 푸시 |
+| Android | `android/` 있음, 스토어 미출시 | 홈 위젯: `android/app/src/main/java/com/onju/app/`의 `OnjuWidgetProvider`·`WidgetStore`(SharedPreferences `onju_widget`)·`WidgetBridgePlugin`(`MainActivity`에서 등록) ↔ 웹 쪽 `src/plugins/widget-bridge`, `src/lib/widget/`(snapshot·reconcile). 로컬 알림(`@capacitor/local-notifications`), 네이티브 소셜 로그인(`@capgo/capacitor-social-login`, `docs/NATIVE_OAUTH.md`) |
+| iOS | **없음** (`ios/` 폴더 없음) | — |
+
+- 웹 코드를 바꾼 뒤 Android에 반영: `npm run sync:android`(웹 빌드 + `cap sync android`). Android Studio는 `npm run open:android`.
+- `android/`의 Gradle·네이티브 파일은 `cap sync`가 다시 쓰는 것이 있으니, 직접 고친 네이티브 파일(위젯 Java, `AndroidManifest.xml`, `res/xml/`)만 손으로 관리한다.
+- iOS를 붙일 때: 이 PC는 Windows라 iOS를 직접 빌드할 수 없다. GitHub Actions의 macOS 러너로 빌드·검사한다(뉴웨이브플로우의 `ios-check.yml`·`ios-testflight.yml` 구성이 참고 예). 저장소가 공개라 Actions는 무료다. 비공개로 바꾸면 macOS 러너 요금이 월 포함 사용액에서 차감되므로, 그때의 요금과 포함 사용액을 확인해 iOS 검사 실행 빈도(수동·출시 때 등)를 정한다.
