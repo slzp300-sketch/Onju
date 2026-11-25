@@ -1,5 +1,9 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import type { RoutineLog } from '../../types';
+import { useAuthStore } from '../../store/authStore';
+import { useLocalDraft } from '../../hooks/useLocalDraft';
+import { useId, useState } from 'react';
+import OverlayDialog from '../ui/OverlayDialog';
+import { useFormProtection } from '../../hooks/useFormProtection';
 import { X, ChevronDown } from '../../icons';
 import Button from '../ui/Button';
 import { parseFaithMemo, type BibleMemoData } from '../../utils/faithMemo';
@@ -7,8 +11,10 @@ import { parseFaithMemo, type BibleMemoData } from '../../utils/faithMemo';
 interface BibleInputProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (memo: string) => void;
+  onSave: (memo: string, base?: RoutineLog) => void;
+  baseLog?: RoutineLog;
   initialMemo?: string;
+  draftKey?: string;
 }
 
 const BIBLE_BOOKS = [
@@ -28,53 +34,58 @@ const BIBLE_BOOKS = [
   '유다서', '요한계시록',
 ];
 
-export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: BibleInputProps) {
-  const existing = initialMemo ? tryParse(initialMemo) : null;
+export default function BibleInput(props: BibleInputProps) {
+  const owner=useAuthStore(s=>s.user?.id);
+  return props.isOpen ? <BibleInputEditor key={owner} {...props} /> : null;
+}
+
+function BibleInputEditor({ isOpen, onClose, onSave, initialMemo, draftKey, baseLog }: BibleInputProps) {
+  const [base,setBase]=useState(baseLog);
+  const [initial]=useState(initialMemo);
+  const existing = base?.memo ? tryParse(base.memo) : initial ? tryParse(initial) : null;
   const [book, setBook] = useState(existing?.book ?? '빌립보서');
   const [chapter, setChapter] = useState(existing?.chapter ?? 4);
   const [verse, setVerse] = useState(existing?.verse ?? 13);
   const [reflection, setReflection] = useState(existing?.reflection ?? '');
 
+  const titleId = useId();
+  const draft = useLocalDraft({ document: draftKey, values: { base, book, chapter, verse, reflection },
+    validate: (value): value is { base?: RoutineLog; book: string; chapter: number; verse: number; reflection: string } => {
+      if (!value || typeof value !== 'object') return false;
+      const v = value as Record<string, unknown>; return (v.base===undefined||(!!v.base&&typeof v.base==='object'&&typeof (v.base as RoutineLog).routineId==='string'&&typeof (v.base as RoutineLog).date==='string')) && typeof v.reflection === 'string' && typeof v.book === 'string' && BIBLE_BOOKS.includes(v.book) && typeof v.chapter === 'number' && typeof v.verse === 'number';
+    }, restore: v => { setBase(v.base?.routineId===baseLog?.routineId&&v.base?.date===baseLog?.date?v.base:baseLog?{...baseLog,memoRevision:undefined}:undefined); setBook(v.book); setChapter(v.chapter); setVerse(v.verse); setReflection(v.reflection); } });
+  const protection = useFormProtection({ book, chapter, verse, reflection }, draft.leaveMessage);
+  const requestClose = () => protection.requestLeave(onClose);
+
   const handleSave = () => {
+    if(draft.awaitingChoice)return;
     // 숫자 입력을 비우면 NaN이 되어 'null:null'로 저장되는 것을 방지
     const clamp = (n: number) => (Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1);
     const data: BibleMemoData = {
       type: 'bible', book, chapter: clamp(chapter), verse: clamp(verse), reflection,
     };
-    onSave(JSON.stringify(data));
-    onClose();
+    if (protection.save(() => onSave(JSON.stringify(data),base))) { draft.clear(); onClose(); }
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-40 flex items-end justify-center bg-black/30 px-4 pb-6"
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 350, damping: 32 }}
-            className="bg-surface rounded-3xl p-6 w-full max-w-md shadow-xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-label-strong">말씀 기록</h3>
-              <button onClick={onClose}><X size={20} className="text-label-alt" /></button>
+    <>
+      <OverlayDialog isOpen={isOpen} onClose={requestClose} labelledBy={titleId} variant="sheet" className="memo-editor-sheet">
+            <div className="memo-editor-header">
+              <h3 id={titleId} className="font-bold text-label-strong">말씀 기록</h3>
+              <button onClick={requestClose} aria-label="말씀 기록 닫기" className="flex size-11 items-center justify-center"><X size={20} className="text-label-alt" /></button>
             </div>
 
+            <div className="memo-editor-body">
+            {draft.banner}
+            <fieldset disabled={draft.awaitingChoice} className="contents">
             {/* 성경 선택 */}
-            <div className="flex gap-2 mb-4">
-              <div className="relative flex-1">
+            <div className="flex flex-wrap gap-2 mb-4">
+              <div className="relative min-w-[120px] flex-1">
                 <select
+                  aria-label="성경 책"
                   value={book}
                   onChange={e => setBook(e.target.value)}
-                  className="w-full appearance-none border border-line rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:ring-2 focus:ring-primary pr-8"
+                  className="form-paper-field w-full min-h-11 appearance-none px-3 py-2.5 pr-8"
                 >
                   {BIBLE_BOOKS.map(b => (
                     <option key={b} value={b}>{b}</option>
@@ -85,18 +96,22 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
               <div className="flex items-center gap-1">
                 <input
                   type="number"
+                  inputMode="numeric"
+                  aria-label="장"
                   value={chapter}
                   onChange={e => setChapter(Number(e.target.value))}
                   min={1}
-                  className="w-14 border border-line rounded-xl px-2 py-2.5 text-body2 text-center focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="form-paper-field w-14 min-h-11 px-2 py-2.5 text-center"
                 />
                 <span className="text-caption1 text-label-alt">장</span>
                 <input
                   type="number"
+                  inputMode="numeric"
+                  aria-label="절"
                   value={verse}
                   onChange={e => setVerse(Number(e.target.value))}
                   min={1}
-                  className="w-14 border border-line rounded-xl px-2 py-2.5 text-body2 text-center focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="form-paper-field w-14 min-h-11 px-2 py-2.5 text-center"
                 />
                 <span className="text-caption1 text-label-alt">절</span>
               </div>
@@ -107,24 +122,28 @@ export default function BibleInput({ isOpen, onClose, onSave, initialMemo }: Bib
             </p>
 
             <textarea
+              aria-label="말씀 묵상"
               value={reflection}
               onChange={e => setReflection(e.target.value)}
               placeholder="오늘 말씀을 통해 받은 은혜를 한 줄로 적어보세요..."
               rows={3}
-              className="w-full border border-line rounded-xl px-3 py-2.5 text-body2 resize-none focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+              className="form-paper-field w-full px-3 py-2.5 resize-none"
             />
 
-            <Button fullWidth onClick={handleSave}>저장</Button>
+            </fieldset>
+            </div>
+            <div className="memo-editor-actions">
+            <Button fullWidth disabled={draft.awaitingChoice} onClick={handleSave}>저장</Button>
             <button
-              onClick={onClose}
-              className="w-full text-center text-caption1 font-semibold text-label-assistive pt-3"
+              onClick={requestClose}
+              className="min-h-11 w-full text-center text-caption1 font-semibold text-label-alt pt-3"
             >
-              오늘은 기록 없이 넘어갈게요
+              나중에 기록
             </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            </div>
+      </OverlayDialog>
+      {protection.guard}
+    </>
   );
 }
 

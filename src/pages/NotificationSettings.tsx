@@ -8,10 +8,13 @@ import { useNotificationStore } from '../store/notificationStore';
 import { requestNotifPermission } from '../lib/notifyPermission';
 import { isWebPushConfigured } from '../lib/webPush';
 import Switch from '../components/ui/Switch';
+import { toast } from '../store/toastStore';
+import { useNotificationSync } from '../lib/notificationSync';
 
 export default function NotificationSettings() {
   const navigate = useNavigate();
   const store = useNotificationStore();
+  const syncStatus = useNotificationSync(s => s.status);
   const [requesting, setRequesting] = useState(false);
   const isNative = Capacitor.isNativePlatform();
 
@@ -21,10 +24,13 @@ export default function NotificationSettings() {
   const worksInBackground = isNative || isWebPushConfigured();
 
   const requestPermission = async () => {
+    if (requesting) return;
     setRequesting(true);
-    const result = await requestNotifPermission();
-    store.setPermission(result);
-    setRequesting(false);
+    try {
+      store.setPermission(await requestNotifPermission());
+    } catch {
+      toast.error('알림 권한을 확인하지 못했어요. 잠시 후 다시 시도해주세요.');
+    } finally { setRequesting(false); }
   };
 
   return (
@@ -64,7 +70,7 @@ export default function NotificationSettings() {
                     whileTap={{ scale: 0.98 }}
                     onClick={requestPermission}
                     disabled={requesting}
-                    className="mt-3 px-4 h-9 bg-primary text-white text-label2 font-medium rounded-lg disabled:opacity-30 hover:bg-primary-strong transition-colors"
+                    className="mt-3 px-4 min-h-11 bg-primary text-white text-label2 font-medium rounded-lg disabled:opacity-30 hover:bg-primary-strong transition-colors"
                   >
                     {requesting ? '요청 중…' : '알림 허용하기'}
                   </motion.button>
@@ -86,6 +92,7 @@ export default function NotificationSettings() {
             <p className="text-caption1 text-label-alt mt-0.5">오늘의 루틴을 시작하도록 알려줘요</p>
           </div>
           <Toggle
+            label="아침 알림"
             enabled={canNotify && store.morningEnabled}
             disabled={!canNotify}
             onChange={v => store.update({ morningEnabled: v })}
@@ -96,6 +103,7 @@ export default function NotificationSettings() {
             <span className="text-caption1 text-label-alt">알림 시간</span>
             <input
               type="time"
+              aria-label="아침 알림 시간"
               value={store.morningTime}
               onChange={e => store.update({ morningTime: e.target.value })}
               className="notification-time-input text-body2 text-label"
@@ -110,9 +118,10 @@ export default function NotificationSettings() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-body2 font-semibold text-label-strong flex items-center gap-1.5"><Moon size={16} strokeWidth={1.9} className="text-label-alt" />저녁 리마인드</p>
-            <p className="text-caption1 text-label-alt mt-0.5">미완료 루틴이 있을 때 알려줘요</p>
+            <p className="text-caption1 text-label-alt mt-0.5">오늘의 루틴을 돌아볼 시간을 알려줘요</p>
           </div>
           <Toggle
+            label="저녁 리마인드"
             enabled={canNotify && store.eveningEnabled}
             disabled={!canNotify}
             onChange={v => store.update({ eveningEnabled: v })}
@@ -123,6 +132,7 @@ export default function NotificationSettings() {
             <span className="text-caption1 text-label-alt">알림 시간</span>
             <input
               type="time"
+              aria-label="저녁 알림 시간"
               value={store.eveningTime}
               onChange={e => store.update({ eveningTime: e.target.value })}
               className="notification-time-input text-body2 text-label"
@@ -140,9 +150,10 @@ export default function NotificationSettings() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-body2 font-semibold text-label-strong flex items-center gap-1.5"><ClipboardList size={16} strokeWidth={1.9} className="text-label-alt" />주간 리뷰 알림</p>
-            <p className="text-caption1 text-label-alt mt-0.5">일요일에 주간 리뷰를 상기시켜줘요</p>
+            <p className="text-caption1 text-label-alt mt-0.5">일요일 저녁 8시에 알려줘요</p>
           </div>
           <Toggle
+            label="주간 리뷰 알림"
             enabled={canNotify && store.reviewEnabled}
             disabled={!canNotify}
             onChange={v => store.update({ reviewEnabled: v })}
@@ -152,16 +163,16 @@ export default function NotificationSettings() {
       </section>
 
       {canNotify && (
-        <p className="text-center text-caption1 text-label-assistive px-4">
-          {worksInBackground
-            ? '앱을 닫아도 예약된 시간에 알림이 와요'
-            : '알림은 앱이 열려 있는 동안 예약됩니다'}
+        <p role="status" className="text-center text-caption1 text-label-alt px-4">
+          {syncStatus === 'syncing' ? '알림 예약을 반영하고 있어요.' : syncStatus === 'error' ? '알림 예약 확인이 필요해요.' : worksInBackground
+            ? '이 기기의 시간대 기준으로 예약해요. 절전·알림 설정에 따라 늦어질 수 있어요.'
+            : '이 기기의 시간대 기준으로 앱이 열려 있을 때만 알려드려요. 지난 알림은 다시 보내지 않아요.'}
         </p>
       )}
     </div>
   );
 }
 
-function Toggle({ enabled, disabled, onChange }: { enabled: boolean; disabled: boolean; onChange: (v: boolean) => void }) {
-  return <Switch checked={enabled} disabled={disabled} onCheckedChange={onChange} label="알림 설정" />;
+function Toggle({ enabled, disabled, onChange, label }: { enabled: boolean; disabled: boolean; onChange: (v: boolean) => void; label: string }) {
+  return <Switch checked={enabled} disabled={disabled} onCheckedChange={onChange} label={label} />;
 }

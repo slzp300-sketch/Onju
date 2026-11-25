@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { toast } from '../../store/toastStore';
+import { useState, useRef } from 'react';
+import { useElapsedTimer } from '../../hooks/useElapsedTimer';
 import { motion } from 'framer-motion';
 import { X, Check } from '../../icons';
 import confetti from 'canvas-confetti';
@@ -32,35 +34,20 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
   const totalSeconds = routine.durationSeconds ?? (routine.durationMinutes ?? 0) * 60;
   const color = routine.type === 'faith' ? '#1f8a4c' : '#6366f1';
 
-  const [elapsed, setElapsed] = useState(0);
+
   const [phase, setPhase] = useState<Phase>('timer');
   const [actualSecs, setActualSecs] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const startRef = useRef<number>(0);
-
-  const finish = useCallback((actual: number) => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    if (!isCompleted(routine.id, today())) toggleRoutineLog(routine.id, today());
+  const finished = useRef(false);
+  const finish = (actual: number) => {
+    if (finished.current) return;
+    try{if(!isCompleted(routine.id,today()))toggleRoutineLog(routine.id,today());}catch(error){toast.error(error instanceof Error?error.message:'저장하지 못했어요. 완료를 다시 눌러주세요.');return;}
+    finished.current = true;
     setActualSecs(actual);
     setPhase('done');
-    confetti({ particleCount: 100, spread: 70, origin: { y: 0.3 }, colors: [color, '#f59e0b', '#fff'] });
-  }, [routine.id, color, isCompleted, toggleRoutineLog]);
-
-  useEffect(() => {
-    startRef.current = Date.now();
-    intervalRef.current = setInterval(() => {
-      setElapsed(e => {
-        const next = e + 1;
-        if (totalSeconds > 0 && next >= totalSeconds) {
-          finish(totalSeconds);
-          return totalSeconds;
-        }
-        return next;
-      });
-    }, 1000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [totalSeconds, finish]);
-
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.3 }, colors: [color, '#1f8a4c', '#f59e0b'] });
+  };
+  const timer = useElapsedTimer(totalSeconds, phase === 'timer', finish);
+  const elapsed = timer.elapsed;
   const remaining = totalSeconds > 0 ? totalSeconds - elapsed : elapsed;
   const progress = totalSeconds > 0 ? Math.min(elapsed / totalSeconds, 1) : 0;
   const circumference = 2 * Math.PI * 44;
@@ -74,7 +61,7 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0, y: 40 }}
         className="focus-paper fixed inset-0 z-50 flex flex-col items-center justify-between px-6"
-        style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))', paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
+        style={{ paddingTop: 'max(3rem, var(--app-safe-top))', paddingBottom: 'max(2rem, var(--app-safe-bottom))' }}
       >
         <div className="flex-1 flex flex-col items-center justify-center gap-6 w-full">
           {/* 성공 아이콘 */}
@@ -175,7 +162,7 @@ export default function FocusMode({ routine, onClose }: FocusModeProps) {
 
       <motion.button
         whileTap={{ scale: 0.95 }}
-        onClick={() => finish(Math.round((Date.now() - startRef.current) / 1000))}
+        onClick={() => finish(timer.stop())}
         style={{ backgroundColor: color }}
         className="flex items-center gap-2 px-12 py-4 rounded-2xl text-white font-semibold text-body1 shadow-lg"
       >

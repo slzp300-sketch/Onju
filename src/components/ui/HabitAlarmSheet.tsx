@@ -136,7 +136,7 @@ export function AlarmTimeSheet({ isOpen, time, onChange, onDelete, onClose }: Al
             {/* 확인 / 알림 삭제 */}
             <div
               className="px-5 pb-6 flex flex-col gap-3"
-              style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+              style={{ paddingBottom: 'max(1.5rem, var(--app-safe-bottom))' }}
             >
               <Button fullWidth onClick={onClose}>확인</Button>
               <button

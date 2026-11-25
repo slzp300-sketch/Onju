@@ -1,2 +1,2 @@
-/** 숲 컨셉 confetti 팔레트 (그린·골드) */
-export const CONFETTI_FOREST = ['#2f9e60', '#7fc98f', '#d9a13b', '#b7e0c0'];
+/** 성장 축하에도 온주의 세 가지 메인 색상을 유지한다. */
+export const CONFETTI_FOREST = ['#1F4D3A', '#FBEFC8', '#F0876E'];

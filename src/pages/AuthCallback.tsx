@@ -10,22 +10,27 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
  */
 export default function AuthCallback() {
   const navigate = useNavigate();
-  const { isAuthenticated, authReady } = useAuthStore();
+  const { isAuthenticated, authReady, sessionError, retrySession } = useAuthStore();
   const [timedOut, setTimedOut] = useState(false);
+  const [callbackError] = useState(() => {
+    const params = new URLSearchParams(`${window.location.search.slice(1)}&${window.location.hash.slice(1)}`);
+    return params.has('error') || params.has('error_code');
+  });
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/', { replace: true });
-  }, [isAuthenticated, navigate]);
+    if (isAuthenticated && !callbackError) navigate('/', { replace: true });
+  }, [isAuthenticated, callbackError, navigate]);
 
   useEffect(() => {
     const t = setTimeout(() => setTimedOut(true), 10000);
     return () => clearTimeout(t);
   }, []);
 
-  if (timedOut && authReady && !isAuthenticated) {
+  if (callbackError || sessionError || (timedOut && authReady && !isAuthenticated)) {
     return (
       <div className="min-h-dvh bg-surface flex flex-col items-center justify-center gap-3 px-6">
-        <p className="text-body2 text-label-alt">로그인에 실패했어요. 다시 시도해주세요.</p>
+        <p role="alert" className="text-body2 text-label-alt">{sessionError ?? '로그인을 완료하지 못했어요. 다시 시도해주세요.'}</p>
+        {sessionError && <button onClick={() => void retrySession()} className="min-h-11 text-body2 font-medium text-primary">로그인 정보 다시 불러오기</button>}
         <button
           onClick={() => navigate('/login', { replace: true })}
           className="text-body2 font-medium text-primary"

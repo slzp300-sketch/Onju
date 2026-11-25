@@ -116,12 +116,17 @@ export default function Signup() {
               onChange={e => setEmailLocal(e.target.value)}
               placeholder="이메일 앞자리"
               autoComplete="email"
+              inputMode="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              enterKeyHint="next"
               className="input-base flex-1 min-w-0"
               style={{ width: 0 }}
             />
             <span className="text-label-alt text-body2 shrink-0 select-none">@</span>
             <div className="relative flex-1 min-w-0" style={{ width: 0 }}>
               <select
+                aria-label="이메일 도메인"
                 value={emailDomain}
                 onChange={e => handleDomainChange(e.target.value)}
                 className="input-base appearance-none pr-8 w-full"
@@ -148,6 +153,9 @@ export default function Signup() {
               onChange={e => setEmailCustomDomain(e.target.value)}
               placeholder="도메인 직접 입력 (예: company.com)"
               autoComplete="off"
+              inputMode="url"
+              autoCapitalize="none"
+              spellCheck={false}
               className="input-base"
             />
           )}
@@ -167,8 +175,9 @@ export default function Signup() {
             />
             <button
               type="button"
+              aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'} aria-pressed={showPassword}
               onClick={() => setShowPassword(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-label-alt"
+              className="icon-button absolute right-1 top-1/2 -translate-y-1/2 text-label-alt"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -211,8 +220,9 @@ export default function Signup() {
             />
             <button
               type="button"
+              aria-label={showPasswordConfirm ? '비밀번호 확인 숨기기' : '비밀번호 확인 보기'} aria-pressed={showPasswordConfirm}
               onClick={() => setShowPasswordConfirm(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-label-alt"
+              className="icon-button absolute right-1 top-1/2 -translate-y-1/2 text-label-alt"
             >
               {showPasswordConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>

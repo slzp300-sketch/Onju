@@ -129,7 +129,7 @@ function PickerContent({ seconds, onConfirm, onClose, title }: PickerContentProp
       {/* 버튼 */}
       <div
         className="flex gap-3 px-5 pb-6"
-        style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'max(1.5rem, var(--app-safe-bottom))' }}
       >
         <Button variant="outlined" className="flex-1" onClick={onClose}>취소</Button>
         <Button className="flex-1"

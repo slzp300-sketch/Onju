@@ -1,4 +1,6 @@
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useUIStore } from '../store/uiStore';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useHabitStore } from '../store/habitStore';
 import HabitFocusMode from '../components/routines/HabitFocusMode';
 import TwoMinuteMode from '../components/routines/TwoMinuteMode';
@@ -11,11 +13,11 @@ export default function HabitTimer() {
   const { id } = useParams<{ id: string }>();
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const habit = useHabitStore((s) => s.habits.find((h) => h.id === id));
+  const habit = useHabitStore((s) => s.habits.find((h) => h.id === id && !h.archivedAt));
+  const dataHydrated = useUIStore(s => s.dataHydrated);
 
   if (!habit) {
-    navigate('/', { replace: true });
-    return null;
+    return dataHydrated ? <Navigate to="/" replace /> : <LoadingSpinner />;
   }
 
   const close = () => navigate('/', { replace: true });

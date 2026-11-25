@@ -1,5 +1,15 @@
+import MembershipStatus from '../components/groups/MembershipStatus';
+import GroupManagement from '../components/groups/GroupManagement';
+import GroupInvites from '../components/groups/GroupInvites';
+import { heldMembershipRequests } from '../lib/sync/outbox';
+import { useSettingsStore } from '../store/settingsStore';
+import { useLocalNow } from '../hooks/useLocalNow';
+import { today } from '../utils/date';
+import { localTimeZone } from '../utils/timeZone';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Users, Check, LogOut, Play, Flag, BarChart3, Sprout, Flame, Heart, Church } from '../icons';
+import { useEffect, useState } from 'react';
+import ConfirmModal from '../components/ui/ConfirmModal';
+import { ChevronLeft, Users, Check, LogOut, BarChart3, Sprout, Flame, Heart, Church } from '../icons';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -15,21 +25,39 @@ import type { MemberGroupProgress, GroupWeeklyShare, CheerType } from '../types'
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import SafetyActions from '../components/groups/SafetyActions';
+import { useBlockedUsers } from '../hooks/useBlockedUsers';
 
 export default function GroupDetail() {
+  useLocalNow();
   const { id = '' } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getById, joinGroup, leaveGroup, setGroupStatus, myGroupIds } = useGroupStore();
+  const { getById, joinGroup, leaveGroup, myGroupIds, membershipStatus, refreshMembership } = useGroupStore();
   const { user } = useAuthStore();
+  const { data: blocked = [] } = useBlockedUsers();
+  const [confirmLeave, setConfirmLeave] = useState(false);
 
-  // 로컬(내 소모임)에 없으면 API(탐색 진입)에서 조회
+  useEffect(() => {
+    const refresh = () => { if (id && user?.id) void refreshMembership(id); };
+    refresh(); window.addEventListener('online', refresh); window.addEventListener('focus', refresh);
+    return () => { window.removeEventListener('online', refresh); window.removeEventListener('focus', refresh); };
+  }, [id, user?.id, refreshMembership]);
+  // 로컬 스냅샷을 보여주면서 모집 상태·정원을 서버에서 갱신한다.
   const local = getById(id);
-  const { data: remote, isLoading } = useQuery({
+  const { data: remote, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ['group', id],
     queryFn: () => fetchGroupById(id),
-    enabled: !local && !!id,
+    enabled: !!id,
   });
-  const group = local ?? remote;
+  useEffect(() => {
+    const refresh = () => { void refetch(); };
+    window.addEventListener('onju-outbox-drained', refresh);
+    return () => window.removeEventListener('onju-outbox-drained', refresh);
+  }, [refetch]);
+  const group = remote ?? local;
+  const phase = membershipStatus[id]?.phase;
+  const waiting = phase === 'pending' || phase === 'unknown';
+  const held = user?.id ? heldMembershipRequests(user.id).some(r => r.groupId === id) : false;
 
   if (!group) {
     if (isLoading) {
@@ -37,8 +65,11 @@ export default function GroupDetail() {
     }
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 px-4">
-        <p className="text-label-assistive text-sm">소모임을 찾을 수 없어요</p>
-        <Button variant="ghost" onClick={() => navigate(-1)}>돌아가기</Button>
+        <MembershipStatus groupId={id} />
+        <GroupManagement key={`${user?.id}:${id}`} groupId={id} />
+        <p className="text-label-alt text-sm">{isError ? '소모임을 불러오지 못했어요' : '소모임을 찾을 수 없어요'}</p>
+        {isError && <Button disabled={isFetching} onClick={() => void refetch()}>다시 시도</Button>}
+        <Button variant="ghost" onClick={() => navigate('/groups', { replace: true })}>소모임 목록으로</Button>
       </div>
     );
   }
@@ -48,25 +79,38 @@ export default function GroupDetail() {
   const isFull = group.currentMemberCount >= group.maxMembers;
   const isMember = myGroupIds.includes(id);
   const isCreator = group.creatorId === user?.id;
-  const isJoined = isMember || isCreator;
+  const isJoined = isMember;
   const canJoin = status === 'recruiting' && !isFull && !isMember && !isCreator;
 
-  const handleLeave = () => {
-    leaveGroup(id);
-    navigate('/groups', { replace: true });
+  const handleLeave = async () => {
+    setConfirmLeave(false);
+    const owner = user?.id;
+    if (await leaveGroup(id) && useAuthStore.getState().user?.id === owner) navigate('/groups', { replace: true });
   };
+  const leaveDialog = <ConfirmModal isOpen={confirmLeave} title="소모임에서 나갈까요?" message="다시 참여할 때 모집 상태와 정원에 따라 참여가 제한될 수 있어요." confirmLabel="나가기"
+    onCancel={() => setConfirmLeave(false)} onConfirm={handleLeave} />;
+
+  if (blocked.some(user => user.userId === group.creatorId)) return (
+    <div className="flex flex-col gap-3 p-6 text-center">
+      <p className="text-body2 text-label-alt">차단한 사용자가 만든 소모임이에요.</p>
+      <Button onClick={() => navigate('/groups')}>소모임 목록으로</Button>
+      <MembershipStatus groupId={id} />
+      {isJoined && !isCreator && <Button disabled={waiting || held} variant="assistive" onClick={() => setConfirmLeave(true)}>소모임 나가기</Button>}
+      {leaveDialog}
+    </div>
+  );
 
   return (
     <div className="group-detail-paper flex min-h-full flex-col gap-4 pb-8">
       {/* 헤더 */}
       <header className="px-4 pt-4 flex items-center gap-2">
-        <button onClick={() => navigate(-1)} aria-label="소모임 목록으로 돌아가기"
+        <button onClick={() => navigate('/groups')} aria-label="소모임 목록으로 돌아가기"
           className="paper-control flex h-11 w-11 items-center justify-center text-label-alt hover:text-label transition-colors">
           <ChevronLeft size={22} />
         </button>
         <div className="min-w-0 flex-1">
-          <p className="text-caption2 font-medium text-label-alt">함께 자라는 소모임</p>
-          <h1 className="text-headline1 font-bold text-label-strong truncate">{group.title}</h1>
+
+          <h1 className="text-headline1 font-bold text-label-strong break-words">{group.title}</h1>
         </div>
       </header>
 
@@ -74,13 +118,14 @@ export default function GroupDetail() {
       <Card className="group-detail-hero mx-4">
         <div className="flex items-start gap-3 mb-2">
           {group.coverIcon && COVER_ICONS[group.coverIcon] && (
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-emphasize"
-              style={{ backgroundColor: `${group.color ?? '#2f9e60'}1a` }}>
-              {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={24} strokeWidth={1.9} style={{ color: group.color ?? '#2f9e60' }} />; })()}
+            <div className="relative w-12 h-12 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0 shadow-emphasize">
+              {(() => { const Icon = COVER_ICONS[group.coverIcon]; return <Icon size={24} strokeWidth={1.9} className="text-primary" />; })()}
+              {group.color && <span aria-hidden className="absolute bottom-1 right-1 size-2 rounded-full" style={{ backgroundColor: group.color }} />}
             </div>
           )}
           <div className="flex items-center gap-2 flex-wrap">
             <Badge label={statusMeta.label} color={statusMeta.color} />
+            {!group.isPublic && <span className="text-caption2 font-bold text-label-alt">비공개 · 초대 전용</span>}
             {group.category && (
               <span className="text-caption2 font-bold px-2 py-1 rounded-lg bg-fill text-label-alt">
                 {GROUP_CATEGORY_LABEL[group.category]}
@@ -89,7 +134,8 @@ export default function GroupDetail() {
           </div>
         </div>
         <p className="text-body2 text-label leading-relaxed mb-3">{group.goal}</p>
-        <div className="flex gap-4 text-caption1 text-label-alt">
+        <SafetyActions target={{ type: 'group', id, groupId: id, userId: group.creatorId }} />
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-caption1 text-label-alt">
           <span className="flex items-center gap-1">
             <Users size={12} />
             {group.currentMemberCount}/{group.maxMembers}명
@@ -100,12 +146,12 @@ export default function GroupDetail() {
           </span>
         </div>
         <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-fill-strong" aria-label={`정원 ${Math.min(100, Math.round((group.currentMemberCount / group.maxMembers) * 100))}% 참여`}>
-          <div className="crayon-chart-fill h-full rounded-full" style={{ width: `${Math.min(100, (group.currentMemberCount / group.maxMembers) * 100)}%`, backgroundColor: group.color ?? 'var(--color-primary)' }} />
+          <div className="crayon-chart-fill h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (group.currentMemberCount / group.maxMembers) * 100)}%` }} />
         </div>
 
         {group.rules && group.rules.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-line-soft">
-            <p className="text-caption1 font-bold text-label-alt mb-2">우리의 약속</p>
+          <details className="quiet-details mt-3 border-t border-line-soft" open={!isJoined}>
+            <summary>우리의 약속</summary>
             <div className="flex flex-col gap-1.5">
               {group.rules.map(rule => (
                 <div key={rule} className="flex items-center gap-2 text-caption1 text-label">
@@ -114,14 +160,17 @@ export default function GroupDetail() {
                 </div>
               ))}
             </div>
-          </div>
+          </details>
         )}
       </Card>
 
+      <MembershipStatus groupId={id} />
+      <GroupManagement key={`${user?.id}:${id}`} groupId={id} group={group} />
+      {isCreator && !group.isPublic && <GroupInvites key={`${user?.id}:${id}`} group={group} />}
       {/* 참여 전 상태 */}
       {canJoin && (
         <div className="px-4">
-          <Button fullWidth onClick={() => joinGroup(group)}>소모임 참여하기</Button>
+          <Button fullWidth disabled={waiting || held} onClick={() => void joinGroup(group)}>{phase === 'pending' ? '참여 상태 확인 중…' : '소모임 참여하기'}</Button>
         </div>
       )}
       {isFull && !isJoined && (
@@ -144,29 +193,13 @@ export default function GroupDetail() {
             </p>
           </div>
 
-          {/* 방장 관리 */}
-          {isCreator && status === 'recruiting' && (
-            <div className="px-4">
-              <Button fullWidth variant="outlined" onClick={() => setGroupStatus(id, 'active')}>
-                <Play size={16} /> 모집 마감하고 시작하기
-              </Button>
-            </div>
-          )}
-          {isCreator && status === 'active' && (
-            <div className="px-4">
-              <Button fullWidth variant="assistive" onClick={() => setGroupStatus(id, 'completed')}>
-                <Flag size={16} /> 소모임 종료하기
-              </Button>
-            </div>
-          )}
-
           <MemberBoard groupId={id} />
           <WeeklyShareFeed groupId={id} />
 
           {/* 나가기 (방장 제외) */}
           {!isCreator && (
             <div className="px-4 mt-2">
-              <button onClick={handleLeave}
+              <button disabled={waiting || held} onClick={() => setConfirmLeave(true)}
                 className="w-full flex items-center justify-center gap-1.5 py-3 text-caption1 font-medium text-label-assistive hover:text-negative transition-colors">
                 <LogOut size={14} /> 소모임 나가기
               </button>
@@ -174,6 +207,7 @@ export default function GroupDetail() {
           )}
         </>
       )}
+      {leaveDialog}
     </div>
   );
 }
@@ -182,13 +216,23 @@ export default function GroupDetail() {
    멤버 현황판 — 주간률 기준 리더보드
 ════════════════════════════════════════ */
 function MemberBoard({ groupId }: { groupId: string }) {
+  const weekStartDay = useSettingsStore(s => s.weekStartDay);
+  useLocalNow();
   const { user } = useAuthStore();
-  const { data: members = [], isLoading } = useQuery({
-    queryKey: ['group-members', groupId],
+  const { data: blocked = [] } = useBlockedUsers();
+  const { data: members = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ['group-members', groupId, today(), localTimeZone(), weekStartDay],
     queryFn: () => fetchGroupMembers(groupId),
+    refetchOnMount: 'always', refetchInterval: 30_000,
   });
 
-  const sorted = [...members].sort((a, b) => b.weeklyRate - a.weeklyRate);
+  useEffect(() => {
+    const refresh = () => { void refetch(); };
+    window.addEventListener('onju-outbox-drained', refresh);
+    return () => window.removeEventListener('onju-outbox-drained', refresh);
+  }, [refetch]);
+
+  const sorted = members.filter(member => !blocked.some(user => user.userId === member.userId)).sort((a, b) => b.weeklyRate - a.weeklyRate);
 
   return (
     <section className="px-4">
@@ -196,10 +240,11 @@ function MemberBoard({ groupId }: { groupId: string }) {
         <h2 className="text-body2 font-bold text-label-strong flex items-center gap-1.5">
           <BarChart3 size={16} strokeWidth={1.9} /> 멤버 현황판
         </h2>
-        <span className="text-caption2 text-label-assistive">주간 달성률 순</span>
+        <span className="text-caption2 text-label-assistive">주간 기록률 순</span>
       </div>
 
-      {isLoading ? (
+      <details className="quiet-details mb-3"><summary>통계 기준</summary><p className="px-1 text-caption2 text-label-alt">각 회원의 현지 날짜·주 시작 요일 기준이에요. 예정일별 기록률을 평균하며 완료·대체·쉬어가기를 포함해요. 아직 시간대가 동기화되지 않은 회원은 한국 시간을 사용해요.</p></details>
+      {isError ? <div role="alert" className="rounded-xl bg-surface p-4 text-body2">통계를 불러오지 못했어요.<button className="ml-2 min-h-11 text-primary font-bold" onClick={() => void refetch()}>다시 시도</button></div> : isLoading ? (
         <div className="group-detail-card py-10 text-center text-caption1 text-label-assistive">
           불러오는 중…
         </div>
@@ -207,12 +252,15 @@ function MemberBoard({ groupId }: { groupId: string }) {
         <div className="group-detail-card flex flex-col items-center py-7 text-center">
           <Sprout size={28} strokeWidth={1.9} className="mb-2 text-label-assistive" />
           <p className="text-caption1 font-bold text-label-alt">멤버 기록을 준비하고 있어요</p>
-          <p className="mt-1 text-caption2 text-label-assistive">활동이 시작되면 주간 달성률이 보여요</p>
+          <p className="mt-1 text-caption2 text-label-assistive">활동이 시작되면 주간 기록률이 보여요</p>
         </div>
       ) : (
         <div className="group-detail-card divide-y divide-line-soft overflow-hidden">
           {sorted.map((m, i) => (
-            <MemberRow key={m.userId} member={m} rank={i + 1} isMe={m.userId === user?.id} />
+            <div key={m.userId}>
+              <MemberRow member={m} rank={i + 1} isMe={m.userId === user?.id} />
+              <div className="px-4 text-right"><SafetyActions target={{ type: 'member', id: m.userId, groupId, userId: m.userId }} /></div>
+            </div>
           ))}
         </div>
       )}
@@ -236,7 +284,7 @@ function MemberRow({ member, rank, isMe }: { member: MemberGroupProgress; rank: 
             {member.userName}{isMe && <span className="text-caption2 text-primary font-bold"> (나)</span>}
           </span>
           {member.streak > 0 && (
-            <span className="text-caption2 font-bold text-orange-500 flex-shrink-0 flex items-center gap-0.5">
+            <span className="text-caption2 font-bold text-cautionary flex-shrink-0 flex items-center gap-0.5">
               <Flame size={12} strokeWidth={1.9} />{member.streak}
             </span>
           )}
@@ -247,7 +295,7 @@ function MemberRow({ member, rank, isMe }: { member: MemberGroupProgress; rank: 
             initial={{ width: 0 }} animate={{ width: `${member.weeklyRate}%` }} transition={{ duration: 0.5 }} />
         </div>
         <p className="text-[10px] text-label-assistive mt-1">
-          오늘 개인 {member.todayPersonalRate}% · 신앙 {member.todayFaithRate}%
+          오늘 개인 {member.todayPersonalRate < 0 ? '예정 없음' : `${member.todayPersonalRate}%`} · 신앙 {member.todayFaithRate < 0 ? '예정 없음' : `${member.todayFaithRate}%`}
         </p>
       </div>
     </div>
@@ -258,12 +306,13 @@ function MemberRow({ member, rank, isMe }: { member: MemberGroupProgress; rank: 
    주간 나눔 피드 + 응원
 ════════════════════════════════════════ */
 function WeeklyShareFeed({ groupId }: { groupId: string }) {
+  const { data: blocked = [] } = useBlockedUsers();
   const { data: shares = [], isLoading } = useQuery({
     queryKey: ['group-shares', groupId],
     queryFn: () => fetchWeeklyShares(groupId),
   });
 
-  const sorted = [...shares].sort((a, b) => (a.sharedAt < b.sharedAt ? 1 : -1));
+  const sorted = shares.filter(share => !blocked.some(user => user.userId === share.userId)).sort((a, b) => (a.sharedAt < b.sharedAt ? 1 : -1));
 
   return (
     <section className="px-4">
@@ -327,6 +376,7 @@ function ShareCard({ share }: { share: GroupWeeklyShare }) {
         )}
 
         {/* 응원 */}
+        <SafetyActions target={{ type: 'weekly_share', id: share.id, groupId: share.groupId, userId: share.userId }} />
         <div className="flex gap-2 border-t border-line-soft pt-3">
           {CHEERS.map(c => (
             <motion.button key={c.key} whileTap={{ scale: 0.88 }} transition={{ duration: 0.1 }}

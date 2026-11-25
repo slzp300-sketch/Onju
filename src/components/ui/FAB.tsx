@@ -1,87 +1,24 @@
-import { useState } from 'react';
-import { Plus } from '../../icons';
-import { motion, AnimatePresence } from 'framer-motion';
-
-interface FABOption {
-  icon: React.ReactNode;
-  label: string;
-  sub?: string;
-  onClick: () => void;
-  color?: string;
-}
-
-interface FABProps {
-  options: FABOption[];
-}
-
-export default function FAB({ options }: FABProps) {
+import { useId, useState } from 'react';
+import { Plus, X } from '../../icons';
+import OverlayDialog from './OverlayDialog';
+interface FABOption { icon: React.ReactNode; label: string; sub?: string; onClick: () => void; color?: string; }
+export default function FAB({ options }: { options: FABOption[] }) {
   const [open, setOpen] = useState(false);
-  const close = () => setOpen(false);
-
-  return (
-    <>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[var(--z-scrim)] bg-[var(--scrim)]"
-            onClick={close}
-          />
-        )}
-      </AnimatePresence>
-
-      <div
-        className="fixed right-[var(--layout-page-gutter)] z-[var(--z-sheet)] flex flex-col items-end gap-3"
-        style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
-      >
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="flex flex-col items-end gap-2.5"
-            >
-              {[...options].reverse().map((opt, i) => (
-                <motion.button
-                  key={i}
-                  initial={{ opacity: 0, y: 12, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.9 }}
-                  transition={{ delay: i * 0.04, duration: 0.18, ease: 'easeOut' }}
-                  onClick={() => { opt.onClick(); close(); }}
-                  aria-label={opt.label}
-                  className="flex items-center gap-3"
-                >
-                  <div className="text-right">
-                    <p className="text-label1 font-bold text-label-strong drop-shadow-sm">{opt.label}</p>
-                    {opt.sub && <p className="text-caption1 text-label-alt">{opt.sub}</p>}
-                  </div>
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-strong text-white ${opt.color ?? 'bg-primary'}`}>
-                    {opt.icon}
-                  </div>
-                </motion.button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          transition={{ duration: 0.12 }}
-          onClick={() => setOpen(v => !v)}
-          aria-label={open ? '빠른 메뉴 닫기' : '빠른 메뉴 열기'}
-          aria-expanded={open}
-          className="w-14 h-14 rounded-full bg-primary text-white shadow-strong flex items-center justify-center focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
-        >
-          <motion.div
-            animate={{ rotate: open ? 45 : 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-          >
-            <Plus size={26} strokeWidth={2.5} />
-          </motion.div>
-        </motion.button>
-      </div>
-    </>
-  );
+  const id = useId();
+  return <div className="flex justify-end px-3 py-3">
+    <button type="button" onClick={() => options.length === 1 ? options[0].onClick() : setOpen(true)}
+      aria-haspopup={options.length > 1 ? 'dialog' : undefined} aria-expanded={options.length > 1 ? open : undefined}
+      className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent px-4 text-label1 font-bold text-accent-ink">
+      <Plus size={18} />{options.length === 1 ? options[0].label : '실천 추가'}
+    </button>
+    <OverlayDialog isOpen={open} onClose={() => setOpen(false)} labelledBy={id} variant="sheet">
+      <div className="flex items-center justify-between px-5 pt-4"><h2 id={id} className="font-bold text-headline1">실천 추가</h2>
+        <button type="button" className="icon-button" aria-label="추가 메뉴 닫기" onClick={() => setOpen(false)}><X size={20} /></button></div>
+      <div className="p-3 pb-6">{options.map(option => <button key={option.label} type="button" onClick={() => { setOpen(false); option.onClick(); }}
+        className="flex min-h-16 w-full items-center gap-3 rounded-xl px-3 text-left hover:bg-fill">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">{option.icon}</span>
+        <span><span className="block font-bold text-body2">{option.label}</span>{option.sub && <span className="text-caption1 text-label-alt">{option.sub}</span>}</span>
+      </button>)}</div>
+    </OverlayDialog>
+  </div>;
 }

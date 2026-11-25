@@ -219,7 +219,7 @@ function ThemeSwatch({ tier }: { tier: ThemeTier }) {
   );
 }
 
-/** 테마 미리보기 모달 — data-theme 래퍼로 실제 테마 변수를 입힌 미니 화면 */
+/** 테마 미리보기 모달 — 공통 색감에 성장 단계별 장식을 입힌 미니 화면 */
 function ThemePreviewModal({ tier, growth, onClose }: { tier: ThemeTier | null; growth: TreeGrowth; onClose: () => void }) {
   const { theme, setTheme } = useThemeStore();
 
@@ -292,7 +292,7 @@ function ThemePreviewModal({ tier, growth, onClose }: { tier: ThemeTier | null; 
   );
 }
 
-/** 미니 앱 화면 목업 — 래퍼의 data-theme이 CSS 변수를 덮어써 실제 색으로 렌더링된다 */
+/** 미니 앱 화면 목업 — 실제 화면과 같은 색상 토큰·단계별 장식을 사용한다. */
 function MockScreen({ tier }: { tier: ThemeTier }) {
   return (
     <div data-theme={tier.id} className="rounded-2xl overflow-hidden border border-line-soft select-none pointer-events-none" aria-hidden>

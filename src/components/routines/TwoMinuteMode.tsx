@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { useElapsedTimer } from '../../hooks/useElapsedTimer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Zap, PartyPopper } from '../../icons';
 import type { Habit, DailyRoutine } from '../../types';
@@ -28,25 +29,15 @@ const TOTAL = 120; // 2분
 
 export default function TwoMinuteMode({ habit, onClose }: TwoMinuteModeProps) {
   const [phase, setPhase] = useState<Phase>('trigger');
-  const [elapsed, setElapsed] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const goToReady = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setPhase('ready');
-    setTimeout(() => setPhase('habit'), 900);
-  }, []);
+  const timer = useElapsedTimer(TOTAL, phase === 'trigger', () => setPhase('ready'));
+  const elapsed = timer.elapsed;
+  const goToReady = () => { timer.stop(); setPhase('ready'); };
 
   useEffect(() => {
-    if (phase !== 'trigger') return;
-    intervalRef.current = setInterval(() => {
-      setElapsed(e => {
-        if (e + 1 >= TOTAL) { goToReady(); return TOTAL; }
-        return e + 1;
-      });
-    }, 1000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [phase, goToReady]);
+    if (phase !== 'ready') return;
+    const timer = setTimeout(() => setPhase('habit'), 900);
+    return () => clearTimeout(timer);
+  }, [phase]);
 
   const remaining = TOTAL - elapsed;
   const progress = elapsed / TOTAL;

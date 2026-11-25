@@ -15,9 +15,11 @@ import {
   toggleShareCheer, adoptSharedRoutine, shareRoutineToGroups, unshareRoutine,
 } from '../api/share';
 import { captureProofPhoto } from '../lib/proofCamera';
-import { isScheduled } from '../utils/goalProgress';
+import { isScheduled } from '../utils/schedule';
 import { newId } from '../utils/id';
 import type { DailyRoutine, ProofReaction, RoutineProof, SharedRoutine } from '../types';
+import SafetyActions from '../components/groups/SafetyActions';
+import { useBlockedUsers } from '../hooks/useBlockedUsers';
 
 const PROOF_WINDOW_MS = 10 * 60 * 1000; // 체크 후 10분 안에만 인증 촬영
 const REACTION_EMOJI: Record<ProofReaction, string> = { heart: '❤️', fire: '🔥', clap: '👏' };
@@ -34,7 +36,9 @@ export default function RoutineShare() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const user = useAuthStore(s => s.user);
-  const groups = useGroupStore(s => s.groups);
+  const allGroups = useGroupStore(s => s.groups);
+  const { data: blocked = [] } = useBlockedUsers();
+  const groups = useMemo(() => allGroups.filter(group => !blocked.some(user => user.userId === group.creatorId)), [allGroups, blocked]);
   const { personalRoutines, faithRoutines, logs, toggleRoutineLog, addRoutine } = useRoutineStore();
 
   const [tab, setTab] = useState<Tab>('proof');
@@ -270,7 +274,7 @@ export default function RoutineShare() {
                   ) : null}
                   <motion.button
                     whileTap={{ scale: 0.92 }}
-                    onClick={() => toggleRoutineLog(r.id)}
+                    onClick={() => {try{toggleRoutineLog(r.id);}catch(error){toast.error(error instanceof Error?error.message:'저장하지 못했어요.');}}}
                     aria-label={`${r.title} 체크`}
                     className={`w-8 h-8 rounded-xl border flex items-center justify-center flex-shrink-0 transition-colors ${
                       log?.completed ? 'bg-primary border-primary text-white' : 'border-line text-transparent'
@@ -288,7 +292,7 @@ export default function RoutineShare() {
             <p className="text-caption1 text-label-assistive text-center py-8">불러오는 중…</p>
           ) : (
             (() => {
-              const list = proofs.filter(p => filteredGroupIds.includes(p.groupId));
+              const list = proofs.filter(p => filteredGroupIds.includes(p.groupId) && !blocked.some(user => user.userId === p.userId));
               if (list.length === 0) {
                 return (
                   <p className="text-caption1 text-label-assistive text-center py-6 leading-relaxed">
@@ -316,7 +320,7 @@ export default function RoutineShare() {
             <p className="text-caption1 text-label-assistive text-center py-8">불러오는 중…</p>
           ) : (
             (() => {
-              const list = shares.filter(s => filteredGroupIds.includes(s.groupId));
+              const list = shares.filter(s => filteredGroupIds.includes(s.groupId) && !blocked.some(user => user.userId === s.userId));
               if (list.length === 0) {
                 return (
                   <EmptyState
@@ -489,6 +493,7 @@ function ProofCard({ proof, onReact }: { proof: RoutineProof; onReact: (emoji: P
           <p className="text-[10px] text-label-assistive tabular-nums">{format(new Date(proof.createdAt), 'HH:mm')}</p>
         </div>
         {proof.note && <p className="text-caption2 text-label-alt mt-1 line-clamp-2">{proof.note}</p>}
+        <SafetyActions target={{ type: 'proof', id: proof.id, groupId: proof.groupId, userId: proof.userId }} />
         <div className="flex gap-1 mt-1.5">
           {(Object.keys(REACTION_EMOJI) as ProofReaction[]).map(emoji => {
             const n = proof.reactions[emoji];
@@ -525,6 +530,7 @@ function SharedRoutineCard({ share, mine, groupTitle, onCheer, onAdopt }: {
         }`}>{groupTitle}</span>
       </div>
       <div className="px-4 pt-3 pb-2.5">
+        <SafetyActions target={{ type: 'routine_share', id: share.id, groupId: share.groupId, userId: share.userId }} />
         <div className="flex items-center gap-2">
           <span className="text-xl">{share.emoji ?? '🌱'}</span>
           <div className="flex-1 min-w-0">

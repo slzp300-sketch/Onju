@@ -27,7 +27,7 @@ export default function ToastHost() {
   return (
     <div
       className="fixed left-0 right-0 z-[var(--z-toast)] flex flex-col items-center gap-2 px-4 max-w-md mx-auto pointer-events-none"
-      style={{ bottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}
+      style={{ bottom: 'calc(6rem + var(--keyboard-inset, 0px) + var(--app-safe-bottom))' }}
     >
       <AnimatePresence>
         {toasts.map(t => {

@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 export default function LoadingSpinner() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-surface/80 backdrop-blur-sm z-50">
+    <div role="status" aria-label="불러오는 중" className="fixed inset-0 flex items-center justify-center bg-surface/80 backdrop-blur-sm z-50">
       <motion.div
         className="w-12 h-12 border-4 border-primary-soft border-t-primary rounded-full"
         animate={{ rotate: 360 }}

@@ -1,5 +1,4 @@
-/* 프로토타입: 웜 라운드 서체 — 본문 고운돋움, 제목 주아 (프로덕션 전환 시 셀프호스팅) */
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap');
+/* Onju · Linen / Parsley / Tomato */
 @import "tailwindcss";
 @import "./styles/tokens.css";
 
@@ -9,10 +8,14 @@
 ══════════════════════════════════════════ */
 @theme {
   /* primary — 색연필 그린 (채도 낮춘 수풀색) */
-  --color-primary: #55966b;
-  --color-primary-strong: #46815c;
-  --color-primary-heavy: #38684a;
-  --color-primary-soft: #eaf1de;
+  --color-primary: #1F4D3A;
+  --color-primary-strong: #173B2C;
+  --color-primary-heavy: #153628;
+  --color-primary-soft: #E4E7D5;
+
+  --color-accent: #F0876E;
+  --color-accent-soft: #F8DCC0;
+  --color-accent-ink: #153628;
 
   /* cool neutral ramp (폼·중립 UI용 그레이) */
   --color-cool-99: #fafafa;
@@ -30,42 +33,42 @@
   --color-cool-12: #212121;
 
   /* text tokens — 연필 흑연 잉크 (웜 그레이) */
-  --color-label: #3f443a;
-  --color-label-strong: #2a2f27;
-  --color-label-alt: #71776a;
-  --color-label-assistive: #a6ab99;
+  --color-label: #1F4D3A;
+  --color-label-strong: #153628;
+  --color-label-alt: #526750;
+  --color-label-assistive: #526750;
 
   /* surfaces / lines / fills — 종이 캔버스 */
-  --color-surface: #fbf7ec;
-  --color-surface-alt: #f4edda;
-  --color-line: #e4dcc3;
-  --color-line-soft: #ede6d2;
-  --color-fill: #f1ead6;
-  --color-fill-strong: #e7dfc8;
+  --color-surface: #F3EADF;
+  --color-surface-alt: #FAF0E6;
+  --color-line: #DBD7C2;
+  --color-line-soft: #E7E1D3;
+  --color-fill: #EFE8DC;
+  --color-fill-strong: #DBD7C2;
 
   /* status — 색연필 톤 */
-  --color-positive: #4a8a58;
-  --color-cautionary: #c98a3d;
-  --color-negative: #c05e52;
+  --color-positive: #1F4D3A;
+  --color-cautionary: #805227;
+  --color-negative: #9D372B;
 
   /* 신앙 = 빛/골드 (primary 그린과 분리) */
-  --color-faith: #c08b2d;
-  --color-faith-soft: #f6eed7;
+  --color-faith: #1F4D3A;
+  --color-faith-soft: #F8DCC0;
 
   /* fonts — 본문: 고운돋움(웜 라운드 고딕), 제목·브랜드: 주아(둥근 볼드) */
-  --font-brand: 'Jua', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
-  --font-ui: 'Gowun Dodum', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-brand: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", system-ui, sans-serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", system-ui, sans-serif;
 
   /* border-radius — 손으로 그린 듯 비대칭 라운딩 (크레파스 스케치) */
-  --radius: 12px 7px 11px 8px / 8px 11px 7px 12px;
-  --radius-md: 15px 9px 14px 10px / 10px 13px 9px 15px;
-  --radius-lg: 17px 10px 16px 11px / 11px 15px 10px 17px;
-  --radius-xl: 19px 12px 18px 13px / 13px 17px 12px 19px;
-  --radius-2xl: 30px 22px 28px 24px / 24px 28px 22px 30px;
-  --radius-3xl: 38px 28px 36px 30px / 30px 36px 28px 38px;
+  --radius: 10px;
+  --radius-md: 12px;
+  --radius-lg: 15px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 28px;
 
   /* shadows — 세피아 틴트 소프트 (종이 위 그림자) */
-  --shadow-emphasize: 0px 1px 3px rgba(74, 62, 34, 0.08);
+  --shadow-emphasize: 0 1px 3px rgb(31 77 58 / 3%);
   --shadow-strong: 0px 6px 16px rgba(74, 62, 34, 0.16);
   --shadow-heavy: 0px 11px 24px rgba(74, 62, 34, 0.15);
   --shadow-overlay: 0px 11px 24px rgba(74, 62, 34, 0.15);
@@ -89,22 +92,25 @@
 
 /* 그라데이션 (Tailwind 토큰 밖 — var()로 직접 사용) */
 :root {
+  /* Capacitor 8은 구형 WebView에도 보정된 값을 제공한다. 웹은 env()를 따른다. */
+  --app-safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --app-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+  --app-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --app-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
   /* 진행바·로고 등 캔오피 면 — 크레파스 왁스 결 + 그라디언트 */
-  --gradient-canopy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55 0.75' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 0.94 0 0 0 0.13 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23c)'/%3E%3C/svg%3E"), linear-gradient(135deg, #8cba93 0%, #55966b 100%);
-  --gradient-hero: linear-gradient(180deg, #f1e9d2 0%, #faf5e8 100%);
-  /* CTA 광택 — 기본(들녘)은 플랫, 티어가 오를수록 그라데이션이 입혀진다 */
+  --gradient-canopy: linear-gradient(135deg, #315F49, #1F4D3A);
+  --gradient-hero: linear-gradient(180deg, #E4E7D5, #FAF0E6);
+  /* 모든 성장 테마에서 파슬리 그린의 차분한 단색 버튼을 유지한다. */
   --gradient-cta: none;
 }
 
-/* 모든 주요 버튼·바(bg-primary)에 티어별 광택을 한 번에 입힌다 */
+/* 주요 버튼·바는 공통 팔레트를 사용한다. */
 .bg-primary {
   background-image: var(--gradient-cta);
 }
 
 /* 모든 lucide 아이콘에 손그림 흔들림 — index.html의 #ui-crayon 필터 참조 */
-svg.lucide {
-  filter: url(#ui-crayon);
-}
+svg.lucide { filter: none; }
 
 /* 이모지를 크레파스 톤으로 — 채도 낮추고 세피아를 살짝 입혀 그림체에 붙인다 */
 .emoji-crayon {
@@ -119,7 +125,7 @@ svg.lucide {
 /* 크레파스 채움 질감 — 프라이머리 면 위에 밝은 왁스 결 오버레이 */
 .bg-primary,
 .bg-faith {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55 0.75' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 0.94 0 0 0 0.13 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23c)'/%3E%3C/svg%3E"), var(--gradient-cta, none);
+  background-image: none;
 }
 
 * {
@@ -135,7 +141,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--ui-bg-canvas);
   /* 종이 결 텍스처 — 정보 영역을 방해하지 않는 낮은 강도 */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.36 0 0 0 0 0.22 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: none;
   overscroll-behavior: none;
 }
 
@@ -185,25 +191,21 @@ body {
 
 /* iOS safe area — 하단 네비게이션이 홈 바 위에 표시되도록 */
 .safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: var(--app-safe-bottom);
 }
 
 /* 홈 화면의 종이 스케치 골격 */
 .home-paper {
   position: relative;
-  background:
-    radial-gradient(circle at 12% 5%, rgb(244 201 138 / 18%), transparent 23%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 72%);
+  background: var(--onju-paper);
 }
 
-.home-paper::before {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  content: '';
-  opacity: var(--paper-texture-opacity);
-  background-image: repeating-linear-gradient(2deg, transparent 0 15px, var(--onju-forest) 16px, transparent 17px);
-}
+.home-paper::before { display: none; }
+
+.home-growth-summary .tree-paper-card { width: calc(100% - 2rem); }
+.home-goal-strip { scroll-snap-type: x proximity; scrollbar-width: thin; }
+.home-goal-card { width: clamp(160px, 46vw, 220px); scroll-snap-align: start; }
+.monthly-goal-paper-card { scroll-margin-top: calc(var(--app-safe-top) + 12px); }
 
 .home-paper > * {
   position: relative;
@@ -225,20 +227,9 @@ body {
   box-shadow: var(--shadow-emphasize);
 }
 
-.home-routine-sheet {
-  border: var(--line-emphasis) solid var(--ui-border);
-  border-bottom: 0;
-  border-radius: var(--radius-3xl) var(--radius-3xl) 0 0;
-  background: var(--ui-bg-surface);
-  box-shadow: 0 -5px 18px rgb(74 62 34 / 7%);
-}
+.home-routine-sheet { background: transparent; border: 0; box-shadow: none; }
 
-.routine-paper-group {
-  border: var(--line-emphasis) solid var(--ui-border);
-  border-radius: var(--radius-xl);
-  background: color-mix(in srgb, var(--ui-bg-surface) 97%, var(--onju-butter-soft));
-  box-shadow: var(--shadow-emphasize);
-}
+.routine-paper-group { border: 1px solid var(--ui-border); border-radius: var(--radius-xl); background: var(--ui-bg-surface); overflow: hidden; }
 
 .habit-paper-row {
   background: color-mix(in srgb, var(--ui-bg-surface) 98%, transparent);
@@ -251,17 +242,10 @@ body {
   box-shadow: var(--shadow-emphasize);
 }
 
-.week-day-card {
-  min-height: 76px;
-  border: var(--line-emphasis) solid transparent;
-  border-radius: var(--radius-xl);
-}
+.week-day-card { min-height: 64px; border: 1px solid transparent; border-radius: 16px; }
 
-.week-day-card.is-selected {
-  border-color: var(--ui-action);
-  background: var(--ui-action-soft);
-  box-shadow: var(--shadow-emphasize);
-}
+.week-day-card.is-selected { border-color: var(--color-primary); background: var(--color-primary); }
+.week-day-card.is-selected span { color: #FAF0E6; }
 
 .week-day-card.is-complete:not(.is-selected) {
   border-color: color-mix(in srgb, var(--ui-faith) 24%, var(--ui-border));
@@ -283,19 +267,10 @@ body {
   display: none;
 }
 
-.bottom-paper-nav {
-  border-top: var(--line-emphasis) solid var(--ui-border);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--ui-bg-surface) 94%, transparent), var(--ui-bg-surface)),
-    repeating-linear-gradient(1deg, transparent 0 13px, rgb(47 62 46 / 3%) 14px, transparent 15px);
-  box-shadow: 0 -4px 14px rgb(74 62 34 / 7%);
-  backdrop-filter: blur(10px);
-}
+.bottom-paper-nav { border-top: 1px solid var(--ui-border); background: var(--onju-paper); }
 
 .stats-paper {
-  background:
-    radial-gradient(circle at 88% 2%, rgb(167 199 231 / 16%), transparent 22%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
+  background: var(--onju-paper);
 }
 
 .stats-tab-backdrop {
@@ -320,13 +295,11 @@ body:has(.stats-paper)::-webkit-scrollbar {
 
 .habit-stat-mark,
 .crayon-chart-fill {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='20'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.5 1.1' numOctaves='2' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='48' height='20' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-image: none;
 }
 
 .groups-paper {
-  background:
-    radial-gradient(circle at 12% 3%, rgb(107 127 107 / 14%), transparent 22%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
+  background: var(--onju-paper);
 }
 
 .groups-tab-backdrop {
@@ -347,13 +320,11 @@ body:has(.stats-paper)::-webkit-scrollbar {
 }
 
 .group-paper-card {
-  border-left: 3px solid var(--group-accent, var(--ui-action));
+  border-left: 3px solid var(--color-accent);
 }
 
 .group-detail-paper {
-  background:
-    radial-gradient(circle at 86% 4%, rgb(107 127 107 / 13%), transparent 24%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
+  background: var(--onju-paper);
 }
 
 .group-detail-hero,
@@ -371,9 +342,7 @@ body:has(.stats-paper)::-webkit-scrollbar {
 }
 
 .profile-paper {
-  background:
-    radial-gradient(circle at 84% 3%, rgb(244 201 138 / 16%), transparent 23%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
+  background: var(--onju-paper);
 }
 
 .profile-hero,
@@ -387,11 +356,7 @@ body:has(.stats-paper)::-webkit-scrollbar {
 }
 
 .notification-paper,
-.theme-rewards-paper {
-  background:
-    radial-gradient(circle at 86% 3%, rgb(167 199 231 / 15%), transparent 23%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
-}
+.theme-rewards-paper { background: var(--onju-paper); }
 
 .paper-back-button {
   display: grid;
@@ -456,14 +421,12 @@ body:has(.stats-paper)::-webkit-scrollbar {
 }
 
 .form-paper {
-  background:
-    radial-gradient(circle at 12% 2%, rgb(244 201 138 / 14%), transparent 22%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
+  background: var(--onju-paper);
 }
 
 .form-paper-header {
   position: sticky;
-  top: 0;
+  top: var(--app-safe-top);
   z-index: 20;
   border-bottom: var(--line-emphasis) solid var(--ui-border);
   background: color-mix(in srgb, var(--onju-paper) 92%, transparent);
@@ -507,6 +470,18 @@ body:has(.stats-paper)::-webkit-scrollbar {
   box-shadow: var(--focus-ring);
 }
 
+/* 입력 글씨와 초점 색을 통일하고, 작은 화면에서도 안내 문구를 읽기 쉽게 한다. */
+.form-paper-input, .form-paper-field, .records-paper-editor { font-size: 16px; color: var(--ui-text); }
+.form-paper-input::placeholder, .form-paper-field::placeholder, .records-paper-editor::placeholder { color: var(--ui-text-muted); opacity: 1; }
+.records-paper-editor:focus { outline: none; border-color: var(--ui-action); box-shadow: var(--focus-ring); }
+.form-paper-choice { min-height: var(--control-hit-min); }
+
+/* 긴 메모는 본문만 스크롤하며 저장·닫기는 키보드 위에 남는다. */
+.memo-editor-sheet { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+.memo-editor-header { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; padding: 8px 20px; border-bottom: 2px solid var(--color-accent); }
+.memo-editor-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 20px; scroll-padding-block: 12px; }
+.memo-editor-actions { flex-shrink: 0; padding: 12px 20px max(12px, var(--app-safe-bottom)); border-top: 1px solid var(--ui-border); background: var(--ui-bg-surface); }
+
 .form-paper .bg-surface.rounded-xl.border.border-line {
   border-width: var(--line-emphasis);
   border-radius: var(--radius-xl);
@@ -524,9 +499,7 @@ body:has(.stats-paper)::-webkit-scrollbar {
 }
 
 .records-paper {
-  background:
-    radial-gradient(circle at 88% 3%, rgb(191 176 219 / 12%), transparent 22%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
+  background: var(--onju-paper);
 }
 
 .records-paper-header {
@@ -550,9 +523,7 @@ body:has(.stats-paper)::-webkit-scrollbar {
 }
 
 .review-paper {
-  background:
-    radial-gradient(circle at 12% 2%, rgb(107 127 107 / 13%), transparent 24%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
+  background: var(--onju-paper);
 }
 
 .review-paper-card,
@@ -584,11 +555,16 @@ body:has(.stats-paper)::-webkit-scrollbar {
   pointer-events: none;
   content: '';
   opacity: .16;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+  background-image: none;
 }
 
-.focus-paper > * {
+.focus-paper > :not(.absolute) {
   position: relative;
+}
+
+.focus-paper {
+  --color-cool-50: #aeb8b1;
+  --color-cool-60: #b9c3bc;
 }
 
 .focus-close-button {
@@ -605,12 +581,7 @@ body:has(.stats-paper)::-webkit-scrollbar {
 }
 
 .auth-paper,
-.onboarding-paper {
-  background:
-    radial-gradient(circle at 50% 4%, rgb(107 127 107 / 15%), transparent 27%),
-    radial-gradient(circle at 10% 72%, rgb(244 201 138 / 11%), transparent 24%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
-}
+.onboarding-paper { background: var(--onju-paper); }
 
 .auth-paper {
   overflow-x: hidden;
@@ -676,9 +647,7 @@ body:has(.stats-paper)::-webkit-scrollbar {
 }
 
 .share-paper {
-  background:
-    radial-gradient(circle at 88% 2%, rgb(107 127 107 / 13%), transparent 23%),
-    linear-gradient(180deg, var(--onju-paper) 0%, var(--color-surface-alt) 100%);
+  background: var(--onju-paper);
 }
 
 .share-paper .bg-surface.border.border-line-soft.rounded-2xl {
@@ -707,64 +676,40 @@ body:has(.stats-paper)::-webkit-scrollbar {
   border-width: var(--line-emphasis);
 }
 
-/* ══════════════════════════════════════════
-   테마 티어 — 나무 성장 단계로 해금
-   primary 패밀리 + 캔버스 틴트만 오버라이드
-   '밤의 숲'(다크)은 추후 티어로 검토
-══════════════════════════════════════════ */
+/* 성장 테마는 공통 색상을 유지하고 잎새·풀숲·빛·낙엽 장식으로 구분한다.
+   저장된 data-theme 값과 해금 조건은 그대로 유지한다. */
 
-/* 새싹 — 맑은 민트 (stage 1 해금) */
-[data-theme="sprout"] {
-  --color-primary: #3bb08f;
-  --color-primary-strong: #2f9478;
-  --color-primary-heavy: #25785f;
-  --color-primary-soft: #e2f5ef;
-  --color-surface-alt: #f0f8f4;
-  --color-fill: #ecf6f1;
-  --color-line: #dcebe3;
-  --gradient-canopy: linear-gradient(135deg, #8fe0c4 0%, #3bb08f 55%, #2a8a70 100%);
-  --gradient-hero: linear-gradient(180deg, #dff5ec 0%, #f2fbf7 55%, #f8fdfb 100%);
-  --gradient-cta: linear-gradient(135deg, #4ec7a2 0%, #2f9478 100%);
-}
+/* 모바일 키보드가 레이아웃 높이를 유지하는 브라우저의 저장 영역 */
+.form-paper-footer { bottom: var(--keyboard-inset, 0px); z-index: 20; }
+html { scroll-padding-top: calc(5rem + var(--app-safe-top)); scroll-padding-bottom: calc(7rem + var(--keyboard-inset, 0px) + var(--app-safe-bottom)); }
+.app-shell { padding-top: var(--app-safe-top); padding-left: var(--app-safe-left); padding-right: var(--app-safe-right); }
+.app-shell::before { content: ''; position: fixed; inset: 0 0 auto; height: var(--app-safe-top); background: var(--color-surface-alt); z-index: 35; pointer-events: none; }
+.app-shell > .min-h-dvh, .app-shell .form-paper, .app-shell .auth-paper, .app-shell .records-paper { min-height: calc(100dvh - var(--app-safe-top)); }
+.groups-tab-backdrop, .stats-tab-backdrop { top: var(--app-safe-top); }
+.form-paper-footer, .bottom-paper-nav { left: var(--app-safe-left); right: var(--app-safe-right); }
+.viewport-dialog { max-height: calc(var(--visible-viewport-height, 100dvh) - var(--app-safe-top) - var(--app-safe-bottom) - 1rem); scroll-padding-block: 1rem; }
+.viewport-sheet { bottom: var(--keyboard-inset, 0px); left: var(--app-safe-left); right: var(--app-safe-right); }
+.viewport-modal { top: calc(var(--visible-viewport-top, 0px) + var(--app-safe-top) + (var(--visible-viewport-height, 100dvh) - var(--app-safe-top) - var(--app-safe-bottom)) / 2); }
 
-/* 풀잎 — 싱그러운 옐로그린 (stage 2 해금) */
-[data-theme="meadow"] {
-  --color-primary: #5da033;
-  --color-primary-strong: #4a8526;
-  --color-primary-heavy: #3a6b1e;
-  --color-primary-soft: #edf6e2;
-  --color-surface-alt: #f5f8ec;
-  --color-fill: #f1f5e6;
-  --color-line: #e3ead2;
-  --gradient-canopy: linear-gradient(135deg, #b5d985 0%, #5da033 55%, #487f24 100%);
-  --gradient-hero: linear-gradient(180deg, #e9f5d3 0%, #f4f9e8 55%, #fbfdf4 100%);
-  --gradient-cta: linear-gradient(135deg, #79b94a 0%, #4a8526 100%);
-}
+/* Shared quiet UI controls */
+.icon-button { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; }
+.icon-button:hover { background: var(--color-fill); }
+.icon-button:disabled { opacity: .4; }
+.completion-button { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; border: 1.5px solid var(--color-line); color: var(--color-primary); background: transparent; }
+.completion-button[aria-pressed="true"] { background: var(--color-primary); border-color: var(--color-primary); color: #FAF0E6; }
+.completion-button:disabled { opacity: .4; }
+.quiet-details > summary { cursor: pointer; min-height: 48px; padding: 12px 4px; color: var(--color-label-alt); font-size: 14px; font-weight: 600; }
+.quiet-details[open] > summary { margin-bottom: 12px; }
+.quiet-details > .space-y-5 { padding-bottom: 12px; }
+.tree-paper-card, .group-detail-hero { border-bottom: 3px solid var(--color-accent); }
+.profile-hero { background: #1F4D3A; color: #FAF0E6; border-color: #1F4D3A; border-bottom: 3px solid #F0876E; }
+.profile-hero :is(.text-label-strong,.text-label,.text-label-alt,.text-label-assistive) { color: #FAF0E6; }
+.profile-hero .profile-avatar { background: #F0876E; color: #153628; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 
-/* 깊은숲 — 고요한 틸그린 (stage 3 해금) */
-[data-theme="deepforest"] {
-  --color-primary: #1d7a68;
-  --color-primary-strong: #166253;
-  --color-primary-heavy: #104c40;
-  --color-primary-soft: #def0ec;
-  --color-surface-alt: #eef5f2;
-  --color-fill: #e9f2ee;
-  --color-line: #d8e6e0;
-  --gradient-canopy: linear-gradient(135deg, #6fc0b0 0%, #1d7a68 55%, #14584b 100%);
-  --gradient-hero: linear-gradient(180deg, #d8ece6 0%, #e9f4f0 50%, #f4faf8 100%);
-  --gradient-cta: linear-gradient(135deg, #2f9a85 0%, #166253 100%);
-}
-
-/* 가을숲 — 따뜻한 앰버 (stage 4 해금) */
-[data-theme="autumn"] {
-  --color-primary: #c4742a;
-  --color-primary-strong: #a85f1e;
-  --color-primary-heavy: #8a4d16;
-  --color-primary-soft: #faeede;
-  --color-surface-alt: #faf5ed;
-  --color-fill: #f6f0e4;
-  --color-line: #ece2d0;
-  --gradient-canopy: linear-gradient(135deg, #ecb877 0%, #c4742a 55%, #a05a1b 100%);
-  --gradient-hero: linear-gradient(180deg, #fae9d2 0%, #f9f1e2 50%, #fdfaf4 100%);
-  --gradient-cta: linear-gradient(135deg, #e0954a 0%, #b2641f 100%);
-}
+.goal-featured > button { background: #1F4D3A; color: #FAF0E6; }
+.goal-featured > button :is(p,span) { color: #FAF0E6 !important; }
+.goal-featured > button span.rounded-full { background: #315F49; }
+.goal-featured > button .h-1\.5 { background: #37654F; }
+.goal-secondary { border-left: 3px solid var(--color-accent); }
+.form-paper-input { min-width: 0; }

@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Shield, X, Flame, Check } from '../icons';
+import { ChevronLeft, X, Flame, Check } from '../icons';
 import { format, getDay } from 'date-fns';
 import { useRoutineStore } from '../store/routineStore';
 import { useHabitStore } from '../store/habitStore';
-import { useStreakStore } from '../store/streakStore';
 import { calcStreak } from '../utils/completion';
 import { today, getWeekDays, ALL_DAY_LABELS } from '../utils/date';
 import { useSettingsStore } from '../store/settingsStore';
@@ -13,35 +12,8 @@ import StampOverlay from '../components/ui/StampOverlay';
 import TreeVisual from '../components/tree/TreeVisual';
 import { useTreeGrowth } from '../hooks/useTreeGrowth';
 import { STAGE_NAMES } from '../utils/treeGrowth';
-import type { DailyRoutine, RoutineLog, Habit } from '../types';
+import { getDayCompletion } from '../utils/dayCompletion';
 
-
-function isDayPerfect(
-  faithRoutines: DailyRoutine[],
-  logs: RoutineLog[],
-  habits: Habit[],
-  habitLogs: { habitId: string; date: string; completed: boolean; skipped?: boolean; substitute?: boolean }[],
-  dateStr: string
-): boolean {
-  // 루틴도 습관도 없으면 달성 아님
-  if (faithRoutines.length === 0 && habits.length === 0) return false;
-
-  // 신앙루틴: 완료 또는 쉬어가기 모두 달성으로 처리
-  const faithOk = faithRoutines.length === 0 || (() => {
-    const done = new Set(
-      logs.filter(l => l.date === dateStr && (l.completed || l.skipped)).map(l => l.routineId)
-    );
-    return faithRoutines.every(r => done.has(r.id));
-  })();
-
-  // 습관: 완료 또는 쉬어가기 모두 달성으로 처리
-  const habitOk = habits.length === 0 || (() => {
-    const done = habitLogs.filter(l => l.date === dateStr && (l.completed || l.skipped || l.substitute)).length;
-    return done >= habits.length;
-  })();
-
-  return faithOk && habitOk;
-}
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.07 } } } as const;
 const itemV = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 420, damping: 28 } } } as const;
@@ -50,15 +22,12 @@ export default function StreakDetail() {
   const navigate = useNavigate();
   const { faithRoutines, logs } = useRoutineStore();
   const { habits, habitLogs } = useHabitStore();
-  const { shields, syncShields } = useStreakStore();
-  const [showShieldInfo, setShowShieldInfo] = useState(false);
   const [showStreakStamp, setShowStreakStamp] = useState(false);
   const prevStreak = useRef(0);
 
   const todayStr = today();
-  const { current: streak, best } = calcStreak(faithRoutines, logs, todayStr);
+  const { current: streak, best } = calcStreak(faithRoutines, logs, todayStr, habits, habitLogs);
 
-  useEffect(() => { syncShields(streak); }, [streak, syncShields]);
 
   // 스트릭 5일 단위 달성 시 스탬프
   useEffect(() => {
@@ -71,10 +40,6 @@ export default function StreakDetail() {
 
   const { weekStartDay } = useSettingsStore();
   const weekDays = getWeekDays(new Date(), weekStartDay as 0 | 1);
-
-  const nextShieldAt = Math.ceil((streak + 1) / 5) * 5;
-  const daysToShield = nextShieldAt - streak;
-  const shieldProgress = (streak % 5) / 5;
 
   return (
     <>
@@ -118,7 +83,8 @@ export default function StreakDetail() {
               <p className="text-display2 font-bold text-cautionary font-brand leading-none">
                 {streak}일
               </p>
-              <p className="text-label1 text-label-alt mt-1">연속 달성 중이에요</p>
+              <p className="text-label1 text-label-alt mt-1">연속 실천 기록이에요</p>
+              <p className="mt-2 text-caption1 text-label-alt leading-relaxed">개인·신앙의 예정 항목을 절반 이상 기록한 날을 세어요.<br />완료·대체·쉼 포함 · 예정 없는 날 제외 · 최근 1년 기준</p>
             </div>
 
             {/* 현재 / 최고 */}
@@ -147,7 +113,8 @@ export default function StreakDetail() {
                 const ds = format(d, 'yyyy-MM-dd');
                 const isFuture = d > new Date(new Date().setHours(23, 59, 59, 999));
                 const isToday = ds === todayStr;
-                const completed = !isFuture && isDayPerfect(faithRoutines, logs, habits, habitLogs, ds);
+                const day = getDayCompletion(ds, habits, habitLogs, faithRoutines, logs);
+                const completed = !isFuture && day.state === 'perfect';
 
                 return (
                   <div key={ds} className="flex-1 flex flex-col items-center gap-1.5">
@@ -183,6 +150,8 @@ export default function StreakDetail() {
                         {completed ? <Check size={14} strokeWidth={2.4} className="text-white" />
                           : isToday ? '·'
                           : isFuture ? ''
+                          : day.state === 'rest' ? '—'
+                          : day.state === 'partial' ? '·'
                           : <X size={14} strokeWidth={2.4} className="text-label-alt" />}
                       </span>
 
@@ -215,122 +184,15 @@ export default function StreakDetail() {
 
             <p className="text-caption1 text-label-assistive text-center mt-4">
               {streak > 0
-                ? `오늘을 포함해 ${streak}일 연속 달성 중이에요`
-                : '오늘 루틴을 완료하면 연속 달성이 시작돼요'}
+                ? `예정된 날 기준 ${streak}일 연속 기록 중이에요`
+                : '오늘 예정 항목의 절반 이상을 기록하면 시작돼요'}
             </p>
           </div>
         </motion.div>
 
-        {/* 방패 카드 */}
-        <motion.div variants={itemV} className="mx-4 mb-4">
-          <button
-            onClick={() => setShowShieldInfo(true)}
-            className="review-paper-card w-full px-4 py-4 flex items-center gap-3 hover:bg-fill transition-colors text-left"
-          >
-            <div className="w-11 h-11 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
-              <Shield size={22} className="text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-label1 font-bold text-label-strong">연속 기록 보호 방패</p>
-              <p className="text-caption1 text-label-alt mt-0.5">
-                {daysToShield > 0 ? `${daysToShield}일 더 달성하면 방패 1개 획득` : '방패를 획득했어요!'}
-              </p>
-            </div>
-            <div className="flex gap-1.5 flex-shrink-0">
-              {Array.from({ length: 2 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    i < shields ? 'bg-primary shadow-sm' : 'bg-fill'
-                  }`}
-                >
-                  <Shield size={15} className={i < shields ? 'text-white' : 'text-label-assistive'} />
-                </div>
-              ))}
-            </div>
-          </button>
-        </motion.div>
 
-        {/* 다음 방패까지 프로그레스 */}
-        <motion.div variants={itemV} className="mx-4">
-          <div className="review-paper-card px-4 py-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Flame size={16} className="text-cautionary" />
-                <p className="text-label1 font-bold text-label-strong">다음 방패까지</p>
-              </div>
-              <span className="text-caption1 text-label-alt font-medium">{streak % 5}/5일</span>
-            </div>
-
-            <div className="h-2.5 bg-fill rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-primary rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${shieldProgress * 100}%` }}
-                transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-              />
-            </div>
-
-            <div className="flex justify-between mt-2">
-              <p className="text-caption1 text-label-assistive">5일 연속마다 방패 획득</p>
-              <p className="text-caption1 text-label-assistive">최대 2개 보유</p>
-            </div>
-          </div>
-        </motion.div>
       </motion.div>
 
-      {/* 방패 설명 바텀시트 */}
-      <AnimatePresence>
-        {showShieldInfo && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/40 z-40"
-              onClick={() => setShowShieldInfo(false)}
-            />
-            <motion.div
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50 bg-surface rounded-t-3xl px-6 pt-6 pb-10 shadow-overlay"
-            >
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-primary-soft flex items-center justify-center">
-                    <Shield size={22} className="text-primary" />
-                  </div>
-                  <h2 className="text-headline1 font-bold text-label-strong">연속 기록 보호 방패</h2>
-                </div>
-                <button onClick={() => setShowShieldInfo(false)} className="text-label-assistive hover:text-label-alt transition-colors">
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="flex flex-col gap-3 mb-6">
-                {[
-                  '방패 1개는 연속 달성 기록 하루를 보호해요',
-                  '5일 연속 달성을 하면 방패 1개를 드려요',
-                  '방패는 한 번에 최대 2개까지 가질 수 있어요',
-                ].map((text, i) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                    <p className="text-body2 text-label leading-relaxed">{text}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-3 bg-primary-soft rounded-xl px-4 py-3">
-                <Shield size={18} className="text-primary flex-shrink-0" />
-                <span className="text-body2 font-semibold text-primary">현재 보유 방패: {shields}개</span>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* 스트릭 5일 단위 달성 스탬프 */}
       <StampOverlay
         show={showStreakStamp}
         label={`${streak}일`}
@@ -376,7 +238,7 @@ function MyTreeCard() {
             style={{ background: 'var(--gradient-canopy)' }}
             initial={{ width: 0 }}
             animate={{ width: `${Math.round(growth.progressToNext * 100)}%` }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
           />
         </div>
       </div>

@@ -37,9 +37,9 @@ export default function ReviewBanner({ completed, overdue = false, weekRangeText
   }
 
   // 미완료 — 승격 카드 (overdue면 더 강한 톤)
-  const accent = overdue ? '#E0792B' : '#5854C7';
-  const softBg = overdue ? '#FCF1E6' : '#EEEDFE';
-  const iconBg = overdue ? '#F7DFC8' : '#DEDCFB';
+  const accent = '#1F4D3A';
+  const softBg = overdue ? '#F8DCC0' : '#E4E7D5';
+  const iconBg = '#F0876E';
 
   return (
     <motion.button
@@ -62,11 +62,9 @@ export default function ReviewBanner({ completed, overdue = false, weekRangeText
       <div className="flex-1 min-w-0">
         <p className="text-caption1 mb-0.5" style={{ color: accent, opacity: 0.85 }}>{weekRangeText}</p>
         <p className="text-body1 font-bold" style={{ color: accent }}>
-          {overdue ? '지난주 리뷰가 아직 남아있어요' : '한 주를 마무리할 시간이에요'}
+          {overdue ? '지난주 리뷰 이어 쓰기' : '이번 주 리뷰'}
         </p>
-        <p className="text-caption1 mt-0.5" style={{ color: accent, opacity: 0.8 }}>
-          {overdue ? '오늘 안에 마무리하고 새로운 주를 시작해요' : '루틴을 점검하고 다음 주를 준비해요'}
-        </p>
+
       </div>
 
       <ChevronRight size={20} style={{ color: accent }} className="flex-shrink-0" />

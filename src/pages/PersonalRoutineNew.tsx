@@ -1,3 +1,10 @@
+import { useLocalDraft } from '../hooks/useLocalDraft';
+import { readDraft } from '../lib/localDrafts';
+import { useAuthStore } from '../store/authStore';
+import { usePlanDeletionIds } from '../hooks/usePlanDeletionIds';
+import { isBundleDraft, type BundleDraft } from '../utils/formDrafts';
+import FormBoundary from '../components/FormBoundary';
+import { useFormProtection } from '../hooks/useFormProtection';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -7,7 +14,7 @@ import { fmtDuration } from '../utils/duration';
 import { format } from 'date-fns';
 import { useHabitStore } from '../store/habitStore';
 import { useGoalStore } from '../store/goalStore';
-import type { Habit } from '../types';
+import type { Habit, PersonalRoutine } from '../types';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
 import OnjuIcon from '../components/ui/OnjuIcon';
 import Switch from '../components/ui/Switch';
@@ -26,9 +33,18 @@ const tap = { whileTap: { scale: 0.94 }, transition: { type: 'spring' as const, 
 const tapSm = { whileTap: { scale: 0.88 }, transition: { type: 'spring' as const, stiffness: 700, damping: 22 } };
 
 export default function PersonalRoutineNew() {
+  const { id } = useParams<{ id?: string }>();
+  const exists = useHabitStore(s => s.personalRoutines.some(item => item.id === id));
+  const owner = useAuthStore(s=>s.user?.id);
+  let fallback: PersonalRoutine | undefined;
+  if (id && owner && !exists) { try { const saved=readDraft(owner,`personal-routine:${id}`,isBundleDraft); if(saved?.values.base?.id===id) fallback=saved.values.base; } catch { /* Keep unreadable drafts in place. */ } }
+  return <FormBoundary id={id} exists={exists || !!fallback}><PersonalRoutineNewEditor fallback={fallback} /></FormBoundary>;
+}
+
+function PersonalRoutineNewEditor({fallback}:{fallback?:PersonalRoutine}) {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
-  const { habits, personalRoutines, addPersonalRoutine, updatePersonalRoutine } = useHabitStore();
+  const { habits: allHabits, personalRoutines, addPersonalRoutine, updatePersonalRoutine } = useHabitStore();
   const { monthlyGoals } = useGoalStore();
 
   const todayIso = format(new Date(), 'yyyy-MM-dd');
@@ -36,8 +52,12 @@ export default function PersonalRoutineNew() {
     .filter(g => g.startDate <= todayIso && g.endDate >= todayIso && g.goalRoutines?.length && g.category === 'personal')
     .flatMap(g => (g.goalRoutines ?? []).map(r => ({ ...r, goalTitle: g.title })));
 
-  const existing = id ? personalRoutines.find(r => r.id === id) : null;
-  const isEdit = !!existing;
+  const habits = allHabits.filter(h => !h.archivedAt);
+  const existing = id ? personalRoutines.find(r => r.id === id) ?? fallback : null;
+  const isEdit = !!id;
+  const [base, setBase] = useState(existing ?? undefined);
+  const [entityId, setEntityId] = useState<string>(newId);
+  const deleting = usePlanDeletionIds().includes(`bundle:${id}`);
 
   const [title, setTitle] = useState(existing?.title ?? '');
   const [emoji, setEmoji] = useState(existing?.emoji ?? '');
@@ -47,6 +67,13 @@ export default function PersonalRoutineNew() {
   const [habitDurations, setHabitDurations] = useState<Record<string, number>>(
     existing?.habitDurations ?? {}
   );
+
+  const values: BundleDraft = { base, entityId, title, emoji, when, selectedIds, timerEnabled, habitDurations };
+  const draft = useLocalDraft({ document: `personal-routine:${id ?? 'new'}`, values, validate: isBundleDraft,
+    restore: v => { setBase(v.base?.id===id ? v.base : id && existing ? {...existing,revision:undefined} : undefined);
+      setEntityId(v.entityId);setTitle(v.title);setEmoji(v.emoji);setWhen(v.when);setSelectedIds(v.selectedIds);setTimerEnabled(v.timerEnabled);setHabitDurations(v.habitDurations); } });
+  const protection = useFormProtection(values, draft.leaveMessage);
+  const leave = () => { if (window.history.state?.idx > 0) navigate(-1); else navigate('/'); };
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -82,26 +109,30 @@ export default function PersonalRoutineNew() {
     : `${totalSeconds}초`;
 
   const handleSubmit = () => {
-    if (!title.trim() || selectedIds.length < 2) return;
+    if (draft.awaitingChoice || deleting || !title.trim() || selectedIds.length < 2) return;
     const data = {
       title: title.trim(), emoji, when: when.trim(),
       habitIds: selectedIds, timerEnabled,
-      habitDurations: timerEnabled ? habitDurations : undefined,
+      habitDurations,
     };
-    if (isEdit && existing) {
-      updatePersonalRoutine(existing.id, data);
-    } else {
-      addPersonalRoutine({ id: newId(), userId: '', createdAt: new Date().toISOString(), ...data });
-    }
-    navigate(-1);
+    if (!protection.save(() => {
+      if (isEdit && base) {
+        updatePersonalRoutine(base.id, data, base);
+      } else {
+        addPersonalRoutine({ id: entityId, userId: '', createdAt: new Date().toISOString(), ...data });
+      }
+      draft.clear();
+    })) return;
+    leave();
   };
 
 
   return (
     <div className="form-paper min-h-dvh flex flex-col">
+      {protection.guard}
       {/* 헤더 */}
       <div className="form-paper-header flex items-center px-4 pt-5 pb-3">
-        <motion.button {...tapSm} onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
+        <motion.button {...tapSm} onClick={() => protection.requestLeave(leave)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">
@@ -110,7 +141,8 @@ export default function PersonalRoutineNew() {
         <div className="w-8" />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5 pb-28">
+      <div className="px-4 pt-3">{draft.banner}{deleting && <p role="status" className="text-caption1 text-primary">삭제 결과를 확인 중이에요. 완료 전까지 묶음을 유지해요.</p>}</div>
+      <fieldset disabled={draft.awaitingChoice || deleting} className="min-w-0 flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5 pb-28">
 
         {/* 월간 목표에서 루틴 가져오기 */}
         {!isEdit && activeGoalRoutines.length > 0 && (
@@ -128,7 +160,7 @@ export default function PersonalRoutineNew() {
                       {[r.when, r.where].filter(Boolean).join(' · ')}
                     </p>
                     {r.miniRoutine && (
-                      <p className="text-caption1 text-amber-500 mt-0.5 flex items-center gap-1"><Flame size={13} strokeWidth={1.9} /> 미니: {r.miniRoutine}</p>
+                      <p className="text-caption1 text-cautionary mt-0.5 flex items-center gap-1"><Flame size={13} strokeWidth={1.9} /> 미니: {r.miniRoutine}</p>
                     )}
                   </div>
                   <span className="text-caption2 text-primary bg-primary-soft px-2 py-0.5 rounded-lg flex-shrink-0 mt-0.5">
@@ -145,20 +177,21 @@ export default function PersonalRoutineNew() {
           <p className="text-caption1 font-bold text-label-alt mb-2">루틴 이름</p>
           <div className="flex gap-2">
             <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
-            <input type="text" value={title} onChange={e => setTitle(e.target.value)}
+            <input aria-label="루틴 이름" type="text" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="루틴 이름을 입력하세요" autoFocus
               className="form-paper-input flex-1 text-body2 font-medium" />
           </div>
         </div>
 
         {/* 언제 + 타이머 */}
+        <details className="quiet-details"><summary>시간·타이머 설정</summary>
         <div className="form-paper-card overflow-hidden">
           <div className="px-4 py-4 border-b border-line-soft">
             <div className="flex items-center gap-3 mb-2">
               <Clock size={20} strokeWidth={1.9} className="text-label-strong" />
               <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
             </div>
-            <input type="text" value={when} onChange={e => setWhen(e.target.value)}
+            <input aria-label="언제 할래요?" type="text" value={when} onChange={e => setWhen(e.target.value)}
               placeholder="예) 아침 7시, 출근 전"
               className="w-full bg-fill border border-line rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-primary focus:bg-surface transition-all" />
           </div>
@@ -174,6 +207,7 @@ export default function PersonalRoutineNew() {
           </div>
         </div>
 
+        </details>
         {/* 습관 선택 + 시간 설정 통합 */}
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -188,7 +222,7 @@ export default function PersonalRoutineNew() {
             </div>
           </div>
 
-          {habits.length === 0 ? (
+          {habits.length === 0 && selectedIds.length === 0 ? (
             <div className="bg-cautionary/10 border border-cautionary/20 rounded-xl px-4 py-4 text-center">
               <p className="text-body2 font-semibold text-[#d47800]">등록된 습관이 없어요</p>
               <p className="text-caption1 text-cautionary mt-0.5">먼저 습관을 추가해 주세요</p>
@@ -198,8 +232,12 @@ export default function PersonalRoutineNew() {
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={selectedIds} strategy={verticalListSortingStrategy}>
                   {selectedIds.map((hId, order) => {
-                    const h = habits.find(x => x.id === hId);
-                    if (!h) return null;
+                    const h = allHabits.find(x => x.id === hId);
+                    if (!h || h.archivedAt) return <div key={hId} className="rounded-xl border border-line p-3 text-body2">
+                      <p>{order+1}. {h?.title ?? '현재 목록에 없는 습관'} · {h ? '보관 중' : '연결 유지 중'}</p>
+                      <p className="text-caption1">선택을 유지하면 순서와 시간 설정도 보존돼요.</p>
+                      <button className="min-h-11 font-bold text-primary" onClick={()=>toggle(hId)}>묶음에서 제외</button>
+                    </div>;
                     const secs = habitDurations[hId] ?? 60;
                     return (
                       <SortableHabitCard
@@ -244,14 +282,14 @@ export default function PersonalRoutineNew() {
           )}
         </div>
 
-      </div>
+      </fieldset>
 
       {/* 하단 버튼 */}
       <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        style={{ paddingBottom: 'max(1rem, var(--app-safe-bottom))' }}>
         <motion.button whileTap={{ scale: 0.98 }} transition={{ duration: 0.12 }}
           onClick={handleSubmit}
-          disabled={!title.trim() || selectedIds.length < 2}
+          disabled={draft.awaitingChoice || deleting || !title.trim() || selectedIds.length < 2}
           className="w-full h-12 mt-3 rounded-lg bg-primary text-white font-bold text-body1 disabled:opacity-30 hover:bg-primary-strong transition-colors">
           {isEdit ? '수정 완료' : '시작하기'}
         </motion.button>

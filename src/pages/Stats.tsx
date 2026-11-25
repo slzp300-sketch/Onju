@@ -1,7 +1,7 @@
+import { isItemDue } from '../utils/scheduleHistory';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Target, BookOpen, Dumbbell, Link2, Pin, BarChart3, Flame, FileText, Moon } from '../icons';
-import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, getDay } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -20,10 +20,11 @@ import {
 } from '../utils/date';
 import { calcReviewStreak } from '../utils/reviewStreak';
 import { calcDiaryStreak, DIARY_MOODS } from '../utils/diaryStats';
-import { getLinkedItems, rateFromItems, adherenceFromItems, isScheduled } from '../utils/goalProgress';
+import { getLinkedItems, rateFromItems, adherenceFromItems } from '../utils/goalProgress';
+import { isHabitDue, isFaithDue } from '../utils/scheduledItems';
 import { getDayCompletion, type DayState } from '../utils/dayCompletion';
 import { getHabitStat, type DayStatus } from '../utils/habitStats';
-import { fetchReviews } from '../api/reviews';
+import { useReviews } from '../hooks/useReviews';
 import type { MonthlyGoal, Habit, DailyRoutine } from '../types';
 
 type TabType = 'goal' | 'habit' | 'weekly' | 'records';
@@ -36,13 +37,13 @@ const REVIEW_MOOD_META: { key: 'easy' | 'normal' | 'hard'; emoji: string; label:
 ];
 
 export default function Stats() {
-  const [activeTab, setActiveTab] = useState<TabType>('goal');
+  const [activeTab, setActiveTab] = useState<TabType>('weekly');
 
   return (
     <div className="stats-paper flex flex-col min-h-full">
       <header className="px-5 pt-5 pb-3">
-        <p className="text-caption1 font-medium tracking-wide text-label-alt">차곡차곡 쌓인 기록</p>
-        <h1 className="mt-0.5 text-heading1 font-bold text-label-strong font-brand">나의 성장 기록</h1>
+
+        <h1 className="mt-0.5 text-heading1 font-bold text-label-strong font-brand">통계</h1>
       </header>
 
       <div className="stats-tab-backdrop sticky top-0 z-sticky px-4 pb-2">
@@ -51,9 +52,9 @@ export default function Stats() {
           onChange={setActiveTab}
           label="통계 항목"
           items={[
+            { value: 'weekly', label: '주간' },
             { value: 'goal', label: '목표' },
             { value: 'habit', label: '습관' },
-            { value: 'weekly', label: '주간' },
             { value: 'records', label: '기록' },
           ]}
         />
@@ -120,7 +121,7 @@ function GoalStatsTab() {
     return (
       <GoalStatCard key={g.id} goal={g} past={past}
         rate={rateFromItems(items)} adherence={adherenceFromItems(items)} items={items}
-        onClick={() => navigate('/goals')}
+        onClick={() => navigate('/goals', { state: { goalId: g.id } })}
       />
     );
   };
@@ -150,18 +151,20 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
   items: ReturnType<typeof getLinkedItems>; onClick: () => void;
 }) {
   const { elapsed, total } = elapsedDays(goal.startDate, goal.endDate);
-  const accent = goal.color ?? (past ? 'var(--color-label-assistive)' : 'var(--color-primary)');
+  const accent = past ? 'var(--color-label-assistive)' : 'var(--color-primary)';
   const status = adherenceStatus(adherence);
+  const hasElapsed = items.some(item => item.scheduledElapsed > 0);
+  const hasScheduled = items.some(item => item.scheduledTotal > 0);
 
   return (
     <motion.button
       whileTap={{ scale: 0.99 }} onClick={onClick}
       className="stats-paper-card w-full text-left overflow-hidden"
-      style={goal.color ? { backgroundColor: `${goal.color}0a`, borderColor: `${goal.color}40` } : undefined}
     >
       {/* 헤더 */}
       <div className="px-4 pt-4 pb-3">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          {goal.color && <span aria-hidden className="size-2 shrink-0 rounded-full" style={{ backgroundColor: goal.color }} />}
           <span className="text-caption1 font-medium" style={{ color: accent }}>
             {format(new Date(goal.startDate + 'T12:00:00'), 'M/d')} ~ {format(new Date(goal.endDate + 'T12:00:00'), 'M/d')}
           </span>
@@ -175,7 +178,7 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
             </span>
           )}
           <span className="text-caption2 text-label-assistive ml-auto">
-            {past ? '종료' : `D+${elapsed - 1} · ${elapsed}/${total}일`}
+            {past ? '종료' : goal.startDate > format(new Date(), 'yyyy-MM-dd') ? '시작 전' : `D+${Math.max(0, elapsed - 1)} · ${elapsed}/${total}일`}
           </span>
         </div>
         <p className={`text-body2 font-bold leading-snug ${past ? 'text-label-alt' : 'text-label-strong'}`}>
@@ -186,34 +189,38 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
       {/* 수행률 / 전체 진척도 */}
       <div className="px-4 pb-3 flex gap-2">
         <div className="flex-1 rounded-xl bg-fill/60 px-3 py-2.5">
-          <p className="text-caption2 text-label-assistive mb-0.5">수행률</p>
-          <p className="text-title3 font-bold leading-none" style={{ color: status.color }}>{adherence}%</p>
-          {!past && <p className="text-caption2 font-semibold mt-1" style={{ color: status.color }}>{status.label}</p>}
+          <p className="text-caption2 text-label-alt mb-0.5">지금까지 기록률</p>
+          <p className="text-title3 font-bold leading-none" style={{ color: status.color }}>{hasElapsed ? `${adherence}%` : '—'}</p>
+          <p className="text-caption2 text-label-alt mt-1">오늘까지 예정일 기준</p>
+          {!past && hasElapsed && <p className="text-caption2 font-semibold mt-1" style={{ color: status.color }}>{status.label}</p>}
         </div>
         <div className="flex-1 rounded-xl bg-fill/60 px-3 py-2.5">
-          <p className="text-caption2 text-label-assistive mb-0.5">전체 진척도</p>
-          <p className="text-title3 font-bold leading-none" style={{ color: accent }}>{rate}%</p>
+          <p className="text-caption2 text-label-alt mb-0.5">전체 진척도</p>
+          <p className="text-title3 font-bold leading-none" style={{ color: accent }}>{hasScheduled ? `${rate}%` : '—'}</p>
           <p className="text-caption2 text-label-assistive mt-1">기간 전체 기준</p>
         </div>
       </div>
 
       {/* 연동 습관별 */}
+      <p className="px-4 pb-3 text-caption1 text-label-alt">완료·대체·쉼 기록을 포함해요. 전체 진척도에는 앞으로의 예정일도 포함돼요.</p>
       <div className="px-4 pb-4 flex flex-col gap-2.5">
-        <p className="text-caption1 font-bold text-label-strong flex items-center gap-1.5"><Link2 size={13} strokeWidth={1.9} className="text-label-strong" /> 연동된 습관 {items.length > 0 && `(${items.length})`}</p>
+        <p className="text-caption1 font-bold text-label-strong flex items-center gap-1.5"><Link2 size={13} strokeWidth={1.9} className="text-label-strong" /> 실천별 기록 {items.length > 0 && `(${items.length})`}</p>
         {items.length > 0 ? items.map(item => (
-          <div key={item.id}>
+          <div key={`${item.kind}:${item.id}`}>
+            {!item.currentlyLinked && <p className="text-caption2 text-label-alt mb-1">이전 연결 기록</p>}
+            {item.currentlyLinked && !item.scheduledTotal && <p className="text-caption2 text-label-alt mb-1">연결 유지 · 이 목표 기간 안의 예정일 없음</p>}
             <div className="flex items-center justify-between mb-1">
-              <span className="text-body2 text-label truncate flex-1 mr-2 inline-flex items-center gap-1.5">
+              <span className="text-body2 text-label min-w-0 flex-1 mr-2 inline-flex items-center gap-1.5">
                 {item.emoji
                   ? <OnjuIcon emoji={item.emoji} size={18} />
                   : item.kind === 'faith'
                     ? <BookOpen size={14} strokeWidth={1.9} className="text-label-assistive flex-shrink-0" />
                     : <Pin size={14} strokeWidth={1.9} className="text-label-assistive flex-shrink-0" />}
-                <span className="truncate">{item.title}</span>
+                <span className="min-w-0 break-words">{item.title}</span>
               </span>
               <span className="flex items-center gap-1.5 flex-shrink-0">
-                <span className="text-caption2 text-label-assistive">{item.doneCount}/{item.scheduledElapsed}일</span>
-                <span className="text-caption1 font-bold" style={{ color: accent }}>{item.adherence}%</span>
+                <span className="text-caption2 text-label-assistive">{item.scheduledElapsed ? `${item.doneCount}/${item.scheduledElapsed}일` : item.scheduledTotal ? '예정 전' : '예정 없음'}</span>
+                <span className="text-caption1 font-bold" style={{ color: accent }}>{item.scheduledElapsed ? `${item.adherence}%` : '—'}</span>
               </span>
             </div>
             <div className="bg-fill-strong rounded-full h-1 overflow-hidden">
@@ -222,7 +229,7 @@ function GoalStatCard({ goal, past = false, rate, adherence, items, onClick }: {
           </div>
         )) : (
           <p className="text-caption1 text-label-assistive leading-relaxed">
-            연동된 습관이 없어요. 목표 화면에서 "습관으로 만들기"로 추가해 보세요.
+            연결된 실천이 없어요. 목표 화면의 "실천 연결·관리"에서 추가해 보세요.
           </p>
         )}
       </div>
@@ -262,9 +269,9 @@ function HabitStatsTab() {
           <p className="text-caption1 font-bold text-label-alt flex items-center gap-1.5"><Pin size={13} strokeWidth={1.9} className="text-label-alt" /> 개인 습관</p>
           {habits.map(h => (
             <HabitStatRow key={h.id}
-              emoji={h.emoji} title={h.title} accent="var(--color-primary)"
+              emoji={h.emoji} title={`${h.title}${h.archivedAt ? ' · 보관됨' : ''}`} accent="var(--color-primary)"
               stat={getHabitStat(h.frequency, h.customDays, h.createdAt,
-                habitLogs.filter(l => l.habitId === h.id))}
+                habitLogs.filter(l => l.habitId === h.id), date => isItemDue(h, date))}
             />
           ))}
         </div>
@@ -275,9 +282,9 @@ function HabitStatsTab() {
           <p className="text-caption1 font-bold text-label-alt flex items-center gap-1.5"><BookOpen size={13} strokeWidth={1.9} className="text-label-alt" /> 신앙 루틴</p>
           {faithRoutines.map(r => (
             <HabitStatRow key={r.id}
-              emoji={r.emoji ?? '✝️'} title={r.title} accent="var(--color-faith)"
+              emoji={r.emoji ?? '✝️'} title={`${r.title}${r.archivedAt ? ' · 보관됨' : ''}`} accent="var(--color-faith)"
               stat={getHabitStat(r.frequency, undefined, r.createdAt,
-                logs.filter(l => l.routineId === r.id))}
+                logs.filter(l => l.routineId === r.id), date => isItemDue(r, date))}
             />
           ))}
         </div>
@@ -288,8 +295,8 @@ function HabitStatsTab() {
 
 const STATUS_STYLE: Record<DayStatus, string> = {
   done:  'bg-primary',
-  sub:   'bg-orange-400',
-  rest:  'bg-amber-300',
+  sub:   'bg-accent',
+  rest:  'bg-[#FBEFC8]',
   miss:  'bg-fill-strong',
   off:   'bg-transparent border border-line-soft',
   future:'bg-transparent border border-dashed border-line-soft',
@@ -311,15 +318,15 @@ function HabitStatRow({ emoji, title, accent, stat }: {
     <div className="stats-paper-card px-4 py-3.5">
       <div className="flex items-center gap-2.5 mb-3">
         <OnjuIcon emoji={emoji} size={30} />
-        <span className="flex-1 text-body2 font-bold text-label-strong truncate">{title}</span>
-        <span className="text-title3 font-bold" style={{ color: accent }}>{stat.rate30}%</span>
+        <span className="min-w-0 flex-1 text-body2 font-bold text-label-strong break-words">{title}</span>
+        <span className="shrink-0 text-title3 font-bold" style={{ color: accent }}>{stat.rate30}%</span>
       </div>
 
       {/* 최근 14일 도트 */}
       <div className="flex gap-1 mb-2" aria-label="최근 14일 실천 기록">
         {stat.recent.map((d, i) => (
           <div key={i} role="img" aria-label={`${format(new Date(d.date + 'T12:00:00'), 'M월 d일')} ${STATUS_LABEL[d.status]}`}
-            className={`habit-stat-mark flex h-5 flex-1 items-center justify-center rounded-md text-[9px] font-bold ${STATUS_STYLE[d.status]} ${d.status === 'done' || d.status === 'sub' ? 'text-white' : 'text-label-alt'}`}
+            className={`habit-stat-mark flex h-5 flex-1 items-center justify-center rounded-md text-[9px] font-bold ${STATUS_STYLE[d.status]} ${d.status === 'done' ? 'text-white' : 'text-label-strong'}`}
             style={d.status === 'done' ? { backgroundColor: accent } : undefined}>
             {STATUS_MARK[d.status]}
           </div>
@@ -330,7 +337,7 @@ function HabitStatRow({ emoji, title, accent, stat }: {
       </div>
 
       {/* 지표 행 */}
-      <div className="flex items-center gap-4 text-caption1">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-caption1">
         <span className="text-label-alt inline-flex items-center gap-1"><Flame size={13} strokeWidth={1.9} className="text-cautionary" /> 연속 <span className="font-bold text-label-strong">{stat.streak}일</span></span>
         <span className="text-label-alt">최고 <span className="font-bold text-label-strong">{stat.best}일</span></span>
         <span className="text-label-assistive ml-auto">최근 30일 {stat.done30}/{stat.sched30}일</span>
@@ -374,7 +381,8 @@ function WeeklyTab() {
   const lastWeekDays = getWeekDays(lastWeekDate, weekStartDay as 0 | 1);
 
   const week     = computeWeek(thisWeekDays, habits, habitLogs, faithRoutines, logs);
-  const lastWeek = computeWeek(lastWeekDays, habits, habitLogs, faithRoutines, logs);
+  const elapsedWeekDays = thisWeekDays.filter(d => format(d, 'yyyy-MM-dd') <= today()).length;
+  const lastWeek = computeWeek(lastWeekDays.slice(0, elapsedWeekDays), habits, habitLogs, faithRoutines, logs);
 
   const perfectCount = week.filter(d => d.state === 'perfect').length;
   const lastPerfect  = lastWeek.filter(d => d.state === 'perfect').length;
@@ -391,12 +399,12 @@ function WeeklyTab() {
   const habitConsistency = [
     ...habits.map(h => ({
       title: h.title, emoji: h.emoji,
-      done: weekIsos.filter(ds => isScheduled(ds, h.frequency, h.customDays)
+      done: weekIsos.filter(ds => isHabitDue(h, ds)
         && habitLogs.some(l => l.habitId === h.id && l.date === ds && (l.completed || l.skipped || l.substitute))).length,
     })),
     ...faithRoutines.map(r => ({
       title: r.title, emoji: r.emoji ?? '✝️',
-      done: weekIsos.filter(ds => isScheduled(ds, r.frequency)
+      done: weekIsos.filter(ds => isFaithDue(r, ds)
         && logs.some(l => l.routineId === r.id && l.date === ds && (l.completed || l.skipped))).length,
     })),
   ].sort((a, b) => b.done - a.done);
@@ -472,7 +480,7 @@ function WeeklyTab() {
           <SummaryStat label="완벽한 날" value={`${perfectCount}일`}
             sub={perfectDelta === 0 ? '지난주와 동일' : perfectDelta > 0 ? `지난주 +${perfectDelta}` : `지난주 ${perfectDelta}`}
             subColor={perfectDelta > 0 ? 'text-positive' : perfectDelta < 0 ? 'text-negative' : 'text-label-assistive'} />
-          <SummaryStat label="평균 달성률" value={`${avgRate}%`} sub="경과일 기준" subColor="text-label-assistive" />
+          <SummaryStat label="평균 기록률" value={obligationDays.length ? `${avgRate}%` : '—'} sub="완료·대체·쉼 포함" subColor="text-label-alt" />
           <SummaryStat label="베스트 습관" value={bestHabit ? `${bestHabit.done}회` : '-'}
             sub={bestHabit ? `${bestHabit.emoji} ${bestHabit.title}` : '아직 없어요'} subColor="text-label-alt" />
         </div>
@@ -483,7 +491,7 @@ function WeeklyTab() {
           {/* ── 이번 주 vs 지난주 ── */}
           <div className="stats-paper-card px-4 py-3.5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <p className="text-caption1 font-bold text-label-strong">이번 주 vs 지난주</p>
+              <p className="text-caption1 font-bold text-label-strong">지난주 같은 기간과 비교</p>
               <span className={`text-caption1 font-bold tabular-nums ${
                 avgDelta > 0 ? 'text-positive' : avgDelta < 0 ? 'text-negative' : 'text-label-assistive'
               }`}>
@@ -494,6 +502,7 @@ function WeeklyTab() {
             <BarRow label="지난주" value={lastAvgRate} color="var(--color-label-assistive)" />
           </div>
 
+          <details className="quiet-details"><summary>개인·신앙과 요일별 분석</summary><div className="flex flex-col gap-4">
           {/* ── 이번 주 개인·신앙 ── */}
           <div className="stats-paper-card px-4 py-3.5 flex flex-col gap-3">
             <p className="text-caption1 font-bold text-label-strong">이번 주 개인·신앙</p>
@@ -534,6 +543,7 @@ function WeeklyTab() {
               <p className="text-caption1 text-center text-label-assistive mt-3">기록이 쌓이면 요일별 패턴이 보여요</p>
             )}
           </div>
+          </div></details>
         </>
       )}
     </div>
@@ -546,7 +556,7 @@ function WeeklyTab() {
 function RecordsTab() {
   const navigate = useNavigate();
   const { entries } = useDiaryStore();
-  const { data: reviews = [] } = useQuery({ queryKey: ['reviews'], queryFn: fetchReviews });
+  const { data: reviews = [] } = useReviews();
   const { weekStartDay } = useSettingsStore();
   const reviewPrompt = getReviewPrompt(reviews);
 
@@ -606,7 +616,7 @@ function RecordsTab() {
               <SummaryStat label="총 일기" value={`${entries.length}개`} sub="지금까지" subColor="text-label-assistive" />
               <SummaryStat label="연속 작성" value={diaryStreak > 0 ? `${diaryStreak}일` : '-'}
                 sub={diaryStreak >= 2 ? '🔥 이어가는 중' : diaryStreak === 1 ? '오늘 작성' : '오늘 써볼까요'}
-                subColor={diaryStreak >= 2 ? 'text-orange-500' : 'text-label-assistive'} />
+                subColor={diaryStreak >= 2 ? 'text-cautionary' : 'text-label-assistive'} />
               <SummaryStat label="이번 달" value={`${thisMonthCount}일`} sub={format(new Date(), 'M월')} subColor="text-label-assistive" />
             </div>
 
@@ -653,7 +663,7 @@ function RecordsTab() {
               <SummaryStat label="총 리뷰" value={`${completedReviews.length}개`} sub="완료 기준" subColor="text-label-assistive" />
               <SummaryStat label="리뷰 연속" value={reviewStreak > 0 ? `${reviewStreak}주` : '-'}
                 sub={reviewStreak >= 2 ? '🔥 연속 리뷰 중' : reviewStreak === 1 ? '이번 주 완료' : '이어가 볼까요'}
-                subColor={reviewStreak >= 2 ? 'text-orange-500' : 'text-label-assistive'} />
+                subColor={reviewStreak >= 2 ? 'text-cautionary' : 'text-label-assistive'} />
               <SummaryStat label="평균 달성" value={`${avgPersonal}%`} sub={`신앙 ${avgFaith}%`} subColor="text-positive" />
             </div>
 
@@ -784,7 +794,7 @@ function WeekStampCell({ info, isToday, delay }: { info: WeekDayInfo; isToday: b
         {info.state === 'perfect' ? (
           <motion.div initial={{ scale: 1.6, opacity: 0, rotate: -16 }} animate={{ scale: 1, opacity: 1, rotate: -10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 18, delay }}>
-            <StampSeal label="완료" color="#1f8a4c" size={40} />
+            <StampSeal label="완료" color="#1F4D3A" size={40} />
           </motion.div>
         ) : info.state === 'partial' ? (
           <svg className="w-[60%] h-[60%] -rotate-90" viewBox="0 0 36 36">

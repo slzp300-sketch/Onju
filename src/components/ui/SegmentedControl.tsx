@@ -18,21 +18,21 @@ interface SegmentedControlProps<T extends string> {
 const containerClasses = {
   segmented: 'flex rounded-xl bg-fill p-1',
   pills: 'flex flex-wrap gap-2',
-  underline: 'flex border-b border-line-soft',
+  underline: 'flex border-b border-line-soft gap-1',
 };
 
 const itemClasses = {
-  segmented: 'min-h-9 flex-1 rounded-lg px-3 py-2 text-label1 font-semibold data-[active=true]:bg-surface data-[active=true]:text-label-strong data-[active=true]:shadow-emphasize',
-  pills: 'min-h-9 rounded-lg bg-fill px-3.5 py-1.5 text-label2 font-medium data-[active=true]:bg-primary data-[active=true]:text-white',
-  underline: 'relative min-h-11 px-1 py-2.5 mr-5 text-label1 font-bold border-b-2 border-transparent data-[active=true]:border-label-strong data-[active=true]:text-label-strong',
+  segmented: 'min-h-11 flex-1 rounded-lg px-3 py-2 text-label1 font-semibold data-[active=true]:bg-surface data-[active=true]:text-label-strong data-[active=true]:shadow-emphasize',
+  pills: 'min-h-11 rounded-lg bg-fill px-3.5 py-1.5 text-label2 font-medium data-[active=true]:bg-primary data-[active=true]:text-white',
+  underline: 'relative min-h-11 flex-1 px-2 py-2.5 text-label1 font-bold border-b-2 border-transparent data-[active=true]:border-accent data-[active=true]:text-label-strong',
 };
 
 export default function SegmentedControl<T extends string>({
-  value, onChange, items, label, variant = 'segmented', className,
+  value, onChange, items, label, variant = 'underline', className,
 }: SegmentedControlProps<T>) {
   return (
     <div role="tablist" aria-label={label} className={cn(containerClasses[variant], className)}>
-      {items.map(item => {
+      {items.map((item, index) => {
         const active = value === item.value;
         return (
           <button
@@ -40,11 +40,21 @@ export default function SegmentedControl<T extends string>({
             type="button"
             role="tab"
             aria-selected={active}
+            tabIndex={active ? 0 : -1}
             data-active={active}
             onClick={() => onChange(item.value)}
+            onKeyDown={event => {
+              const next = event.key === 'ArrowRight' ? (index + 1) % items.length
+                : event.key === 'ArrowLeft' ? (index + items.length - 1) % items.length
+                : event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : null;
+              if (next === null) return;
+              event.preventDefault();
+              onChange(items[next].value);
+              event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+            }}
             className={cn(
               'transition-[color,background-color,border-color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-standard)]',
-              'text-label-alt focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]',
+              'min-w-0 text-label-alt focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]',
               itemClasses[variant],
             )}
           >

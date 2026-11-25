@@ -1,9 +1,16 @@
-import { useMemo } from 'react';
-import { ChevronLeft, Feather, Sparkles } from '../icons';
+import type { RoutineLog } from '../types';
+import { useAuthStore } from '../store/authStore';
+import { useSavedDrafts } from '../hooks/useSavedDrafts';
+import PrayerMemo from '../components/routines/PrayerMemo';
+import BibleInput from '../components/routines/BibleInput';
+import { ruleAt } from '../utils/scheduleHistory';
+import { useMemo, useState } from 'react';
+import { ChevronLeft, Feather, Sparkles, Pencil } from '../icons';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import EmptyState from '../components/ui/EmptyState';
+import ActionMenu from '../components/ui/ActionMenu';
 import { useRoutineStore } from '../store/routineStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { toast } from '../store/toastStore';
@@ -12,6 +19,7 @@ import { getWeekRangeFor } from '../utils/date';
 import { WEEKDAY_LABELS } from '../types';
 
 interface Note {
+  base: RoutineLog;
   routineId: string;
   routineTitle?: string;
   date: string;
@@ -19,18 +27,29 @@ interface Note {
 }
 
 /** 은혜 기록 — 신앙 루틴에 남긴 말씀·기도 기록의 날짜별 아카이브 */
-export default function FaithNotes() {
+function isMemoDraft(value:unknown): value is {base?:RoutineLog} {
+  if(!value||typeof value!=='object')return false;
+  const v=value as Record<string,unknown>,base=v.base as RoutineLog|undefined;
+  return (typeof v.content==='string'||typeof v.reflection==='string') && (base===undefined||(!!base&&typeof base.routineId==='string'&&typeof base.date==='string'));
+}
+export default function FaithNotes(){const owner=useAuthStore(s=>s.user?.id);return <Notes key={owner}/>;}
+function Notes() {
   const navigate = useNavigate();
   const { logs, personalRoutines, faithRoutines, updateLogMemo } = useRoutineStore();
+  const drafts=useSavedDrafts('faith:',isMemoDraft);
+  const savedBase=(d:typeof drafts.drafts[number]):RoutineLog=>{const [,routineId,date]=d.document.split(':');return d.values.base??logs.find(l=>l.routineId===routineId&&l.date===date)??{id:routineId,routineId,date,userId:'',completed:false};};
+  const [editing,setEditing]=useState<{base:RoutineLog;kind:'bible'|'prayer'}>();
   const weekStartDay = useSettingsStore(s => s.weekStartDay);
 
   const notes = useMemo<Note[]>(() => {
-    const titleOf = (id: string) =>
-      [...faithRoutines, ...personalRoutines].find(r => r.id === id)?.title;
+    const titleOf = (id: string, date: string) => {
+      const item = [...faithRoutines, ...personalRoutines].find(r => r.id === id);
+      return item ? ruleAt(item, date)?.title ?? item.title : undefined;
+    };
     return logs
       .flatMap(l => {
         const memo = parseFaithMemo(l.memo);
-        return memo ? [{ routineId: l.routineId, routineTitle: titleOf(l.routineId), date: l.date, memo }] : [];
+        return memo ? [{ base:l, routineId: l.routineId, routineTitle: titleOf(l.routineId, l.date), date: l.date, memo }] : [];
       })
       .sort((a, b) => b.date.localeCompare(a.date));
   }, [logs, faithRoutines, personalRoutines]);
@@ -75,7 +94,7 @@ export default function FaithNotes() {
   const toggleAnswered = (note: Note) => {
     if (note.memo.type !== 'prayer') return;
     const next = { ...note.memo, answered: !note.memo.answered };
-    updateLogMemo(note.routineId, note.date, JSON.stringify(next));
+    try{updateLogMemo(note.routineId,note.date,JSON.stringify(next),note.base);}catch(error){toast.error(error instanceof Error?error.message:'저장하지 못했어요.');return;}
     if (next.answered) toast.success('응답받은 기도로 기록했어요 ✨');
   };
 
@@ -89,12 +108,14 @@ export default function FaithNotes() {
         </motion.button>
         <div>
           <h1 className="text-heading2 font-bold text-label-strong font-brand">은혜 기록</h1>
-          <p className="text-caption1 text-label-alt mt-0.5">쌓여가는 말씀과 기도</p>
+
         </div>
       </div>
 
-      {/* 통계 */}
-      <div className="px-4 grid grid-cols-3 gap-2">
+      {drafts.error&&<p role="alert" className="px-4">남겨둔 메모 초안을 읽지 못했어요.</p>}
+      {drafts.drafts.length>0&&<details className="mx-4 rounded-xl border border-line p-3"><summary className="min-h-11 font-bold">남겨둔 메모 초안 {drafts.drafts.length}개</summary>{drafts.drafts.map(d=><button key={d.document} className="block min-h-11 w-full text-left text-primary" onClick={()=>setEditing({base:savedBase(d),kind:d.document.endsWith(':bible')?'bible':'prayer'})}>{savedBase(d).date} · {d.document.endsWith(':bible')?'말씀':'기도'} 초안 이어 쓰기</button>)}</details>}
+      <details className="quiet-details mx-4"><summary>기록 통계</summary>
+      <div className="grid grid-cols-3 gap-2">
         <div className="records-summary-card py-3 text-center">
           <p className="text-headline1 font-bold text-label-strong tabular-nums">{thisWeekCount}<span className="text-caption1 text-label-alt font-semibold">개</span></p>
           <p className="text-caption2 font-semibold text-label-assistive mt-0.5">이번 주 기록</p>
@@ -109,6 +130,7 @@ export default function FaithNotes() {
         </div>
       </div>
 
+      </details>
       {/* 아카이브 */}
       {notes.length === 0 ? (
         <div className="px-4 pt-8">
@@ -161,6 +183,9 @@ export default function FaithNotes() {
                         </motion.button>
                       </>
                     )}
+                    <div className="flex justify-end"><ActionMenu title={n.memo.type === 'bible' ? '말씀 기록' : '기도 기록'} actions={[
+                      {label: '메모 수정', icon: <Pencil size={18} />, onClick: () => setEditing({base:n.base,kind:n.memo.type})},
+                    ]} /></div>
                     {n.routineTitle && (
                       <p className="text-caption2 text-label-assistive mt-2 flex items-center gap-1">
                         <Feather size={10} /> {n.routineTitle}
@@ -173,6 +198,7 @@ export default function FaithNotes() {
           ))}
         </div>
       )}
+      {editing&&(()=>{const Editor=editing.kind==='bible'?BibleInput:PrayerMemo;return <Editor key={`${editing.base.routineId}:${editing.base.date}:${editing.kind}`} isOpen onClose={()=>setEditing(undefined)} initialMemo={editing.base.memo} baseLog={editing.base} draftKey={`faith:${editing.base.routineId}:${editing.base.date}:${editing.kind}`} onSave={(memo,base)=>updateLogMemo(editing.base.routineId,editing.base.date,memo,base)}/>;})()}
     </div>
   );
 }

@@ -32,7 +32,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.14, ease: [0.2, 0, 0, 1] }}
       className={cn(
-        'inline-flex items-center justify-center gap-1.5 font-bold transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]',
+        'inline-flex min-h-11 items-center justify-center gap-1.5 font-bold transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]',
         'disabled:cursor-not-allowed',
         SIZES[size],
         VARIANTS[variant],

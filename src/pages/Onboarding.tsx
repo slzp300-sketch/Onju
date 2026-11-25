@@ -1,3 +1,4 @@
+import { toast } from '../store/toastStore';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -81,6 +82,7 @@ export default function Onboarding() {
     const t = title.trim();
     if (!t) return;
     const finalEmoji = emoji || (routineType === 'faith' ? '🙏' : '🌱');
+    try {
     if (routineType === 'faith') {
       addRoutine({
         id: newId(), userId: '',
@@ -97,6 +99,7 @@ export default function Onboarding() {
     }
     setCreated({ title: t, emoji: finalEmoji });
     go(4);
+    } catch (error) { toast.error(error instanceof Error ? error.message : '실천을 저장하지 못했어요. 다시 시도해주세요.'); }
   };
 
   const canPlant = title.trim().length > 0;

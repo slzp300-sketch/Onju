@@ -1,5 +1,12 @@
+import { readDraft } from '../lib/localDrafts';
+import { useAuthStore } from '../store/authStore';
+import type { Habit } from '../types';
+import { useLocalDraft } from '../hooks/useLocalDraft';
+import { habitDraftBase, isHabitDraft, type HabitDraft } from '../utils/formDrafts';
+import FormBoundary from '../components/FormBoundary';
+import { useFormProtection } from '../hooks/useFormProtection';
 import { useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Target, Bell, Calendar, Check, Zap, Lightbulb, Flame } from '../icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPickerButton from '../components/ui/EmojiPickerButton';
@@ -18,8 +25,10 @@ import { useHabitStore } from '../store/habitStore';
 import { useGoalStore } from '../store/goalStore';
 import type { HabitFrequency } from '../types';
 import { WEEKDAY_LABELS } from '../types';
-import { newId } from '../utils/id';
+import { newId, isUuid } from '../utils/id';
 import { requestNotifPermission } from '../lib/notifyPermission';
+import { toast } from '../store/toastStore';
+import { canLinkMonthlyGoal } from '../utils/goalRules';
 
 const FREQ_OPTIONS: { value: HabitFrequency; label: string; desc: string }[] = [
   { value: 'daily', label: '매일', desc: '매일 반복' },
@@ -29,23 +38,42 @@ const FREQ_OPTIONS: { value: HabitFrequency; label: string; desc: string }[] = [
 ];
 
 export default function HabitNew() {
+  const { id } = useParams<{ id?: string }>();
+  const [params] = useSearchParams();
+  const target = params.get('goal');
+  const validGoal = useGoalStore(s => s.monthlyGoals.some(g => g.id === target && canLinkMonthlyGoal(g, 'personal', format(new Date(), 'yyyy-MM-dd'))));
+  const owner = useAuthStore(s => s.user?.id);
+  const exists = useHabitStore(s => s.habits.some(item => item.id === id));
+  let fallback: Habit | undefined;
+  if (id && owner && !exists) {
+    try { const saved = readDraft(owner, `habit:${id}`, isHabitDraft); if (saved) fallback = habitDraftBase(saved.values, id); } catch { /* The draft hook reports storage errors. */ }
+  }
+  return <FormBoundary id={id ?? target ?? undefined} exists={id ? exists || !!fallback : !target || validGoal}><HabitNewEditor fallback={fallback} /></FormBoundary>;
+}
+
+function HabitNewEditor({ fallback }: { fallback?: Habit }) {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
   const { habits, addHabit, updateHabit } = useHabitStore();
   const { monthlyGoals } = useGoalStore();
   const location = useLocation();
-  const existing = id ? habits.find(h => h.id === id) : null;
+  const [params] = useSearchParams();
+  const sourceGoal = monthlyGoals.find(g => g.id === params.get('goal'));
+  const plan = sourceGoal?.goalRoutines?.[0];
+  const existing = id ? habits.find(h => h.id === id) ?? fallback : null;
   const isEdit = !!existing;
+  const [baseHabit, setBaseHabit] = useState(existing ?? undefined);
 
   // 목표 상세 "습관으로 만들기"에서 넘어온 프리필
-  const prefill = (location.state as { prefill?: {
+  const legacyPrefill = (location.state as { prefill?: {
     title?: string; when?: string; miniRoutine?: string; twoMinuteHabit?: string; goalId?: string;
   } } | null)?.prefill;
+  const prefill = sourceGoal ? { title: plan?.title, when: [plan?.when, plan?.where].filter(Boolean).join(' · '), miniRoutine: plan?.miniRoutine, twoMinuteHabit: plan?.twoMinuteHabit, goalId: sourceGoal.id } : legacyPrefill;
 
   const todayIso = format(new Date(), 'yyyy-MM-dd');
   // 연동 가능한 개인 목표 (활성)
   const linkableGoals = monthlyGoals.filter(
-    g => g.startDate <= todayIso && g.endDate >= todayIso && g.category === 'personal'
+    g => canLinkMonthlyGoal(g, 'personal', todayIso, existing?.goalId)
   );
 
   const { setPermission } = useNotificationStore();
@@ -73,6 +101,19 @@ export default function HabitNew() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showTypePicker, setShowTypePicker] = useState(false);
 
+  const [entityId, setEntityId] = useState<string>(() => isUuid(plan?.id) && !habits.some(h => h.id === plan?.id) ? plan.id : newId());
+  const draftValues: HabitDraft = { baseHabit, entityId, title, emoji, freq, customDays, when, goalId, miniRoutine, twoMinuteHabit, twoMinEnabled, timerEnabled, durationSecs, notifEnabled, notifType, notifTimes };
+  const draft = useLocalDraft({ document: `habit:${id ?? (sourceGoal ? `new:goal:${sourceGoal.id}` : 'new')}`, values: draftValues, validate: isHabitDraft, restore: v => {
+    setBaseHabit(v.baseHabit?.id === id ? v.baseHabit : existing ? { ...existing, revision: undefined } : undefined);
+    setEntityId(v.entityId); setTitle(v.title); setEmoji(v.emoji); setFreq(v.freq); setCustomDays(v.customDays); setWhen(v.when);
+    setGoalId(v.goalId && linkableGoals.some(g => g.id === v.goalId) ? v.goalId : undefined);
+    if (v.goalId && !linkableGoals.some(g => g.id === v.goalId)) toast.error('이전에 연결한 목표가 없어 목표 연결을 해제했어요. 내용을 확인해주세요.');
+    setMiniRoutine(v.miniRoutine); setTwoMinuteHabit(v.twoMinuteHabit); setTwoMinEnabled(v.twoMinEnabled);
+    setTimerEnabled(v.timerEnabled); setDurationSecs(v.durationSecs); setNotifEnabled(v.notifEnabled); setNotifType(v.notifType); setNotifTimes(v.notifTimes);
+  } });
+  const protection = useFormProtection(draftValues, draft.leaveMessage);
+  const leave = () => { if (window.history.state?.idx > 0) navigate(-1); else navigate('/'); };
+
   const handleToggleNotif = () => {
     if (notifEnabled) {
       setNotifEnabled(false);
@@ -82,15 +123,19 @@ export default function HabitNew() {
     void requestNotifPermission().then(perm => {
       setPermission(perm);
       if (perm === 'granted') setNotifEnabled(true);
-      else if (perm === 'denied') alert('알림 권한이 차단되어 있어요. 설정에서 알림을 허용해주세요.');
-    });
+      else if (perm === 'denied') toast.error('설정에서 알림 권한을 허용해주세요.');
+    }).catch(() => toast.error('알림 권한을 확인하지 못했어요. 다시 시도해주세요.'));
   };
 
   const freqLabel = FREQ_OPTIONS.find(f => f.value === freq)?.label ?? '매일';
   const whenPlaceholder = '예) 8:00 / 출근길';
 
   const handleSubmit = () => {
-    if (!title.trim()) return;
+    if (draft.awaitingChoice || !title.trim()) return;
+    if (goalId && !monthlyGoals.some(g => g.id === goalId && canLinkMonthlyGoal(g, 'personal', format(new Date(), 'yyyy-MM-dd'), existing?.goalId))) {
+      toast.error('선택한 목표가 없어졌거나 연결할 수 없어요. 목표를 다시 선택하거나 연동 안 함을 선택해주세요.'); return;
+    }
+    if (freq === 'custom' && customDays.length === 0) { toast.error('반복할 요일을 하나 이상 선택해주세요.'); return; }
     const data = {
       title: title.trim(), emoji, frequency: freq,
       ...(freq === 'custom' ? { customDays } : {}),
@@ -103,19 +148,24 @@ export default function HabitNew() {
         ? { enabled: true, type: notifType, times: notifTimes }
         : undefined,
     };
-    if (isEdit && existing) {
-      updateHabit(existing.id, data);
-    } else {
-      addHabit({ id: newId(), userId: '', createdAt: new Date().toISOString(), ...data });
-    }
-    navigate(-1);
+    if (!protection.save(() => {
+      if (isEdit && existing) {
+        updateHabit(existing.id, data, baseHabit);
+      } else {
+        addHabit({ id: entityId, userId: '', createdAt: new Date().toISOString(), ...data });
+      }
+      draft.clear();
+    })) return;
+    if (sourceGoal) navigate(`/goals/${sourceGoal.id}/connect`, { replace: true }); else leave();
   };
 
   return (
     <div className="form-paper min-h-dvh flex flex-col">
+      {protection.guard}
+      {(fallback || existing?.archivedAt) && <p role="status" className="p-4 bg-primary-soft text-body2">보관되었거나 목록에서 사라진 항목의 입력이에요. 저장 시 원래 버전과 서버 내용을 비교하며, 수행 기록은 유지해요.</p>}
       {/* 헤더 */}
       <div className="form-paper-header flex items-center px-4 pt-5 pb-3">
-        <motion.button {...tapSm} onClick={() => navigate(-1)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
+        <motion.button {...tapSm} onClick={() => protection.requestLeave(leave)} aria-label="뒤로 가기" className="paper-back-button text-label-alt">
           <ChevronLeft size={24} />
         </motion.button>
         <h1 className="flex-1 text-center text-headline1 font-bold text-label-strong">
@@ -124,6 +174,8 @@ export default function HabitNew() {
         <div className="w-8" />
       </div>
 
+      <div className="px-4 pt-3">{draft.banner}</div>
+      <fieldset disabled={draft.awaitingChoice} className="contents">
       <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5 pb-28">
 
         {/* 습관 이름 */}
@@ -133,7 +185,7 @@ export default function HabitNew() {
             <div className="relative">
               <EmojiPickerButton emoji={emoji} onChange={setEmoji} />
             </div>
-            <input
+            <input aria-label="습관 이름"
               type="text" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="습관 이름을 입력하세요"
               className="form-paper-input flex-1 text-body2 font-medium"
@@ -142,15 +194,56 @@ export default function HabitNew() {
           </div>
         </div>
 
+        {/* 반복 주기 카드 */}
+        <div className="form-paper-card overflow-hidden">
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Calendar size={20} strokeWidth={1.9} className="text-label-strong" />
+                <span className="text-body2 font-semibold text-label-strong">반복 주기</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-body2 text-label-alt">{freqLabel}</span>
+                <ChevronRight size={16} className="text-label-assistive" />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-3 flex-wrap">
+              {FREQ_OPTIONS.map(f => (
+                <motion.button key={f.value} {...tap} aria-pressed={freq === f.value} onClick={() => setFreq(f.value)}
+                  className={`form-paper-choice px-4 py-2 rounded-lg text-body2 font-medium border transition-all ${freq === f.value ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt bg-fill'}`}>
+                  {f.label}
+                </motion.button>
+              ))}
+            </div>
+            <AnimatePresence>
+              {freq === 'custom' && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                  <div className="flex gap-1.5 mt-3">
+                    {WEEKDAY_LABELS.map((label, idx) => (
+                      <motion.button key={idx} {...tap} aria-label={`${label}요일`} aria-pressed={customDays.includes(idx)} onClick={() => setCustomDays(d => d.includes(idx) ? d.filter(x => x !== idx) : [...d, idx])}
+                        className={`form-paper-choice flex-1 py-2 rounded-lg text-caption1 font-bold border transition-all ${customDays.includes(idx) ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt bg-fill'}`}>
+                        {label}
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <details className="quiet-details"><summary>추가 설정 · 목표·알림·타이머</summary><div className="space-y-5">
         {/* 월간 목표 연동 카드 */}
-        {linkableGoals.length > 0 && (
+        {(linkableGoals.length > 0 || goalId) && (
           <div className="form-paper-card overflow-hidden">
             <div className="px-4 py-4">
               <div className="flex items-center gap-3 mb-3">
                 <Target size={20} strokeWidth={1.9} className="text-label-strong" />
                 <div>
                   <p className="text-body2 font-semibold text-label-strong">월간 목표 연동</p>
-                  <p className="text-caption1 text-label-alt">이 습관의 달성이 목표 달성률에 반영돼요</p>
+                  <p className="text-caption1 text-label-alt">연결 변경은 저장한 날짜부터 반영돼요. 이전 연결 이력과 수행 기록은 유지돼요.</p>
+                  {existing?.goalId === goalId && monthlyGoals.some(g => g.id === goalId && (g.category === 'faith' || g.endDate < todayIso)) && <p className="text-caption1 text-label-alt mt-1">목표의 분류·기간이 바뀌어도 기존 연결을 유지할 수 있어요. 이 항목은 개인 습관으로 남아요.</p>}
+                  {goalId && !linkableGoals.some(g => g.id === goalId) && <p className="text-caption1 text-label-alt mt-1">현재 선택: {monthlyGoals.find(g => g.id === goalId)?.title ?? '삭제된 목표'} · 새 목표를 고르거나 연결을 해제할 수 있어요.</p>}
                 </div>
               </div>
               <div className="flex flex-col gap-2">
@@ -228,53 +321,15 @@ export default function HabitNew() {
           </div>
         </div>
 
-        {/* 반복 주기 카드 */}
-        <div className="form-paper-card overflow-hidden">
-          <div className="px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Calendar size={20} strokeWidth={1.9} className="text-label-strong" />
-                <span className="text-body2 font-semibold text-label-strong">반복 주기</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-body2 text-label-alt">{freqLabel}</span>
-                <ChevronRight size={16} className="text-label-assistive" />
-              </div>
-            </div>
-            <div className="flex gap-2 mt-3 flex-wrap">
-              {FREQ_OPTIONS.map(f => (
-                <motion.button key={f.value} {...tap} onClick={() => setFreq(f.value)}
-                  className={`px-4 py-2 rounded-lg text-body2 font-medium border transition-all ${freq === f.value ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt bg-fill'}`}>
-                  {f.label}
-                </motion.button>
-              ))}
-            </div>
-            <AnimatePresence>
-              {freq === 'custom' && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                  <div className="flex gap-1.5 mt-3">
-                    {WEEKDAY_LABELS.map((label, idx) => (
-                      <motion.button key={idx} {...tap} onClick={() => setCustomDays(d => d.includes(idx) ? d.filter(x => x !== idx) : [...d, idx])}
-                        className={`flex-1 py-2 rounded-lg text-caption1 font-bold border transition-all ${customDays.includes(idx) ? 'border-primary bg-primary-soft text-primary' : 'border-line text-label-alt bg-fill'}`}>
-                        {label}
-                      </motion.button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
         {/* 언제 할래요? 카드 */}
         <div className="form-paper-card overflow-hidden px-4 py-4">
           <div className="flex items-center gap-3 mb-3">
             <Check size={20} strokeWidth={1.9} className="text-label-strong" />
             <span className="text-body2 font-semibold text-label-strong">언제 할래요?</span>
           </div>
-          <input type="text" value={when} onChange={e => setWhen(e.target.value)}
+          <input aria-label="언제 할래요?" type="text" value={when} onChange={e => setWhen(e.target.value)}
             placeholder={whenPlaceholder}
-            className="w-full bg-fill border border-line rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-primary focus:bg-surface transition-all" />
+            className="form-paper-field w-full px-3 py-2.5" />
           <p className="text-caption1 text-label-assistive mt-1.5">시작 시간이나 행동 트리거를 적어주세요</p>
         </div>
 
@@ -323,10 +378,10 @@ export default function HabitNew() {
               {twoMinEnabled && (
                 <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden mt-3">
-                  <input type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
+                  <input aria-label="2분 트리거 습관" type="text" value={twoMinuteHabit} onChange={e => setTwoMinuteHabit(e.target.value)}
                     placeholder="예: 운동복 갈아입기, 러닝화 신기"
-                    className="w-full bg-fill border border-emerald-200 rounded-xl px-3 py-2.5 text-body2 focus:outline-none focus:border-emerald-400 focus:bg-surface transition-all" />
-                  <p className="text-caption2 text-emerald-600 mt-1.5 flex items-center gap-1"><Lightbulb size={13} strokeWidth={1.9} /> 트리거 완료 후 자동으로 메인 습관으로 연결돼요</p>
+                    className="form-paper-field w-full px-3 py-2.5" />
+                  <p className="text-caption2 text-label-alt mt-1.5 flex items-center gap-1"><Lightbulb size={13} strokeWidth={1.9} /> 트리거 완료 후 메인 습관으로 이어져요</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -334,22 +389,22 @@ export default function HabitNew() {
         </div>
 
         {/* 대체 습관 카드 */}
-        <div className="bg-surface rounded-xl border border-amber-200/60 overflow-hidden">
-          <div className="px-4 py-4 bg-amber-50/40">
+        <div className="form-paper-card overflow-hidden">
+          <div className="px-4 py-4">
             <div className="flex items-center gap-3 mb-3">
-              <Flame size={20} strokeWidth={1.9} className="text-amber-700" />
+              <Flame size={20} strokeWidth={1.9} className="text-cautionary" />
               <div>
-                <p className="text-body2 font-semibold text-amber-700">대체 습관</p>
-                <p className="text-caption1 text-amber-600">하기 힘든 날의 더 쉬운 버전</p>
+                <p className="text-body2 font-semibold text-label-strong">대체 습관</p>
+                <p className="text-caption1 text-label-alt">하기 힘든 날의 더 쉬운 버전</p>
               </div>
             </div>
-            <input type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
+            <input aria-label="대체 습관" type="text" value={miniRoutine} onChange={e => setMiniRoutine(e.target.value)}
               placeholder="예: 10분 스트레칭, 5분 걷기"
-              className="w-full bg-white/80 border border-amber-200 rounded-lg px-3 py-2.5 text-body2 focus:outline-none focus:border-amber-400 transition-all placeholder:text-amber-300" />
-            <p className="text-caption2 text-amber-500 mt-1.5 flex items-center gap-1"><Lightbulb size={13} strokeWidth={1.9} /> 쉬운 버전을 만들어두면 포기하지 않을 수 있어요</p>
+              className="form-paper-field w-full px-3 py-2.5" />
           </div>
         </div>
 
+        </div></details>
       </div>
 
       {/* 타이머 시트 */}
@@ -381,14 +436,15 @@ export default function HabitNew() {
         onClose={() => setShowTypePicker(false)}
       />
 
+      </fieldset>
       {/* 하단 버튼 */}
       <div className="form-paper-footer fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4"
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        style={{ paddingBottom: 'max(1rem, var(--app-safe-bottom))' }}>
         <motion.button
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.12 }}
           onClick={handleSubmit}
-          disabled={!title.trim() || (freq === 'custom' && customDays.length === 0)}
+          disabled={draft.awaitingChoice || !title.trim() || (freq === 'custom' && customDays.length === 0)}
           className="w-full h-12 mt-3 rounded-lg bg-primary text-white font-bold text-body1 disabled:opacity-30 hover:bg-primary-strong transition-colors"
         >
           {isEdit ? '수정 완료' : '시작하기'}

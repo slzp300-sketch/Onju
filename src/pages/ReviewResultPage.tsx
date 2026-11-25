@@ -4,6 +4,10 @@ import { ChevronLeft, Star, Smile, Frown } from '../icons';
 import type { LucideIcon } from '../icons';
 import { fetchReviewByWeek } from '../api/reviews';
 import Card from '../components/ui/Card';
+import { format } from 'date-fns';
+import { useHabitStore } from '../store/habitStore';
+import { useRoutineStore } from '../store/routineStore';
+import { useAuthStore } from '../store/authStore';
 
 const MOOD_MAP: Record<string, { label: string; Icon: LucideIcon }> = {
   hard: { label: '힘들었어요', Icon: Frown },
@@ -14,14 +18,17 @@ const MOOD_MAP: Record<string, { label: string; Icon: LucideIcon }> = {
 export default function ReviewResultPage() {
   const { week } = useParams<{ week: string }>();
   const navigate = useNavigate();
+  const userId = useAuthStore(state => state.user?.id);
+  const habits = useHabitStore(s => s.habits);
+  const faithRoutines = useRoutineStore(s => s.faithRoutines);
 
   // week 파라미터 형식: "YYYY-WW"
   const [year, weekNumber] = (week ?? '').split('-').map(Number);
 
   const { data: review, isLoading } = useQuery({
-    queryKey: ['review', weekNumber, year],
-    queryFn: () => fetchReviewByWeek(weekNumber, year),
-    enabled: !!weekNumber && !!year,
+    queryKey: ['review', userId, weekNumber, year],
+    queryFn: ({ signal }) => userId ? fetchReviewByWeek(weekNumber, year, userId, signal) : Promise.resolve(null),
+    enabled: !!userId && !!weekNumber && !!year,
   });
 
   if (isLoading) {
@@ -46,6 +53,10 @@ export default function ReviewResultPage() {
   }
 
   const mood = review.mood ? MOOD_MAP[review.mood] : null;
+  const adjustments = [
+    ...(review.habitChanges ?? []).map(c => ({ action: c.action, label: c.newHabit?.title || c.changes?.title || c.title || habits.find(h => h.id === c.habitId)?.title || '개인 습관' })),
+    ...review.routineChanges.map(c => ({ action: c.action, label: c.newRoutine?.title || c.changes?.title || c.title || faithRoutines.find(r => r.id === c.routineId)?.title || '루틴' })),
+  ].filter(c => c.action !== 'keep');
 
   return (
     <div className="review-paper flex min-h-full flex-col gap-4 pb-8">
@@ -135,12 +146,12 @@ export default function ReviewResultPage() {
       )}
 
       {/* 루틴 변경 내역 */}
-      {review.routineChanges.filter(c => c.action !== 'keep').length > 0 && (
+      {!review.applicationResults && adjustments.length > 0 && (
         <Card className="mx-4">
-          <p className="text-caption2 font-semibold text-label-alt mb-3">루틴 조정 내역</p>
+          <p className="text-caption2 font-semibold text-label-alt mb-2">루틴·습관 조정 내역</p>
+          {review.changesAppliedAt && <p className="text-caption1 text-primary mb-3">{format(new Date(review.changesAppliedAt), 'yyyy년 M월 d일 HH:mm')}부터 적용</p>}
           <div className="flex flex-col gap-2">
-            {review.routineChanges
-              .filter(c => c.action !== 'keep')
+            {adjustments
               .map((c, i) => (
                 <div key={i} className="flex items-center gap-2 text-body2">
                   <span className={`text-caption1 font-medium px-2 py-0.5 rounded-full ${
@@ -148,16 +159,22 @@ export default function ReviewResultPage() {
                     c.action === 'edit' ? 'bg-primary-soft text-primary' :
                     'bg-positive/10 text-positive'
                   }`}>
-                    {c.action === 'delete' ? '삭제' : c.action === 'edit' ? '수정' : '추가'}
+                    {c.action === 'delete' ? '보관' : c.action === 'edit' ? '수정' : '추가'}
                   </span>
                   <span className="text-label truncate">
-                    {c.action === 'add' ? c.newRoutine?.title : c.routineId}
+                    {c.label}
                   </span>
                 </div>
               ))}
           </div>
         </Card>
       )}
+      {review.applicationResults && <Card className="mx-4">
+        <p className="text-caption2 font-semibold text-label-alt mb-3">항목별 저장 결과</p>
+        <ul className="space-y-3">{review.applicationResults.map((result,i)=><li key={i} className="text-body2 break-words">
+          <p>{result.label}</p><p className="text-caption1 text-label-alt">{result.status==='done'?'저장 완료':'최신 상태 유지 · 조정 제외'}{result.date && ` · ${result.date}부터 적용`}</p>
+        </li>)}</ul>
+      </Card>}
     </div>
   );
 }

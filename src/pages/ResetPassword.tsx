@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { updatePassword } from '../lib/authActions';
 import ForestBackdrop from '../components/tree/ForestBackdrop';
+import { usePasswordRecoveryStore } from '../store/passwordRecoveryStore';
+import { toast } from '../store/toastStore';
 
 /**
  * 비밀번호 재설정 — 메일의 재설정 링크로 진입한다.
@@ -11,7 +13,8 @@ import ForestBackdrop from '../components/tree/ForestBackdrop';
  */
 export default function ResetPassword() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
+  const { userId, processing, error: linkError } = usePasswordRecoveryStore();
+  const submitting = useRef(false);
 
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -20,6 +23,7 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting.current || !userId) return;
     if (password.length < 6) {
       setError('비밀번호는 6자 이상이어야 해요.');
       return;
@@ -29,14 +33,19 @@ export default function ResetPassword() {
       return;
     }
     setLoading(true);
+    submitting.current = true;
     setError('');
     try {
-      await updatePassword(password);
-      navigate('/', { replace: true });
+      await updatePassword(password, userId);
+      const current = useAuthStore.getState();
+      if (current.user && current.user.id !== userId) return;
+      toast.success('비밀번호를 변경했어요.');
+      navigate(current.isAuthenticated ? '/' : '/login', { replace: true });
     } catch {
       setError('비밀번호 변경에 실패했어요. 잠시 후 다시 시도해주세요.');
     } finally {
       setLoading(false);
+      submitting.current = false;
     }
   };
 
@@ -47,14 +56,17 @@ export default function ResetPassword() {
         <h1 className="text-heading2 font-bold text-label-strong font-brand">비밀번호 재설정</h1>
       </div>
 
-      {isAuthenticated ? (
+      {processing ? <p role="status" className="text-center text-body2 text-label-alt">재설정 링크를 확인하고 있어요…</p> : userId ? (
         <form onSubmit={handleSubmit} className="auth-paper-panel flex flex-col gap-3">
           <input
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
             placeholder="새 비밀번호 (6자 이상)"
+            aria-label="새 비밀번호"
+            disabled={loading}
             autoComplete="new-password"
+            enterKeyHint="next"
             autoFocus
             className="input-base"
           />
@@ -63,7 +75,10 @@ export default function ResetPassword() {
             value={confirm}
             onChange={e => setConfirm(e.target.value)}
             placeholder="새 비밀번호 확인"
+            aria-label="새 비밀번호 확인"
+            disabled={loading}
             autoComplete="new-password"
+            enterKeyHint="done"
             className="input-base"
           />
           <button
@@ -71,15 +86,14 @@ export default function ResetPassword() {
             disabled={loading || !password || !confirm}
             className="w-full bg-primary text-white rounded-lg h-12 text-body2 font-bold disabled:opacity-30 hover:bg-primary-strong transition-colors"
           >
-            비밀번호 변경
+            {loading ? '변경 중…' : '비밀번호 변경'}
           </button>
-          {error && <p className="text-caption1 text-negative px-1 text-center">{error}</p>}
+          {error && <p role="alert" className="text-caption1 text-negative px-1 text-center">{error}</p>}
         </form>
       ) : (
         <div className="flex flex-col items-center gap-4 text-center">
           <p className="text-body2 text-label-alt leading-relaxed">
-            재설정 링크가 만료됐거나 잘못된 접근이에요.{'\n'}
-            로그인 화면에서 재설정 메일을 다시 요청해주세요.
+            {linkError ?? '재설정 링크가 만료됐거나 잘못된 접근이에요. 로그인 화면에서 재설정 메일을 다시 요청해주세요.'}
           </p>
           <Link to="/login" className="text-primary font-medium text-body2">
             로그인 화면으로

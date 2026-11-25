@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { loginWithGoogle, loginWithKakao, requestPasswordReset } from '../lib/authActions';
@@ -6,7 +6,8 @@ import ForestBackdrop from '../components/tree/ForestBackdrop';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuthStore();
+  const { login, isAuthenticated, sessionError, retrySession } = useAuthStore();
+  const requestActive = useRef(false);
 
   const [showEmail, setShowEmail] = useState(false);
   const [email, setEmail] = useState('');
@@ -22,39 +23,50 @@ export default function Login() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) return;
+    if (!email.trim() || !password || requestActive.current) return;
+    requestActive.current = true;
     setLoading(true);
     setError('');
-    const result = await login(email.trim(), password);
-    setLoading(false);
-    if (!result.success) {
-      setError(result.error ?? '로그인에 실패했어요.');
-    }
+    setInfo('');
+    try {
+      const result = await login(email.trim(), password);
+      if (!result.success) setError(result.error ?? '로그인에 실패했어요.');
+    } catch { setError('로그인에 연결하지 못했어요. 네트워크를 확인해주세요.'); }
+    finally { requestActive.current = false; setLoading(false); }
   };
 
   const handleForgotPassword = async () => {
+    if (requestActive.current) return;
     if (!email.trim()) {
       setInfo('');
       setError('가입한 이메일을 먼저 입력해주세요.');
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError('올바른 이메일 주소를 입력해주세요.'); return; }
+    requestActive.current = true;
+    setLoading(true);
     setError('');
+    setInfo('');
     try {
       await requestPasswordReset(email.trim());
-      setInfo('재설정 메일을 보냈어요. 메일함을 확인해주세요.');
+      setInfo('가입된 이메일이면 재설정 메일이 도착해요. 메일함과 스팸함을 확인해주세요.');
     } catch {
       setInfo('');
       setError('재설정 메일 발송에 실패했어요. 잠시 후 다시 시도해주세요.');
-    }
+    } finally { requestActive.current = false; setLoading(false); }
   };
 
   const handleSocial = async (provider: 'google' | 'kakao') => {
+    if (requestActive.current) return;
+    requestActive.current = true;
+    setLoading(true);
     setError('');
+    setInfo('');
     try {
       await (provider === 'google' ? loginWithGoogle() : loginWithKakao());
     } catch {
       setError(`${provider === 'kakao' ? '카카오' : '구글'} 로그인에 실패했어요.`);
-    }
+    } finally { requestActive.current = false; setLoading(false); }
   };
 
   return (
@@ -70,6 +82,7 @@ export default function Login() {
       <div className="auth-paper-panel flex flex-col gap-3">
         <button
           onClick={() => handleSocial('google')}
+          disabled={loading}
           className="w-full flex items-center justify-center gap-3 border border-line rounded-lg h-12 text-body2 font-medium text-label bg-surface hover:bg-fill transition-colors"
         >
           <svg width="18" height="18" viewBox="0 0 48 48">
@@ -83,6 +96,7 @@ export default function Login() {
 
         <button
           onClick={() => handleSocial('kakao')}
+          disabled={loading}
           className="w-full flex items-center justify-center gap-3 rounded-lg h-12 text-body2 font-medium text-[#3C1E1E] bg-[#FEE500] hover:bg-[#F5DC00] transition-colors"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E">
@@ -100,6 +114,7 @@ export default function Login() {
         {!showEmail ? (
           <button
             onClick={() => setShowEmail(true)}
+            disabled={loading}
             className="w-full border border-line rounded-lg h-12 text-body2 font-medium text-label-alt hover:bg-fill transition-colors"
           >
             이메일로 로그인
@@ -111,7 +126,12 @@ export default function Login() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="이메일"
+              aria-label="이메일"
               autoComplete="email"
+              inputMode="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              enterKeyHint="next"
               autoFocus
               className="input-base"
             />
@@ -120,7 +140,9 @@ export default function Login() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="비밀번호"
+              aria-label="비밀번호"
               autoComplete="current-password"
+              enterKeyHint="go"
               className="input-base"
             />
             <button
@@ -133,6 +155,7 @@ export default function Login() {
             <button
               type="button"
               onClick={handleForgotPassword}
+              disabled={loading}
               className="text-caption1 text-label-alt underline underline-offset-2 self-center py-1"
             >
               비밀번호를 잊으셨나요?
@@ -140,8 +163,9 @@ export default function Login() {
           </form>
         )}
 
-        {info && <p className="text-caption1 text-primary px-1 text-center">{info}</p>}
-        {error && <p className="text-caption1 text-negative px-1 text-center">{error}</p>}
+        {info && <p role="status" className="text-caption1 text-primary px-1 text-center">{info}</p>}
+        {(error || sessionError) && <p role="alert" className="text-caption1 text-negative px-1 text-center">{error || sessionError}</p>}
+        {sessionError && <button type="button" disabled={loading} onClick={() => void retrySession()} className="min-h-11 text-caption1 text-primary underline">로그인 정보 다시 불러오기</button>}
       </div>
 
       <p className="text-body2 text-label-alt text-center mt-6">

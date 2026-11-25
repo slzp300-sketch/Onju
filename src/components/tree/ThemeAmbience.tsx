@@ -16,7 +16,7 @@ function LeafShape({ size, color }: { size: number; color: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
       <path d="M4 20 C4 10 10 4 20 4 C20 14 14 20 4 20 Z" fill={color} />
-      <path d="M6.5 17.5 L17 7" stroke="#fff" strokeWidth="1" opacity="0.3" strokeLinecap="round" />
+      <path d="M6.5 17.5 L17 7" stroke="#FBEFC8" strokeWidth="1" opacity="0.3" strokeLinecap="round" />
     </svg>
   );
 }
@@ -70,7 +70,7 @@ export function TierBackdrop({ level, palette, offset = '0px' }: { level: number
       )}
       {/* 4단계: 실루엣 나무에 맺힌 열매 */}
       {level >= 4 && (
-        <g fill={palette.accent}>
+        <g fill="#F0876E">
           <circle cx="313" cy="51" r="2.4" opacity="0.4" />
           <circle cx="322" cy="56" r="2.4" opacity="0.35" />
           <circle cx="318" cy="47" r="2" opacity="0.3" />
@@ -128,7 +128,7 @@ export function AmbienceLayer({ level, palette, compact = false }: { level: numb
             height: '75%',
             transform: 'rotate(16deg)',
             transformOrigin: 'top center',
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 75%)',
+            background: 'linear-gradient(180deg, rgba(251,239,200,0.35) 0%, rgba(251,239,200,0) 75%)',
           }}
           animate={{ opacity: [0.05, 0.14, 0.05] }}
           transition={{ duration: 7 * sp, repeat: Infinity, ease: 'easeInOut', delay: -s.delay * sp }}
@@ -144,7 +144,7 @@ export function AmbienceLayer({ level, palette, compact = false }: { level: numb
             right: -50 * k,
             width: 220 * k,
             height: 220 * k,
-            background: 'radial-gradient(circle, rgba(255, 196, 110, 0.5) 0%, rgba(255, 196, 110, 0) 68%)',
+            background: 'radial-gradient(circle, rgba(240,135,110,0.16) 0%, rgba(240,135,110,0) 68%)',
           }}
           animate={{ scale: [1, 1.12, 1], opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 6.5 * sp, repeat: Infinity, ease: 'easeInOut' }}
@@ -192,8 +192,8 @@ export function AmbienceLayer({ level, palette, compact = false }: { level: numb
             top: f.top,
             width: f.size * k,
             height: f.size * k,
-            backgroundColor: '#ffe08a',
-            boxShadow: '0 0 8px 2px rgba(255, 220, 130, 0.75)',
+            backgroundColor: '#FBEFC8',
+            boxShadow: '0 0 8px 2px rgba(251,239,200,0.4)',
           }}
           animate={{
             opacity: [0.1, 0.9, 0.25, 0.8, 0.1],
@@ -218,7 +218,7 @@ export function AmbienceLayer({ level, palette, compact = false }: { level: numb
           }}
           transition={{ duration: l.dur * sp, repeat: Infinity, ease: 'linear', delay: -l.delay * sp }}
         >
-          <LeafShape size={l.size * k} color={palette.accent} />
+          <LeafShape size={l.size * k} color="#F0876E" />
         </motion.div>
       ))}
     </div>
@@ -240,7 +240,7 @@ export default function GlobalAmbience() {
   return (
     <div className="fixed inset-0 max-w-md mx-auto pointer-events-none" aria-hidden>
       {!onAuthPage && (
-        <TierBackdrop level={level} palette={palette} offset="calc(5.5rem + env(safe-area-inset-bottom, 0px))" />
+        <TierBackdrop level={level} palette={palette} offset="calc(5.5rem + var(--app-safe-bottom))" />
       )}
       <AmbienceLayer level={level} palette={palette} />
     </div>
