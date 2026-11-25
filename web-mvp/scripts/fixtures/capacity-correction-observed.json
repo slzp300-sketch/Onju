@@ -1,0 +1,1043 @@
+{
+  "sourceRunId": "dc7964e1-99cf-4ffd-a6fb-6585dfbe847a",
+  "syntheticInputsOnly": true,
+  "cases": [
+    {
+      "caseId": "reading",
+      "provider": "openai",
+      "initial": {
+        "stage": 5,
+        "messages": [
+          {
+            "id": "ec0f774d-ff60-4bda-8814-bbb51826ce19",
+            "role": "user",
+            "text": "퇴근하고 책을 꾸준히 읽고 싶어. 설계해주고 같이 관리해줘."
+          },
+          {
+            "id": "eed8f164-06b0-45bd-81c3-98f59627854b",
+            "role": "assistant",
+            "text": "퇴근 후 독서를 습관으로 만들고, 기록을 바탕으로 함께 조정해드릴게요. 무리한 분량보다 퇴근 뒤 실제로 지속 가능한 방식으로 설계하려면 몇 가지만 알려주세요.\n\n1. **기간** 어느 기간을 목표로 볼까요? (예: 1개월, 3개월)\n2. **현재 상태** 요즘 한 주에 얼마나 읽는지, 또는 거의 못 읽는지 알려주세요.\n3. **완료 기준** 기간이 끝났을 때 무엇이 되면 만족할까요? (예: 주 4회 읽기, 책 2권 완독, 매일 15분)\n4. **여건·제약** 퇴근 후 가능한 요일·대략 시간, 피하고 싶은 방식이나 방해 요소가 있나요? (예: 야근, 피로, 휴대폰)\n5. **우선순위** 다른 목표와 겹치면 독서는 반드시 지킬 목표인가요, 조절 가능한 목표인가요?"
+          },
+          {
+            "id": "8ffe5db2-27ef-442e-bbec-551a8aef5ba8",
+            "role": "user",
+            "text": "8주 동안 책 2권이 목표야. 지금은 한 달에 0권이고, 평일 화요일과 목요일 저녁에 20분씩 가능해. 주말에는 약속이 자주 바뀌어. 전자책으로 읽을 거야."
+          },
+          {
+            "id": "f876a0fe-90c7-451c-8edf-7c99b40b9558",
+            "role": "assistant",
+            "text": "8주에 2권, 화·목 저녁 각 20분이라는 틀과 전자책 환경을 반영할게요. 주말은 고정 일정으로 넣지 않고, 평일 두 번을 중심으로 기록을 보고 조정하는 방식이 맞겠습니다.\n\n설계 전에 한 가지만 정할게요. 다른 목표나 일이 겹치면 독서는 **꼭 지킬 우선순위**인가요, 아니면 그 주 상황에 따라 횟수·분량을 조절해도 될까요?"
+          }
+        ],
+        "goal_card": {
+          "category": "기타",
+          "outcome": "",
+          "identity": "",
+          "deadline": "",
+          "baselineMetric": "",
+          "targetMetric": "",
+          "tinyStart": "",
+          "cue": "",
+          "environment": "",
+          "fallbackAction": "",
+          "recoveryRule": "두 번 연속 놓치지 않기",
+          "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+          "durationWeeks": 0,
+          "weeklyActions": []
+        },
+        "blocks": [],
+        "day_bounds": [],
+        "agent_v2_context": {
+          "brief": {
+            "period": {
+              "label": "8주",
+              "weeks": 8
+            },
+            "areas": [
+              "독서"
+            ],
+            "baselines": [
+              {
+                "area": "독서",
+                "current": "최근 한 달 독서 완독 0권",
+                "evidence": "지금은 한 달에 0권",
+                "status": "known",
+                "binding": {
+                  "version": 1,
+                  "field": "baseline",
+                  "area": "독서",
+                  "value": "최근 한 달 독서 완독 0권",
+                  "evidence": "지금은 한 달에 0권",
+                  "scope": "지금은 한 달에 0권이고, 평일 화요일과 목요일 저녁에 20분씩 가능해.",
+                  "quantity": {
+                    "value": 0,
+                    "unit": "권",
+                    "perWeek": 0
+                  },
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              }
+            ],
+            "objectives": [
+              {
+                "area": "독서",
+                "result": "퇴근 후 꾸준히 책을 읽기",
+                "evidence": "퇴근하고 책을 꾸준히 읽고 싶어.",
+                "resultKind": "observable_change",
+                "binding": {
+                  "version": 1,
+                  "field": "objective",
+                  "area": "독서",
+                  "value": "퇴근 후 꾸준히 책을 읽기",
+                  "evidence": "퇴근하고 책을 꾸준히 읽고 싶어.",
+                  "scope": "퇴근하고 책을 꾸준히 읽고 싶어.",
+                  "quantity": null,
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              },
+              {
+                "area": "독서",
+                "result": "8주 동안 책 2권 완독",
+                "evidence": "8주 동안 책 2권이 목표야",
+                "resultKind": "metric",
+                "binding": {
+                  "version": 1,
+                  "field": "objective",
+                  "area": "독서",
+                  "value": "8주 동안 책 2권 완독",
+                  "evidence": "8주 동안 책 2권이 목표야",
+                  "scope": "8주 동안 책 2권이 목표야.",
+                  "quantity": {
+                    "value": 2,
+                    "unit": "권"
+                  },
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              }
+            ],
+            "priority": null,
+            "capacity": {
+              "summary": "평일 화·목 저녁에 각 20분 가능, 주말 약속은 자주 변동",
+              "evidence": "평일 화요일과 목요일 저녁에 20분씩 가능해. 주말에는 약속이 자주 바뀌어.",
+              "status": "known",
+              "binding": {
+                "version": 1,
+                "field": "capacity",
+                "area": null,
+                "value": "평일 화·목 저녁에 각 20분 가능, 주말 약속은 자주 변동",
+                "evidence": "평일 화요일과 목요일 저녁에 20분씩 가능해. 주말에는 약속이 자주 바뀌어.",
+                "scope": "지금은 한 달에 0권이고, 평일 화요일과 목요일 저녁에 20분씩 가능해.",
+                "quantity": {
+                  "value": 20,
+                  "unit": "분"
+                },
+                "subject": "self_or_unspecified",
+                "temporal": "current_or_unspecified",
+                "progress": "unspecified",
+                "budgetScope": {
+                  "owner": "personal_or_unspecified",
+                  "allocation": "overall",
+                  "areas": []
+                }
+              },
+              "contract": {
+                "version": 1,
+                "summary": "평일 화·목 저녁에 각 20분 가능, 주말 약속은 자주 변동",
+                "evidence": "평일 화요일과 목요일 저녁에 20분씩 가능해. 주말에는 약속이 자주 바뀌어.",
+                "source": "지금은 한 달에 0권이고, 평일 화요일과 목요일 저녁에 20분씩 가능해.",
+                "limits": {
+                  "status": "bounded",
+                  "weeklyMinutes": {
+                    "min": 4.615384615384616,
+                    "max": 4.615384615384616
+                  },
+                  "weeklySessions": null,
+                  "perSessionMinutes": null
+                }
+              }
+            },
+            "feasibilityAcceptance": null
+          },
+          "memory": [
+            {
+              "id": "d7ec1f34-ad96-4160-b9aa-4ae3fae7f91f",
+              "kind": "context",
+              "note": "퇴근 후 꾸준한 독서 습관을 원함",
+              "evidence": "퇴근하고 책을 꾸준히 읽고 싶어.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "ec0f774d-ff60-4bda-8814-bbb51826ce19",
+              "supersedesId": null
+            },
+            {
+              "id": "7c933bbe-d58b-4384-a24d-0ba7e16d4541",
+              "kind": "preference",
+              "note": "전자책으로 독서함",
+              "evidence": "전자책으로 읽을 거야.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "8ffe5db2-27ef-442e-bbec-551a8aef5ba8",
+              "supersedesId": null
+            },
+            {
+              "id": "6f434494-da65-4fea-ad0b-1244522554ab",
+              "kind": "constraint",
+              "note": "주말 약속이 자주 변동됨",
+              "evidence": "주말에는 약속이 자주 바뀌어.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "8ffe5db2-27ef-442e-bbec-551a8aef5ba8",
+              "supersedesId": null
+            }
+          ],
+          "dialogue": {
+            "version": 3,
+            "focus": "goals",
+            "lastIntent": "share_fact",
+            "lastMove": "ask",
+            "confidence": "low",
+            "expectsReply": true,
+            "openThreads": [],
+            "scheduleComplete": false
+          }
+        }
+      },
+      "message": "화요일만 10분으로 줄여줘. 목요일 20분과 8주 동안 2권이라는 목표는 그대로 둬. 아직 확정하거나 저장하지 말고 수정안을 보여줘.",
+      "expectedWeeklyMinutes": 30
+    },
+    {
+      "caseId": "reading",
+      "provider": "anthropic",
+      "initial": {
+        "stage": 5,
+        "messages": [
+          {
+            "id": "352e64bb-3a7e-46cb-b9ea-267e6cf375d2",
+            "role": "user",
+            "text": "퇴근하고 책을 꾸준히 읽고 싶어. 설계해주고 같이 관리해줘."
+          },
+          {
+            "id": "20e5fbde-23d9-4f4a-970c-b47a82dd91d9",
+            "role": "assistant",
+            "text": "퇴근 후 독서 루틴을 함께 설계할게요. 맞춤 계획을 만들려면 몇 가지만 확인이 필요해요.\n\n1. **기간** — 얼마나 이어가고 싶으세요? (예: 1개월 / 3개월 / 기간 없이 습관으로)\n2. **현재 독서량** — 요즘 한 달에 책을 몇 권 정도 읽고 있나요? (거의 안 읽으면 0권도 괜찮아요)\n3. **원하는 결과** — 목표하는 게 있나요? 예를 들어 월 권 수, 특정 분야 완독, 아니면 그냥 매일 읽는 습관 자체인지요.\n4. **가능한 시간** — 퇴근 후 독서에 쓸 수 있는 시간이 하루에 어느 정도 될 것 같으세요?"
+          },
+          {
+            "id": "f4a34338-b4ee-40ee-8de0-d5af07788cb2",
+            "role": "user",
+            "text": "8주 동안 책 2권이 목표야. 지금은 한 달에 0권이고, 평일 화요일과 목요일 저녁에 20분씩 가능해. 주말에는 약속이 자주 바뀌어. 전자책으로 읽을 거야."
+          },
+          {
+            "id": "504bc9d5-144c-4ca1-9275-652b621f1a6a",
+            "role": "assistant",
+            "text": "지금 독서량 0권에서 시작하는 거라, 처음부터 욕심 내지 않는 게 중요해요. **화요일·목요일 저녁 20분씩, 8주 동안 총 16번**의 세션으로 2권 완독을 목표로 잡았어요. 권당 약 160분이 예산인데, 전자책은 앱을 켜면 바로 시작할 수 있어서 준비 부담이 거의 없어요.\n\n세션은 세 단계로 구성했어요.\n\n1. **앱 열기 · 전날 멈춘 페이지 확인** (1분)\n2. **본문 읽기** — 흐름을 끊지 않고 집중해서 읽기 (17분)\n3. **짧은 기록** — 오늘 읽은 쪽수와 누적 진도 한 줄 메모 (2분)\n\n바쁜 날엔 10분만 읽어도 세션 완료로 인정해요. 앱을 닫지 말고 다음에 이어 읽을 페이지를 확인하고 끝내면 돼요.\n\n첫 2주는 세션마다 읽은 쪽수만 한 줄 적어두세요. 예: '화 20분 — 47쪽까지'. 이 기록으로 4주차에 2권 완독 궤도인지 함께 확인하고, 조금 뒤처지면 그때 주말 자투리 세션 추가를 같이 결정해요.\n\n**읽으려는 책이 정해져 있나요? 두 권 모두 정했으면 알려주세요. 아직 못 고른 경우에는 분야나 관심사를 말해주시면 골라보는 것도 도와드릴게요.**"
+          }
+        ],
+        "goal_card": {
+          "category": "기타",
+          "outcome": "",
+          "identity": "",
+          "deadline": "",
+          "baselineMetric": "",
+          "targetMetric": "",
+          "tinyStart": "",
+          "cue": "",
+          "environment": "",
+          "fallbackAction": "",
+          "recoveryRule": "두 번 연속 놓치지 않기",
+          "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+          "durationWeeks": 0,
+          "weeklyActions": []
+        },
+        "blocks": [],
+        "day_bounds": [],
+        "agent_v2_context": {
+          "brief": {
+            "period": {
+              "label": "8주",
+              "weeks": 8
+            },
+            "areas": [
+              "독서"
+            ],
+            "baselines": [
+              {
+                "area": "독서",
+                "current": "한 달에 0권",
+                "evidence": "지금은 한 달에 0권이고",
+                "status": "known",
+                "binding": {
+                  "version": 1,
+                  "field": "baseline",
+                  "area": "독서",
+                  "value": "한 달에 0권",
+                  "evidence": "지금은 한 달에 0권이고",
+                  "scope": "지금은 한 달에 0권이고, 평일 화요일과 목요일 저녁에 20분씩 가능해.",
+                  "quantity": {
+                    "value": 0,
+                    "unit": "권",
+                    "perWeek": 0
+                  },
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              }
+            ],
+            "objectives": [
+              {
+                "area": "독서",
+                "result": "8주 안에 책 2권 완독",
+                "evidence": "8주 동안 책 2권이 목표야",
+                "resultKind": "metric",
+                "binding": {
+                  "version": 1,
+                  "field": "objective",
+                  "area": "독서",
+                  "value": "8주 안에 책 2권 완독",
+                  "evidence": "8주 동안 책 2권이 목표야",
+                  "scope": "8주 동안 책 2권이 목표야.",
+                  "quantity": {
+                    "value": 2,
+                    "unit": "권"
+                  },
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              }
+            ],
+            "priority": null,
+            "capacity": {
+              "summary": "평일 화·목 저녁 각 20분, 주말은 약속이 자주 바뀌어 유동적",
+              "evidence": "평일 화요일과 목요일 저녁에 20분씩 가능해. 주말에는 약속이 자주 바뀌어.",
+              "status": "known",
+              "binding": {
+                "version": 1,
+                "field": "capacity",
+                "area": null,
+                "value": "평일 화·목 저녁 각 20분, 주말은 약속이 자주 바뀌어 유동적",
+                "evidence": "평일 화요일과 목요일 저녁에 20분씩 가능해. 주말에는 약속이 자주 바뀌어.",
+                "scope": "지금은 한 달에 0권이고, 평일 화요일과 목요일 저녁에 20분씩 가능해.",
+                "quantity": {
+                  "value": 20,
+                  "unit": "분"
+                },
+                "subject": "self_or_unspecified",
+                "temporal": "current_or_unspecified",
+                "progress": "unspecified",
+                "budgetScope": {
+                  "owner": "personal_or_unspecified",
+                  "allocation": "overall",
+                  "areas": []
+                }
+              },
+              "contract": {
+                "version": 1,
+                "summary": "평일 화·목 저녁 각 20분, 주말은 약속이 자주 바뀌어 유동적",
+                "evidence": "평일 화요일과 목요일 저녁에 20분씩 가능해. 주말에는 약속이 자주 바뀌어.",
+                "source": "지금은 한 달에 0권이고, 평일 화요일과 목요일 저녁에 20분씩 가능해.",
+                "limits": {
+                  "status": "bounded",
+                  "weeklyMinutes": {
+                    "min": 4.615384615384616,
+                    "max": 4.615384615384616
+                  },
+                  "weeklySessions": null,
+                  "perSessionMinutes": null
+                }
+              }
+            },
+            "feasibilityAcceptance": null
+          },
+          "memory": [
+            {
+              "id": "59936a28-e90f-4cc8-a787-aee6fd508bca",
+              "kind": "constraint",
+              "note": "주말 약속이 자주 바뀌어 유동적 — 고정 배치 불가",
+              "evidence": "주말에는 약속이 자주 바뀌어",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "f4a34338-b4ee-40ee-8de0-d5af07788cb2",
+              "supersedesId": null
+            }
+          ],
+          "dialogue": {
+            "version": 3,
+            "focus": "goals",
+            "lastIntent": "decide",
+            "lastMove": "ask",
+            "confidence": "high",
+            "expectsReply": true,
+            "openThreads": [],
+            "scheduleComplete": false
+          }
+        }
+      },
+      "message": "화요일만 10분으로 줄여줘. 목요일 20분과 8주 동안 2권이라는 목표는 그대로 둬. 아직 확정하거나 저장하지 말고 수정안을 보여줘.",
+      "expectedWeeklyMinutes": 30
+    },
+    {
+      "caseId": "learning",
+      "provider": "anthropic",
+      "initial": {
+        "stage": 5,
+        "messages": [
+          {
+            "id": "8f4cc1f7-986d-41da-8bbb-3e33a2cb14ac",
+            "role": "user",
+            "text": "업무에 쓸 파이썬을 배우고 싶은데 어디서부터 할지 모르겠어. 공부 방법과 같이 관리하는 방법을 설명해줘."
+          },
+          {
+            "id": "3e4a5edf-b9f9-4c71-be1d-3ee9d2f973f1",
+            "role": "assistant",
+            "text": "업무용 파이썬을 어디서부터 시작할지, 그리고 꾸준히 관리하는 방법까지 알고 싶으신 거네요. 목표 설계와 함께 충분히 설명할게요.\n\n---\n\n## 왜 이 순서로 배우는 게 맞는가\n\n업무에서 파이썬을 쓴다는 건 보통 **엑셀 자동화, 데이터 정리, 반복 작업 제거** 같은 실제 문제를 해결하는 게 목적이에요. 그래서 문법을 처음부터 전부 외우는 방식보다, **\"내 업무에서 뭘 자동화하고 싶은가\"를 먼저 정하고 그에 맞는 문법·라이브러리만 골라 배우는 것**이 훨씬 빠르고 지속하기 쉬워요.\n\n---\n\n## 단계별 공부 방법\n\n### 1단계 · 기초 문법 (2~3주)\n배워야 할 핵심만 골라 익혀요. 전부 알 필요 없고, 아래 다섯 가지만 이해하면 업무 코드를 읽고 쓸 수 있어요.\n\n- 변수·자료형 (숫자, 문자열, 리스트, 딕셔너리)\n- 조건문 `if / else`\n- 반복문 `for / while`\n- 함수 `def`\n- 파일 읽고 쓰기 `open()`\n\n**추천 자료:** [점프 투 파이썬](https://wikidocs.net/book/1) (무료, 한국어, 브라우저에서 바로 실습 가능)\n\n### 2단계 · 업무 연결 (3~4주)\n배운 문법으로 실제 파일을 건드리는 연습을 해요.\n\n- **엑셀·CSV 다루기** → `pandas`, `openpyxl`\n- **반복 작업 자동화** → `os`, `shutil` (파일 복사·이동·정리)\n- **웹에서 데이터 가져오기** → `requests`, `BeautifulSoup` (선택)\n\n이 단계는 \"내 업무 파일을 파이썬으로 열어보기\"가 첫 미션이에요. 작은 성공이 동기를 유지시켜요.\n\n### 3단계 · 실전 프로젝트 (이후 계속)\n배운 걸 내 업무에 직접 적용해요. 예를 들면:\n- 매주 반복하는 보고서 취합 자동화\n- 폴더 안 파일을 날짜별로 정리하는 스크립트\n- 여러 시트를 합치는 엑셀 처리\n\n**처음부터 완벽한 코드를 짜려 하지 말고**, 일단 동작하게 만든 뒤 조금씩 고쳐나가는 게 실력을 늘리는 핵심이에요.\n\n---\n\n## 환경 세팅 (딱 한 번)\n\n| 항목 | 추천 | 이유 |\n|------|------|------|\n| 파이썬 설치 | [python.org](https://python.org) 최신 버전 | 공식 배포, 가장 안정적 |\n| 편집기 | VS Code + Python 확장 | 무료, 자동완성·오류 표시 |\n| 첫 실습 | Google Colab | 설치 없이 브라우저에서 바로 실행 |\n\n처음엔 **Google Colab**으로 시작하면 설치 부담 없이 바로 문법 연습이 가능해요.\n\n---\n\n## 꾸준히 관리하는 방법\n\n### 주간 루틴 만들기\n공부를 \"시간 날 때\"로 두면 쉽게 밀려요. **주 3회, 회당 30~45분**처럼 횟수와 분량을 미리 정해두는 게 효과적이에요.\n\n- **공부한 날** → 배운 개념 한 줄 메모 + 코드 저장\n- **쉬는 날** → 이전에 짠 코드를 다시 읽어보거나 작은 부분 수정\n\n### 기록과 조정\n- 매주 \"이번 주에 뭘 만들었나?\" 한 줄로 남겨요.\n- 2주 연속 진도가 없으면 **분량을 줄이는 게 쉬는 것보다 낫고**, 1회 15분짜리 초소형 세션으로 줄여도 돼요.\n- 4주마다 \"내 업무에서 자동화할 수 있는 게 생겼나?\" 점검해요.\n\n### 막혔을 때 대처법\n- 에러 메시지 → **그대로 복사해서 검색** (Stack Overflow, ChatGPT 모두 유용)\n- 개념이 안 잡힐 때 → 억지로 넘어가지 말고 같은 예제를 다른 숫자·단어로 바꿔서 두 번 더 써보기\n- 동기가 떨어질 때 → 내 업무 파일을 파이썬으로 열어보는 것만 해도 충분\n\n---\n\n현재 어떤 업무에 파이썬을 쓰고 싶으신지, 그리고 하루나 주간 기준으로 시간을 얼마나 쓸 수 있을지 알면 **실제 주차별 계획**을 같이 잡아드릴 수 있어요."
+          },
+          {
+            "id": "9e49c48d-7c96-479b-b9df-4ff07234d30f",
+            "role": "user",
+            "text": "6주 뒤에 매주 받는 CSV 매출 파일을 정리하는 스크립트를 만들고 싶어. 프로그래밍은 처음이고 노트북은 있어. 월수금 퇴근 뒤 30분씩 가능해. 유료 강의는 결제하지 않을 거야."
+          },
+          {
+            "id": "fca1b1c9-c35e-46ce-b38e-f3f08e3c00a9",
+            "role": "assistant",
+            "text": "프로그래밍이 처음이고 월수금 30분씩 쓸 수 있으니, 6주를 **\"문법 → 파일 다루기 → 내 스크립트 완성\"** 세 구간으로 나누는 게 맞아요. 매주 3회 × 30분 = **주 90분**, 6주 합산 약 9시간으로 CSV 정리 스크립트를 완성하는 게 충분히 현실적인 목표예요. 유료 강의 없이 무료 자료만 써도 이 범위는 충분히 커버돼요.\n\n## 6주 주차별 계획\n\n### 1주차 · 환경 세팅 + 파이썬 첫 실행\n- **Google Colab** 접속 (설치 없이 브라우저에서 바로 실행)\n- 변수, 문자열, 숫자, `print()` 연습\n- 참고: [점프 투 파이썬](https://wikidocs.net/book/1) 1~2장\n- 이번 주 미션: `print(\"내 이름\")` 실행하고 화면에 뜨는 거 확인\n\n### 2주차 · 핵심 문법 3가지\n- 리스트, `for` 반복문, `if` 조건문\n- 예: 숫자 리스트에서 100 이상인 것만 출력해보기\n- 참고: 점프 투 파이썬 3~4장\n\n### 3주차 · 파일 읽고 쓰기\n- `pandas` 라이브러리로 CSV 파일 열기\n- 컬럼 확인, 행 필터, 합산(`sum`) 연습\n- Colab에 샘플 CSV를 업로드해서 직접 다뤄보기\n- 이번 주 미션: 내 매출 CSV를 Colab에 올려서 `df.head()` 출력해보기\n\n### 4주차 · 실제 파일 연결\n- 매출 CSV의 실제 컬럼 구조 파악\n- 필요한 정리 작업 목록 만들기 (예: 빈 행 제거, 날짜 형식 통일, 합계 열 추가 등)\n- 각 작업을 코드 한 줄씩 만들어보기\n\n### 5주차 · 스크립트 조립\n- 4주차 코드들을 하나의 `.py` 파일로 합치기\n- VS Code 설치하고 노트북에서 실행해보기\n- 실행 → 에러 → 수정 반복 (이 과정이 실제 개발 방식이에요)\n\n### 6주차 · 완성 + 정리\n- 파일 이름을 자동으로 날짜 포함해서 저장\n- 코드에 설명 주석(`#`) 달기 — 나중에 내가 봐도 이해되도록\n- 다음 주 매출 파일로 한 번 더 돌려보기\n\n## 관리 방법\n\n**매 세션 끝에 한 줄만 기록해요.**\n예: \"3/15 — for문 연습, 리스트 필터 성공\"\n노션, 메모앱, 종이 어디든 괜찮아요.\n\n**2주 연속 진도가 없으면** 세션 길이를 30분 → 15분으로 줄이세요. 빠뜨리는 것보다 짧게라도 여는 게 훨씬 낫거든요.\n\n**막혔을 때**는 에러 메시지를 그대로 복사해서 검색하거나 ChatGPT에 붙여넣으면 바로 해결되는 경우가 대부분이에요. 처음엔 에러가 많이 나는 게 정상이에요.\n\n**4주차쯤**에 내 매출 CSV에서 어떤 정리가 필요한지 목록이 나오면 그때 알려주세요. 스크립트 코드를 구체적으로 같이 짜드릴 수 있어요."
+          }
+        ],
+        "goal_card": {
+          "category": "기타",
+          "outcome": "",
+          "identity": "",
+          "deadline": "",
+          "baselineMetric": "",
+          "targetMetric": "",
+          "tinyStart": "",
+          "cue": "",
+          "environment": "",
+          "fallbackAction": "",
+          "recoveryRule": "두 번 연속 놓치지 않기",
+          "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+          "durationWeeks": 0,
+          "weeklyActions": []
+        },
+        "blocks": [],
+        "day_bounds": [],
+        "agent_v2_context": {
+          "brief": {
+            "period": {
+              "label": "6주",
+              "weeks": 6
+            },
+            "areas": [],
+            "baselines": [],
+            "objectives": [],
+            "priority": null,
+            "capacity": null,
+            "feasibilityAcceptance": null
+          },
+          "memory": [
+            {
+              "id": "bf0a4fd0-3fe0-4f77-8a4b-b5f9635cc736",
+              "kind": "constraint",
+              "note": "유료 강의 결제 안 함 — 무료 자료만 사용",
+              "evidence": "유료 강의는 결제하지 않을 거야",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "9e49c48d-7c96-479b-b9df-4ff07234d30f",
+              "supersedesId": null
+            },
+            {
+              "id": "eb7b5199-e4e9-44b5-bf20-2481491f15e7",
+              "kind": "context",
+              "note": "노트북 보유, 프로그래밍 처음, 월수금 퇴근 후 30분 실행",
+              "evidence": "프로그래밍은 처음이고 노트북은 있어. 월수금 퇴근 뒤 30분씩 가능해",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "9e49c48d-7c96-479b-b9df-4ff07234d30f",
+              "supersedesId": null
+            },
+            {
+              "id": "bdc62ab5-cb40-45f8-8110-289068deb89a",
+              "kind": "motivation",
+              "note": "매주 받는 CSV 매출 파일 정리 자동화가 실제 목적",
+              "evidence": "매주 받는 CSV 매출 파일을 정리하는 스크립트를 만들고 싶어",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "9e49c48d-7c96-479b-b9df-4ff07234d30f",
+              "supersedesId": null
+            }
+          ],
+          "dialogue": {
+            "version": 3,
+            "focus": "goals",
+            "lastIntent": "share_fact",
+            "lastMove": "ask",
+            "confidence": "high",
+            "expectsReply": true,
+            "openThreads": [],
+            "scheduleComplete": false
+          }
+        }
+      },
+      "message": "수요일은 앞으로 시간이 안 나. 월요일과 금요일의 30분은 유지하고, 주말에 할 수 있다고 가정하지 마. 범위를 줄이는 선택지도 설명해줘. 변경은 아직 승인하지 않을게.",
+      "expectedWeeklyMinutes": 60
+    },
+    {
+      "caseId": "learning",
+      "provider": "openai",
+      "initial": {
+        "stage": 5,
+        "messages": [
+          {
+            "id": "7ece4b29-57e9-4a33-94ca-50b34ebce638",
+            "role": "user",
+            "text": "업무에 쓸 파이썬을 배우고 싶은데 어디서부터 할지 모르겠어. 공부 방법과 같이 관리하는 방법을 설명해줘."
+          },
+          {
+            "id": "5a1e0bd3-a359-4159-bc55-6ffc3381520e",
+            "role": "assistant",
+            "text": "업무용 파이썬은 문법을 처음부터 끝까지 외우기보다, **반복 업무 하나를 실제로 줄이는 작은 결과물**을 중심으로 배우는 게 좋아요. 흐름은 보통 ① 실행 환경과 기본 문법 ② 파일·표 데이터 다루기 ③ 업무 자동화 미니 프로젝트 ④ 예외 처리와 재사용 가능한 코드 순서로 잡습니다. 웹 개발이나 알고리즘처럼 당장 업무와 무관한 내용은 뒤로 미뤄도 돼요.\n\n공부할 때는 ‘개념 학습 → 예제 그대로 실행 → 업무와 비슷하게 변형 → 막힌 점 기록’의 짧은 순환을 사용해요. 강의를 오래 보기보다 매회 작동하는 코드나 파일을 하나 남기고, AI가 만든 코드는 각 줄의 역할을 설명할 수 있고 입력값을 바꿔 다시 실행할 수 있을 때만 학습 결과로 인정하는 편이 안전합니다.\n\n관리는 시간보다 **산출물과 막힌 지점**을 기록하는 방식이 효과적이에요. 매회 `오늘 만들 것 / 실제로 된 것 / 오류와 해결 / 다음 한 단계`만 남기고, 매주 ‘혼자 다시 만들 수 있는가, 실제 업무 시간을 줄였는가, 오류가 나도 원인을 찾을 수 있는가’를 점검해요. 진도가 버거우면 새 내용을 늘리지 않고 같은 결과물을 더 작은 단계로 나누고, 쉬었다 돌아오면 마지막으로 작동했던 코드부터 다시 실행합니다.\n\n조건을 알려주시면 불필요한 문법은 덜어내고, 업무 결과물·주간 학습 행동·기록 및 조정 기준까지 포함한 초안을 만들어 드릴게요. 아래 항목은 정확하지 않아도 되고, 모르는 것은 ‘모름’이라고 적어도 괜찮아요.\n\n- 추천 학습 축: 파이썬 기초 → 파일/엑셀·CSV 처리 → 업무 데이터 가공 → 자동화 → 오류 처리·정리\n- 최소 기록: 날짜, 만든 결과물, 막힌 오류, 해결법, 다음 할 일\n- 주간 점검: 재현 가능성, 업무 적용 가능성, 절약된 수작업 여부\n\n1. **업무**: 어떤 일을 하며, 파이썬으로 줄이고 싶은 반복 작업은 무엇인가요? 예: 엑셀 취합, 보고서 작성, 데이터 분석, 파일 정리, 웹 정보 수집\n2. **현재 수준**: 코딩이나 엑셀 함수·SQL을 어느 정도 사용해 봤나요?\n3. **완료 결과**: 일정 기간 뒤 무엇을 직접 만들거나 처리할 수 있으면 성공인가요?\n4. **기간**: 언제까지를 첫 학습 기간으로 잡고 싶나요? 미정이면 1·3·6개월 중 선택해도 돼요.\n5. **실행 여건**: 현실적으로 주 몇 회, 회당 몇 분 정도 가능하며 회사 PC의 설치·보안 제약이 있나요?\n6. **학습 방식**: 영상, 글, 따라 만들기 중 선호가 있나요? 유료 강의 가능 여부도 선택적으로 알려주세요."
+          },
+          {
+            "id": "28e4fb16-3b8a-47cb-9a3d-f1a0699c4bdd",
+            "role": "user",
+            "text": "6주 뒤에 매주 받는 CSV 매출 파일을 정리하는 스크립트를 만들고 싶어. 프로그래밍은 처음이고 노트북은 있어. 월수금 퇴근 뒤 30분씩 가능해. 유료 강의는 결제하지 않을 거야."
+          },
+          {
+            "id": "e6f2fd66-5aed-4c20-858c-f8ddc7ea54e5",
+            "role": "assistant",
+            "text": "목표와 시간은 충분히 구체적이에요. 주 3회 30분이면 6주 동안 ‘CSV를 읽어 필요한 형태로 정리해 새 파일로 저장하는’ 첫 스크립트를 목표로 삼을 수 있어요. 프로그래밍이 처음이므로 문법을 넓게 공부하기보다, 실제 파일을 단계별로 다루며 완성하는 방식이 맞습니다.\n\n1. **CSV 정리 결과**: 매출 파일에서 구체적으로 어떤 정리를 하고 싶나요? 예: 여러 파일 합치기, 열 이름·순서 바꾸기, 특정 행 제외, 월/상품별 합계, 엑셀 파일로 저장\n2. **설치 제약·자료**: 노트북에 파이썬이나 프로그램을 설치할 수 있나요? 개인정보·회사 기밀을 뺀 샘플 CSV 파일(또는 열 이름 몇 개)을 학습에 쓸 수 있나요?"
+          }
+        ],
+        "goal_card": {
+          "category": "기타",
+          "outcome": "",
+          "identity": "",
+          "deadline": "",
+          "baselineMetric": "",
+          "targetMetric": "",
+          "tinyStart": "",
+          "cue": "",
+          "environment": "",
+          "fallbackAction": "",
+          "recoveryRule": "두 번 연속 놓치지 않기",
+          "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+          "durationWeeks": 0,
+          "weeklyActions": []
+        },
+        "blocks": [],
+        "day_bounds": [],
+        "agent_v2_context": {
+          "brief": {
+            "period": {
+              "label": "6주",
+              "weeks": 6
+            },
+            "areas": [
+              "파이썬 업무 자동화"
+            ],
+            "baselines": [
+              {
+                "area": "파이썬 업무 자동화",
+                "current": "프로그래밍은 처음이며, 첫 주에는 개발 환경과 CSV 파일 구조를 확인해야 함",
+                "evidence": "프로그래밍은 처음이고 노트북은 있어.",
+                "status": "known",
+                "binding": {
+                  "version": 1,
+                  "field": "baseline",
+                  "area": "파이썬 업무 자동화",
+                  "value": "프로그래밍은 처음이며, 첫 주에는 개발 환경과 CSV 파일 구조를 확인해야 함",
+                  "evidence": "프로그래밍은 처음이고 노트북은 있어.",
+                  "scope": "프로그래밍은 처음이고 노트북은 있어.",
+                  "quantity": null,
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              }
+            ],
+            "objectives": [
+              {
+                "area": "파이썬 업무 자동화",
+                "result": "매주 받는 CSV 매출 파일을 정리하는 스크립트를 만든다",
+                "evidence": "6주 뒤에 매주 받는 CSV 매출 파일을 정리하는 스크립트를 만들고 싶어.",
+                "resultKind": "deliverable",
+                "binding": {
+                  "version": 1,
+                  "field": "objective",
+                  "area": "파이썬 업무 자동화",
+                  "value": "매주 받는 CSV 매출 파일을 정리하는 스크립트를 만든다",
+                  "evidence": "6주 뒤에 매주 받는 CSV 매출 파일을 정리하는 스크립트를 만들고 싶어.",
+                  "scope": "6주 뒤에 매주 받는 CSV 매출 파일을 정리하는 스크립트를 만들고 싶어.",
+                  "quantity": null,
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              }
+            ],
+            "priority": null,
+            "capacity": {
+              "summary": "월·수·금 퇴근 후 30분씩 학습 가능",
+              "evidence": "월수금 퇴근 뒤 30분씩 가능해.",
+              "status": "known",
+              "binding": {
+                "version": 1,
+                "field": "capacity",
+                "area": null,
+                "value": "월·수·금 퇴근 후 30분씩 학습 가능",
+                "evidence": "월수금 퇴근 뒤 30분씩 가능해.",
+                "scope": "월수금 퇴근 뒤 30분씩 가능해.",
+                "quantity": {
+                  "value": 30,
+                  "unit": "분"
+                },
+                "subject": "self_or_unspecified",
+                "temporal": "current_or_unspecified",
+                "progress": "unspecified",
+                "budgetScope": {
+                  "owner": "personal_or_unspecified",
+                  "allocation": "overall",
+                  "areas": []
+                }
+              },
+              "contract": {
+                "version": 1,
+                "summary": "월·수·금 퇴근 후 30분씩 학습 가능",
+                "evidence": "월수금 퇴근 뒤 30분씩 가능해.",
+                "source": "월수금 퇴근 뒤 30분씩 가능해.",
+                "limits": {
+                  "status": "unresolved",
+                  "weeklyMinutes": null,
+                  "weeklySessions": null,
+                  "perSessionMinutes": null
+                }
+              }
+            },
+            "feasibilityAcceptance": null
+          },
+          "memory": [
+            {
+              "id": "4eead13b-772c-4133-bb18-a070628774e1",
+              "kind": "motivation",
+              "note": "업무에 활용하기 위해 파이썬을 배우고 싶어 함",
+              "evidence": "업무에 쓸 파이썬을 배우고 싶은데",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "7ece4b29-57e9-4a33-94ca-50b34ebce638",
+              "supersedesId": null
+            },
+            {
+              "id": "c864c264-3dcd-42af-858e-2be3bde320d7",
+              "kind": "challenge",
+              "note": "파이썬 학습의 시작점과 관리 방법을 정하기 어려워함",
+              "evidence": "어디서부터 할지 모르겠어. 공부 방법과 같이 관리하는 방법을 설명해줘.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "temporary",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": "2026-11-22T00:00:00.000Z",
+              "sourceMessageId": "7ece4b29-57e9-4a33-94ca-50b34ebce638",
+              "supersedesId": null
+            },
+            {
+              "id": "de7d68bb-f81c-4b01-a311-6584b404ae3e",
+              "kind": "motivation",
+              "note": "6주 내 매주 받는 CSV 매출 파일을 정리하는 스크립트를 만들고 싶어 함",
+              "evidence": "6주 뒤에 매주 받는 CSV 매출 파일을 정리하는 스크립트를 만들고 싶어.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "temporary",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": "2026-11-06T00:00:00.000Z",
+              "sourceMessageId": "28e4fb16-3b8a-47cb-9a3d-f1a0699c4bdd",
+              "supersedesId": null
+            },
+            {
+              "id": "0044917e-3eab-4338-afe3-4e5f405651f6",
+              "kind": "constraint",
+              "note": "월·수·금 퇴근 후 각 30분 학습 가능",
+              "evidence": "월수금 퇴근 뒤 30분씩 가능해.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "28e4fb16-3b8a-47cb-9a3d-f1a0699c4bdd",
+              "supersedesId": null
+            },
+            {
+              "id": "67111b21-284a-45ec-b774-ee0a1b0804b8",
+              "kind": "preference",
+              "note": "유료 강의는 결제하지 않음",
+              "evidence": "유료 강의는 결제하지 않을 거야.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "28e4fb16-3b8a-47cb-9a3d-f1a0699c4bdd",
+              "supersedesId": null
+            }
+          ],
+          "dialogue": {
+            "version": 3,
+            "focus": "goals",
+            "lastIntent": "seek_advice",
+            "lastMove": "ask",
+            "confidence": "high",
+            "expectsReply": true,
+            "openThreads": [],
+            "scheduleComplete": false
+          }
+        }
+      },
+      "message": "수요일은 앞으로 시간이 안 나. 월요일과 금요일의 30분은 유지하고, 주말에 할 수 있다고 가정하지 마. 범위를 줄이는 선택지도 설명해줘. 변경은 아직 승인하지 않을게.",
+      "expectedWeeklyMinutes": 60
+    },
+    {
+      "caseId": "uncertainty",
+      "provider": "openai",
+      "initial": {
+        "stage": 5,
+        "messages": [
+          {
+            "id": "cc5a4f86-19ec-4b38-b291-72fad092b6f6",
+            "role": "user",
+            "text": "영어 회화를 꾸준히 하고 싶어. 기간과 목표 점수는 아직 모르겠고 시험 볼 계획은 없어. 먼저 어떤 방식으로 시작할 수 있을지 알려줘."
+          },
+          {
+            "id": "67f3f440-7970-4c24-a39c-ec5ceb852cdc",
+            "role": "assistant",
+            "text": "시험 계획이 없다면 점수 대신 **실제로 말한 횟수·시간·해낸 대화 상황**을 기준으로 시작하는 편이 잘 맞아요. 기간은 지금 확정하지 않아도 되고, 먼저 짧게 시험해 본 뒤 정할 수 있어요.\n\n시작 방식은 크게 네 가지예요. **혼잣말·문장 바꿔 말하기**는 부담이 가장 낮고, **짧은 음원 따라 말하기(쉐도잉)**는 발음과 말의 리듬에 도움이 돼요. **AI와 역할 대화**는 반복과 즉시 연습에 편하고, **튜터·언어교환**은 실제 상대에게 반응하는 경험을 쌓는 데 좋아요. 보통은 혼자 하는 짧은 연습과 실제 대화를 함께 두되, 현재 수준과 부담에 따라 비중을 달리해요.\n\n조건을 확인하면 시험 점수 대신 대화 과제와 실행 기록을 기준으로, 시작 방법·바쁜 날의 최소 연습·조정 기준까지 묶어드릴게요. 기간이 막막하면 **1개월을 적합한 방식을 찾는 실험 기간**으로 삼을 수도 있지만, 아직 확정안은 아니에요.\n\n- 혼자 시작: 오늘 있었던 일 3문장 말하기, 같은 뜻을 다른 표현으로 바꿔보기\n- 입력과 발음: 짧은 음원을 듣고 문장 단위로 따라 말한 뒤 녹음 비교하기\n- 상호작용: AI 역할극으로 반복한 뒤 튜터나 언어교환에서 실제 반응 연습하기\n- 기록: 공부한 양보다 ‘입 밖으로 말한 날’과 ‘완료한 대화 과제’를 표시하기\n\n1. **현재 수준**: 자기소개나 일상 이야기를 영어로 어느 정도 말할 수 있나요? 모르겠다면 최근 해본 회화 경험을 적어도 돼요.\n2. **원하는 장면**: 여행, 외국인 친구와 일상 대화, 업무, 영상·전화 등 어떤 상황에서 자연스럽게 말하고 싶나요?\n3. **실행 여건**: 현실적으로 주 몇 회, 한 번에 몇 분 정도 가능할까요? 일정이 유동적이면 가능한 범위로 답해도 돼요.\n4. **연습 환경**: 혼자 연습, AI, 유료 튜터, 언어교환 중 사용 가능하거나 선호·비선호하는 방식이 있나요?"
+          },
+          {
+            "id": "27e8ddb8-a4d3-4176-8a48-3af277fddccb",
+            "role": "user",
+            "text": "초급 수준이고 해외 동료에게 업무 진행을 짧게 설명하는 게 목적이야. 일주일에 3번, 출근 전 10분 정도 가능해. 언제까지 할지는 아직 정하지 않았어. 정해진 교재는 없어."
+          },
+          {
+            "id": "a67b622f-6c0a-4959-b30f-486e4c5e8f86",
+            "role": "assistant",
+            "text": "이 조건이라면 교재를 처음부터 따라가기보다, 실제 업무 업데이트에 쓰는 짧은 문장을 만들어 **소리 내어 회상하고 역할 대화로 적용하는 방식**이 잘 맞아요. 10분 안에는 새 표현을 많이 배우기보다 ‘완료한 일–현재 하는 일–막힌 점–다음 행동’을 짧게 말하는 능력에 집중하는 편이 효율적이에요.\n\n기간은 아직 정하지 않아도 괜찮아요. 다만 맞춤 시작안을 만들려면 연습 상대와 완료 기준을 정해야 해요. 답을 바탕으로 주 3회 구성과 기록·조정 방법까지 제안할게요.\n\n1. **연습 방식**: 출근 전에 음성 AI와 말하기가 가능한가요, 아니면 혼자 녹음하는 방식이 더 편한가요? 유료 튜터나 언어교환 가능 여부도 알려주세요.\n2. **완료 기준**: 우선 어떤 상태를 만들고 싶나요? 예: 메모를 보고 30초 설명, 메모 없이 1분 설명, 동료의 간단한 후속 질문에 답하기. 아직 모르겠다면 ‘모름’이라고 해도 돼요."
+          }
+        ],
+        "goal_card": {
+          "category": "기타",
+          "outcome": "",
+          "identity": "",
+          "deadline": "",
+          "baselineMetric": "",
+          "targetMetric": "",
+          "tinyStart": "",
+          "cue": "",
+          "environment": "",
+          "fallbackAction": "",
+          "recoveryRule": "두 번 연속 놓치지 않기",
+          "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+          "durationWeeks": 0,
+          "weeklyActions": []
+        },
+        "blocks": [],
+        "day_bounds": [],
+        "agent_v2_context": {
+          "brief": {
+            "period": null,
+            "areas": [
+              "영어 회화"
+            ],
+            "baselines": [
+              {
+                "area": "영어 회화",
+                "current": "초급 수준",
+                "evidence": "초급 수준이고",
+                "status": "known",
+                "binding": {
+                  "version": 1,
+                  "field": "baseline",
+                  "area": "영어 회화",
+                  "value": "초급 수준",
+                  "evidence": "초급 수준이고",
+                  "scope": "초급 수준이고 해외 동료에게 업무 진행을 짧게 설명하는 게 목적이야.",
+                  "quantity": null,
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              }
+            ],
+            "objectives": [
+              {
+                "area": "영어 회화",
+                "result": "영어 회화를 꾸준히 하기",
+                "evidence": "영어 회화를 꾸준히 하고 싶어.",
+                "resultKind": "observable_change",
+                "binding": {
+                  "version": 1,
+                  "field": "objective",
+                  "area": "영어 회화",
+                  "value": "영어 회화를 꾸준히 하기",
+                  "evidence": "영어 회화를 꾸준히 하고 싶어.",
+                  "scope": "영어 회화를 꾸준히 하고 싶어.",
+                  "quantity": null,
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              },
+              {
+                "area": "영어 회화",
+                "result": "해외 동료에게 업무 진행을 영어로 짧게 설명하기",
+                "evidence": "해외 동료에게 업무 진행을 짧게 설명하는 게 목적이야.",
+                "resultKind": "observable_change",
+                "binding": {
+                  "version": 1,
+                  "field": "objective",
+                  "area": "영어 회화",
+                  "value": "해외 동료에게 업무 진행을 영어로 짧게 설명하기",
+                  "evidence": "해외 동료에게 업무 진행을 짧게 설명하는 게 목적이야.",
+                  "scope": "초급 수준이고 해외 동료에게 업무 진행을 짧게 설명하는 게 목적이야.",
+                  "quantity": null,
+                  "subject": "self_or_unspecified",
+                  "temporal": "current_or_unspecified",
+                  "progress": "unspecified"
+                }
+              }
+            ],
+            "priority": null,
+            "capacity": {
+              "summary": "주 3회, 출근 전 회당 약 10분 가능",
+              "evidence": "일주일에 3번, 출근 전 10분 정도 가능해.",
+              "status": "known",
+              "binding": {
+                "version": 1,
+                "field": "capacity",
+                "area": null,
+                "value": "주 3회, 출근 전 회당 약 10분 가능",
+                "evidence": "일주일에 3번, 출근 전 10분 정도 가능해.",
+                "scope": "일주일에 3번, 출근 전 10분 정도 가능해.",
+                "quantity": null,
+                "subject": "self_or_unspecified",
+                "temporal": "current_or_unspecified",
+                "progress": "unspecified",
+                "budgetScope": {
+                  "owner": "personal_or_unspecified",
+                  "allocation": "overall",
+                  "areas": []
+                }
+              },
+              "contract": {
+                "version": 1,
+                "summary": "주 3회, 출근 전 회당 약 10분 가능",
+                "evidence": "일주일에 3번, 출근 전 10분 정도 가능해.",
+                "source": "일주일에 3번, 출근 전 10분 정도 가능해.",
+                "limits": {
+                  "status": "bounded",
+                  "weeklyMinutes": {
+                    "min": 30,
+                    "max": 30
+                  },
+                  "weeklySessions": {
+                    "min": 3,
+                    "max": 3
+                  },
+                  "perSessionMinutes": {
+                    "min": 10,
+                    "max": 10
+                  }
+                }
+              }
+            },
+            "feasibilityAcceptance": null
+          },
+          "memory": [
+            {
+              "id": "e69cb3dd-7aa3-49b8-8f8c-752022a59578",
+              "kind": "preference",
+              "note": "영어 회화는 시험 점수보다 꾸준한 실전 연습을 원함",
+              "evidence": "기간과 목표 점수는 아직 모르겠고 시험 볼 계획은 없어.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "cc5a4f86-19ec-4b38-b291-72fad092b6f6",
+              "supersedesId": null
+            },
+            {
+              "id": "6588e340-9b21-4f29-82ee-d9af9f9389cb",
+              "kind": "context",
+              "note": "영어 회화용으로 정해진 교재가 없음",
+              "evidence": "정해진 교재는 없어.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "temporary",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": "2026-11-22T00:00:00.000Z",
+              "sourceMessageId": "27e8ddb8-a4d3-4176-8a48-3af277fddccb",
+              "supersedesId": null
+            }
+          ],
+          "dialogue": {
+            "version": 3,
+            "focus": "goals",
+            "lastIntent": "seek_advice",
+            "lastMove": "ask",
+            "confidence": "high",
+            "expectsReply": true,
+            "openThreads": [],
+            "scheduleComplete": false
+          }
+        }
+      },
+      "message": "아까 주 3번이라고 했는데 주 2번으로 정정할게. 10분은 유지해. 목표 점수나 마감일을 새로 만들지 말고 어떤 식으로 연습하고 기록할지 구체적으로 보여줘.",
+      "expectedWeeklyMinutes": 20
+    },
+    {
+      "caseId": "uncertainty",
+      "provider": "anthropic",
+      "initial": {
+        "stage": 5,
+        "messages": [
+          {
+            "id": "45bdf24b-f1bc-42d8-8760-2edbcb56df1f",
+            "role": "user",
+            "text": "영어 회화를 꾸준히 하고 싶어. 기간과 목표 점수는 아직 모르겠고 시험 볼 계획은 없어. 먼저 어떤 방식으로 시작할 수 있을지 알려줘."
+          },
+          {
+            "id": "6c4a7ade-576b-439a-a772-1348f8436521",
+            "role": "assistant",
+            "text": "시험 없이 회화를 꾸준히 유지하는 게 목표라면, '점수'보다 **말하기 습관**을 먼저 잡는 게 핵심이에요. 시작 방식은 크게 세 가지로 나눌 수 있어요.\n\n**① 혼자 꾸준히 하는 방법** — 섀도잉(원어민 오디오를 따라 말하기), 독백 일기(하루 1~2분 영어로 말하기 녹음), AI 챗봇 대화 등이 여기에 해당해요. 비용 없이 언제든 할 수 있고 부담이 적어서 습관을 만들기 좋아요. 다만 발음이나 표현의 오류를 잡아주는 사람이 없다는 단점이 있어요.\n\n**② 파트너나 커뮤니티와 연습하는 방법** — 언어 교환 앱(HelloTalk, Tandem 등)이나 원어민 회화 스터디를 활용하는 방식이에요. 실제 대화 감각을 키우기 좋고 동기 유지에도 유리해요. 시간 조율이 필요하고 꾸준히 이어가려면 약간의 의지가 더 필요해요.\n\n**③ 튜터나 강의를 활용하는 방법** — 화상 튜터링(Cambly, 튜터링 앱 등)이나 온라인 회화 강의를 정기적으로 잡는 방식이에요. 피드백이 명확하고 실력 향상이 빠르지만 비용과 시간 약속이 필요해요.\n\n어떤 방식이든 **매일 짧게 말하는 루틴을 먼저 만드는 게** 장기적으로 가장 효과적이에요. 예를 들어 하루 15분도 충분한 시작점이 돼요. 현재 어느 정도 수준인지, 하루에 얼마나 시간을 쓸 수 있는지 알면 어떤 방식이 더 맞을지 구체적으로 함께 정리할 수 있어요.\n\n1. **현재 수준** — 간단한 일상 대화는 가능한 편인가요, 아니면 기초부터 다시 시작하는 느낌인가요?\n2. **가용 시간** — 하루 또는 일주일에 회화 연습에 쓸 수 있는 시간이 대략 얼마나 되나요?"
+          },
+          {
+            "id": "c2ffe450-88ec-45a6-b49c-1254890d4d32",
+            "role": "user",
+            "text": "초급 수준이고 해외 동료에게 업무 진행을 짧게 설명하는 게 목적이야. 일주일에 3번, 출근 전 10분 정도 가능해. 언제까지 할지는 아직 정하지 않았어. 정해진 교재는 없어."
+          },
+          {
+            "id": "818b3bad-ca6f-486b-844f-7b09b3e24625",
+            "role": "assistant",
+            "text": "초급이고 업무 설명이 목적이라면, 넓게 영어를 공부하기보다 **'업무 진행을 짧게 말하는 패턴'** 에 집중하는 게 훨씬 효율적이에요. 주 3회 10분은 길진 않지만, 범위를 좁히면 충분히 쌓이는 시간이에요.\n\n---\n\n**실행 루틴 — 매 회차 10분**\n\n1. **패턴 읽기 (1~2분)** — 업무 설명에 자주 쓰는 표현 하나를 소리 내어 2~3번 읽어요. 교재 없이도 이런 패턴을 매 회차 하나씩 늘려가면 돼요.\n   - *\"I'm currently working on…\"*\n   - *\"We're waiting for approval on…\"*\n   - *\"I'll update you once…\"*\n\n2. **내 업무에 대입해서 말하기 (5~7분)** — 오늘 실제 업무 내용을 그 패턴에 넣어 짧게 말해 봐요. 막히는 부분은 메모해 두면 다음 회차 재료가 돼요. 녹음하면 더 좋지만, 안 해도 괜찮아요.\n\n3. **막힌 표현 하나 정리 (1~2분)** — 말하다 막힌 단어·표현을 검색하거나 메모해서 다음 회차에 써요.\n\n---\n\n**기간을 정하지 않아도 되는 이유**\n\n업무 상황은 계속 바뀌기 때문에, 특정 시험 준비와 달리 '끝' 시점보다 **말이 조금씩 더 자연스럽게 나오는 것**을 기준으로 삼는 게 더 현실적이에요. **4주마다 한 번씩** '지난달보다 막히는 게 줄었나'를 짧게 돌아보는 것만으로 방향을 유지할 수 있어요.\n\n원하시면 자주 쓰이는 업무 설명 패턴 목록이나, 첫 주 연습 예시를 구체적으로 정리해 드릴 수 있어요."
+          }
+        ],
+        "goal_card": {
+          "category": "기타",
+          "outcome": "",
+          "identity": "",
+          "deadline": "",
+          "baselineMetric": "",
+          "targetMetric": "",
+          "tinyStart": "",
+          "cue": "",
+          "environment": "",
+          "fallbackAction": "",
+          "recoveryRule": "두 번 연속 놓치지 않기",
+          "reviewCycle": "매주 실행률 확인 · 4주마다 조정",
+          "durationWeeks": 0,
+          "weeklyActions": []
+        },
+        "blocks": [],
+        "day_bounds": [],
+        "agent_v2_context": {
+          "brief": {
+            "period": null,
+            "areas": [
+              "영어 회화"
+            ],
+            "baselines": [],
+            "objectives": [],
+            "priority": null,
+            "capacity": null,
+            "feasibilityAcceptance": null
+          },
+          "memory": [
+            {
+              "id": "6af17144-dd01-4a8f-8e82-d961434ec4f3",
+              "kind": "preference",
+              "note": "연습 가용 시간: 주 3회, 출근 전 10분. 기간 미정.",
+              "evidence": "일주일에 3번, 출근 전 10분 정도 가능해. 언제까지 할지는 아직 정하지 않았어.",
+              "status": "confirmed",
+              "source": "user",
+              "scope": "long_term",
+              "confidence": 1,
+              "createdAt": "2026-10-23T00:00:00.000Z",
+              "updatedAt": "2026-10-23T00:00:00.000Z",
+              "expiresAt": null,
+              "sourceMessageId": "c2ffe450-88ec-45a6-b49c-1254890d4d32",
+              "supersedesId": null
+            }
+          ],
+          "dialogue": {
+            "version": 3,
+            "focus": "goals",
+            "lastIntent": "share_fact",
+            "lastMove": "suggest",
+            "confidence": "high",
+            "expectsReply": false,
+            "openThreads": [],
+            "scheduleComplete": false
+          }
+        }
+      },
+      "message": "아까 주 3번이라고 했는데 주 2번으로 정정할게. 10분은 유지해. 목표 점수나 마감일을 새로 만들지 말고 어떤 식으로 연습하고 기록할지 구체적으로 보여줘.",
+      "expectedWeeklyMinutes": 20
+    }
+  ]
+}

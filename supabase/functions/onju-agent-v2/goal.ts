@@ -1,4 +1,5 @@
 import { validExecution, type GoalExecution } from './goalExecution.ts'
+import { isKoreanAgentLocale } from './promptLanguage.ts'
 const textFields = ['category','outcome','identity','deadline','baselineMetric','targetMetric','tinyStart','cue','environment','fallbackAction','recoveryRule','reviewCycle'] as const
 export type GoalCard = Record<typeof textFields[number], string> & { execution?: GoalExecution; durationWeeks: number; weeklyActions: { title: string; frequencyPerWeek: number; durationMinutes: number; preferredDays: number[] }[] }
 export type GoalChange = { label: string; before: string; after: string }
@@ -12,13 +13,15 @@ const actionProperties = {
   completionCriterion: { type: 'string', minLength: 4, maxLength: 120 },
   minimumAction: { type: 'string', minLength: 4, maxLength: 120 },
   minimumMinutes: { type: 'integer', minimum: 1, maximum: 2 },
+  goalResult: { type: 'string', minLength: 1, maxLength: 160, description: '이 행동이 기여하는 goalBrief.objectives의 result 원문.' },
+  steps: { type: 'array', minItems: 2, maxItems: 3, items: { type: 'string', minLength: 3, maxLength: 100 }, description: '이 루틴을 하는 날 시작→실행→기록의 구체적 순서. 시간·횟수를 중복해서 쓰지 않는다.' },
 }
 
 // The model proposes every action once. Persistence still uses GoalCard so old
 // sessions remain readable, but derived review/fallback prose is owned by code.
 export const goalSchema = {
   type: 'object', additionalProperties: false,
-  required: ['category','outcome','identity','cue','environment','deadline','baselineMetric','targetMetric','durationWeeks','measurement','completionPercent','reviewEveryWeeks','actions'],
+  required: ['category','outcome','identity','cue','environment','deadline','baselineMetric','targetMetric','durationWeeks','measurement','completionPercent','reviewEveryWeeks','progressStrategy','actions'],
   properties: {
     category: { type: 'string', minLength: 1, maxLength: 40 },
     outcome: { type: 'string', minLength: 1, maxLength: 160 },
@@ -32,6 +35,7 @@ export const goalSchema = {
     measurement: { type:'string', enum:['routine_completion','custom_outcome'] },
     completionPercent: { type:['integer','null'], minimum:1, maximum:100 },
     reviewEveryWeeks: { type:'integer', minimum:1, maximum:104 },
+    progressStrategy: { type: 'string', minLength: 20, maxLength: 240, description: '정한 기간 내 결과까지의 중간 진도와 실행량 조정 방법. 현재 수준/총 분량이 미정이면 반드시 첫 주 측정용 실행안이라고 밝히고 실제 수행량을 확인한 뒤 조정한다. 작은 시작량만으로 최종 목표 달성을 보장하지 않는다.' },
     actions: { type: 'array', minItems: 1, maxItems: 7, items: { type: 'object', additionalProperties: false, required: Object.keys(actionProperties), properties: actionProperties } },
   },
 }
@@ -48,8 +52,11 @@ export function goalSchemaForAreas(areas: string[]) {
 export function requestedSingleSession(message: string): {frequency:number;minutes:number}|null {
   // Only an unambiguous single routine, not a cap, range, correction or a
   // request to split/combine multiple activities.
-  if(requestedGoalAreas(message).length>1||/말고|대신|이하|이내|이상|미만|최대|최소|정도|쯤|약\s*\d|각각|분야별|나눠|분할|쪼개|합쳐|총\s*\d/.test(message))return null
-  const pairs=[...message.matchAll(/(?:주|일주일에)\s*([1-7])\s*(?:회|번)\s*[,·]?\s*(\d{1,3})\s*분\s*씩/g)]
+  if(requestedGoalAreas(message).length>1||/말고|대신|이하|이내|이상|미만|최대|최소|정도|쯤|약\s*\d|각각|분야별|나눠|분할|쪼개|합쳐|총\s*\d|\b(?:instead|rather|maximum|minimum|at\s+most|at\s+least|about|approximately|per\s+area|each\s+area|split|combine|total)\b/i.test(message))return null
+  const pairs=[
+    ...message.matchAll(/(?:주|일주일에)\s*([1-7])\s*(?:회|번)\s*[,·]?\s*(\d{1,3})\s*분\s*씩/g),
+    ...message.matchAll(/([1-7])\s*(?:times?|sessions?)\s*(?:a|per)\s*week\s*[,·]?\s*(?:for\s*)?(\d{1,3})\s*minutes?\s*(?:each|per\s*session)?/gi),
+  ]
   if(pairs.length!==1||Number(pairs[0][2])<1||Number(pairs[0][2])>240)return null
   return {frequency:Number(pairs[0][1]),minutes:Number(pairs[0][2])}
 }
@@ -111,7 +118,7 @@ export function materializeGoalDraft(value: unknown, areas: string[] = []): Goal
     identity:input.identity.trim(),cue:input.cue.trim(),environment:input.environment.trim(),
     baselineMetric:input.baselineMetric.trim(),targetMetric:input.targetMetric.trim(),durationWeeks:Number(input.durationWeeks),
     weeklyActions:parsed.map(action=>({title:String(action!.title).trim(),frequencyPerWeek:Number(action!.frequencyPerWeek),durationMinutes:Number(action!.durationMinutes),preferredDays:[...(action!.preferredDays as number[])]})),
-    execution:{measurement:input.measurement as GoalExecution['measurement'],completionPercent:input.completionPercent as number|null,reviewEveryWeeks:Number(input.reviewEveryWeeks),actions:parsed.map(action=>({completionCriterion:String(action!.completionCriterion).trim(),minimumAction:String(action!.minimumAction).trim(),minimumMinutes:Number(action!.minimumMinutes)}))},
+    execution:{measurement:input.measurement as GoalExecution['measurement'],completionPercent:input.completionPercent as number|null,reviewEveryWeeks:Number(input.reviewEveryWeeks),...(input.progressStrategy!==undefined?{progressStrategy:input.progressStrategy as string}:{}),actions:parsed.map(action=>({completionCriterion:String(action!.completionCriterion).trim(),minimumAction:String(action!.minimumAction).trim(),minimumMinutes:Number(action!.minimumMinutes),...(action!.steps!==undefined?{steps:action!.steps as string[],goalResult:action!.goalResult as string}:{})}))},
   }
   return validGoalCard(card)?card:null
 }
@@ -166,9 +173,13 @@ export function initialGoalProseIssue(card: GoalCard): string | null {
 // Only recognize an explicit joined list, not incidental mentions such as
 // "업무가 바빠서 건강 목표부터" or requests to choose/exclude a category.
 export function requestedGoalAreas(message: string): string[] {
-  if(/말고|빼고|제외|대신|중(?:에서)?\s*(?:하나|한\s*(?:분야|가지|파트))/.test(message))return []
+  if(/말고|빼고|제외|대신|중(?:에서)?\s*(?:하나|한\s*(?:분야|가지|파트))|\b(?:instead|exclude|except|rather\s+than|one\s+of)\b/i.test(message))return []
   const lists=message.match(/(?:일(?:적인\s*부분)?|업무|건강|신앙)(?:\s*(?:,|·|와|과|및|그리고)\s*(?:일(?:적인\s*부분)?|업무|건강|신앙))+/g)??[]
-  return [...new Set(lists.flatMap(list=>(list.match(/일(?:적인\s*부분)?|업무|건강|신앙/g)??[]).map(area=>area.startsWith('일')||area==='업무'?'일':area)))]
+  const korean=[...new Set(lists.flatMap(list=>(list.match(/일(?:적인\s*부분)?|업무|건강|신앙/g)??[]).map(area=>area.startsWith('일')||area==='업무'?'일':area)))]
+  if(korean.length)return korean
+  const englishLists=message.match(/(?:work|career|business|health|fitness|faith|spirituality)(?:\s*(?:,\s*(?:and\s+)?|&\s*|and\s+)(?:work|career|business|health|fitness|faith|spirituality))+/gi)??[]
+  const normalizeArea=(area:string)=>/work|career|business/i.test(area)?'work':/health|fitness/i.test(area)?'health':'faith'
+  return [...new Set(englishLists.flatMap(list=>(list.match(/work|career|business|health|fitness|faith|spirituality/gi)??[]).map(normalizeArea)))]
 }
 
 export function goalCoverageIssue(card: GoalCard, requested: string[]): string | null {
@@ -178,7 +189,19 @@ export function goalCoverageIssue(card: GoalCard, requested: string[]): string |
 }
 
 // Visible terms are rendered from the same immutable card that confirmation commits.
-export function describeGoal(card: GoalCard) {
+export function describeGoal(card: GoalCard, locale = 'ko-KR') {
+  if(!isKoreanAgentLocale(locale))return [
+    `**Goal**: ${card.outcome}`,
+    ...(card.durationWeeks ? [`**Period**: ${card.durationWeeks} weeks${card.deadline ? ` · ${card.deadline}` : ''}`] : []),
+    ...(card.targetMetric ? [`**Outcome measure**: ${card.targetMetric}`] : []),
+    ...card.weeklyActions.map(a => `**${a.title}**: ${a.frequencyPerWeek}×/week · ${a.durationMinutes} min${a.preferredDays.length && a.preferredDays.length < 7 ? ` · Preferred: ${a.preferredDays.map(d => ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][d]).join(' · ')}` : ''}`),
+    ...(card.baselineMetric ? [`Current baseline: ${card.baselineMetric}`] : []),
+    ...(['identity','cue','environment'] as const).flatMap((key, i) => card[key] ? [`${['Identity','Cue','Environment'][i]}: ${card[key]}`] : []),
+    ...(!card.execution&&card.tinyStart?[`Small start: ${card.tinyStart}`]:[]),
+    ...(!card.execution&&card.fallbackAction?[`Reduced version: ${card.fallbackAction}`]:[]),
+    ...(card.recoveryRule?[`Recovery rule: ${card.recoveryRule}`]:[]),
+    ...(card.reviewCycle?[`Review: ${card.reviewCycle}`]:[]),
+  ]
   return [
     `**목표**: ${card.outcome}`,
     ...(card.durationWeeks ? [`**기간**: ${card.durationWeeks}주${card.deadline ? ` · ${card.deadline}` : ''}`] : []),

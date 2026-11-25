@@ -8,7 +8,16 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "eval:agent": "node scripts/run-agent-evals.mjs",
-    "test:agent": "node --test scripts/agent-state.test.mjs scripts/agent-quality.test.mjs scripts/goal-design.test.mjs scripts/goal-execution.test.mjs"
+    "eval:adaptive": "node scripts/run-agent-evals.mjs --adaptive --all",
+    "eval:english": "node scripts/run-agent-evals.mjs --english --all",
+    "eval:claude": "node scripts/compare-claude-coaching.mjs",
+    "test:agent": "node --test scripts/agent-state.test.mjs scripts/agent-quality.test.mjs scripts/goal-design.test.mjs scripts/goal-execution.test.mjs scripts/goal-brief.test.mjs scripts/knowledge-dialogue.test.mjs scripts/adaptive-dialogue.test.mjs scripts/agent-advanced.test.mjs scripts/daily-state.test.mjs scripts/weekly-insights.test.mjs scripts/structure-proposal.test.mjs scripts/trial-review.test.mjs scripts/regional-context.test.mjs scripts/i18n.test.mjs scripts/global-agent.test.mjs scripts/metrics.test.mjs scripts/metrics-report.test.mjs scripts/eval-plan.test.mjs",
+    "report:metrics": "node scripts/report-metrics.mjs",
+    "verify:offline": "node scripts/verify-offline.mjs",
+    "audit:global": "node scripts/audit-global-readiness.mjs",
+    "test:readiness": "node --import ./scripts/offline-network-guard.mjs --test scripts/audit-global-readiness.test.mjs",
+    "test:session": "node --import ./scripts/offline-network-guard.mjs --test scripts/session-security.test.mjs scripts/session-database.test.mjs",
+    "report:demo": "node scripts/report-metrics.mjs --demo"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.1",

@@ -6,6 +6,8 @@ import {effortPolicy,effortIssue,fitsDailyCapacity} from '../../supabase/functio
 import {loadState,runAgentTurn} from '../../supabase/functions/onju-agent-v2/agent.ts'
 const action=(title,f=3,m=10)=>({title,frequencyPerWeek:f,durationMinutes:m,preferredDays:[]})
 const book={...emptyGoal,outcome:'독서 습관',durationWeeks:2,targetMetric:'2주간 6회',weeklyActions:[action('독서')],fallbackAction:'책을 펼쳐 한 문장만 읽기'}
+// These tests exercise draft validation after the user has chosen the period/result.
+const agreed=card=>loadState({stage:5,agent_v2_context:{version:3,draft:null,brief:{period:{label:`${card.durationWeeks}주`,weeks:card.durationWeeks},areas:['독서'],objectives:[{area:'독서',result:card.targetMetric}]}}})
 const edit=(field,number,evidence,actionIndex=0)=>({field,number,evidence,actionIndex,text:null,days:null})
 const respond=card=>['respond',{focus:'goals',goal_outcome:'독서',goal_draft:{...card,execution:card.execution??{measurement:'routine_completion',completionPercent:null,reviewEveryWeeks:1,actions:card.weeklyActions.map(a=>({completionCriterion:a.title+' 기록 한 줄 남기기',minimumAction:a.title+' 시작 기록 한 줄 적기',minimumMinutes:1}))}},summary:'초안이에요.',details:[],question:'시작할까요?',choices:[]}]
 const provider=steps=>{let i=0;return{now:'2026년 9월 4일 오전 9시',request:async()=>{assert.ok(i<steps.length,'unexpected extra call');const [name,args]=steps[i++];return{id:'r'+i,model:'gpt-4.1',usage:{input_tokens:1,output_tokens:1},output:[{type:'function_call',name,call_id:'c'+i,arguments:JSON.stringify(args)}]}}}}
@@ -63,7 +65,7 @@ test('ambiguous yes cannot approve related changes; explicit versioned choice co
 })
 test('light starting policy rejects 60-minute suggestion and requires fallback',async()=>{
  const heavy={...book,weeklyActions:[action('독서',3,60)]}
- const result=await runAgentTurn(loadState({stage:5}),'가볍게 독서 습관부터 추천해줘',provider([respond(heavy),respond(book)]))
+ const result=await runAgentTurn(agreed(book),'가볍게 독서 습관부터 추천해줘',provider([respond(heavy),respond(book)]))
  assert.equal(result.state.agent_v2_context.draft.card.weeklyActions[0].durationMinutes,10)
  assert.ok(result.events.some(e=>e.result?.error?.startsWith('lighter_draft_needed')))
  assert.match(effortIssue({...book,fallbackAction:''},effortPolicy([],[],[])),/fallback_needed/)
@@ -89,7 +91,7 @@ test('weekly total alone cannot pass an impossible daily budget',()=>{
  assert.equal(fitsDailyCapacity({...six,weeklyActions:six.weeklyActions.map(a=>({...a,durationMinutes:5}))},[10,10,10,10,10,0,0]),true)
 })
 test('unsolicited end dates are not presented as facts',async()=>{
- const result=await runAgentTurn(loadState({stage:5}),'독서 습관 초안을 추천해줘',provider([respond({...book,deadline:'2026-10-02'})]))
+ const result=await runAgentTurn(agreed(book),'독서 습관 초안을 추천해줘',provider([respond({...book,deadline:'2026-10-02'})]))
  assert.equal(result.state.agent_v2_context.draft.card.deadline,'')
  assert.doesNotMatch(result.assistant_message,/2026-10-02/)
 })
@@ -101,7 +103,7 @@ test('new goal headlines cannot promise daily or per-domain counts that actions 
  assert.match(initialGoalProseIssue({...multi,outcome:'퇴근 후 매일 일, 건강, 신앙 실천'}),/goal_prose_frequency_mismatch/)
  assert.equal(initialGoalProseIssue({...multi,outcome:'세 분야를 합쳐 주 5회 실천'}),null)
  const corrected={...multi,outcome:'일, 건강, 신앙의 작은 습관 만들기'}
- const result=await runAgentTurn(loadState({stage:5}),'세 분야를 가볍게 추천해줘',provider([respond(multi),respond(corrected)]))
+ const result=await runAgentTurn(agreed(corrected),'세 분야를 가볍게 추천해줘',provider([respond(multi),respond(corrected)]))
  assert.equal(result.state.agent_v2_context.draft.card.outcome,corrected.outcome)
  assert.ok(result.events.some(e=>e.result?.error?.startsWith('goal_prose_frequency_mismatch')))
 })

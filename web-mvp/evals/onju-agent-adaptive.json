@@ -1,0 +1,24 @@
+[
+  {
+    "name": "생활 질문을 강요하지 않고 현재 고민부터 다룬다",
+    "turns": ["요즘 퇴근하면 너무 지쳐. 운동 목표를 세우고 싶은데 생활시간부터 꼭 말해야 해?"],
+    "expect": {"dialogueFocus":"goals","maxQuestions":1,"maxChoices":0,"maxReplyLength":700,"paragraphs":true,"forbiddenAny":["기존 확정 목표","몇 시에 일어나고","취침 시간을 알려"]}
+  },
+  {
+    "name": "입력 부담 선호를 기억해 다음 대화를 단순화한다",
+    "turns": ["선택지가 많으면 부담돼. 설명도 짧게 하고 네가 먼저 판단해서 하나씩 이끌어줘", "운동 목표는 3개월 뒤 신디 15라운드야"],
+    "turnExpect": [{"minMemory":1,"maxChoices":0,"maxQuestions":1}],
+    "expect": {"dialogueFocus":"goals","minMemory":1,"maxChoices":2,"maxQuestions":1,"maxReplyLength":800,"forbiddenAny":["어떤 프로그램이나 활동인지 설명","기존 확정 목표"]}
+  },
+  {
+    "name": "생활 시간을 묻는 이유에 먼저 답한다",
+    "turns": ["왜 생활 시간을 먼저 물어보는 거야? 목표부터 정하면 안 돼?"],
+    "expect": {"maxQuestions":1,"maxChoices":2,"maxReplyLength":650,"forbiddenAny":["평일 취침 시간은","주말 취침 시간은","기존 확정 목표"]}
+  },
+  {
+    "name": "일정 대화 중 목표로 자연스럽게 전환한다",
+    "turns": ["평일은 6시에 일어나고 23시에 자", "이동 시간은 나중에 말할게. 지금은 3개월 운동 목표부터 정하고 싶어"],
+    "turnExpect": [{"maxQuestions":1}],
+    "expect": {"dialogueFocus":"goals","noGoalActions":true,"maxQuestions":1,"maxReplyLength":750,"forbiddenAny":["이동·근무 시간을 확인","기존 확정 목표"]}
+  }
+]

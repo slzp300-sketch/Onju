@@ -3,7 +3,11 @@ import { replaceScheduleBlock, scheduleOpenings, type ScheduleBlock } from './st
 export type DayBound = { days: number[]; wake: string; bedtime: string; variable: boolean; deferred?: boolean }
 const clock = /^([01]\d|2[0-3]):[0-5]\d$/
 export const week = ['월', '화', '수', '목', '금', '토', '일']
-export const dayLabel = (days: number[]) => days.length === 7 ? '매일' : days.join(',') === '0,1,2,3,4' ? '평일' : days.map(day => `${week[day]}요일`).join('·')
+const englishWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const isKorean = (locale: string) => locale.toLowerCase().startsWith('ko')
+export const dayLabel = (days: number[], locale = 'ko-KR') => isKorean(locale)
+  ? days.length === 7 ? '매일' : days.join(',') === '0,1,2,3,4' ? '평일' : days.map(day => `${week[day]}요일`).join('·')
+  : days.length === 7 ? 'Every day' : days.join(',') === '0,1,2,3,4' ? 'Weekdays' : days.map(day => englishWeek[day]).join(' · ')
 function validDays(days: unknown): days is number[] {
   return Array.isArray(days) && days.length > 0 && days.every(d => Number.isInteger(d) && d >= 0 && d < 7) && new Set(days).size === days.length
 }
@@ -31,13 +35,16 @@ export function mergeRhythm(current: DayBound[], incoming: DayBound[]) {
   return [...grouped.values()]
 }
 
-export function missingRhythm(bounds: DayBound[]) {
+export function missingRhythm(bounds: DayBound[], locale = 'ko-KR') {
   // Continue a partially answered day before asking about entirely unknown days.
   const order = [...bounds.filter(b => !b.deferred && !!b.wake !== !!b.bedtime).flatMap(b => b.days), 0, 1, 2, 3, 4, 5, 6]
   for (const day of new Set(order)) {
     const bound = bounds.find(b => b.days.includes(day))
     if (bound?.deferred || (bound?.wake && bound?.bedtime)) continue
-    return { day, field: bound?.wake ? 'bedtime' : bound?.bedtime ? 'wake' : 'both', question: `${week[day]}요일에는 보통 ${bound?.wake ? '몇 시에 잠드나요' : bound?.bedtime ? '몇 시에 일어나나요' : '몇 시에 일어나고 잠드나요'}?` }
+    const question = isKorean(locale)
+      ? `${week[day]}요일에는 보통 ${bound?.wake ? '몇 시에 잠드나요' : bound?.bedtime ? '몇 시에 일어나나요' : '몇 시에 일어나고 잠드나요'}?`
+      : `What time do you usually ${bound?.wake ? 'go to bed' : bound?.bedtime ? 'wake up' : 'wake up and go to bed'} on ${englishWeek[day]}?`
+    return { day, field: bound?.wake ? 'bedtime' : bound?.bedtime ? 'wake' : 'both', question }
   }
   return null
 }
@@ -68,15 +75,19 @@ export function applySchedule(current: { day_bounds: DayBound[]; blocks: Schedul
   return { day_bounds, blocks }
 }
 
-export function scheduleReceipt(before: { day_bounds: DayBound[]; blocks: ScheduleBlock[] }, after: { day_bounds: DayBound[]; blocks: ScheduleBlock[] }) {
+export function scheduleReceipt(before: { day_bounds: DayBound[]; blocks: ScheduleBlock[] }, after: { day_bounds: DayBound[]; blocks: ScheduleBlock[] }, locale = 'ko-KR') {
   const changedBounds = after.day_bounds.filter(b => b.days.some(day => {
     const old = before.day_bounds.find(x => x.days.includes(day))
     return !old || old.wake !== b.wake || old.bedtime !== b.bedtime || old.variable !== b.variable || !!old.deferred !== !!b.deferred
   }))
   const changedBlocks = after.blocks.filter(b => !before.blocks.some(x => JSON.stringify(x) === JSON.stringify(b)))
+  if (!isKorean(locale)) return [
+    ...changedBounds.map(b => `**${dayLabel(b.days, locale)}**: ${b.wake ? `wake ${b.wake}` : 'wake time unknown'} · ${b.bedtime ? `bed ${b.bedtime}` : 'bedtime unknown'}${b.deferred ? ' (check later)' : b.variable ? ' (variable)' : ''}`),
+    ...changedBlocks.map(b => `**${dayLabel(b.days, locale)} ${b.title}**: ${b.start}–${b.end}`),
+  ]
   return [
-    ...changedBounds.map(b => `**${dayLabel(b.days)}**: ${b.wake ? `${b.wake} 기상` : '기상 미정'} · ${b.bedtime ? `${b.bedtime} 취침` : '취침 미정'}${b.deferred ? ' (나중에 확인)' : b.variable ? ' (변동)' : ''}`),
-    ...changedBlocks.map(b => `**${dayLabel(b.days)} ${b.title}**: ${b.start}–${b.end}`),
+    ...changedBounds.map(b => `**${dayLabel(b.days, locale)}**: ${b.wake ? `${b.wake} 기상` : '기상 미정'} · ${b.bedtime ? `${b.bedtime} 취침` : '취침 미정'}${b.deferred ? ' (나중에 확인)' : b.variable ? ' (변동)' : ''}`),
+    ...changedBlocks.map(b => `**${dayLabel(b.days, locale)} ${b.title}**: ${b.start}–${b.end}`),
   ]
 }
 
@@ -86,17 +97,22 @@ export function isDraftAcceptance(message: string) {
   const text = message.trim().replace(/[.!。！]+$/u, '').replace(/\s+/g, '')
   if (/^(응|네|좋아|좋아요|확정해줘|그렇게해줘)$/.test(text)) return true
   return /^(?:(?:응|네|좋아|좋아요),?)?(?:(?:(?:이|그|네가제안한)?초안(?:으로|대로)?)(?:그대로)?|그대로|이대로|그렇게)(?:시작할게(?:요)?|시작하자|시작해줘|확정해줘|진행하자|진행해줘|반영해줘)$/.test(text)
+    || /^(?:yes|okay|ok|sounds?good|approve(?:it)?|confirm(?:it)?|start(?:with)?(?:this|that)(?:draft|plan)?|use(?:this|that)(?:draft|plan)?|go(?:with|aheadwith)(?:this|that)(?:draft|plan)?)$/i.test(text)
 }
 
 export function deferredEvidence(text: string) {
-  return /일정하지|불규칙|들쑥날쑥|그때그때|나중에|미정|모르겠|모르겠어|넘어가|건너뛰|아직 몰라/.test(text)
+  return /일정하지|불규칙|들쑥날쑥|그때그때|나중에|미정|모르겠|넘어가|건너뛰|아직 몰라/.test(text)
+    || /변동(?:이|은|도)?\s*(?:많|있|심|커|크)|(?:매주|매번|날마다|요일마다|주말마다|그날그날)\s*(?:달라(?!지지\s*않)|다르(?!지\s*않)|바뀌(?!지\s*않))|정해지지\s*않|정해져\s*있지\s*않/.test(text)
+    || /\b(?:irregular|variable|varies|changes?|not\s+fixed|not\s+sure|unknown|later|skip\s+it|depends)\b/i.test(text)
 }
 
-export function freeTimeSummary(bounds: DayBound[], blocks: ScheduleBlock[]) {
+export function freeTimeSummary(bounds: DayBound[], blocks: ScheduleBlock[], locale = 'ko-KR') {
   const openings = scheduleOpenings(bounds, blocks).filter(day => day.slots.length && blocks.some(b => b.days.includes(day.day)))
   if (!openings.length) return ''
   const first = openings[0]
   const sameDays = openings.filter(day => JSON.stringify(day.slots) === JSON.stringify(first.slots)).map(day => day.day)
   const intervals = first.slots.slice(0, 2).map(slot => `**${slot.start}–${slot.end}**`).join(', ')
-  return `등록된 일정 기준 ${dayLabel(sameDays)} ${intervals}${first.slots.length > 2 ? ' 등' : ''}이 비어 있어요. 휴식·이동은 더 확인할게요.`
+  return isKorean(locale)
+    ? `등록된 일정 기준 ${dayLabel(sameDays, locale)} ${intervals}${first.slots.length > 2 ? ' 등' : ''}이 비어 있어요. 휴식·이동은 더 확인할게요.`
+    : `Based on the schedule entered so far, ${dayLabel(sameDays, locale)} has open time at ${intervals}${first.slots.length > 2 ? ' and other intervals' : ''}. We can still account for rest and travel time.`
 }

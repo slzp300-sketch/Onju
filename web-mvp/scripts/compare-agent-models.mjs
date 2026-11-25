@@ -171,6 +171,7 @@ function summarize() {
 }
 
 const mode = process.argv[2]
+if (mode === 'run' && (process.env.ONJU_OFFLINE === '1' || process.env.ONJU_ALLOW_PAID_EVALS !== '1' || !process.argv.includes('--live'))) throw new Error('Paid evaluation is deferred. Explicit --live and ONJU_ALLOW_PAID_EVALS=1 are required.')
 if (mode === 'prepare') prepare()
 else if (mode === 'run') await run()
 else if (mode === 'summary') summarize()

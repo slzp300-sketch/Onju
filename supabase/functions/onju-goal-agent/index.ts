@@ -1,3 +1,9 @@
+import { bindAiCostContext, createBudgetedFetch } from '../_shared/webMvpCostControl.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { ownedPreviousResponse, recordOwnedResponse } from '../_shared/webMvpResponseOwner.ts'
+import { claimWebMvpSession, sessionAccessResponse, enforceWebMvpRateLimits } from '../_shared/webMvpAccess.ts'
+import { cleanRegionalContext, regionalNowLabel, type UserRegionalContext } from '../_shared/onjuRegionalContext.ts'
+
 const corsHeaders={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type'}
 
 const goalCardProperties={
@@ -12,8 +18,10 @@ const schema={type:'object',additionalProperties:false,required:['assistant_mess
   missing_fields:{type:'array',items:{type:'string'}},ready_for_confirmation:{type:'boolean'},suggestions:{type:'array',maxItems:3,items:{type:'string'}},
 }}
 
-const instructions=(today:string)=>`당신은 온주(Onju)의 목표 설계 파트너다. 현재 한국 시각은 ${today}, 기준 시간대는 Asia/Seoul이다.
+const instructions=(regionalContext:UserRegionalContext)=>`당신은 온주(Onju)의 목표 설계 파트너다. 사용자의 현지 시각은 ${regionalNowLabel(regionalContext)}, 기준 시간대는 ${regionalContext.timeZone}이다.
 사용자의 막연한 희망을 숫자로 판정 가능한 중장기 목표와 현실적인 주간 시스템으로 함께 설계한다.
+
+- assistant_message, goal_card의 사용자 표시 문구, suggestions는 반드시 ${regionalContext.locale} 언어로 자연스럽게 작성한다. category enum과 내부 규칙이 한국어여도 사용자 답변 언어를 바꾸지 않는다.
 
 대화 원칙:
 - 매 응답에서 사용자가 가장 쉽게 답할 수 있는 질문을 정확히 하나만 한다. 한꺼번에 설문하지 않는다.
@@ -49,14 +57,23 @@ assistant_message 형식:
 
 Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{headers:corsHeaders});try{
   const apiKey=Deno.env.get('OPENAI_API_KEY');if(!apiKey)throw new Error('OPENAI_API_KEY is not configured')
-  const body=await req.json();if(typeof body.message!=='string'||!body.message.trim())return new Response(JSON.stringify({error:'message_required'}),{status:400,headers:{...corsHeaders,'Content-Type':'application/json'}})
-  const today=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'full',timeStyle:'short'}).format(new Date())
-  const requestBody:Record<string,unknown>={model:'gpt-4o-mini',store:true,instructions:instructions(today),input:JSON.stringify({user_message:body.message,current_goal_card:body.goalCard??{},confirmed_schedule_blocks:Array.isArray(body.scheduleBlocks)?body.scheduleBlocks:[]}),text:{format:{type:'json_schema',name:'onju_goal_design_turn',strict:true,schema}}}
-  if(typeof body.previousResponseId==='string'&&body.previousResponseId.startsWith('resp_'))requestBody.previous_response_id=body.previousResponseId
-  let response=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(requestBody)})
-  if(!response.ok&&requestBody.previous_response_id){delete requestBody.previous_response_id;response=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(requestBody)})}
+  const body=await req.json();
+  const dbUrl = Deno.env.get('SUPABASE_URL'), dbKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  if (!dbUrl || !dbKey) throw new Error('missing_environment')
+  const db = createClient(dbUrl, dbKey, { auth: { persistSession: false } })
+  const tokenHash = await claimWebMvpSession(db, body.sessionId, body.sessionToken)
+  await enforceWebMvpRateLimits(db, req, tokenHash, { scope: 'conversation', minute: 12, day: 120 })
+  bindAiCostContext(db, body.sessionId, 'onju-goal-agent', body)
+  const requestFetch = createBudgetedFetch(db)
+if(typeof body.message!=='string'||!body.message.trim())return new Response(JSON.stringify({error:'message_required'}),{status:400,headers:{...corsHeaders,'Content-Type':'application/json'}})
+  const regionalContext=cleanRegionalContext(body.regionalContext)
+  const requestBody:Record<string,unknown>={model:'gpt-4o-mini',store:true,instructions:instructions(regionalContext),input:JSON.stringify({user_message:body.message,current_goal_card:body.goalCard??{},confirmed_schedule_blocks:Array.isArray(body.scheduleBlocks)?body.scheduleBlocks:[]}),text:{format:{type:'json_schema',name:'onju_goal_design_turn',strict:true,schema}}}
+  requestBody.previous_response_id = await ownedPreviousResponse(db, body.sessionId, body.previousResponseId)
+  let response=await requestFetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(requestBody)})
+  if(response.status===400&&requestBody.previous_response_id){delete requestBody.previous_response_id;response=await requestFetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify(requestBody)})}
   if(!response.ok)throw new Error(`OpenAI request failed: ${response.status}`)
   const result=await response.json();const outputText=result.output?.flatMap((item:{content?:{type:string;text?:string}[]})=>item.content??[]).find((part:{type:string})=>part.type==='output_text')?.text
   if(!outputText||typeof result.id!=='string')throw new Error('No structured output returned')
+  await recordOwnedResponse(db, body.sessionId, result.id)
   const parsed=JSON.parse(outputText);return new Response(JSON.stringify({...parsed,response_id:result.id}),{headers:{...corsHeaders,'Content-Type':'application/json'}})
-}catch(error){console.error(error);return new Response(JSON.stringify({error:'onju_goal_agent_failed'}),{status:500,headers:{...corsHeaders,'Content-Type':'application/json'}})}})
+}catch(error){ const accessFailure = sessionAccessResponse(error, corsHeaders); if (accessFailure) return accessFailure;console.error(error);return new Response(JSON.stringify({error:'onju_goal_agent_failed'}),{status:500,headers:{...corsHeaders,'Content-Type':'application/json'}})}})

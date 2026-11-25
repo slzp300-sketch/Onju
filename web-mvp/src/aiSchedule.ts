@@ -1,4 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
+import { getAgentSessionId, withAgentSession } from './agentSession'
+import { supabase } from './supabaseClient'
+import { agentRequestFailure } from './agentApiErrors'
 
 export type AiScheduleBlock = {
   days: number[]
@@ -20,10 +22,6 @@ export type AiScheduleResult = {
   response_id: string
 }
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-const supabase = url && anonKey ? createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } }) : null
-
 export async function interpretSchedule(input: {
   message: string
   stage: string
@@ -32,8 +30,8 @@ export async function interpretSchedule(input: {
   previousResponseId?: string
 }): Promise<AiScheduleResult> {
   if (!supabase) throw new Error('Supabase 환경변수가 연결되지 않았어요.')
-  const { data, error } = await supabase.functions.invoke<AiScheduleResult>('onju-agent', { body: input })
-  if (error) throw new Error(`AI 일정 해석기 연결 오류: ${error.message}`)
+  const { data, error } = await supabase.functions.invoke<AiScheduleResult>('onju-agent', { body: withAgentSession(getAgentSessionId(), input) })
+  if (error) throw await agentRequestFailure(error, 'AI 일정 해석기에 연결하지 못했어요. 입력을 보존했으니 잠시 후 다시 확인해 주세요.')
   if (!data) throw new Error('AI가 빈 응답을 보냈어요. 다시 시도해 주세요.')
   return data
 }

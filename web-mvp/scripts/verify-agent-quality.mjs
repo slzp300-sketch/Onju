@@ -141,6 +141,7 @@ function exportResults(){
   write(resolve(root,`docs/evals/${prefix}-${manifest.runId}.json`),{manifest,summary,results})
 }
 const mode=process.argv[2]
+if(mode==='run'&&(process.env.ONJU_OFFLINE==='1'||process.env.ONJU_ALLOW_PAID_EVALS!=='1'||!process.argv.includes('--live')))throw Error('Paid evaluation is deferred. Explicit --live and ONJU_ALLOW_PAID_EVALS=1 are required.')
 function finalize() {
   const baseRun=process.argv.find(x=>x.startsWith('--base-run='))?.slice(11)
   if(!baseRun||!/^\d{4}-\d{2}-\d{2}T[\d-]+Z$/.test(baseRun))throw Error('Expected --base-run=archived-run-id')

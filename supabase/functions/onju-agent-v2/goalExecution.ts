@@ -1,10 +1,12 @@
 import type { GoalCard } from './goal.ts'
+import { isKoreanAgentLocale } from './promptLanguage.ts'
 
 export type GoalExecution = {
   measurement: 'routine_completion' | 'custom_outcome'
   completionPercent: number | null
   reviewEveryWeeks: number
-  actions: { completionCriterion: string; minimumAction: string; minimumMinutes: number }[]
+  progressStrategy?: string
+  actions: { completionCriterion: string; minimumAction: string; minimumMinutes: number; steps?: string[]; goalResult?: string }[]
 }
 const text = { type: 'string', minLength: 4, maxLength: 120 }
 export const executionSchema = {
@@ -28,10 +30,12 @@ export function validExecution(value: unknown, actionCount: number): value is Go
     (x.completionPercent===null || Number.isInteger(x.completionPercent)&&x.completionPercent>=1&&x.completionPercent<=100) &&
     (x.measurement!=='custom_outcome'||x.completionPercent===null) &&
     Number.isInteger(x.reviewEveryWeeks)&&x.reviewEveryWeeks>=1&&x.reviewEveryWeeks<=104 &&
+    (x.progressStrategy===undefined || typeof x.progressStrategy==='string'&&x.progressStrategy.length>=20&&x.progressStrategy.length<=240) &&
     Array.isArray(x.actions)&&x.actions.length===actionCount&&x.actions.every(a=>a&&
       typeof a.completionCriterion==='string'&&a.completionCriterion.trim().length>=4&&a.completionCriterion.length<=120&&
       typeof a.minimumAction==='string'&&a.minimumAction.trim().length>=4&&a.minimumAction.length<=120&&
-      Number.isInteger(a.minimumMinutes)&&a.minimumMinutes>=1&&a.minimumMinutes<=2)
+      Number.isInteger(a.minimumMinutes)&&a.minimumMinutes>=1&&a.minimumMinutes<=2&&
+      (a.steps===undefined&&a.goalResult===undefined || Array.isArray(a.steps)&&a.steps.length>=2&&a.steps.length<=3&&a.steps.every(s=>typeof s==='string'&&s.trim().length>=3&&s.length<=100)&&typeof a.goalResult==='string'&&a.goalResult.length>0&&a.goalResult.length<=160))
 }
 
 export function executionIssue(card: GoalCard): string | null {
@@ -98,29 +102,39 @@ export function requestedCompletionPercent(messages: string[]): number | undefin
   return percent
 }
 
-export function reviewText(card: GoalCard): string {
+export function reviewText(card: GoalCard, locale = 'ko-KR'): string {
   const every=card.execution!.reviewEveryWeeks
+  if(!isKoreanAgentLocale(locale))return `${every===1?'Review weekly':`Review every ${every} weeks`} · Full review at the end of the ${card.durationWeeks}-week trial`
   return `${every===1?'매주':`${every}주마다`} 실행 기록 점검 · ${card.durationWeeks}주 시험 종료 시 전체 점검`
 }
-export function completionText(card: GoalCard): string {
+export function completionText(card: GoalCard, locale = 'ko-KR'): string {
   const total=card.durationWeeks*card.weeklyActions.reduce((sum,a)=>sum+a.frequencyPerWeek,0)
   const percent=card.execution?.completionPercent
-  return percent == null ? '' : `${card.durationWeeks}주간 계획한 기본 실행 ${total}회 중 ${Math.ceil(total*percent/100)}회 이상 완료 (${percent}% 기준·올림)`
+  if(percent == null)return ''
+  return isKoreanAgentLocale(locale)
+    ? `${card.durationWeeks}주간 계획한 기본 실행 ${total}회 중 ${Math.ceil(total*percent/100)}회 이상 완료 (${percent}% 기준·올림)`
+    : `Complete at least ${Math.ceil(total*percent/100)} of ${total} planned full sessions over ${card.durationWeeks} weeks (${percent}% target, rounded up)`
 }
 
 // Only normalize a not-yet-approved proposal, or a separately approved related card.
-export function synchronizeExecution(card: GoalCard): GoalCard {
+export function synchronizeExecution(card: GoalCard, locale = 'ko-KR'): GoalCard {
   const next=structuredClone(card)
   if(!next.execution)return next
-  next.reviewCycle=reviewText(next)
-  next.fallbackAction=next.execution.actions.map((a,i)=>`${next.weeklyActions[i].title}: ${a.minimumAction} (${a.minimumMinutes}분)`).join(' / ')
-  if(next.execution.measurement==='routine_completion'&&next.execution.completionPercent!==null)next.targetMetric=completionText(next)
+  next.reviewCycle=reviewText(next, locale)
+  next.recoveryRule=isKoreanAgentLocale(locale)?'두 번 연속 놓치지 않기':'Never miss twice in a row'
+  next.fallbackAction=next.execution.actions.map((a,i)=>`${next.weeklyActions[i].title}: ${a.minimumAction} (${a.minimumMinutes}${isKoreanAgentLocale(locale)?'분':' min'})`).join(' / ')
+  if(next.execution.measurement==='routine_completion'&&next.execution.completionPercent!==null)next.targetMetric=completionText(next, locale)
   return next
 }
 
-export function executionSummary(card: GoalCard): string[] {
+export function executionSummary(card: GoalCard, locale = 'ko-KR'): string[] {
   if(!card.execution)return []
   const total=card.durationWeeks*card.weeklyActions.reduce((sum,a)=>sum+a.frequencyPerWeek,0)
+  if(!isKoreanAgentLocale(locale))return [
+    `${card.execution.measurement==='custom_outcome'?'Routine log (separate from the outcome goal)':'Tracking rule'}: completed full sessions ÷ ${total} planned full sessions. Count each session once.`,
+    ...card.execution.actions.map((a,i)=>`${card.weeklyActions[i].title}: complete the planned ${card.weeklyActions[i].durationMinutes}-minute session + ${a.completionCriterion}`),
+    'Log the minimum version separately to preserve continuity; do not count it as a completed full session.',
+  ]
   return [
     `${card.execution.measurement==='custom_outcome'?'루틴 기록(성과 목표와 별개)':'기록 기준'}: 기본 실행을 마친 횟수 ÷ 계획한 기본 실행 ${total}회. 같은 회차는 한 번만 기록해요.`,
     ...card.execution.actions.map((a,i)=>`${card.weeklyActions[i].title}: 계획한 ${card.weeklyActions[i].durationMinutes}분 실행 + ${a.completionCriterion}`),
@@ -128,12 +142,32 @@ export function executionSummary(card: GoalCard): string[] {
   ]
 }
 
-export function initialGoalMessage(card: GoalCard, notes: string[] = []): string {
+export function initialGoalMessage(card: GoalCard, notes: string[] = [], locale = 'ko-KR'): string {
+  if(!isKoreanAgentLocale(locale)){
+    const lines=[
+      'Here is a **draft to test together**. Nothing is confirmed yet.',
+      `**Goal**\n\n${card.outcome}`,
+      `**Trial period**\n\n${card.durationWeeks} weeks${card.deadline?` · ${card.deadline}`:''}`,
+      card.execution?.progressStrategy ? `**How we will progress toward the goal**\n\n${card.execution.progressStrategy}` : '',
+      `**Weekly actions**\n\n${card.weeklyActions.map(action=>`- **${action.title}**: ${action.frequencyPerWeek}×/week · ${action.durationMinutes} min${action.preferredDays.length&&action.preferredDays.length<7?` · ${action.preferredDays.map(day=>['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][day]).join(' · ')}`:''}`).join('\n')}`,
+      ...card.execution?.actions.flatMap((guide,index)=>guide.steps?.length ? [`**${card.weeklyActions[index].title} · Steps for each session**\n\nGoal contribution: ${guide.goalResult}\n\n${guide.steps.map((step,i)=>`${i+1}. ${step}`).join('\n')}`] : []) ?? [],
+      card.baselineMetric?`Current baseline: ${card.baselineMetric}`:'',
+      [card.identity&&`Identity: ${card.identity}`,card.cue&&`Cue: ${card.cue}`,card.environment&&`Environment: ${card.environment}`].filter(Boolean).map(line=>`- ${line}`).join('\n'),
+      `**Completion criteria**\n\n- ${card.targetMetric}\n${card.execution?.actions.map((guide,index)=>`- **${card.weeklyActions[index].title}**: ${guide.completionCriterion}`).join('\n')??''}\n\nCount one full session when you complete the planned duration and its criterion. Count each session once.`,
+      card.execution?`**Minimum version for busy days**\n\n${card.execution.actions.map((guide,index)=>`- **${card.weeklyActions[index].title}**: ${guide.minimumAction} · ${guide.minimumMinutes} min`).join('\n')}\n\nThe minimum version preserves continuity but does not count as a completed full session.`:'',
+      card.reviewCycle?`**Review**\n\n${card.reviewCycle}`:'',
+      ...notes.filter(Boolean).slice(0,2),
+      '**Would you like to start with this draft? Tell me only what you want to change.**',
+    ]
+    return lines.filter(Boolean).join('\n\n')
+  }
   const lines=[
     '함께 시험해 볼 **초안**이에요. 아직 확정하지 않았어요.',
     `**목표**\n\n${card.outcome}`,
     `**시험 기간**\n\n${card.durationWeeks}주${card.deadline?` · ${card.deadline}`:''}`,
+    card.execution?.progressStrategy ? `**목표까지의 진행 방법**\n\n${card.execution.progressStrategy}` : '',
     `**주간 실행**\n\n${card.weeklyActions.map(action=>`- **${action.title}**: 주 ${action.frequencyPerWeek}회 · ${action.durationMinutes}분${action.preferredDays.length&&action.preferredDays.length<7?` · ${action.preferredDays.map(day=>['월','화','수','목','금','토','일'][day]).join('·')}`:''}`).join('\n')}`,
+    ...card.execution?.actions.flatMap((guide,index)=>guide.steps?.length ? [`**${card.weeklyActions[index].title} · 실행하는 날의 순서**\n\n목표: ${guide.goalResult}\n\n${guide.steps.map((step,i)=>`${i+1}. ${step}`).join('\n')}`] : []) ?? [],
     card.baselineMetric?`현재 기준: ${card.baselineMetric}`:'',
     [card.identity&&`지향점: ${card.identity}`,card.cue&&`실행 단서: ${card.cue}`,card.environment&&`환경: ${card.environment}`].filter(Boolean).map(line=>`- ${line}`).join('\n'),
     `**완료 기준**\n\n- ${card.targetMetric}\n${card.execution?.actions.map((guide,index)=>`- **${card.weeklyActions[index].title}**: ${guide.completionCriterion}`).join('\n')??''}\n\n위의 기본 실행 시간을 채우고 이 기준을 마치면 한 회 완료로 기록해요. 같은 회차는 한 번만 세어요.`,

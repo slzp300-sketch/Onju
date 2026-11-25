@@ -13,6 +13,7 @@ export function isScheduleComplete(message: string): boolean {
   return /^(?:응|네|좋아|이제)?(?:더이상|더)?(?:설명할|말할|추가할|알려줄)?일정(?:에대해(?:설명할|말할)(?:게|것이))?(?:은|는|이|도)?(?:더|더이상)?(?:없어|없어요|없습니다|없다|없는것같아|없는것같아요)$/u.test(text)
     || /^(?:일정(?:은|는)?)(?:이게전부(?:야|예요|입니다)?|여기까지(?:야|예요|입니다)?|다말했어(?:요)?)$/u.test(text)
     || /^(?:이제)?목표(?:를|로|부터|이야기로|대화로|설정으로)?(?:정하자|세우자|넘어가자|넘어가줘|넘어가주세요)$/u.test(text)
+    || /^(?:(?:yes|okay|ok))?(?:that'?sall(?:formy)?schedule|nothingelsetoadd|nomoreschedule(?:items?)?|myscheduleiscomplete|let'?smoveontogoals?|let'?sworkongoals?)$/i.test(text)
 }
 
 // Only an entire, unambiguous completion utterance can close a stage.
@@ -20,6 +21,8 @@ export function isExplicitCompletion(message: string): boolean {
   const text = message.trim().replace(/[.!。！]+$/u, '').trim()
   return /^(?:(?:이 단계는|고정 일정은|반복 일정도|매주 일정은|보호할 회복 시간은|이번 주 일정도|다른 일정은)\s*)?(?:이게 전부(?:예요|야)?|없어(?:요)?|없습니다|충분해요)(?:\s*[·,]\s*|\s+)?(?:다음으로)?$/u.test(text)
     || /^(?:다음으로|다음 단계로|이 단계는 충분해요 · 다음으로|넘어가자|넘어가 주세요)$/u.test(text)
+    || /^(?:(?:thisstage|fixedschedule|recurringschedule|weeklyschedule|otherschedule)(?:is|has))?(?:complete|enough|done|that'?sall|nothingelse)(?:moveon|next)?$/i.test(text.replace(/\s+/g,''))
+    || /^(?:next|moveon|gotothenextstep)$/i.test(text.replace(/\s+/g,''))
 }
 
 export function replaceScheduleBlock(blocks: ScheduleBlock[], index: number, days: number[], start: string, end: string): ScheduleBlock[] {
@@ -37,15 +40,36 @@ export function replaceScheduleBlock(blocks: ScheduleBlock[], index: number, day
 
 export function replayConversation(messages: { role: string; text: string }[], message: string) {
   return [
-    ...messages.filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string').slice(-100).map(m => ({ role: m.role, content: m.text })),
+    // Structured state and a compact summary carry older context. Keeping only
+    // the recent dialogue prevents long sessions from growing every model call.
+    ...messages.filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string').slice(-16).map(m => ({ role: m.role, content: m.text })),
     { role: 'user', content: message },
   ]
 }
 
 export function formatReply(value: unknown, savedDetails: string[] = []): { text: string; choices: string[] } {
   if (!value || typeof value !== 'object') throw new Error('invalid_reply')
-  const { summary, details, question, choices } = value as Record<string, unknown>
+  const { paragraphs, bullets, summary, details, question, choices } = value as Record<string, unknown>
   const line = (v: unknown, max: number): v is string => typeof v === 'string' && v.length <= max && !v.includes('\n')
+  if (Array.isArray(paragraphs)) {
+    if (!paragraphs.length || paragraphs.length > 4 || !paragraphs.every(v => line(v, 280) && v.trim() && !/[?？]/.test(v)) ||
+      !Array.isArray(bullets) || bullets.length > 4 || !bullets.every(v => line(v, 180) && v.trim() && !/[?？]/.test(v)) ||
+      !line(question, 180) || (question.match(/[?？]/g)?.length ?? 0) > 1 ||
+      !Array.isArray(choices) || choices.length === 1 || choices.length > 3 || !choices.every(v => line(v, 60) && v.trim())) throw new Error('reply_needs_natural_sections_and_optional_question')
+    const seen = new Set<string>()
+    const unique = (items: string[]) => items.filter(item => {
+      const key = item.replace(/[\p{P}\s]/gu, '')
+      if (!key || seen.has(key)) return false
+      seen.add(key); return true
+    })
+    const cleanParagraphs = unique(paragraphs.map(v => v.trim()))
+    const cleanBullets = unique([...bullets, ...savedDetails].map(v => v.trim()))
+    const questionText = question.trim().replace(/\*\*/g, '')
+    return {
+      text: [...cleanParagraphs, cleanBullets.length ? cleanBullets.map(v => `- ${v}`).join('\n') : '', questionText ? `**${questionText}**` : ''].filter(Boolean).join('\n\n'),
+      choices: [...new Set(choices.map(v => v.trim()))],
+    }
+  }
   if (!line(summary, 240) || !summary.trim() || !line(question, 160) || (question.match(/[?？]/g)?.length ?? 0) > 1 ||
     !Array.isArray(details) || details.length > 4 || !details.every(v => line(v, 180) && v.trim()) ||
     !Array.isArray(choices) || choices.length === 1 || choices.length > 3 || !choices.every(v => line(v, 60) && v.trim())) throw new Error('reply_needs_short_sections_and_one_question')

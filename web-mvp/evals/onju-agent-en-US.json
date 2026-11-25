@@ -1,0 +1,28 @@
+[
+  {
+    "name": "English goal intake explains before asking one useful question",
+    "regionalContext": {"locale":"en-US","countryCode":"US","timeZone":"America/New_York","currencyCode":"USD","weekStartsOn":0},
+    "turns": ["I want to set a fitness goal, but I am not sure how long it should take."],
+    "expect": {"dialogueFocus":"goals","noGoalActions":true,"maxQuestions":1,"maxChoices":3,"maxReplyLength":800,"paragraphs":true,"noKorean":true}
+  },
+  {
+    "name": "English multi-turn goal intake remembers period and seeks current context",
+    "regionalContext": {"locale":"en-US","countryCode":"US","timeZone":"America/New_York","currencyCode":"USD","weekStartsOn":0},
+    "turns": ["I want to work on fitness for three months.", "My result is to finish a 5K in under 30 minutes."],
+    "turnExpect": [{"dialogueFocus":"goals","noGoalActions":true,"maxQuestions":1,"noKorean":true}],
+    "expect": {"dialogueFocus":"goals","noGoalActions":true,"maxQuestions":1,"maxReplyLength":900,"noKorean":true}
+  },
+  {
+    "name": "English rhythm facts are saved and acknowledged in English",
+    "regionalContext": {"locale":"en-US","countryCode":"US","timeZone":"America/New_York","currencyCode":"USD","weekStartsOn":0},
+    "turns": ["On weekdays I wake up at 6:30 AM and go to bed at 11 PM. Weekends vary, so I will tell you later."],
+    "expect": {"stage":1,"maxQuestions":1,"paragraphs":true,"noKorean":true}
+  },
+  {
+    "name": "English schedule completion transitions to goals",
+    "regionalContext": {"locale":"en-US","countryCode":"US","timeZone":"America/New_York","currencyCode":"USD","weekStartsOn":0},
+    "turns": ["Every day I wake up at 6 AM and go to bed at 11 PM.", "That's all for my schedule. Let's move on to goals."],
+    "turnExpect": [{"maxQuestions":1,"noKorean":true}],
+    "expect": {"dialogueFocus":"goals","maxQuestions":1,"noKorean":true}
+  }
+]

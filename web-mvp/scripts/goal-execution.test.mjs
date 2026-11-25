@@ -7,6 +7,8 @@ import {loadState,runAgentTurn} from '../../supabase/functions/onju-agent-v2/age
 
 const guide=()=>({completionCriterion:'읽은 문장 하나 표시하기',minimumAction:'책 한 문장 읽기',minimumMinutes:1})
 const book=()=>({...emptyGoal,outcome:'독서 습관',durationWeeks:2,targetMetric:'실행률 80%',weeklyActions:[{title:'독서',frequencyPerWeek:3,durationMinutes:10,preferredDays:[]}],execution:{measurement:'routine_completion',completionPercent:80,reviewEveryWeeks:1,actions:[guide()]}})
+// Draft/execution tests start after period and outcome intake is complete.
+const agreed=(areas=['독서'])=>loadState({stage:5,agent_v2_context:{version:3,draft:null,brief:{period:{label:'2주',weeks:2},areas,objectives:areas.map(area=>({area,result:'실행률 80%'}))}}})
 const edit=(field,number,evidence,actionIndex=0)=>({field,number,evidence,actionIndex,text:null,days:null})
 const compact=card=>({category:card.category,outcome:card.outcome,identity:card.identity,cue:card.cue,environment:card.environment,deadline:card.deadline,baselineMetric:card.baselineMetric,targetMetric:card.targetMetric,durationWeeks:card.durationWeeks,measurement:card.execution.measurement,completionPercent:card.execution.completionPercent,reviewEveryWeeks:card.execution.reviewEveryWeeks,actions:card.weeklyActions.map((action,index)=>({...action,...card.execution.actions[index]}))})
 
@@ -108,13 +110,13 @@ test('named slots do not reject valid priorities or gratitude for lacking a keyw
  input.completionPercent=null
  input.actions={일:{...action,title:'우선순위 적기',completionCriterion:'우선순위 하나 기록',minimumAction:'우선순위 한 줄 적기'},건강:{...action,title:'가벼운 스트레칭'},신앙:{...action,title:'감사한 일 기록',completionCriterion:'감사한 일 한 가지 적기',minimumAction:'감사한 일 한 줄 적기'}}
  let calls=0
- const result=await runAgentTurn(loadState({stage:5}),'일, 건강, 신앙 초안을 추천해줘',{now:'한국시간',request:async()=>{calls++;return {id:'areas',model:'gpt-4.1',usage:{input_tokens:1,output_tokens:1},output:[{type:'function_call',name:'respond',call_id:'c',arguments:JSON.stringify({focus:'goals',goal_outcome:'세 분야',goal_draft:input,summary:'',details:[],question:'',choices:[]})}]}}})
+ const result=await runAgentTurn(agreed(['일','건강','신앙']),'일, 건강, 신앙 초안을 추천해줘',{now:'한국시간',request:async()=>{calls++;return {id:'areas',model:'gpt-4.1',usage:{input_tokens:1,output_tokens:1},output:[{type:'function_call',name:'respond',call_id:'c',arguments:JSON.stringify({focus:'goals',goal_outcome:'세 분야',goal_draft:input,summary:'',details:[],question:'',choices:[]})}]}}})
  assert.equal(calls,1);assert.ok(result.state.agent_v2_context.draft);assert.equal(result.state.agent_v2_context.draft.card.execution.completionPercent,80)
 })
 test('compact live-shaped draft with redundant duration succeeds in exactly one provider call',async()=>{
  const input=compact(book());input.actions[0].completionCriterion='10분 읽고 한 문장 표시하기'
  let calls=0
- const result=await runAgentTurn(loadState({stage:5}),'독서 주 3회 10분씩 2주, 실행률 80%로 추천해줘',{now:'한국시간',request:async()=>{calls++;return {id:'compact',model:'gpt-4.1',usage:{input_tokens:1,output_tokens:1},output:[{type:'function_call',name:'respond',call_id:'c',arguments:JSON.stringify({focus:'goals',goal_outcome:'독서',goal_draft:input,summary:'',details:[],question:'',choices:[]})}]}}})
+ const result=await runAgentTurn(agreed(),'독서 주 3회 10분씩 2주, 실행률 80%로 추천해줘',{now:'한국시간',request:async()=>{calls++;return {id:'compact',model:'gpt-4.1',usage:{input_tokens:1,output_tokens:1},output:[{type:'function_call',name:'respond',call_id:'c',arguments:JSON.stringify({focus:'goals',goal_outcome:'독서',goal_draft:input,summary:'',details:[],question:'',choices:[]})}]}}})
  assert.equal(calls,1);assert.ok(result.state.agent_v2_context.draft)
  assert.equal(executionIssue(result.state.agent_v2_context.draft.card),null)
  assert.equal(result.state.goal_card.weeklyActions.length,0)
@@ -209,9 +211,9 @@ test('new draft validates all constraints together and preserves explicit comple
  const bad=book();bad.execution.completionPercent=90;bad.targetMetric='실행률 90%'
  const good=book()
  let i=0
- const result=await runAgentTurn(loadState({stage:5}),'독서 실행률 80%로 추천해줘',{now:'한국시간',request:async()=>({id:'x'+i,model:'gpt-4.1',usage:{input_tokens:1,output_tokens:1},output:[{type:'function_call',name:'respond',call_id:'c'+i,arguments:JSON.stringify({focus:'goals',goal_outcome:'독서',goal_draft:[bad,good][i++],summary:'초안',details:[],question:'시작할까요?',choices:[]})}]})})
+ const result=await runAgentTurn(agreed(),'독서 실행률 80%로 추천해줘',{now:'한국시간',request:async()=>({id:'x'+i,model:'gpt-4.1',usage:{input_tokens:1,output_tokens:1},output:[{type:'function_call',name:'respond',call_id:'c'+i,arguments:JSON.stringify({focus:'goals',goal_outcome:'독서',goal_draft:[bad,good][i++],summary:'초안',details:[],question:'시작할까요?',choices:[]})}]})})
  assert.equal(result.state.agent_v2_context.draft.card.execution.completionPercent,80)
- assert.ok(result.events.some(e=>e.result?.error?.includes('preserve_requested_completion_percent')))
+ assert.ok(result.events.some(e=>/preserve_goal_results|preserve_requested_completion_percent/.test(e.result?.error)))
 })
 test('exhausted draft validation is a clear coaching message, not a network error or confirmation',async()=>{
  const base=synchronizeExecution(book())

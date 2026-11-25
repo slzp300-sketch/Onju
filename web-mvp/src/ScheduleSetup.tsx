@@ -6,22 +6,38 @@ import {
   Clock3,
   MessageCircle,
   Send,
+  ThumbsDown,
+  ThumbsUp,
   Trash2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { PlanItem, Profile } from "./model";
-import { koreaTodayLabel, koreaWeekKey, ONJU_TIME_ZONE } from "./koreaTime";
 import type { AiDayBounds } from "./aiSchedule";
 import {
   getAgentSessionId,
+  forgetAgentMemory,
   loadAgentState,
+  saveAgentFeedback,
   saveAgentState,
+  savePlanRevision,
+  deleteAgentSession,
 } from "./agentMemory";
-import { canGenerateGoalPlan, emptyGoalCard, type GoalCard } from "./goalAgent";
+import { clearAgentSession, resetAgentSession, sessionFailureMessage, readSessionLocalState, writeSessionLocalState } from './agentSession';
+import { canGenerateGoalPlan, emptyGoalCardFor, type GoalCard } from "./goalAgent";
 import { generateWeeklyPlan, type GeneratedPlanItem } from "./planAgent";
 import AgentText from "./AgentText";
-import { talkToOnju, type PendingGoalDraft } from "./unifiedAgent";
+import { talkToOnju, type DailyCheckInView, type DialogueView, type PendingGoalDraft } from "./unifiedAgent";
 import { useChatScroll } from "./useChatScroll";
+import {
+  loadRegionalContext,
+  orderedWeekdayIndices,
+  regionalDateKey,
+  regionalTimeZoneLabel,
+  type UserRegionalContext,
+} from "./regionalContext";
+import { goalCategoryLabel, translator, uiLocale, weekdayLabels } from "./i18n";
+import { useRegionalContext } from './useRegionalContext';
+import { RegionalSettingsLink } from './RegionalSettings';
 
 type Kind = "fixed" | "variable" | "recovery";
 type Block = {
@@ -34,82 +50,59 @@ type Block = {
   pending?: boolean;
 };
 type ChatMessage = { id: string; role: "user" | "assistant"; text: string };
-type Stage = { title: string; question: string; hint: string; kind: Kind };
-const week = ["월", "화", "수", "목", "금", "토", "일"];
-const stages: Stage[] = [
-  {
-    title: "생활 리듬",
-    question: "보통 몇 시에 일어나고 몇 시에 잠드나요?",
-    hint: "평일과 주말이 다르면 나누어 알려주세요. 아는 시간만 짧게 말해도 괜찮아요.\n\n예: “평일은 6시 기상, 23시 취침. 주말은 그때그때 달라.”",
-    kind: "fixed",
-  },
-  {
-    title: "기본 생활",
-    question: "먼저 평일의 고정된 시간을 알려주세요.",
-    hint: "기상·이동·근무 시간을 한 문장으로 말하면 지도에 바로 채우고, 남는 시간을 계산해 드릴게요.",
-    kind: "fixed",
-  },
-  {
-    title: "반복 일정",
-    question: "퇴근 후나 주말에 매주 반복되는 일정이 있나요?",
-    hint: "요일과 시간을 함께 말하면 지도에 바로 표시할게요.",
-    kind: "fixed",
-  },
-  {
-    title: "회복 시간",
-    question: "일정이 비어 있어도 쉬거나 가족과 보내야 하는 시간이 있나요?",
-    hint: "이 시간은 목표를 넣지 않고 보호할게요.",
-    kind: "recovery",
-  },
-  {
-    title: "이번 주 일정",
-    question: "이번 주에만 있는 약속, 야근, 병원 일정이 있나요?",
-    hint: `${koreaTodayLabel()} 한국시간을 기준으로 이해할게요.`,
-    kind: "variable",
-  },
-  {
-    title: "목표 협의",
-    question: "이제 남은 시간에 어떤 변화를 만들어가고 싶나요?",
-    hint: "온주가 시간 지도와 함께 현실적인 계획을 제안할게요.",
-    kind: "fixed",
-  },
-];
 
 export default function ScheduleSetup({
   onComplete,
 }: {
-  onComplete: (p: Profile, plan: PlanItem[]) => void;
+  onComplete: (p: Profile, plan: PlanItem[], regionalContext: UserRegionalContext) => void;
 }) {
   const nav = useNavigate(),
-    sessionId = useRef(getAgentSessionId()),
+    [initialSessionId] = useState(getAgentSessionId),
+    sessionId = useRef(initialSessionId),
     saveQueue = useRef<Promise<void>>(Promise.resolve()),
+    [regionalContext] = useRegionalContext(),
     [stage, setStage] = useState(0),
-    [input, setInput] = useState(""),
+    [input, setInput] = useState(() => readSessionLocalState('onju-chat-input', initialSessionId) ?? ''),
     [messages, setMessages] = useState<ChatMessage[]>([]),
     [blocks, setBlocks] = useState<Block[]>([]),
     [pending, setPending] = useState<Block[]>([]),
     [dayBounds, setDayBounds] = useState<AiDayBounds[]>([]),
     [goal, setGoal] = useState(""),
-    [reason, setReason] = useState("내 생활에 무리 없이 변화를 만들고 싶어서"),
-    [obstacle, setObstacle] = useState("갑자기 일정이 생길 때"),
+    [reason, setReason] = useState(() => translator(loadRegionalContext())('setup.defaultReason')),
+    [obstacle, setObstacle] = useState(() => translator(loadRegionalContext())('setup.defaultObstacle')),
     [responseId, setResponseId] = useState<string>(),
-    [goalCard, setGoalCard] = useState<GoalCard>(emptyGoalCard),
+    [goalCard, setGoalCard] = useState<GoalCard>(() => emptyGoalCardFor(loadRegionalContext())),
     [goalDraft, setGoalDraft] = useState<PendingGoalDraft | null>(null),
+    [dialogue, setDialogue] = useState<DialogueView>(),
+    [dailyCheckIns, setDailyCheckIns] = useState<DailyCheckInView[]>([]),
     [goalResponseId, setGoalResponseId] = useState<string>(),
     [generatedPlan, setGeneratedPlan] = useState<GeneratedPlanItem[]>([]),
     [planResponseId, setPlanResponseId] = useState<string>(),
     [goalReady, setGoalReady] = useState(false),
     [loading, setLoading] = useState(false),
     [failedRequest, setFailedRequest] = useState<string>(),
+    [failedTurnId, setFailedTurnId] = useState<string>(),
     [failedConfirmation, setFailedConfirmation] = useState<{draftId:string;includeRelated?:boolean}>(),
     [needsClarification, setNeedsClarification] = useState(false),
     [hydrated, setHydrated] = useState(false),
     [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "offline">(
       "saved"
     );
-  const [suggestions, setSuggestions] = useState<string[]>([]),
-    current = stages[stage];
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [mapOpen, setMapOpen] = useState(false);
+  const [revealingId, setRevealingId] = useState<string | null>(null);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [loadingLabel, setLoadingLabel] = useState(() => translator(loadRegionalContext())('setup.loadingOrganize'));
+  const [feedback, setFeedback] = useState<Record<string, -1 | 1>>({});
+  const [loadError, setLoadError] = useState('');
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const t = translator(regionalContext);
+  const week = weekdayLabels(regionalContext);
+  const opening = {
+    title: t('setup.openingTitle'),
+    question: t('setup.openingQuestion'),
+    hint: t('setup.openingHint'),
+  };
   const { historyRef, contentRef, onScroll, scrollToLatest, showLatest } = useChatScroll(`${messages.at(-1)?.id ?? ''}:${loading}:${suggestions.join('|')}`, hydrated);
   useEffect(() => {
     let active = true;
@@ -117,6 +110,9 @@ export default function ScheduleSetup({
       .then((saved) => {
         if (!active) return;
         if (saved) {
+          // Server rows may contain migration defaults, not a user's selection.
+          // Device preferences remain authoritative for this browser.
+          const savedRegionalContext = loadRegionalContext();
           setStage(Math.min(5, Math.max(0, saved.stage)));
           setMessages(saved.messages);
           setBlocks(
@@ -128,16 +124,19 @@ export default function ScheduleSetup({
           setPending([]);
           setDayBounds(saved.dayBounds);
           setGoal(saved.goal);
-          setReason(saved.reason || "내 생활에 무리 없이 변화를 만들고 싶어서");
-          setObstacle(saved.obstacle || "갑자기 일정이 생길 때");
+          const savedT = translator(savedRegionalContext);
+          setReason(saved.reason || savedT('setup.defaultReason'));
+          setObstacle(saved.obstacle || savedT('setup.defaultObstacle'));
           setResponseId(saved.responseId);
           setGoalCard(
             saved.goalCard && Object.keys(saved.goalCard).length
               ? saved.goalCard
-              : emptyGoalCard
+              : emptyGoalCardFor(savedRegionalContext)
           );
           setGoalResponseId(saved.goalResponseId);
           setGoalDraft(saved.goalDraft ?? null);
+          setDialogue(saved.dialogue);
+          setDailyCheckIns(saved.dailyCheckIns ?? []);
           setSuggestions(saved.suggestions ?? []);
           setGeneratedPlan(saved.generatedPlan ?? []);
           setPlanResponseId(saved.planResponseId);
@@ -146,21 +145,29 @@ export default function ScheduleSetup({
         }
         setHydrated(true);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (active) {
           setSaveStatus("offline");
-          setHydrated(true);
+          const code = error instanceof Error ? error.message : '';
+          setLoadError(sessionFailureMessage(code, regionalContext.locale) || (uiLocale(regionalContext) === 'en-US' ? 'Could not load your conversation. Your input is kept; please retry.' : '대화를 불러오지 못했어요. 입력은 보존했어요. 다시 불러와 주세요.'));
+          setHydrated(false);
         }
       });
     return () => {
       active = false;
     };
-  }, []);
+  // Rehydrate only on explicit retry, not whenever the region is restored.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadAttempt]);
+  useEffect(() => {
+    try { writeSessionLocalState('onju-chat-input', sessionId.current, input); } catch { /* Keep the in-memory input. */ }
+  }, [input]);
   useEffect(() => {
     if (!hydrated || loading || failedRequest) return;
     const timer = window.setTimeout(() => {
       setSaveStatus("saving");
       saveQueue.current = saveQueue.current.catch(() => {}).then(() => saveAgentState(sessionId.current, {
+        regionalContext,
         stage,
         messages,
         blocks,
@@ -181,6 +188,7 @@ export default function ScheduleSetup({
     return () => window.clearTimeout(timer);
   }, [
     hydrated,
+    regionalContext,
     loading,
     failedRequest,
     stage,
@@ -197,9 +205,18 @@ export default function ScheduleSetup({
     generatedPlan,
     planResponseId,
   ]);
-  const send = async (text = input, confirmation?: { draftId: string; includeRelated?: boolean }) => {
+  const sendInFlight = useRef(false);
+  const lastRegionalRequest = useRef<{ turnId: string; context: typeof regionalContext } | null>(null);
+  const send = async (text = input, confirmation?: { draftId: string; includeRelated?: boolean }, retryTurnId?: string) => {
     const message = text.trim();
-    if (!message || loading) return;
+    if (!message || loading || !hydrated || sendInFlight.current) return;
+    sendInFlight.current = true;
+    const turnId = retryTurnId ?? crypto.randomUUID();
+    const turnContext = retryTurnId && lastRegionalRequest.current?.turnId === retryTurnId ? lastRegionalRequest.current.context : regionalContext;
+    lastRegionalRequest.current = { turnId, context: turnContext };
+    setRevealingId(null);
+    setStreamingMessageId(null);
+    setLoadingLabel(t('setup.loadingUnderstand'));
     scrollToLatest();
     setMessages((previous) => [
       ...(failedRequest ? previous.slice(0, -2) : previous),
@@ -208,27 +225,48 @@ export default function ScheduleSetup({
     setInput("");
     setSuggestions([]);
     setFailedRequest(undefined);
+    setFailedTurnId(undefined);
     setFailedConfirmation(undefined);
     setLoading(true);
     setNeedsClarification(false);
     try {
       await saveQueue.current;
-      const result = await talkToOnju(sessionId.current, message, confirmation);
+      let streamed = "";
+      let liveReplyId: string = crypto.randomUUID();
+      const result = await talkToOnju(sessionId.current, message, confirmation, {
+        turnId,
+        regionalContext: turnContext,
+        onEvent: event => {
+          if (event.type === "status") setLoadingLabel(event.message || t('setup.loadingReply'));
+          if (event.type === "meta" && event.assistantMessageId) liveReplyId = event.assistantMessageId;
+          if (event.type === "delta") {
+            streamed += event.text;
+            setStreamingMessageId(liveReplyId);
+            setMessages(previous => {
+              const index = previous.findIndex(item => item.id === liveReplyId);
+              if (index < 0) return [...previous, { id: liveReplyId, role: "assistant", text: streamed }];
+              return previous.map((item, itemIndex) => itemIndex === index ? { ...item, text: streamed } : item);
+            });
+          }
+        },
+      });
       setResponseId(result.response_id);
       setNeedsClarification(result.needs_clarification);
       setSuggestions(result.suggestions ?? []);
-      setMessages((previous) => [
-        ...previous,
-        {
-          id: result.assistant_message_id ?? crypto.randomUUID(),
-          role: "assistant",
-          text: result.assistant_message,
-        },
-      ]);
+      const replyId = result.assistant_message_id ?? crypto.randomUUID();
+      if (!streamed) setRevealingId(replyId);
+      setMessages(previous => {
+        const liveIndex = previous.findIndex(item => item.id === liveReplyId);
+        if (liveIndex >= 0) return previous.map((item, index) => index === liveIndex ? { id: replyId, role: "assistant", text: result.assistant_message } : item);
+        return [...previous, { id: replyId, role: "assistant", text: result.assistant_message }];
+      });
       setBlocks(result.state.blocks.map((block) => ({...block,id:crypto.randomUUID(),pending:false})));
       setDayBounds(result.state.dayBounds);
       setGoalCard(result.state.goalCard);
       setGoalDraft(result.state.goalDraft ?? null);
+      setDialogue(result.state.dialogue);
+      setDailyCheckIns(result.state.dailyCheckIns ?? []);
+      // A response may have started before a setting change. It cannot change preferences.
       setGoal(result.state.goalCard.outcome);
       setReason(result.state.goalCard.identity || reason);
       setObstacle(result.state.goalCard.recoveryRule || obstacle);
@@ -239,30 +277,54 @@ export default function ScheduleSetup({
       }
     } catch (error) {
       console.error(error);
+      setInput(message);
       setFailedRequest(message);
+      setFailedTurnId(turnId);
       setFailedConfirmation(confirmation);
       setPending([]);
       setSuggestions([]);
       const detail = error instanceof Error ? error.message : "";
+      const errorCode = error && typeof error === 'object' && 'code' in error ? String(error.code) : '';
       setMessages((previous) => [
         ...previous,
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          text: detail.startsWith("요청이 잠시") || detail.startsWith("온주")
+          text: sessionFailureMessage(errorCode, regionalContext.locale) || sessionFailureMessage(detail, regionalContext.locale) || (uiLocale(regionalContext) === 'ko-KR' && (detail.startsWith("요청이 잠시") || detail.startsWith("온주") || detail.startsWith('이 대화') || detail.startsWith('만료되거나'))
             ? detail
-            : "온주에 연결하지 못했어요. 입력하신 내용은 그대로 두었으니 다시 시도해 주세요.",
+            : t('setup.connectionError')),
         },
       ]);
     } finally {
+      setStreamingMessageId(null);
+      sendInFlight.current = false;
       setLoading(false);
     }
   };
+  const rateMessage = async (messageId: string, rating: -1 | 1) => {
+    const previous = feedback[messageId];
+    setFeedback(current => ({ ...current, [messageId]: rating }));
+    try {
+      await saveAgentFeedback(sessionId.current, messageId, rating);
+    } catch {
+      setFeedback(current => {
+        const next = { ...current };
+        if (previous) next[messageId] = previous;
+        else delete next[messageId];
+        return next;
+      });
+    }
+  };
+  const removeMemory = async (memoryId: string) => {
+    const next = await forgetAgentMemory(sessionId.current, memoryId);
+    setDialogue(next);
+  };
   const finish = async () => {
-    if (loading) return;
+    if (loading || !hydrated) return;
     setLoading(true);
     try {
       const result = await generateWeeklyPlan({
+        sessionId: sessionId.current,
         goalCard,
         scheduleBlocks: blocks.map(({ days, title, start, end, kind }) => ({
           days,
@@ -272,6 +334,7 @@ export default function ScheduleSetup({
           kind,
         })),
         dayBounds: dayBounds.filter(bound => bound.wake && bound.bedtime && !bound.variable),
+        regionalContext,
       });
       setGeneratedPlan(result.items);
       setPlanResponseId(result.response_id);
@@ -279,8 +342,8 @@ export default function ScheduleSetup({
         goal: goalCard.outcome || goal,
         reason: goalCard.identity || reason,
         obstacle: goalCard.recoveryRule || obstacle,
-        availableTime: "확인된 시간 지도 기준",
-        checkinTime: "밤 10시",
+        availableTime: t('setup.availableTime'),
+        checkinTime: t('setup.checkInTime'),
       };
       const plan: PlanItem[] = result.items.map((item) => ({
         id: crypto.randomUUID(),
@@ -293,16 +356,25 @@ export default function ScheduleSetup({
         fallback: item.fallback,
         rationale: item.rationale,
       }));
+      // Explicit plan saving remains available when conversation auto-save is
+      // server-managed. Never depend on a pending component effect on navigation.
+      await saveQueue.current;
+      await savePlanRevision(sessionId.current, { plan, pendingPlan: [], history: [], responseId: result.response_id });
       const map = {
-        timeZone: ONJU_TIME_ZONE,
-        weekOf: koreaWeekKey(),
+        locale: regionalContext.locale,
+        countryCode: regionalContext.countryCode,
+        currencyCode: regionalContext.currencyCode,
+        weekStartsOn: regionalContext.weekStartsOn,
+        timeZone: regionalContext.timeZone,
+        weekOf: regionalDateKey(regionalContext),
         blocks,
         dayBounds,
         goalCard,
         plan,
       };
-      localStorage.setItem("onju-week-map", JSON.stringify(map));
+      writeSessionLocalState("onju-week-map", sessionId.current, JSON.stringify(map));
       await saveAgentState(sessionId.current, {
+        regionalContext,
         stage,
         messages,
         blocks,
@@ -317,7 +389,7 @@ export default function ScheduleSetup({
         generatedPlan: result.items,
         planResponseId: result.response_id,
       });
-      onComplete(profile, plan);
+      onComplete(profile, plan, regionalContext);
       nav("/plan");
     } catch {
       setMessages((previous) => [
@@ -325,61 +397,95 @@ export default function ScheduleSetup({
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          text: "주간 계획을 배치하지 못했어요. 시간 지도를 확인한 뒤 다시 시도해 주세요.",
+          text: t('setup.planError'),
         },
       ]);
     } finally {
       setLoading(false);
     }
   };
-  if (!hydrated)
+  if (!hydrated && !loadError)
     return (
       <main className="schedule-setup setup-loading">
-        <div className="assistant-avatar">온</div>
-        <p>온주가 지난 대화를 불러오고 있어요.</p>
+        <div className="assistant-avatar">{t('app.mark')}</div>
+        <p>{t('setup.hydrating')}</p>
       </main>
     );
   return (
     <main className="schedule-setup">
       <header className="setup-header">
-        <button aria-label="홈으로" onClick={() => nav("/")}>
+        <button aria-label={t('setup.home')} onClick={() => nav("/")}>
           <ArrowLeft />
         </button>
         <div>
-          <b>온주와 내 계획 만들기</b>
+          <b>{t('setup.title')}</b>
           <span>
-            한국시간(KST) · {stage === 5 ? '목표 설계' : '생활 이해'} ·{" "}
+            <RegionalSettingsLink /> · {regionalTimeZoneLabel(regionalContext)} · {t('setup.organizing')} ·{" "}
             {saveStatus === "saved"
-              ? "저장됨"
+              ? t('setup.saved')
               : saveStatus === "saving"
-              ? "저장 중…"
-              : "오프라인"}
+              ? t('setup.saving')
+              : t('setup.offline')}
           </span>
         </div>
         <button className="save-exit" onClick={() => nav("/")}>
-          나중에
+          {t('setup.later')}
         </button>
       </header>
       <div className="schedule-layout">
         <section className="setup-panel chat-setup">
           <div className="chat-top">
-            <div className="assistant-avatar small">온</div>
+            <div className="assistant-avatar small">{t('app.mark')}</div>
             <div>
-              <b>온주</b>
+              <b>{t('app.name')}</b>
               <span>
-                {stage === 5 ? "목표 설계 파트너" : "당신의 일정 비서"} · KST
+                {t('setup.partner', { timezone: regionalTimeZoneLabel(regionalContext) })}
               </span>
             </div>
           </div>
+          {loadError && <div role="alert" className="assistant-question">
+            <p>{loadError}</p>
+            <button onClick={() => { setLoadError(''); setHydrated(false); setLoadAttempt(value => value + 1); }}>{uiLocale(regionalContext) === 'en-US' ? 'Retry loading' : '다시 불러오기'}</button>
+            <button onClick={() => {
+              if (!window.confirm(uiLocale(regionalContext) === 'en-US' ? 'Start a new conversation? The previous conversation will not be deleted.' : '이전 대화는 삭제하지 않고 새 대화를 시작할까요?')) return;
+              const nextId = resetAgentSession();
+              writeSessionLocalState('onju-chat-input', nextId, input);
+              window.location.assign('/setup');
+            }}>{uiLocale(regionalContext) === 'en-US' ? 'Start new conversation' : '새 대화로 시작'}</button>
+          </div>}
+          <button disabled={loading} className="save-exit" onClick={async () => {
+            if (!window.confirm(uiLocale(regionalContext) === 'en-US' ? 'Delete this session and its linked records? This cannot be undone.' : '이 대화와 연결된 기록을 삭제할까요? 삭제하면 복구할 수 없어요.')) return;
+            setLoading(true);
+            setHydrated(false);
+            try {
+              await saveQueue.current.catch(() => {});
+              await deleteAgentSession(sessionId.current);
+              for (const key of ['onju-web-alpha', 'onju-week-map', 'onju-chat-input']) {
+                localStorage.removeItem(`${key}:${sessionId.current}`);
+                if (localStorage.getItem(`${key}:legacy-owner`) === sessionId.current) {
+                  localStorage.removeItem(key);
+                  localStorage.removeItem(`${key}:legacy-owner`);
+                }
+              }
+              clearAgentSession();
+              window.location.assign('/setup');
+            } catch {
+              setLoadError(uiLocale(regionalContext) === 'en-US' ? 'Deletion was not confirmed. Saving is paused. Retry the delete action.' : '삭제 완료를 확인하지 못했어요. 저장을 중지했어요. 삭제 버튼으로 다시 시도해 주세요.');
+              setLoading(false);
+            }
+          }}>{uiLocale(regionalContext) === 'en-US' ? 'Delete this conversation' : '이 대화 삭제'}</button>
+          <p className="setup-purpose">
+            {t('setup.purpose')}
+          </p>
           <div className="conversation-viewport">
           <div className="conversation-history" ref={historyRef} onScroll={onScroll}
-            role="log" aria-label="온주와의 대화" aria-live="polite" aria-relevant="additions" tabIndex={0}>
+            role="log" aria-label={t('setup.chatAria')} aria-live="polite" aria-relevant="additions" tabIndex={0}>
           <div className="conversation-content" ref={contentRef}>
             {messages.length === 0 && (
             <div className="assistant-question">
-              <span>{current.title}</span>
-              <h1>{current.question}</h1>
-              <AgentText text={current.hint} />
+              <span>{opening.title}</span>
+              <h1>{opening.question}</h1>
+              <AgentText text={opening.hint} />
             </div>
             )}
             {messages.map((message) => (
@@ -388,28 +494,36 @@ export default function ScheduleSetup({
                   message.role === "user" ? "user-bubble" : "assistant-bubble"
                 }
                 key={message.id}
+                aria-busy={message.id === revealingId || undefined}
               >
-                {message.role === "assistant" ? <AgentText text={message.text} /> : message.text}
+                {message.role === "assistant" ? <AgentText text={message.text} animate={message.id === revealingId}
+                  onRevealComplete={() => setRevealingId(id => id === message.id ? null : id)} /> : message.text}
+                {message.role === "assistant" && message.id !== streamingMessageId && message.text !== t('setup.connectionError') && (
+                  <div className="agent-feedback" aria-label={t('setup.feedbackAria')}>
+                    <button className={feedback[message.id] === 1 ? "selected" : ""} aria-label={t('setup.helpful')} onClick={() => rateMessage(message.id, 1)}><ThumbsUp size={14} /></button>
+                    <button className={feedback[message.id] === -1 ? "selected" : ""} aria-label={t('setup.notHelpful')} onClick={() => rateMessage(message.id, -1)}><ThumbsDown size={14} /></button>
+                  </div>
+                )}
               </div>
             ))}
-            {loading && (
+            {loading && !streamingMessageId && (
               <div
                 className="assistant-bubble typing"
-                aria-label="온주가 생각하고 있어요"
+                aria-label={t('setup.thinking')}
               >
                 <i />
                 <i />
                 <i />
-                <span>말씀하신 내용을 정리하고 있어요</span>
+                <span>{loadingLabel}</span>
               </div>
             )}
-          {suggestions.length > 0 && (
+          {suggestions.length > 0 && !revealingId && (
             <div className="suggestions agent-suggestions">
               {suggestions.map((suggestion) => (
                 <button
                   disabled={loading}
                   key={suggestion}
-                  onClick={() => send(suggestion, goalDraft && ['이 초안으로 시작할게요','관련 조건도 함께 조정할게요'].includes(suggestion) ? { draftId: goalDraft.id,includeRelated:suggestion==='관련 조건도 함께 조정할게요' } : undefined)}
+                  onClick={() => send(suggestion, goalDraft && [t('setup.confirmDraft'), t('setup.confirmRelated'), '이 초안으로 시작할게요', '관련 조건도 함께 조정할게요'].includes(suggestion) ? { draftId: goalDraft.id, includeRelated: [t('setup.confirmRelated'), '관련 조건도 함께 조정할게요'].includes(suggestion) } : undefined)}
                 >
                   {suggestion}
                 </button>
@@ -417,18 +531,19 @@ export default function ScheduleSetup({
             </div>
           )}
           {failedRequest && !loading && <div className="suggestions agent-suggestions">
-            <button onClick={() => send(failedRequest,failedConfirmation)}>같은 내용으로 다시 시도</button>
+            <button onClick={() => send(failedRequest,failedConfirmation,failedTurnId)}>{t('setup.retry')}</button>
           </div>}
           </div>
           </div>
           {showLatest && <button className="latest-message" onClick={scrollToLatest}>
-            <ArrowDown size={16} /> 최신 대화로
+            <ArrowDown size={16} /> {t('setup.latest')}
           </button>}
           </div>
           <div className="chat-input-area">
+          {revealingId && <button className="reveal-skip" onClick={() => setRevealingId(null)}>{t('setup.showAll')}</button>}
           <div className="composer large">
             <textarea
-              aria-label="온주에게 메시지"
+              aria-label={t('setup.messageAria')}
               disabled={loading}
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -440,36 +555,39 @@ export default function ScheduleSetup({
               }}
               placeholder={
                 needsClarification
-                  ? "온주의 질문에 답해 주세요"
-                  : stage === 5 ? "원하는 변화나 수정할 점을 말해 주세요" : "아는 내용만 편하게 이야기해 주세요"
+                  ? t('setup.clarificationPlaceholder')
+                  : t('setup.placeholder')
               }
               rows={2}
             />
             <button
-              aria-label="보내기"
-              disabled={!input.trim() || loading}
+              aria-label={t('setup.send')}
+              disabled={!input.trim() || loading || !hydrated}
               onClick={() => send()}
             >
               <Send />
             </button>
           </div>
-          <p className="composer-hint">짧게 답해도 괜찮아요. 정리는 온주가 할게요.</p>
+          <p className="composer-hint">{t('setup.composerHint')}</p>
           </div>
         </section>
         <aside className="map-sidebar">
           <button className="map-toggle" aria-expanded={mapOpen} aria-controls="setup-map" onClick={() => setMapOpen(!mapOpen)}>
-            <Clock3 size={17} /> {stage === 5 ? '시간 지도·목표' : '시간 지도'} · 일정 {blocks.length}개 <span>{mapOpen ? '접기' : '보기'}</span>
+            <Clock3 size={17} /> {goalCard.outcome || goalDraft ? t('setup.mapAndGoal') : t('setup.timeMap')} · {t('setup.scheduleCount', { count: blocks.length })} <span>{mapOpen ? t('setup.collapse') : t('setup.view')}</span>
           </button>
           <div id="setup-map" className={`map-content ${mapOpen ? 'is-open' : ''}`}>
         <WeekMap
           blocks={blocks}
           dayBounds={dayBounds}
+          regionalContext={regionalContext}
           remove={(id) => setBlocks(blocks.filter((b) => b.id !== id))}
         />
-          {stage === 5 && (goalCard.outcome || goalDraft) && (
-            <GoalDraft card={goalDraft?.card ?? goalCard} draft={goalDraft} pending={!!goalDraft} confirmed={goalReady} ready={goalReady && dayBounds.some(b => b.wake && b.bedtime && !b.variable)} loading={loading}
-              onConfirm={() => goalDraft && send(goalDraft.related?'관련 조건도 함께 조정할게요':'이 초안으로 시작할게요', { draftId: goalDraft.id,includeRelated:!!goalDraft.related })} onFinish={finish} />
+          {(goalCard.outcome || goalDraft) && (
+            <GoalDraft regionalContext={regionalContext} card={goalDraft?.card ?? goalCard} draft={goalDraft} pending={!!goalDraft} confirmed={goalReady} ready={goalReady && dayBounds.some(b => b.wake && b.bedtime && !b.variable)} loading={loading || !!revealingId}
+              onConfirm={() => goalDraft && send(goalDraft.related ? t('setup.confirmRelated') : t('setup.confirmDraft'), { draftId: goalDraft.id,includeRelated:!!goalDraft.related })} onFinish={finish} />
           )}
+          {!!dialogue?.memory.length && <AgentMemoryPanel regionalContext={regionalContext} memory={dialogue.memory} onForget={removeMemory} />}
+          {!!dailyCheckIns.length && <DailyCheckInPanel regionalContext={regionalContext} items={dailyCheckIns} />}
           </div>
         </aside>
       </div>
@@ -478,6 +596,7 @@ export default function ScheduleSetup({
 }
 
 function GoalDraft({
+  regionalContext,
   card,
   draft,
   ready,
@@ -487,6 +606,7 @@ function GoalDraft({
   confirmed,
   onConfirm,
 }: {
+  regionalContext: UserRegionalContext;
   card: GoalCard;
   draft: PendingGoalDraft | null;
   ready: boolean;
@@ -496,44 +616,45 @@ function GoalDraft({
   confirmed: boolean;
   onConfirm: () => void;
 }) {
+  const t = translator(regionalContext);
   return (
     <section className="goal-draft">
       <div className="goal-draft-head">
-        <span>{card.category}</span>
-        <b>{pending ? '검토 중인 초안 · 미확정' : confirmed ? '함께 정한 목표' : '목표 정리 중'}</b>
+        <span>{goalCategoryLabel(regionalContext, card.category)}</span>
+        <b>{pending ? t('goal.pending') : confirmed ? t('goal.confirmed') : t('goal.organizing')}</b>
       </div>
       {!!draft?.changes?.length && <div className="goal-change-summary">
-        <strong>{draft.baseLabel || '직전 계획'} 대비 변경</strong>
+        <strong>{t('goal.changesFrom', { base: draft.baseLabel || t('goal.previous') })}</strong>
         <ul>{draft.changes.map((change,i)=><li key={i}><b>{change.label}</b><span>{change.before} → <strong>{change.after}</strong></span></li>)}</ul>
       </div>}
       <details className="goal-draft-details">
       <summary>{card.outcome}</summary>
       {card.durationWeeks > 0 && (
         <p className="goal-period">
-          {card.durationWeeks}주 시험{card.deadline ? ` · ${card.deadline}` : ''}
+          {t('goal.trialWeeks', { count: card.durationWeeks })}{card.deadline ? ` · ${card.deadline}` : ''}
         </p>
       )}
       <dl>
         {card.targetMetric && (
           <>
-            <dt>결과 기준</dt>
+            <dt>{t('goal.resultMetric')}</dt>
             <dd>{card.targetMetric}</dd>
           </>
         )}
         {card.baselineMetric && (
           <>
-            <dt>현재 기준선</dt>
+            <dt>{t('goal.baseline')}</dt>
             <dd>{card.baselineMetric}</dd>
           </>
         )}
         {card.weeklyActions.length > 0 && (
           <>
-            <dt>주간 시스템</dt>
+            <dt>{t('goal.weeklySystem')}</dt>
             <dd>
               {card.weeklyActions
                 .map(
                   (action) =>
-                    `${action.title} · 주 ${action.frequencyPerWeek}회 · ${action.durationMinutes}분`
+                    t('goal.actionSummary', { title: action.title, frequency: action.frequencyPerWeek, minutes: action.durationMinutes })
                 )
                 .join(" / ")}
             </dd>
@@ -541,56 +662,88 @@ function GoalDraft({
         )}
         {!card.execution && card.tinyStart && (
           <>
-            <dt>2분 시작</dt>
+            <dt>{t('goal.tinyStart')}</dt>
             <dd>{card.tinyStart}</dd>
           </>
         )}
         {card.cue && (
           <>
-            <dt>실행 단서</dt>
+            <dt>{t('goal.cue')}</dt>
             <dd>{card.cue}</dd>
           </>
         )}
         {card.execution && <>
-          <dt>완료 기준</dt>
-          <dd><ul className="goal-execution-list">{card.execution.actions.map((guide,i)=><li key={i}><strong>{card.weeklyActions[i].title}</strong><span>계획한 {card.weeklyActions[i].durationMinutes}분 실행 + {guide.completionCriterion}</span></li>)}</ul></dd>
-          <dt>바쁜 날 최소 실행</dt>
-          <dd><ul className="goal-execution-list">{card.execution.actions.map((guide,i)=><li key={i}><strong>{card.weeklyActions[i].title}</strong><span>{guide.minimumAction} · {guide.minimumMinutes}분</span></li>)}</ul><small>최소 실행은 기본 실행 완료 횟수에 포함하지 않고 따로 기록해요.</small></dd>
-          <dt>점검</dt><dd>{card.reviewCycle}</dd>
+          {card.execution.progressStrategy && <><dt>{t('goal.progressStrategy')}</dt><dd>{card.execution.progressStrategy}</dd></>}
+          {card.execution.actions.some(guide=>guide.steps?.length) && <><dt>{t('goal.dayGuide')}</dt><dd>{card.execution.actions.map((guide,i)=>guide.steps?.length ? <div key={i}><strong>{card.weeklyActions[i].title}</strong><p>{t('goal.goalLabel', { goal: guide.goalResult ?? '' })}</p><ol>{guide.steps.map((step,j)=><li key={j}>{step}</li>)}</ol></div> : null)}</dd></>}
+          <dt>{t('goal.completion')}</dt>
+          <dd><ul className="goal-execution-list">{card.execution.actions.map((guide,i)=><li key={i}><strong>{card.weeklyActions[i].title}</strong><span>{t('goal.plannedCompletion', { minutes: card.weeklyActions[i].durationMinutes, criterion: guide.completionCriterion })}</span></li>)}</ul></dd>
+          <dt>{t('goal.minimum')}</dt>
+          <dd><ul className="goal-execution-list">{card.execution.actions.map((guide,i)=><li key={i}><strong>{card.weeklyActions[i].title}</strong><span>{t('goal.minimumSummary', { action: guide.minimumAction, minutes: guide.minimumMinutes })}</span></li>)}</ul><small>{t('goal.minimumNote')}</small></dd>
+          <dt>{t('goal.review')}</dt><dd>{card.reviewCycle}</dd>
         </>}
         {!card.execution && card.fallbackAction && (
           <>
-            <dt>축소 실행</dt>
+            <dt>{t('goal.fallback')}</dt>
             <dd>{card.fallbackAction}</dd>
           </>
         )}
         {card.recoveryRule && (
           <>
-            <dt>복귀 규칙</dt>
+            <dt>{t('goal.recovery')}</dt>
             <dd>{card.recoveryRule}</dd>
           </>
         )}
       </dl>
       </details>
-      <p className="goal-period">기본 실행량: 주 {card.weeklyActions.reduce((sum,a)=>sum+a.frequencyPerWeek*a.durationMinutes,0)}분</p>
+      <p className="goal-period">{t('goal.weeklyMinutes', { minutes: card.weeklyActions.reduce((sum,a)=>sum+a.frequencyPerWeek*a.durationMinutes,0) })}</p>
       {draft?.related && <div className="goal-related-review">
-        <strong>함께 확인할 조건</strong><p>{draft.related.reason}</p>
+        <strong>{t('goal.related')}</strong><p>{draft.related.reason}</p>
         <ul>{draft.related.changes.map((change,i)=><li key={i}><b>{change.label}</b><span>{change.before} → <strong>{change.after}</strong></span></li>)}</ul>
-        <p>아래 버튼을 누르면 요청한 변경과 이 관련 변경을 함께 확정해요.</p>
+        <p>{t('goal.relatedCopy')}</p>
       </div>}
       {pending ? (
-        <button className="button full" disabled={loading} onClick={onConfirm}>{draft?.related?'관련 조건도 함께 조정할게요':'이 초안으로 시작할게요'} <ArrowRight size={18} /></button>
+        <button className="button full" disabled={loading} onClick={onConfirm}>{draft?.related ? t('setup.confirmRelated') : t('setup.confirmDraft')} <ArrowRight size={18} /></button>
       ) : ready ? (
         <button className="button full" disabled={loading} onClick={onFinish}>
-          {loading ? '계획 준비 중…' : '이 목표로 주간 계획 만들기'} <ArrowRight size={18} />
+          {loading ? t('goal.preparing') : t('goal.makeWeekly')} <ArrowRight size={18} />
         </button>
       ) : (
         <p className="goal-draft-note">
-          {confirmed ? '목표는 확정했어요. 주간 계획을 만들려면 대화에서 기상·취침 시간을 먼저 알려 주세요.' : '이루고 싶은 변화를 이야기해 주세요. 온주가 작은 실행 초안으로 정리할게요.'}
+          {confirmed ? t('goal.needsRhythm') : t('goal.tellChange')}
         </p>
       )}
     </section>
   );
+}
+
+function AgentMemoryPanel({ regionalContext, memory, onForget }: {
+  regionalContext: UserRegionalContext;
+  memory: DialogueView["memory"];
+  onForget: (id: string) => Promise<void>;
+}) {
+  const t = translator(regionalContext);
+  return <details className="agent-memory-panel">
+    <summary>{t('memory.title')} <span>{memory.length}</span></summary>
+    <p>{t('memory.copy')}</p>
+    <ul>{memory.map(item => <li key={item.id}>
+      <span><b>{item.note}</b><small>{item.scope === "temporary" ? t('memory.temporary') : t('memory.durable')}</small></span>
+      <button aria-label={t('memory.remove', { note: item.note })} onClick={() => onForget(item.id)}><Trash2 size={15} /></button>
+    </li>)}</ul>
+  </details>;
+}
+
+function DailyCheckInPanel({ regionalContext, items }: { regionalContext: UserRegionalContext; items: DailyCheckInView[] }) {
+  const t = translator(regionalContext);
+  const latest = items.at(-1);
+  if (!latest) return null;
+  return <details className="daily-checkin-panel">
+    <summary>{t('checkIn.recent')} <span>{latest.date}</span></summary>
+    {!!latest.completed.length && <p><b>{t('checkIn.completed')}</b> {latest.completed.join(" · ")}</p>}
+    {!!latest.missed.length && <p><b>{t('checkIn.adjustNext')}</b> {latest.missed.join(" · ")}</p>}
+    {latest.energy && <p><b>{t('checkIn.energy')}</b> {latest.energy}/5</p>}
+    {latest.blocker && <p><b>{t('checkIn.blocker')}</b> {latest.blocker}</p>}
+    {latest.adjustment && <p><b>{t('checkIn.adjustment')}</b> {latest.adjustment}</p>}
+  </details>;
 }
 
 function mergeBlocks(current: Block[], incoming: Block[]) {
@@ -608,43 +761,48 @@ function mergeBlocks(current: Block[], incoming: Block[]) {
 function WeekMap({
   blocks,
   dayBounds,
+  regionalContext,
   remove,
 }: {
   blocks: Block[];
   dayBounds: AiDayBounds[];
+  regionalContext: UserRegionalContext;
   remove: (id: string) => void;
 }) {
+  const t = translator(regionalContext);
+  const week = weekdayLabels(regionalContext);
   return (
     <aside className="week-map">
       <div className="week-map-head">
         <div>
-          <span className="section-label">실시간 시간 지도</span>
-          <h2>이번 주 · 한국시간</h2>
+          <span className="section-label">{t('map.realtime')}</span>
+          <h2>{t('map.thisWeek', { timezone: regionalTimeZoneLabel(regionalContext) })}</h2>
         </div>
         <span className="available-chip">
-          {dayBounds.length ? "알려주신 리듬 반영" : "생활 리듬 확인 전"}
+          {dayBounds.length ? t('map.rhythmApplied') : t('map.beforeRhythm')}
         </span>
       </div>
       <div className="kst-notice">
         <Clock3 />
         {dayBounds.length
-          ? "기상·취침이 확인된 요일만 빈 시간을 계산해요."
-          : "기상·취침 시간을 먼저 알려주세요."}
+          ? t('map.knownOnly')
+          : t('map.tellRhythm')}
       </div>
       {dayBounds.length > 0 && (
         <div className="rhythm-summary">
           {dayBounds.map((bound, index) => (
             <span key={`${bound.days.join("-")}-${index}`}>
-              <b>{bound.days.map((day) => week[day]).join("·")}</b> {bound.wake || "미정"}{" "}
-              기상 · {bound.bedtime || "미정"} 취침 {bound.deferred ? <em>나중에 확인</em> : bound.variable && <em>변동</em>}
+              <b>{bound.days.map((day) => week[day]).join("·")}</b>{" "}
+              {t('map.wakeSleep', { wake: bound.wake || t('map.unknown'), bedtime: bound.bedtime || t('map.unknown') })}{" "}
+              {bound.deferred ? <em>{t('map.later')}</em> : bound.variable && <em>{t('map.variable')}</em>}
             </span>
           ))}
         </div>
       )}
       <div className="week-columns">
-        {week.map((day, index) => (
-          <div className="day-column" key={day}>
-            <b>{day}</b>
+        {orderedWeekdayIndices(regionalContext).map((index) => (
+          <div className="day-column" key={index}>
+            <b>{week[index]}</b>
             <div className="day-blocks">
               {blocks
                 .filter((b) => b.days.includes(index))
@@ -666,8 +824,8 @@ function WeekMap({
               {!blocks.some((b) => b.days.includes(index)) && (
                 <span className="empty-day">
                   {dayBounds.some((bound) => bound.days.includes(index))
-                    ? "등록 일정 없음"
-                    : "리듬 확인 전"}
+                    ? t('map.noSchedule')
+                    : t('map.beforeRhythm')}
                 </span>
               )}
             </div>
@@ -677,25 +835,25 @@ function WeekMap({
       <div className="map-legend">
         <span>
           <i className="fixed" />
-          고정
+          {t('map.fixed')}
         </span>
         <span>
           <i className="variable" />
-          이번 주
+          {t('map.currentWeek')}
         </span>
         <span>
           <i className="recovery" />
-          회복
+          {t('map.recovery')}
         </span>
       </div>
       <div className="map-insight">
         <MessageCircle />
         <p>
-          <b>대화할수록 지도가 정확해져요.</b>
+          <b>{t('map.insightTitle')}</b>
           <br />
           {dayBounds.some((bound) => bound.variable)
-            ? "변동형 생활 리듬은 당일 대화로 다시 조정해요."
-            : `현재 일정 ${blocks.length}개를 반영하고 있어요.`}
+            ? t('map.variableCopy')
+            : t('map.scheduleCopy', { count: blocks.length })}
         </p>
       </div>
     </aside>

@@ -1,0 +1,17 @@
+.regional-settings { max-width: 38rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; color: var(--ink); }
+.regional-settings h1 { font-size: 1.8rem; margin: 1.5rem 0 1rem; }
+.regional-settings p { font-size: 1rem; line-height: 1.65; overflow-wrap: anywhere; }
+.regional-settings form { display: grid; gap: 1.1rem; margin: 1.5rem 0; }
+.regional-settings label { display: grid; gap: .5rem; font-size: 1rem; font-weight: 600; }
+.regional-settings select, .regional-settings input { width: 100%; min-width: 0; box-sizing: border-box; min-height: 2.75rem; border: 1px solid var(--line); border-radius: .75rem; padding: .75rem; background: var(--paper); color: inherit; font: inherit; }
+.regional-settings form p { margin: 0; font-size: .875rem; }
+.regional-settings form button { min-height: 2.75rem; white-space: normal; }
+.regional-settings :focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+.regional-settings-link { display: inline-block; font-size: .875rem; line-height: 1.5; text-decoration: underline; text-underline-offset: .2em; }
+.nav-links { flex-wrap: wrap; }
+html[lang^="en"] .weekly-days li.is-today>span::after { content: 'Today'; }
+@media (max-width:760px) {
+  .nav, .nav.compact { height: auto; min-height: 76px; flex-wrap: wrap; gap: .75rem; padding-block: .75rem; }
+  .nav .nav-links { display: flex; flex-basis: 100%; order: 3; gap: 0; }
+  .nav-links > a:not(.regional-settings-link) { display: none; }
+}

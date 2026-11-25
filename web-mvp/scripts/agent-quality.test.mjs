@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { applySchedule, mergeRhythm, missingRhythm, normalizeSchedule, isDraftAcceptance } from '../../supabase/functions/onju-agent-v2/policy.ts'
+import { applySchedule, mergeRhythm, missingRhythm, normalizeSchedule, isDraftAcceptance, deferredEvidence } from '../../supabase/functions/onju-agent-v2/policy.ts'
 import { emptyGoal, goalDraftIssue, describeGoal } from '../../supabase/functions/onju-agent-v2/goal.ts'
 import { loadState, runAgentTurn } from '../../supabase/functions/onju-agent-v2/agent.ts'
 import { formatReply } from '../../supabase/functions/onju-agent-v2/state.ts'
@@ -109,4 +109,49 @@ test('failed save cannot be presented as success even if the model claims succes
   assert.deepEqual(result.state.blocks,[])
   assert.match(result.assistant_message,/아직 반영하지 못했어요/)
   assert.doesNotMatch(result.assistant_message,/모두 반영했어요|모임 완료/)
+})
+
+test('first message with variable weekends saves rhythm and explains the next schedule question', async () => {
+  const result = await runAgentTurn(loadState(null), '평일은 5시반, 22시반에 취침하고, 주말은 변동이 많아', provider([
+    ['apply_schedule', { bounds:[{days:['월','화','수','목','금'],wake:'05:30',bedtime:'22:30',variable:false,deferred:false},{days:['토','일'],wake:'',bedtime:'',variable:true,deferred:true}], blocks:[], updates:[] }],
+    ['respond', respond({question:'이 밖에 비워둘 시간이 있나요?'})],
+  ]))
+  assert.equal(result.state.stage, 1)
+  assert.equal(result.state.day_bounds[0].wake, '05:30')
+  assert.equal(result.state.day_bounds[0].bedtime, '22:30')
+  assert.equal(result.state.day_bounds[1].deferred, true)
+  assert.equal(result.state.day_bounds[1].wake, '')
+  assert.equal(result.state.goal_card.weeklyActions.length, 0)
+  assert.equal(result.state.agent_v2_context.draft, null)
+  assert.match(result.assistant_message, /목표와 루틴.*생활 시간/)
+  assert.match(result.assistant_message.split('\n\n').at(-1), /이동이나 근무.*몇 시부터 몇 시/)
+  assert.doesNotMatch(result.assistant_message, /기존 확정 목표|초안의 실행량/)
+  assert.equal(result.events.filter(e=>e.tool==='model_usage').length, 2)
+})
+
+test('variable rhythm expressions are accepted without treating fixed times as deferred', () => {
+  for (const message of ['주말은 변동이 많아','주말은 변동이 있어','매주 달라','날마다 달라져','아직 정해지지 않았어']) assert.equal(deferredEvidence(message), true, message)
+  for (const message of ['주말은 변동이 없어','주말에도 일정해','시간을 변경해줘']) assert.equal(deferredEvidence(message), false, message)
+})
+
+test('exhausted first rhythm validation never claims a confirmed goal exists', async () => {
+  const bad = ['apply_schedule', {bounds:[{days:['월'],wake:'25:00',bedtime:'23:00',variable:false,deferred:false}],blocks:[],updates:[]}]
+  const result = await runAgentTurn(loadState(null), '평일 생활 시간을 말할게', provider(Array.from({length:5},()=>bad)))
+  assert.deepEqual(result.state.day_bounds, [])
+  assert.match(result.assistant_message, /생활 시간|시간 지도/)
+  assert.match(result.assistant_message, /기상.*취침/)
+  assert.doesNotMatch(result.assistant_message, /확정 목표|초안|실행할 행동/)
+  assert.ok(result.events.some(e=>e.tool==='schedule_validation_exhausted'))
+})
+
+test('successful rhythm is preserved and acknowledged even if final reply formatting repeatedly fails', async () => {
+  const result = await runAgentTurn(loadState(null), '평일 5시반 기상 22시반 취침, 주말은 그때그때 달라', provider([
+    ['apply_schedule',{bounds:[{days:['월','화','수','목','금'],wake:'05:30',bedtime:'22:30',variable:false,deferred:false},{days:['토','일'],wake:'',bedtime:'',variable:true,deferred:true}],blocks:[],updates:[]}],
+    ...Array.from({length:4},()=>['respond',respond({choices:['하나뿐인 선택지']})]),
+  ]))
+  assert.equal(result.state.day_bounds[0].wake,'05:30')
+  assert.match(result.assistant_message,/반영했어요/)
+  assert.match(result.assistant_message,/05:30/)
+  assert.match(result.assistant_message,/이동이나 근무/)
+  assert.doesNotMatch(result.assistant_message,/기존 확정 목표|맞추지 못했어요/)
 })

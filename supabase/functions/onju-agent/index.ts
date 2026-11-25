@@ -1,3 +1,7 @@
+import { bindAiCostContext, createBudgetedFetch } from '../_shared/webMvpCostControl.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { ownedPreviousResponse, recordOwnedResponse } from '../_shared/webMvpResponseOwner.ts'
+import { claimWebMvpSession, sessionAccessResponse, enforceWebMvpRateLimits } from '../_shared/webMvpAccess.ts'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -97,6 +101,14 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get('OPENAI_API_KEY')
     if (!apiKey) throw new Error('OPENAI_API_KEY is not configured')
     const body = await req.json()
+  const dbUrl = Deno.env.get('SUPABASE_URL'), dbKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  if (!dbUrl || !dbKey) throw new Error('missing_environment')
+  const db = createClient(dbUrl, dbKey, { auth: { persistSession: false } })
+  const tokenHash = await claimWebMvpSession(db, body.sessionId, body.sessionToken)
+  await enforceWebMvpRateLimits(db, req, tokenHash, { scope: 'conversation', minute: 12, day: 120 })
+  bindAiCostContext(db, body.sessionId, 'onju-agent', body)
+  const requestFetch = createBudgetedFetch(db)
+
     if (typeof body.message !== 'string' || !body.message.trim()) {
       return new Response(JSON.stringify({ error: 'message_required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
@@ -113,17 +125,15 @@ Deno.serve(async (req) => {
       }),
       text: { format: { type: 'json_schema', name: 'onju_schedule_turn', strict: true, schema: scheduleSchema } },
     }
-    if (typeof body.previousResponseId === 'string' && body.previousResponseId.startsWith('resp_')) {
-      requestBody.previous_response_id = body.previousResponseId
-    }
-    let response = await fetch('https://api.openai.com/v1/responses', {
+    requestBody.previous_response_id = await ownedPreviousResponse(db, body.sessionId, body.previousResponseId)
+    let response = await requestFetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody),
     })
-    if (!response.ok && requestBody.previous_response_id) {
+    if (response.status === 400 && requestBody.previous_response_id) {
       delete requestBody.previous_response_id
-      response = await fetch('https://api.openai.com/v1/responses', {
+      response = await requestFetch('https://api.openai.com/v1/responses', {
         method: 'POST',
         headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
@@ -133,6 +143,7 @@ Deno.serve(async (req) => {
     const result = await response.json()
     const outputText = result.output?.flatMap((item: { content?: { type: string; text?: string }[] }) => item.content ?? []).find((part: { type: string }) => part.type === 'output_text')?.text
     if (!outputText || typeof result.id !== 'string') throw new Error('No structured output returned')
+    await recordOwnedResponse(db, body.sessionId, result.id)
     const parsed = JSON.parse(outputText)
     const existingDayBounds:Array<DayBounds>=Array.isArray(body.existingDayBounds)?body.existingDayBounds:[]
     const mentionsBedtime=/(취침|잠들|잠자|자고|자는|잡니다|잘게|잘 거|새벽\s*\d)/.test(body.message)
@@ -153,7 +164,7 @@ Deno.serve(async (req) => {
     const rhythmText=rhythmComplete?'\n\n→ 다음으로 고정된 이동·근무 시간을 확인할게요.':''
     const needsClarification=body.stage==='생활 리듬'?!rhythmComplete:parsed.needs_clarification
     return new Response(JSON.stringify({ ...parsed, stage_complete:rhythmComplete||parsed.stage_complete, needs_clarification:needsClarification, day_bounds:parsedDayBounds, suggestions:rhythmComplete?[]:suggestions, assistant_message: `${parsed.assistant_message}${gapText}${rhythmText}`, blocks, response_id: result.id }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-  } catch (error) {
+  } catch(error){ const accessFailure = sessionAccessResponse(error, corsHeaders); if (accessFailure) return accessFailure;
     console.error(error)
     return new Response(JSON.stringify({ error: 'onju_agent_failed' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
