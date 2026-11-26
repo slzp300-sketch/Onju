@@ -18,6 +18,9 @@ let root: Root, host: HTMLDivElement;
 const day = '2026-10-27';
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  // jsdom has neither; the home tree uses both (reduced-motion check, framer-motion useInView).
+  vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
+  vi.stubGlobal('IntersectionObserver', class { observe() {} unobserve() {} disconnect() {} takeRecords() { return []; } });
   vi.useFakeTimers(); vi.setSystemTime(new Date(2026, 9, 27, 12));
   useHabitStore.setState({ habits: [], habitLogs: [], personalRoutines: [] });
   useRoutineStore.setState({ faithRoutines: [], logs: [] });
@@ -25,7 +28,7 @@ beforeEach(() => {
   useTodoStore.setState({ todos: [{ id: 'todo', userId: '', title: '확인할 일', date: day, completed: false, createdAt: '' }] });
   host = document.createElement('div'); document.body.append(host); root = createRoot(host);
 });
-afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.useRealTimers(); });
+afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 async function press(button: HTMLButtonElement) { await act(async () => button.click()); await act(async () => vi.advanceTimersByTime(500)); }
 
 test('홈의 성장 정보는 접혀 있고 편집 후 돌아와도 선택한 할 일 탭을 유지한다', async () => {
