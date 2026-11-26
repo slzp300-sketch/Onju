@@ -10,7 +10,8 @@ const config: KnipConfig = {
     'src/utils/routineRecommendation.ts',
   ],
   // autoprefixer: 빌드 체인 외부 참조 / @capacitor/assets: npx capacitor-assets로 수동 실행
-  ignoreDependencies: ['autoprefixer', '@capacitor/assets'],
+  // lint-staged: .husky/pre-commit에서 실행
+  ignoreDependencies: ['autoprefixer', '@capacitor/assets', 'lint-staged'],
   // @preserved 태그가 붙은 export는 보존 파일 전용이므로 미사용 보고에서 제외
   tags: ['-preserved'],
 };
